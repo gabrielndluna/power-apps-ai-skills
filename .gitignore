@@ -1,0 +1,14 @@
+# Ignore generated packages and references
+_reference/
+*.msapp
+*.msapp.zip
+*.msapp.tar.gz
+*.msapp.tmp
+*.msapp.cache
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+node_modules/
+.vscode/
