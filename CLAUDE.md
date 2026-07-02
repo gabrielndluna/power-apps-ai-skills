@@ -44,6 +44,7 @@ This workspace uses an offline offline-first Canvas Apps source workflow with `p
 
 - `power_apps/`
   - `_reference/` — cloned offline reference materials (gitignored)
+  - `_canvas-notes/` — validated icons, layout patterns, design tokens (maintain after Studio imports)
   - `<app_name>/`
     - `seed.msapp` — user-provided blank canvas app seed
     - `app.msapp` — packed version produced by `pac canvas pack`
@@ -54,3 +55,5 @@ This workspace uses an offline offline-first Canvas Apps source workflow with `p
 - The workspace is deliberately offline for Canvas YAML authoring.
 - Do not rely on external MCP servers for app source generation.
 - Use the `_reference/` clone only for guidance and offline reference.
+- Check `_canvas-notes/` before adding new icons or AutoLayout patterns; update it after import validation.
+- For SharePoint lists with large row counts, follow `_canvas-notes/delegation.md` (preload collections, avoid `in` on connector sources).

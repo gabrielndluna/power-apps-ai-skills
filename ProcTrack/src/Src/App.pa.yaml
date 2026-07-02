@@ -1,0 +1,137 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =Set(varPackageFilter, "all");
+      Set(varCanEditCurrentProject, false);
+
+      Set(
+          varIgnoredContractTypes,
+          ["Standard Purchase Order", "Cancelled", "Change Order", "Self Perform"]
+      );
+
+      ClearCollect(
+          colPackageDetails,
+          {
+              packageidentifier:                  "",
+              itemnumber:                         "",
+              packagedescription:                 "",
+              packagetype:                        "",
+              qualityprogram:                     "",
+              prerequisitedesigndeliverable:      "",
+              bopsite:                            "",
+              procpackageleadname:                "",
+              procurementpackageleadid:           "",
+              opspackageleadname:                 "",
+              operationspackageleadid:            "",
+              engineeringcontactid:               "",
+              engineeringcontactname:             "",
+              operationspackagebundle:            "",
+              leadtimesowtorfqissuedays:          0,
+              leadtimerfqissuetoclosingdays:      0,
+              leadtimeclosingtoevaluationdays:    0,
+              leadtimeevaluationtoawarddays:      0,
+              standardleadtimemonths:             0,
+              originalplannedsowdate:             DateValue(Blank()),
+              originalplannedrfqissuedate:        DateValue(Blank()),
+              originalplannedrfqclosingdate:      DateValue(Blank()),
+              originalplannedevaluationcompleti:  DateValue(Blank()),
+              originalplannedawarddate:           DateValue(Blank()),
+              plannedawarddate:                   DateValue(Blank()),
+              requiredatsitedate:                 DateValue(Blank()),
+              actualsowdate:                      DateValue(Blank()),
+              actualrfqissuedate:                 DateValue(Blank()),
+              actualrfqclosingdate:               DateValue(Blank()),
+              actualevaluationcompletiondate:     DateValue(Blank()),
+              actualawarddate:                    DateValue(Blank()),
+              actual_onsite:                      DateValue(Blank()),
+              revisedplannedsowdate:              DateValue(Blank()),
+              revisedplannedrfqissuedate:         DateValue(Blank()),
+              revisedplannedrfqclosingdate:       DateValue(Blank()),
+              revisedplannedevaluationcompletio:  DateValue(Blank()),
+              revisedplannedawarddate:            DateValue(Blank()),
+              subcontractorname:                  "",
+              purchaseordernumber:                "",
+              awardvalue:                         0,
+              indigenous_award:                   0,
+              ontario_award:                      0,
+              budgetamount:                       0
+          }
+      );
+      Clear(colPackageDetails);
+
+      Set(varShowValidationErrors, false);
+      Set(varShowComments, false);
+      Set(varCurrentUserEmail, User().Email);
+
+      ClearCollect(
+          colUserPermissions,
+          Filter('ProcTrack - Permissions', Title = varCurrentUserEmail)
+      );
+
+      Set(
+          varUserCanEdit,
+          CountRows(Filter(colUserPermissions, Edit_allowed = "yes")) > 0
+      );
+
+      ClearCollect(
+          colPermittedProjects,
+          ForAll(
+              colUserPermissions As perm,
+              LookUp('ProcTrack - Projects', projectidentifier = perm.Project)
+          )
+      );
+
+      ClearCollect(colPermittedPackages, Blank());
+      ForAll(
+          colUserPermissions As perm,
+          Collect(
+              colPermittedPackages,
+              Filter('ProcTrack - Packages', projectidentifier = perm.Project)
+          )
+      );
+
+      Clear(colProjectPackages);
+
+      // ── Column registry: only the swappable pool lives here ──────────────
+      ClearCollect(
+          colColumns,
+          {key:"contracttype",            label:"Contract Type",    type:"text",  sortField:"contracttype",            slotEligible:true},
+          {key:"stagedue",                label:"Stage Due",        type:"date",  sortField:"_sortDue",                slotEligible:true},
+          {key:"requiredatsitedate",      label:"RAS",              type:"date",  sortField:"requiredatsitedate",      slotEligible:true},
+          {key:"ras_original_input",      label:"RAS (Original)",   type:"date",  sortField:"ras_original_input",      slotEligible:true},
+          {key:"revisedplannedawarddate", label:"Planned Award",    type:"date",  sortField:"revisedplannedawarddate", slotEligible:true},
+          {key:"budgetamount",            label:"Budget",           type:"money", sortField:"budgetamount",            slotEligible:true},
+          {key:"awardvalue",              label:"Award Value",      type:"money", sortField:"awardvalue",              slotEligible:true},
+          {key:"indigenous_award",        label:"Indigenous Award", type:"money", sortField:"indigenous_award",        slotEligible:true},
+          {key:"ontario_award",           label:"Ontario Award",    type:"money", sortField:"ontario_award",           slotEligible:true},
+          {key:"mplcode",                 label:"MPL Code",         type:"text",  sortField:"mplcode",                 slotEligible:true},
+          {key:"qualityprogram",          label:"Quality Program",  type:"text",  sortField:"qualityprogram",          slotEligible:true},
+          {key:"bopsite",                 label:"BOP Site",         type:"text",  sortField:"bopsite",                 slotEligible:true},
+          {key:"subcontractorname",       label:"Subcontractor",    type:"text",  sortField:"subcontractorname",       slotEligible:true}
+      );
+
+      // Load this user's saved column preferences (blank record if none yet)
+      Set(
+          varUserPrefs,
+          LookUp('ProcTrack - UserColumnPrefs', Title = varCurrentUserEmail)
+      );
+
+      // Apply saved columns, falling back to the original defaults
+      Set(varCol1, Coalesce(varUserPrefs.Col1, "contracttype"));
+      Set(varCol2, Coalesce(varUserPrefs.Col2, "stagedue"));
+      Set(varCol3, Coalesce(varUserPrefs.Col3, "requiredatsitedate"));
+      Set(varCol4, Coalesce(varUserPrefs.Col4, "budgetamount"));
+
+      // ── Sort state: default = next due date, soonest first ───────────────
+      Set(varSortColumn, "_sortDue");
+      Set(varSortAscending, true);
+    StartScreen: ='Project Dashboard'
+    Theme: =PowerAppsTheme

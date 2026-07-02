@@ -1,0 +1,98 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  ButtonInverted:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      ArrowVisible:
+        PropertyKind: Input
+        DisplayName: ArrowVisible
+        Description: A custom property
+        DataType: Boolean
+        Default: =true
+      Icon:
+        PropertyKind: Input
+        DisplayName: Icon
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      IconVisible:
+        PropertyKind: Input
+        DisplayName: IconVisible
+        Description: A custom property
+        DataType: Boolean
+        Default: =true
+      OnPressAction:
+        PropertyKind: Event
+        DisplayName: OnPressAction
+        Description: Onselect of the button
+        ReturnType: None
+        Default: =
+      Text:
+        PropertyKind: Input
+        DisplayName: Text
+        Description: A custom property
+        DataType: Text
+        Default: ="Text"
+      TextSize:
+        PropertyKind: Input
+        DisplayName: TextSize
+        Description: A custom property
+        DataType: Number
+        Default: =100
+    Properties:
+      Fill: |
+        =Color.White
+      Height: =60
+      Width: =350
+    Children:
+      - Button1:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =ColorValue("#D61E2C")
+            BorderThickness: =3
+            Color: =ColorValue("#D61E2C")
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.'Segoe UI'
+            Height: =ButtonInverted.Height
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorValue("#D61E2C")
+            OnSelect: =ButtonInverted.OnPressAction()
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Color.White
+            Size: =ButtonInverted.TextSize
+            Text: =ButtonInverted.Text
+            Width: =ButtonInverted.Width
+            X: =(Parent.Width - Self.Width ) /2
+            Y: =(Parent.Height - Self.Height ) /2
+      - Icon4:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =ColorValue("#D61E2C")
+            Height: =ButtonInverted.Height
+            Icon: =Icon.ChevronRight
+            OnSelect: =ButtonInverted.OnPressAction()
+            Visible: =ButtonInverted.ArrowVisible
+            Width: =30
+            X: =ButtonInverted.Width*0.85
+      - Icon4_1:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =ColorValue("#D61E2C")
+            Height: =ButtonInverted.Height
+            Icon: =ButtonInverted.Icon
+            OnSelect: =ButtonInverted.OnPressAction()
+            Visible: =ButtonInverted.IconVisible
+            Width: =30
+            X: =ButtonInverted.Width*0.1

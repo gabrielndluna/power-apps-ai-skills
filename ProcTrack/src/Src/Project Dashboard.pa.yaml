@@ -1,0 +1,995 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Project Dashboard:
+    Properties:
+      Fill: =RGBA(245, 245, 245, 1)
+      LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
+      OnVisible: |-
+        =Set(varPackageFilter, "all");
+        Set(varSelectedProject, Blank());
+        ClearCollect(
+            colPermittedProjects,
+            ForAll(
+                colUserPermissions As perm,
+                LookUp('ProcTrack - Projects', projectidentifier = perm.Project)
+            )
+        );
+        ClearCollect(colPermittedPackages, Blank());
+        ForAll(
+            colUserPermissions As perm,
+            Collect(
+                colPermittedPackages,
+                Filter('ProcTrack - Packages', projectidentifier = perm.Project)
+            )
+        )
+    Children:
+      - dash_main_container:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =RGBA(245, 245, 245, 1)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =10
+            PaddingBottom: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =12
+            Width: =Parent.Width
+          Children:
+            - dash_header_container:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.Light
+                  Fill: =RGBA(214, 12, 48, 1)
+                  FillPortions: =0
+                  Height: =64
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =10
+                  PaddingBottom: =10
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =10
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                Children:
+                  - dash_header_icon_wrap:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 0.18)
+                        FillPortions: =0
+                        Height: =36
+                        LayoutMinHeight: =36
+                        LayoutMinWidth: =36
+                        RadiusBottomLeft: =18
+                        RadiusBottomRight: =18
+                        RadiusTopLeft: =18
+                        RadiusTopRight: =18
+                        Width: =36
+                      Children:
+                        - dash_header_icon:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Height: =20
+                              Icon: =Icon.Home
+                              Width: =20
+                              X: =8
+                              Y: =8
+                  - dash_header_text_col:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                      Children:
+                        - dash_header_title:
+                            Control: Text@0.0.51
+                            Properties:
+                              AutoHeight: =true
+                              FontColor: =RGBA(255, 255, 255, 1)
+                              Size: =20
+                              Text: ="ProcTrack"
+                              Weight: ='TextCanvas.Weight'.Bold
+                              Width: =260
+                        - dash_header_subtitle:
+                            Control: Text@0.0.51
+                            Properties:
+                              AutoHeight: =true
+                              FontColor: =RGBA(255, 255, 255, 0.82)
+                              Size: =12
+                              Text: ="Project procurement dashboard"
+                              Width: =260
+                  - dash_header_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                  - dash_header_user_col:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        LayoutAlignItems: =LayoutAlignItems.End
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                      Children:
+                        - dash_header_user_label:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.End
+                              AutoHeight: =true
+                              FontColor: =RGBA(255, 255, 255, 0.7)
+                              Size: =10
+                              Text: ="SIGNED IN AS"
+                              Weight: ='TextCanvas.Weight'.Bold
+                              Width: =200
+                        - dash_header_user_name:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.End
+                              AutoHeight: =true
+                              FontColor: =RGBA(255, 255, 255, 1)
+                              Size: =13
+                              Text: =User().FullName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =200
+            - dash_kpi_row:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =68
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =8
+                  LayoutMinHeight: =68
+                  LayoutMinWidth: =16
+                Children:
+                  - dash_kpi_projects:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =52
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - dash_kpi_projects_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(214, 12, 48, 0.12)
+                              FillPortions: =0
+                              Height: =28
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =28
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                              Width: =28
+                            Children:
+                              - dash_kpi_projects_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(214, 12, 48, 1)
+                                    Height: =16
+                                    Icon: =Icon.Folder
+                                    Width: =16
+                                    X: =6
+                                    Y: =6
+                        - dash_kpi_projects_text:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =44
+                              LayoutMinWidth: =48
+                            Children:
+                              - dash_kpi_projects_value:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: |-
+                                      =CountRows(colPermittedProjects)
+                                    Width: =Parent.Width
+                              - dash_kpi_projects_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Active projects"
+                                    Width: =Parent.Width
+                  - dash_kpi_packages:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =52
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - dash_kpi_packages_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(0, 120, 212, 0.12)
+                              FillPortions: =0
+                              Height: =28
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =28
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                              Width: =28
+                            Children:
+                              - dash_kpi_packages_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(0, 120, 212, 1)
+                                    Height: =16
+                                    Icon: =Icon.Text
+                                    Width: =16
+                                    X: =6
+                                    Y: =6
+                        - dash_kpi_packages_text:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =44
+                              LayoutMinWidth: =48
+                            Children:
+                              - dash_kpi_packages_value:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: |-
+                                      =CountRows(colPermittedPackages)
+                                    Width: =Parent.Width
+                              - dash_kpi_packages_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Total packages"
+                                    Width: =Parent.Width
+                  - dash_kpi_awarded:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =52
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - dash_kpi_awarded_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(16, 124, 65, 0.14)
+                              FillPortions: =0
+                              Height: =28
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =28
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                              Width: =28
+                            Children:
+                              - dash_kpi_awarded_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(16, 124, 65, 1)
+                                    Height: =16
+                                    Icon: =Icon.CheckBadge
+                                    Width: =16
+                                    X: =6
+                                    Y: =6
+                        - dash_kpi_awarded_text:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =44
+                              LayoutMinWidth: =48
+                            Children:
+                              - dash_kpi_awarded_value:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: |-
+                                      =CountRows(
+                                          Filter(
+                                              colPermittedPackages,
+                                              !IsBlank(actualawarddate)
+                                          )
+                                      )
+                                    Width: =Parent.Width
+                              - dash_kpi_awarded_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Awarded"
+                                    Width: =Parent.Width
+                  - dash_kpi_attention:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =52
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - dash_kpi_attention_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 140, 0, 0.16)
+                              FillPortions: =0
+                              Height: =28
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =28
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                              Width: =28
+                            Children:
+                              - dash_kpi_attention_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(255, 140, 0, 1)
+                                    Height: =16
+                                    Icon: =Icon.Warning
+                                    Width: =16
+                                    X: =6
+                                    Y: =6
+                        - dash_kpi_attention_text:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =44
+                              LayoutMinWidth: =48
+                            Children:
+                              - dash_kpi_attention_value:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: |-
+                                      =CountRows(
+                                          Filter(
+                                              colPermittedPackages,
+                                              IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && (
+                                                  revisedplannedawarddate < Today() ||
+                                                  (
+                                                      revisedplannedawarddate >= Today() &&
+                                                      revisedplannedawarddate <= Today() + 30
+                                                  )
+                                              )
+                                          )
+                                      )
+                                    Width: =Parent.Width
+                              - dash_kpi_attention_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Needs attention"
+                                    Width: =Parent.Width
+            - dash_toolbar_row:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =40
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =12
+                  LayoutMinHeight: =40
+                  LayoutMinWidth: =16
+                Children:
+                  - dash_search:
+                      Control: CanvasComponent
+                      ComponentName: Search_Bar
+                      Properties:
+                        Height: =36
+                        LayoutMinWidth: =200
+                        Width: =300
+                        hint_text: ="Search projects..."
+                  - dash_toolbar_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                  - dash_section_title:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.End
+                        AutoHeight: =true
+                        FontColor: =RGBA(48, 48, 48, 1)
+                        Size: =14
+                        Text: ="Your projects"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =120
+            - dash_projects_gallery:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  FillPortions: =1
+                  Items: |-
+                    =With(
+                        {
+                            _projects: colPermittedProjects,
+                            _q: Trim(dash_search.search_text)
+                        },
+                        If(
+                            IsBlank(_q),
+                            _projects,
+                            Filter(
+                                _projects,
+                                _q in projectname || _q in projectidentifier
+                            )
+                        )
+                    )
+                  TemplatePadding: =8
+                  TemplateSize: =210
+                  Width: =Parent.Width
+                  WrapCount: =Max(1, RoundDown((Parent.Width - 16) / 360, 0))
+                Children:
+                  - dash_project_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =Parent.TemplateHeight - 4
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =6
+                        LayoutJustifyContent: =LayoutJustifyContent.Start
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Width: =Parent.TemplateWidth - 4
+                      Children:
+                        - dash_card_accent:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              Fill: =RGBA(214, 12, 48, 1)
+                              Height: =3
+                              Width: =Parent.Width - 20
+                        - dash_card_header_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =48
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =6
+                              LayoutMinHeight: =48
+                              LayoutMinWidth: =16
+                            Children:
+                              - dash_card_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Center
+                                    Color: =RGBA(214, 12, 48, 1)
+                                    FillPortions: =0
+                                    Height: =22
+                                    Icon: =Icon.Folder
+                                    Width: =22
+                              - dash_card_title_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =44
+                                    LayoutMinWidth: =16
+                                  Children:
+                                    - dash_project_name:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(33, 33, 33, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =30
+                                          Size: =12
+                                          Text: =ThisItem.projectname
+                                          Width: =Parent.Width
+                                          Wrap: =true
+                                    - dash_project_id:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(106, 122, 127, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: =ThisItem.projectidentifier
+                                          Width: =Parent.Width
+                              - dash_project_logo:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Center
+                                    FillPortions: =0
+                                    Height: =28
+                                    Image: =ThisItem.project_logo
+                                    RadiusBottomLeft: =4
+                                    RadiusBottomRight: =4
+                                    RadiusTopLeft: =4
+                                    RadiusTopRight: =4
+                                    Visible: =!IsBlank(ThisItem.project_logo)
+                                    Width: =48
+                        - dash_metrics_row1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =34
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =34
+                              LayoutMinWidth: =0
+                              Width: =Parent.Width - 20
+                            Children:
+                              - dash_metric_packages:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(245, 247, 250, 1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =34
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =3
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =3
+                                    RadiusBottomLeft: =6
+                                    RadiusBottomRight: =6
+                                    RadiusTopLeft: =6
+                                    RadiusTopRight: =6
+                                  Children:
+                                    - dash_metric_packages_value:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(33, 33, 33, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =11
+                                          Text: |-
+                                            =CountRows(
+                                                Filter(
+                                                    colPermittedPackages,
+                                                    projectidentifier = ThisItem.projectidentifier
+                                                )
+                                            )
+                                          Width: =dash_metric_packages.Width - 12
+                                    - dash_metric_packages_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(106, 122, 127, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: ="Packages"
+                                          Width: =dash_metric_packages.Width - 12
+                              - dash_metric_awarded:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(232, 246, 238, 1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =34
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =3
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =3
+                                    RadiusBottomLeft: =6
+                                    RadiusBottomRight: =6
+                                    RadiusTopLeft: =6
+                                    RadiusTopRight: =6
+                                  Children:
+                                    - dash_metric_awarded_value:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(16, 124, 65, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =11
+                                          Text: |-
+                                            =CountRows(
+                                                Filter(
+                                                    colPermittedPackages,
+                                                    projectidentifier = ThisItem.projectidentifier && !IsBlank(actualawarddate)
+                                                )
+                                            )
+                                          Width: =dash_metric_awarded.Width - 12
+                                    - dash_metric_awarded_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(16, 124, 65, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: ="Awarded"
+                                          Width: =dash_metric_awarded.Width - 12
+                        - dash_metrics_row2:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =34
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =34
+                              LayoutMinWidth: =0
+                              Width: =Parent.Width - 20
+                            Children:
+                              - dash_metric_delayed:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(253, 236, 236, 1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =34
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =3
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =3
+                                    RadiusBottomLeft: =6
+                                    RadiusBottomRight: =6
+                                    RadiusTopLeft: =6
+                                    RadiusTopRight: =6
+                                  Children:
+                                    - dash_metric_delayed_value:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(214, 12, 48, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =11
+                                          Text: |-
+                                            =CountRows(
+                                                Filter(
+                                                    colPermittedPackages,
+                                                    projectidentifier = ThisItem.projectidentifier && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate < Today()
+                                                )
+                                            )
+                                          Width: =dash_metric_delayed.Width - 12
+                                    - dash_metric_delayed_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(214, 12, 48, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: ="Delayed"
+                                          Width: =dash_metric_delayed.Width - 12
+                              - dash_metric_risk:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 244, 229, 1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =34
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =3
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =3
+                                    RadiusBottomLeft: =6
+                                    RadiusBottomRight: =6
+                                    RadiusTopLeft: =6
+                                    RadiusTopRight: =6
+                                  Children:
+                                    - dash_metric_risk_value:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(255, 140, 0, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =11
+                                          Text: |-
+                                            =CountRows(
+                                                Filter(
+                                                    colPermittedPackages,
+                                                    projectidentifier = ThisItem.projectidentifier && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate >= Today() && revisedplannedawarddate <= Today() + 30
+                                                )
+                                            )
+                                          Width: =dash_metric_risk.Width - 12
+                                    - dash_metric_risk_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(255, 140, 0, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: ="At risk"
+                                          Width: =dash_metric_risk.Width - 12
+                        - dash_open_button:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              BorderColor: =RGBA(214, 12, 48, 1)
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(214, 12, 48, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =30
+                              HoverFill: =RGBA(192, 0, 0, 1)
+                              OnSelect: |-
+                                =Set(varSelectedProject, ThisItem);
+                                ClearCollect(
+                                    colProjectPackages,
+                                    Filter(
+                                        colPermittedPackages,
+                                        projectidentifier = ThisItem.projectidentifier
+                                    )
+                                );
+                                Set(
+                                    varCanEditCurrentProject,
+                                    !IsBlank(
+                                        LookUp(
+                                            colUserPermissions,
+                                            Project = ThisItem.projectidentifier && Edit_allowed = "yes"
+                                        )
+                                    )
+                                );
+                                Navigate('Welcome screen', ScreenTransition.Fade)
+                              RadiusBottomLeft: =6
+                              RadiusBottomRight: =6
+                              RadiusTopLeft: =6
+                              RadiusTopRight: =6
+                              Text: ="Open project"
+                              Width: =Parent.Width - 20
+            - dash_empty_state:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =8
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingBottom: =24
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =24
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Visible: =CountRows(dash_projects_gallery.AllItems) = 0
+                Children:
+                  - dash_empty_icon:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        Color: =RGBA(180, 180, 180, 1)
+                        Height: =40
+                        Icon: =Icon.Search
+                        Width: =40
+                  - dash_empty_title:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AutoHeight: =true
+                        FontColor: =RGBA(48, 48, 48, 1)
+                        Size: =15
+                        Text: ="No projects found"
+                        Weight: ='TextCanvas.Weight'.Semibold
+                        Width: =300
+                  - dash_empty_subtitle:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AutoHeight: =true
+                        FontColor: =RGBA(106, 122, 127, 1)
+                        Size: =12
+                        Text: ="Try a different search term or contact your administrator for access."
+                        Width: =420
