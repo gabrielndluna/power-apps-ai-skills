@@ -1,0 +1,53 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =Set(varCurrentUserEmail, Lower(User().Email));
+      Set(
+          varIsCreator,
+          varCurrentUserEmail in [
+              Lower("gduarteluna@aecon.com"),
+              Lower("kpunno@aecon.com")
+          ]
+      );
+      Set(varSelectedRole, Blank());
+      Set(varRoleTab, "req");
+      Set(varSelectedCandidate, Blank());
+      Set(varRolesListTab, "pending");
+      Set(varShowAddCandidate, false);
+      Set(varShowNewRole, false);
+      Set(varTalentContextRole, Blank());
+      Set(varScreenRefresh, true);
+      Set(varWsExpandedPillar, "");
+      Set(varWsExpandedCategory, "");
+
+      ClearCollect(colGuides, Filter(KI_reference_guides, isactive = true));
+      ClearCollect(colPillars, KI_pillars);
+      ClearCollect(colCategories, KI_categories);
+      ClearCollect(colGuideItems, KI_guide_items);
+      ClearCollect(colRoles, KI_roles);
+      ClearCollect(colRoleRequirements, KI_role_requirements);
+      ClearCollect(colCandidates, Filter(KI_candidates, isactive = true));
+      ClearCollect(colRoleCandidates, KI_role_candidates);
+      ClearCollect(colAttestations, KI_attestations);
+
+      ClearCollect(
+          colMySponsorRoles,
+          Filter(colRoles, Lower(sponsoremail) = varCurrentUserEmail)
+      );
+      Set(
+          varTalentContextRole,
+          Coalesce(
+              First(Filter(colRoles, status.Value = "Searching")),
+              First(colRoles)
+          )
+      );
+    StartScreen: =Home
+    Theme: =PowerAppsTheme

@@ -1,0 +1,2036 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Role Workspace:
+    Properties:
+      Fill: =RGBA(243, 244, 246, 1)
+      OnVisible: |-
+        =ClearCollect(colRoles, KI_roles);
+        ClearCollect(colPillars, KI_pillars);
+        ClearCollect(colGuideItems, KI_guide_items);
+        ClearCollect(colRoleRequirements, KI_role_requirements);
+        ClearCollect(colRoleCandidates, KI_role_candidates);
+        ClearCollect(colAttestations, KI_attestations);
+        ClearCollect(colCandidates, Filter(KI_candidates, isactive));
+        Set(varSelectedRole, LookUp(colRoles, rolecode = varSelectedRole.rolecode));
+        Set(varWsExpandedCategory, "");
+        Set(
+            varWsExpandedPillar,
+            Coalesce(
+                First(
+                    SortByColumns(
+                        Filter(colPillars, guidecode = varSelectedRole.guidecode),
+                        "sortorder",
+                        SortOrder.Ascending
+                    )
+                ).pillarcode,
+                ""
+            )
+        );
+        ClearCollect(
+            colWsPillars,
+            SortByColumns(
+                Filter(colPillars, guidecode = varSelectedRole.guidecode),
+                "sortorder",
+                SortOrder.Ascending
+            )
+        );
+        Clear(colWsAccordion);
+        ForAll(
+            colWsPillars As p,
+            With(
+                {
+                    pillarRow: {
+                        rowkind: "pillar",
+                        pillarcode: p.pillarcode,
+                        Title: p.Title,
+                        description: p.description,
+                        statement: "",
+                        itemcode: "",
+                        categorycode: "",
+                        sortorder: p.sortorder,
+                        defaultcritical: false
+                    },
+                    itemRows: If(
+                        p.pillarcode = varWsExpandedPillar,
+                        ForAll(
+                            SortByColumns(
+                                Filter(colGuideItems, pillarcode = p.pillarcode),
+                                "sortorder",
+                                SortOrder.Ascending
+                            ) As g,
+                            {
+                                rowkind: "item",
+                                pillarcode: g.pillarcode,
+                                Title: g.Title,
+                                description: "",
+                                statement: g.statement,
+                                itemcode: g.itemcode,
+                                categorycode: g.categorycode,
+                                sortorder: g.sortorder,
+                                defaultcritical: g.defaultcritical
+                            }
+                        ),
+                        Table()
+                    )
+                },
+                Collect(colWsAccordion, pillarRow);
+                Collect(colWsAccordion, itemRows)
+            )
+        );
+        ClearCollect(
+            colWsRoleCands,
+            ForAll(
+                Filter(colRoleCandidates, rolecode = varSelectedRole.rolecode) As rc,
+                LookUp(colCandidates, candidatecode = rc.candidatecode)
+            )
+        )
+    Children:
+      - ws_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Horizontal
+            Width: =Parent.Width
+          Children:
+            - ws_rail:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Fill: =RGBA(44, 47, 51, 1)
+                  FillPortions: =0
+                  Height: =Parent.Height
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =4
+                  PaddingBottom: =14
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =18
+                  Width: =224
+                Children:
+                  - ws_brand_title:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(228, 0, 43, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =28
+                        Size: =20
+                        Text: ="RoleFit"
+                  - ws_nav_home:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(198, 202, 207, 1)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Navigate(Home, ScreenTransition.Fade)
+                        Text: ="Home"
+                        Width: =200
+                  - ws_nav_roles:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(198, 202, 207, 1)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Navigate('All Roles', ScreenTransition.Fade)
+                        Text: ="All Roles"
+                        Visible: =varIsCreator
+                        Width: =200
+                  - ws_nav_pool:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(198, 202, 207, 1)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Navigate('Talent Pool', ScreenTransition.Fade)
+                        Text: ="Talent Pool"
+                        Visible: =varIsCreator
+                        Width: =200
+                  - ws_rail_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        FillPortions: =1
+                        LayoutMinHeight: =40
+                  - ws_user_name:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(198, 202, 207, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =18
+                        Size: =12
+                        Text: =User().FullName
+                  - ws_user_role:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(124, 130, 139, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =16
+                        Size: =11
+                        Text: =If(varIsCreator, "HR Assessor", "Executive Sponsor")
+            - ws_main:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  FillPortions: =1
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMinWidth: =0
+                Children:
+                  - ws_topbar:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderThickness: =0
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Height: =56
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutMinHeight: =0
+                        PaddingLeft: =26
+                      Children:
+                        - ws_crumb:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(26, 26, 26, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              Size: =13
+                              Text: =varSelectedRole.Title
+                  - ws_scroll:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderThickness: =0
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =14
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =40
+                        PaddingLeft: =30
+                        PaddingRight: =30
+                        PaddingTop: =20
+                      Children:
+                        - ws_header:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: |-
+                                =If(
+                                    IsBlank(varSelectedRole.selectedcandidatecode),
+                                    112,
+                                    164
+                                )
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              LayoutMinHeight: |-
+                                =If(
+                                    IsBlank(varSelectedRole.selectedcandidatecode),
+                                    112,
+                                    164
+                                )
+                              LayoutMinWidth: =0
+                              PaddingBottom: =12
+                              PaddingLeft: =18
+                              PaddingRight: =18
+                              PaddingTop: =12
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - ws_header_top:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    FillPortions: =0
+                                    Height: =52
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =12
+                                    LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - ws_header_left:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =1
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =4
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - ws_header_title:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(26, 26, 26, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =26
+                                                Size: =18
+                                                Text: =varSelectedRole.Title
+                                                Width: =Parent.Width
+                                          - ws_header_status_row:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                FillPortions: =0
+                                                Height: =24
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutGap: =10
+                                                LayoutMinHeight: =0
+                                                LayoutMinWidth: =0
+                                              Children:
+                                                - ws_header_status_pill:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: AutoLayout
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      DropShadow: =DropShadow.None
+                                                      FillPortions: =0
+                                                      Fill: |-
+                                                        =Switch(
+                                                            varSelectedRole.status.Value,
+                                                            "Pending Requirements", RGBA(251, 241, 223, 1),
+                                                            "Searching", RGBA(231, 240, 251, 1),
+                                                            RGBA(232, 246, 238, 1)
+                                                        )
+                                                      Height: =24
+                                                      LayoutAlignItems: =LayoutAlignItems.Center
+                                                      LayoutDirection: =LayoutDirection.Horizontal
+                                                      LayoutGap: =6
+                                                      LayoutMinHeight: =0
+                                                      LayoutMinWidth: =0
+                                                      PaddingLeft: =10
+                                                      PaddingRight: =10
+                                                      RadiusBottomLeft: =12
+                                                      RadiusBottomRight: =12
+                                                      RadiusTopLeft: =12
+                                                      RadiusTopRight: =12
+                                                      Width: =124
+                                                    Children:
+                                                      - ws_header_status_dot:
+                                                          Control: Rectangle@2.3.0
+                                                          Properties:
+                                                            BorderColor: =RGBA(0, 0, 0, 0)
+                                                            Fill: |-
+                                                              =Switch(
+                                                                  varSelectedRole.status.Value,
+                                                                  "Pending Requirements", RGBA(185, 119, 11, 1),
+                                                                  "Searching", RGBA(44, 110, 189, 1),
+                                                                  RGBA(31, 138, 84, 1)
+                                                              )
+                                                            FillPortions: =0
+                                                            Height: =7
+                                                            Width: =7
+                                                      - ws_header_status_text:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            BorderColor: =RGBA(0, 0, 0, 0)
+                                                            BorderThickness: =0
+                                                            Color: |-
+                                                              =Switch(
+                                                                  varSelectedRole.status.Value,
+                                                                  "Pending Requirements", RGBA(185, 119, 11, 1),
+                                                                  "Searching", RGBA(44, 110, 189, 1),
+                                                                  RGBA(31, 138, 84, 1)
+                                                              )
+                                                            FillPortions: =0
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =20
+                                                            Size: =11
+                                                            Text: |-
+                                                              =Switch(
+                                                                  varSelectedRole.status.Value,
+                                                                  "Pending Requirements", "Pending reqs",
+                                                                  "Searching", "Not-Filled",
+                                                                  "Filled"
+                                                              )
+                                                            Width: =96
+                                                - ws_header_project:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      Color: =RGBA(90, 96, 105, 1)
+                                                      FillPortions: =1
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =20
+                                                      Size: =12
+                                                      Text: =varSelectedRole.project
+                                    - ws_header_guide:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =0
+                                          LayoutAlignItems: =LayoutAlignItems.End
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          Width: =160
+                                        Children:
+                                          - ws_header_guide_lbl:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Right
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(124, 130, 139, 1)
+                                                Font: =Font.'Segoe UI'
+                                                Height: =14
+                                                Size: =10
+                                                Text: ="Reference guide"
+                                                Width: =160
+                                          - ws_header_guide_val:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Right
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(44, 47, 51, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =18
+                                                Size: =12
+                                                Text: =Coalesce(LookUp(colGuides, guidecode = varSelectedRole.guidecode).Title, varSelectedRole.guidecode)
+                                                Width: =160
+                              - ws_header_meta_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    FillPortions: =0
+                                    Height: =34
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =28
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - ws_header_loc:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =0
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - ws_header_loc_lbl:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(124, 130, 139, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =12
+                                                Size: =10
+                                                Text: ="LOCATION"
+                                          - ws_header_loc_val:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(44, 47, 51, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =18
+                                                Size: =12
+                                                Text: =Coalesce(varSelectedRole.location, "-")
+                                    - ws_header_band:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =0
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - ws_header_band_lbl:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(124, 130, 139, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =12
+                                                Size: =10
+                                                Text: ="BAND"
+                                          - ws_header_band_val:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(44, 47, 51, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =18
+                                                Size: =12
+                                                Text: =Coalesce(varSelectedRole.band, "-")
+                              - ws_selected_strip:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(232, 245, 238, 1)
+                                    FillPortions: =0
+                                    Height: =40
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    RadiusBottomLeft: =7
+                                    RadiusBottomRight: =7
+                                    RadiusTopLeft: =7
+                                    RadiusTopRight: =7
+                                    Visible: =!IsBlank(varSelectedRole.selectedcandidatecode)
+                                  Children:
+                                    - ws_selected_name:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          Color: =RGBA(26, 26, 26, 1)
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =20
+                                          Size: =13
+                                          Text: |-
+                                            =LookUp(colCandidates, candidatecode = varSelectedRole.selectedcandidatecode).Title & " · selected for this role"
+                                    - ws_selected_pill:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          Color: =RGBA(31, 138, 84, 1)
+                                          Fill: =RGBA(232, 246, 238, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =22
+                                          Size: =11
+                                          Text: ="Selected"
+                                          Width: =70
+                                    - ws_selected_view:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(228, 228, 228, 1)
+                                          Color: =RGBA(90, 96, 105, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          Height: =26
+                                          OnSelect: |-
+                                            =Set(varSelectedCandidate, LookUp(colCandidates, candidatecode = varSelectedRole.selectedcandidatecode));
+                                            Set(varRoleTab, "cand")
+                                          Size: =11
+                                          Text: ="View"
+                                          Width: =56
+                        - ws_tabs:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(0, 0, 0, 0)
+                              FillPortions: =0
+                              Height: =40
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - ws_tab_req:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varRoleTab = "req", RGBA(228, 0, 43, 1), RGBA(228, 228, 228, 1))
+                                    Color: =If(varRoleTab = "req", RGBA(228, 0, 43, 1), RGBA(90, 96, 105, 1))
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    OnSelect: =Set(varRoleTab, "req"); Set(varSelectedCandidate, Blank())
+                                    Size: =12
+                                    Text: |-
+                                      ="Requirements (" & Text(CountRows(Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode))) & ")"
+                                    Width: =170
+                              - ws_tab_cand:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varRoleTab = "cand", RGBA(228, 0, 43, 1), RGBA(228, 228, 228, 1))
+                                    Color: =If(varRoleTab = "cand", RGBA(228, 0, 43, 1), RGBA(90, 96, 105, 1))
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    OnSelect: =Set(varRoleTab, "cand")
+                                    Size: =12
+                                    Text: |-
+                                      ="Candidates (" & Text(CountRows(Filter(colRoleCandidates, rolecode = varSelectedRole.rolecode))) & ")"
+                                    Visible: =varIsCreator
+                                    Width: =150
+                              - ws_tab_comp:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varRoleTab = "comp", RGBA(228, 0, 43, 1), RGBA(228, 228, 228, 1))
+                                    Color: =If(varRoleTab = "comp", RGBA(228, 0, 43, 1), RGBA(90, 96, 105, 1))
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    OnSelect: =Set(varRoleTab, "comp"); Set(varSelectedCandidate, Blank())
+                                    Size: =12
+                                    Text: |-
+                                      ="Compare (" & Text(CountRows(colWsRoleCands)) & ")"
+                                    Visible: =varIsCreator
+                                    Width: =140
+                        - ws_req_panel:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =12
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Visible: =varRoleTab = "req"
+                            Children:
+                              - ws_req_progress:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Height: =64
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =18
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =10
+                                    PaddingLeft: =16
+                                    PaddingRight: =16
+                                    PaddingTop: =10
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                  Children:
+                                    - ws_req_stats_row:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =0
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =22
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - ws_req_stat_required:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Vertical
+                                                LayoutGap: =2
+                                                LayoutMinHeight: =0
+                                                LayoutMinWidth: =0
+                                              Children:
+                                                - ws_req_stat_required_num:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      Color: =RGBA(228, 0, 43, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =22
+                                                      Size: =18
+                                                      Text: =Text(CountRows(Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode && isrequired)))
+                                                - ws_req_stat_required_lbl:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      Color: =RGBA(124, 130, 139, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =12
+                                                      Size: =10
+                                                      Text: ="REQUIRED"
+                                          - ws_req_stat_critical:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Vertical
+                                                LayoutGap: =2
+                                                LayoutMinHeight: =0
+                                                LayoutMinWidth: =0
+                                              Children:
+                                                - ws_req_stat_critical_num:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      Color: =RGBA(26, 26, 26, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =22
+                                                      Size: =18
+                                                      Text: =Text(CountRows(Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode && iscritical)))
+                                                - ws_req_stat_critical_lbl:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      Color: =RGBA(124, 130, 139, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =12
+                                                      Size: =10
+                                                      Text: ="CRITICAL"
+                                    - ws_req_bar_col:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =1
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =4
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - ws_req_bar_track:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(238, 240, 243, 1)
+                                                FillPortions: =0
+                                                Height: =7
+                                                LayoutMinHeight: =0
+                                                RadiusBottomLeft: =6
+                                                RadiusBottomRight: =6
+                                                RadiusTopLeft: =6
+                                                RadiusTopRight: =6
+                                                Width: =Parent.Width
+                                              Children:
+                                                - ws_req_bar_fill:
+                                                    Control: Rectangle@2.3.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      Fill: =RGBA(228, 0, 43, 1)
+                                                      Height: =7
+                                                      Width: |-
+                                                        =With(
+                                                            {
+                                                                total: CountRows(Filter(colGuideItems, guidecode = varSelectedRole.guidecode)),
+                                                                sel: CountRows(Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode))
+                                                            },
+                                                            If(total = 0, 0, Parent.Width * sel / total)
+                                                        )
+                                          - ws_req_bar_cap:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(90, 96, 105, 1)
+                                                Font: =Font.'Segoe UI'
+                                                Height: =14
+                                                Size: =11
+                                                Text: |-
+                                                  =With(
+                                                      {
+                                                          sel: CountRows(Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode)),
+                                                          total: CountRows(Filter(colGuideItems, guidecode = varSelectedRole.guidecode))
+                                                      },
+                                                      Text(sel) & " of " & Text(total) & " statements selected"
+                                                  )
+                                                Width: =Parent.Width
+                                    - ws_req_save:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderThickness: =0
+                                          Color: =RGBA(255, 255, 255, 1)
+                                          Fill: =RGBA(228, 0, 43, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =34
+                                          HoverFill: =RGBA(184, 0, 34, 1)
+                                          OnSelect: |-
+                                            =Patch(
+                                                KI_roles,
+                                                varSelectedRole,
+                                                {
+                                                    requirementsfinalized: true,
+                                                    status: {Value: "Searching"},
+                                                    requirementsfinalizedon: Now()
+                                                }
+                                            );
+                                            ClearCollect(colRoles, KI_roles);
+                                            Set(varSelectedRole, LookUp(colRoles, rolecode = varSelectedRole.rolecode));
+                                            Notify("Requirements saved - role is now searching", NotificationType.Success)
+                                          Size: =11
+                                          Text: ="Save requirements"
+                                          Width: =140
+                              - ws_req_instr:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    Color: =RGBA(90, 96, 105, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    Height: =28
+                                    Size: =12
+                                    Text: ="Tick every statement this individual must demonstrate. Use Critical to flag non-negotiable must-haves. Expand or collapse any pillar to move quickly."
+                                    Width: =Parent.Width
+                                    Wrap: =true
+                              - ws_req_pillar_gallery:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    FillPortions: =1
+                                    Items: =colWsAccordion
+                                    LayoutMinHeight: =0
+                                    TemplatePadding: =6
+                                    TemplateSize: =72
+                                    Width: =Parent.Width
+                                  Children:
+                                    - ws_acc_pillar:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =Parent.TemplateHeight - 4
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =10
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          PaddingRight: =14
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Visible: =ThisItem.rowkind = "pillar"
+                                          Width: =Parent.TemplateWidth - 4
+                                        Children:
+                                          - ws_acc_pillar_accent:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                AlignInContainer: =AlignInContainer.Stretch
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Fill: =RGBA(228, 0, 43, 1)
+                                                FillPortions: =0
+                                                Width: =4
+                                          - ws_acc_pillar_chev:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                Color: =RGBA(133, 139, 147, 1)
+                                                FillPortions: =0
+                                                Height: =20
+                                                Icon: =If(ThisItem.pillarcode = varWsExpandedPillar, Icon.ChevronDown, Icon.ChevronRight)
+                                                OnSelect: |-
+                                                  =Set(
+                                                      varWsExpandedPillar,
+                                                      If(varWsExpandedPillar = ThisItem.pillarcode, "", ThisItem.pillarcode)
+                                                  );
+                                                  Clear(colWsAccordion);
+                                                  ForAll(
+                                                      colWsPillars As p,
+                                                      With(
+                                                          {
+                                                              pillarRow: {
+                                                                  rowkind: "pillar",
+                                                                  pillarcode: p.pillarcode,
+                                                                  Title: p.Title,
+                                                                  description: p.description,
+                                                                  statement: "",
+                                                                  itemcode: "",
+                                                                  categorycode: "",
+                                                                  sortorder: p.sortorder,
+                                                                  defaultcritical: false
+                                                              },
+                                                              itemRows: If(
+                                                                  p.pillarcode = varWsExpandedPillar,
+                                                                  ForAll(
+                                                                      SortByColumns(
+                                                                          Filter(colGuideItems, pillarcode = p.pillarcode),
+                                                                          "sortorder",
+                                                                          SortOrder.Ascending
+                                                                      ) As g,
+                                                                      {
+                                                                          rowkind: "item",
+                                                                          pillarcode: g.pillarcode,
+                                                                          Title: g.Title,
+                                                                          description: "",
+                                                                          statement: g.statement,
+                                                                          itemcode: g.itemcode,
+                                                                          categorycode: g.categorycode,
+                                                                          sortorder: g.sortorder,
+                                                                          defaultcritical: g.defaultcritical
+                                                                      }
+                                                                  ),
+                                                                  Table()
+                                                              )
+                                                          },
+                                                          Collect(colWsAccordion, pillarRow);
+                                                          Collect(colWsAccordion, itemRows)
+                                                      )
+                                                  )
+                                                Width: =20
+                                          - ws_acc_pillar_text:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                FillPortions: =1
+                                                LayoutDirection: =LayoutDirection.Vertical
+                                                LayoutGap: =2
+                                                LayoutMinHeight: =0
+                                                LayoutMinWidth: =0
+                                              Children:
+                                                - ws_acc_pillar_title:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      Color: =RGBA(26, 26, 26, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =20
+                                                      OnSelect: |-
+                                                        =Set(
+                                                      varWsExpandedPillar,
+                                                      If(varWsExpandedPillar = ThisItem.pillarcode, "", ThisItem.pillarcode)
+                                                  );
+                                                  Clear(colWsAccordion);
+                                                  ForAll(
+                                                      colWsPillars As p,
+                                                      With(
+                                                          {
+                                                              pillarRow: {
+                                                                  rowkind: "pillar",
+                                                                  pillarcode: p.pillarcode,
+                                                                  Title: p.Title,
+                                                                  description: p.description,
+                                                                  statement: "",
+                                                                  itemcode: "",
+                                                                  categorycode: "",
+                                                                  sortorder: p.sortorder,
+                                                                  defaultcritical: false
+                                                              },
+                                                              itemRows: If(
+                                                                  p.pillarcode = varWsExpandedPillar,
+                                                                  ForAll(
+                                                                      SortByColumns(
+                                                                          Filter(colGuideItems, pillarcode = p.pillarcode),
+                                                                          "sortorder",
+                                                                          SortOrder.Ascending
+                                                                      ) As g,
+                                                                      {
+                                                                          rowkind: "item",
+                                                                          pillarcode: g.pillarcode,
+                                                                          Title: g.Title,
+                                                                          description: "",
+                                                                          statement: g.statement,
+                                                                          itemcode: g.itemcode,
+                                                                          categorycode: g.categorycode,
+                                                                          sortorder: g.sortorder,
+                                                                          defaultcritical: g.defaultcritical
+                                                                      }
+                                                                  ),
+                                                                  Table()
+                                                              )
+                                                          },
+                                                          Collect(colWsAccordion, pillarRow);
+                                                          Collect(colWsAccordion, itemRows)
+                                                      )
+                                                  )
+                                                      Size: =14
+                                                      Text: =ThisItem.Title
+                                                      Width: =Parent.Width
+                                                - ws_acc_pillar_desc:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      Color: =RGBA(90, 96, 105, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =16
+                                                      Size: =11
+                                                      Text: =ThisItem.description
+                                                      Width: =Parent.Width
+                                          - ws_acc_pillar_count:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Right
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(228, 0, 43, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =20
+                                                Size: =11
+                                                Text: |-
+                                                  =With(
+                                                      {
+                                                          total: CountRows(Filter(colGuideItems, pillarcode = ThisItem.pillarcode)),
+                                                          sel: CountRows(
+                                                              Filter(
+                                                                  colRoleRequirements,
+                                                                  rolecode = varSelectedRole.rolecode &&
+                                                                  pillarcode = ThisItem.pillarcode
+                                                              )
+                                                          )
+                                                      },
+                                                      Text(sel) & "/" & Text(total)
+                                                  )
+                                                Width: =48
+                                    - ws_acc_item:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =If(!IsBlank(LookUp(colRoleRequirements, rolecode = varSelectedRole.rolecode && itemcode = ThisItem.itemcode)), RGBA(253, 236, 238, 1), RGBA(250, 251, 252, 1))
+                                          Height: =Parent.TemplateHeight - 4
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =10
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          PaddingLeft: =18
+                                          PaddingRight: =10
+                                          RadiusBottomLeft: =7
+                                          RadiusBottomRight: =7
+                                          RadiusTopLeft: =7
+                                          RadiusTopRight: =7
+                                          Visible: =ThisItem.rowkind = "item"
+                                          Width: =Parent.TemplateWidth - 4
+                                        Children:
+                                          - ws_acc_item_chk:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                Color: =If(!IsBlank(LookUp(colRoleRequirements, rolecode = varSelectedRole.rolecode && itemcode = ThisItem.itemcode)), RGBA(228, 0, 43, 1), RGBA(180, 180, 180, 1))
+                                                FillPortions: =0
+                                                Height: =28
+                                                Icon: =If(!IsBlank(LookUp(colRoleRequirements, rolecode = varSelectedRole.rolecode && itemcode = ThisItem.itemcode)), Icon.CheckBadge, Icon.Add)
+                                                OnSelect: |-
+                                                  =With(
+                                                      {existing: LookUp(colRoleRequirements, rolecode = varSelectedRole.rolecode && itemcode = ThisItem.itemcode)},
+                                                      If(
+                                                          IsBlank(existing),
+                                                          Patch(
+                                                              KI_role_requirements,
+                                                              Defaults(KI_role_requirements),
+                                                              {
+                                                                  Title: ThisItem.Title,
+                                                                  requirementcode: "REQ-" & varSelectedRole.rolecode & "-" & ThisItem.itemcode,
+                                                                  rolecode: varSelectedRole.rolecode,
+                                                                  itemcode: ThisItem.itemcode,
+                                                                  iscustom: false,
+                                                                  statement: ThisItem.statement,
+                                                                  pillarcode: ThisItem.pillarcode,
+                                                                  categorycode: ThisItem.categorycode,
+                                                                  isrequired: true,
+                                                                  iscritical: ThisItem.defaultcritical,
+                                                                  sortorder: ThisItem.sortorder
+                                                              }
+                                                          );
+                                                          ClearCollect(colRoleRequirements, KI_role_requirements),
+                                                          Remove(KI_role_requirements, existing);
+                                                          RemoveIf(colRoleRequirements, requirementcode = existing.requirementcode)
+                                                      )
+                                                  )
+                                                Width: =28
+                                          - ws_acc_item_text:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(44, 47, 51, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                Height: =56
+                                                Size: =12
+                                                Text: =ThisItem.statement
+                                                Wrap: =true
+                                          - ws_acc_item_crit:
+                                              Control: Classic/Button@2.2.0
+                                              Properties:
+                                                BorderThickness: =0
+                                                Color: =If(LookUp(colRoleRequirements, rolecode = varSelectedRole.rolecode && itemcode = ThisItem.itemcode).iscritical, RGBA(228, 0, 43, 1), RGBA(150, 150, 150, 1))
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                Height: =28
+                                                OnSelect: |-
+                                                  =With(
+                                                      {existing: LookUp(colRoleRequirements, rolecode = varSelectedRole.rolecode && itemcode = ThisItem.itemcode)},
+                                                      If(
+                                                          IsBlank(existing),
+                                                          Patch(
+                                                              KI_role_requirements,
+                                                              Defaults(KI_role_requirements),
+                                                              {
+                                                                  Title: ThisItem.Title,
+                                                                  requirementcode: "REQ-" & varSelectedRole.rolecode & "-" & ThisItem.itemcode,
+                                                                  rolecode: varSelectedRole.rolecode,
+                                                                  itemcode: ThisItem.itemcode,
+                                                                  iscustom: false,
+                                                                  statement: ThisItem.statement,
+                                                                  pillarcode: ThisItem.pillarcode,
+                                                                  categorycode: ThisItem.categorycode,
+                                                                  isrequired: true,
+                                                                  iscritical: true,
+                                                                  sortorder: ThisItem.sortorder
+                                                              }
+                                                          ),
+                                                          Patch(
+                                                              KI_role_requirements,
+                                                              existing,
+                                                              {iscritical: !existing.iscritical, isrequired: true}
+                                                          )
+                                                      );
+                                                      ClearCollect(colRoleRequirements, KI_role_requirements)
+                                                  )
+                                                Text: ="Critical"
+                                                Visible: =!IsBlank(LookUp(colRoleRequirements, rolecode = varSelectedRole.rolecode && itemcode = ThisItem.itemcode))
+                                                Width: =70
+                              - ws_req_custom_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =10
+                                  Children:
+                                    - ws_req_custom_input:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          Default: =""
+                                          Font: =Font.'Segoe UI'
+                                          HintText: ="Add custom requirement..."
+                                          Width: =400
+                                    - ws_req_custom_add:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderThickness: =0
+                                          Color: =RGBA(255, 255, 255, 1)
+                                          Fill: =RGBA(228, 0, 43, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =36
+                                          HoverFill: =RGBA(184, 0, 34, 1)
+                                          OnSelect: |-
+                                            =If(
+                                                !IsBlank(ws_req_custom_input.Text),
+                                                With(
+                                                    {
+                                                        _code: "REQ-" & varSelectedRole.rolecode & "-C" & Text(CountRows(Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode && iscustom)) + 1)
+                                                    },
+                                                    Patch(
+                                                        KI_role_requirements,
+                                                        Defaults(KI_role_requirements),
+                                                        {
+                                                            Title: Left(ws_req_custom_input.Text, 80),
+                                                            requirementcode: _code,
+                                                            rolecode: varSelectedRole.rolecode,
+                                                            itemcode: "",
+                                                            iscustom: true,
+                                                            statement: ws_req_custom_input.Text,
+                                                            pillarcode: "NUCLEAR-COMP",
+                                                            categorycode: "NUCLEAR-COMP-MANAGING",
+                                                            isrequired: true,
+                                                            iscritical: false,
+                                                            sortorder: 99
+                                                        }
+                                                    );
+                                                    Reset(ws_req_custom_input);
+                                                    ClearCollect(colRoleRequirements, KI_role_requirements)
+                                                )
+                                            )
+                                          Size: =11
+                                          Text: ="Add custom"
+                                          Width: =120
+                        - ws_cand_panel:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              FillPortions: =1
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =12
+                              Visible: =varRoleTab = "cand" && IsBlank(varSelectedCandidate)
+                            Children:
+                              - ws_cand_header:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutJustifyContent: =LayoutJustifyContent.End
+                                  Children:
+                                    - ws_cand_add_btn:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderThickness: =0
+                                          Color: =RGBA(255, 255, 255, 1)
+                                          Fill: =RGBA(228, 0, 43, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =36
+                                          HoverFill: =RGBA(184, 0, 34, 1)
+                                          OnSelect: =Set(varShowAddCandidate, true)
+                                          Size: =11
+                                          Text: ="+ Add candidate"
+                                          Width: =140
+                              - ws_cand_gallery:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    FillPortions: =1
+                                    Items: |-
+                                      =ForAll(
+                                          Filter(colRoleCandidates, rolecode = varSelectedRole.rolecode) As rc,
+                                          With(
+                                              {cand: LookUp(colCandidates, candidatecode = rc.candidatecode)},
+                                              Patch(cand, {rolecandidatecode: rc.rolecandidatecode})
+                                          )
+                                      )
+                                    OnSelect: =Set(varSelectedCandidate, ThisItem)
+                                    TemplatePadding: =8
+                                    TemplateSize: =180
+                                    Width: =Parent.Width
+                                    WrapCount: =Max(1, RoundDown((Self.Width - 16) / 360, 0))
+                                  Children:
+                                    - ws_cand_card:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.Light
+                                          Fill: =If(ThisItem.candidatecode = varSelectedRole.selectedcandidatecode, RGBA(253, 236, 238, 1), RGBA(255, 255, 255, 1))
+                                          Height: =Parent.TemplateHeight - 4
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =6
+                                          PaddingBottom: =12
+                                          PaddingLeft: =14
+                                          PaddingRight: =14
+                                          PaddingTop: =12
+                                          RadiusBottomLeft: =10
+                                          RadiusBottomRight: =10
+                                          RadiusTopLeft: =10
+                                          RadiusTopRight: =10
+                                          Width: =Parent.TemplateWidth - 4
+                                        Children:
+                                          - ws_cand_name:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(26, 26, 26, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =22
+                                                Size: =15
+                                                Text: =ThisItem.Title
+                                          - ws_cand_title:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(90, 96, 105, 1)
+                                                Font: =Font.'Segoe UI'
+                                                Height: =18
+                                                Size: =12
+                                                Text: =ThisItem.currenttitle
+                                          - ws_cand_tenure:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(90, 96, 105, 1)
+                                                Font: =Font.'Segoe UI'
+                                                Height: =16
+                                                Size: =11
+                                                Text: =ThisItem.tenuresource
+                                          - ws_cand_scores:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutGap: =18
+                                              Children:
+                                                - ws_cand_score_reqs:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =RGBA(44, 47, 51, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =36
+                                                      Size: =12
+                                                      Text: |-
+                                                        =With(
+                                                            {
+                                                                reqs: Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode && isrequired),
+                                                                met: Filter(colAttestations, candidatecode = ThisItem.candidatecode && status.Value = "Met")
+                                                            },
+                                                            With(
+                                                                {
+                                                                    metCount: CountRows(
+                                                                        Filter(
+                                                                            reqs As r,
+                                                                            !IsBlank(LookUp(met, itemcode = r.itemcode || requirementcode = r.requirementcode))
+                                                                        )
+                                                                    )
+                                                                },
+                                                                Text(metCount) & "/" & Text(CountRows(reqs)) & Char(10) & "Requirements met"
+                                                            )
+                                                        )
+                                                      Width: =120
+                                                      Wrap: =true
+                                                - ws_cand_score_crit:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =RGBA(44, 47, 51, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Bold
+                                                      Height: =36
+                                                      Size: =12
+                                                      Text: |-
+                                                        =With(
+                                                            {
+                                                                crits: Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode && iscritical),
+                                                                met: Filter(colAttestations, candidatecode = ThisItem.candidatecode && status.Value = "Met")
+                                                            },
+                                                            With(
+                                                                {
+                                                                    metCount: CountRows(
+                                                                        Filter(
+                                                                            crits As r,
+                                                                            !IsBlank(LookUp(met, itemcode = r.itemcode || requirementcode = r.requirementcode))
+                                                                        )
+                                                                    )
+                                                                },
+                                                                Text(metCount) & "/" & Text(CountRows(crits)) & Char(10) & "Criticals met"
+                                                            )
+                                                        )
+                                                      Width: =110
+                                                      Wrap: =true
+                        - ws_cand_detail:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              Visible: =varRoleTab = "cand" && !IsBlank(varSelectedCandidate)
+                            Children:
+                              - ws_cand_back:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderThickness: =0
+                                    Color: =RGBA(90, 96, 105, 1)
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    Font: =Font.'Segoe UI'
+                                    OnSelect: =Set(varSelectedCandidate, Blank())
+                                    Text: ="<- All candidates"
+                              - ws_cand_detail_header:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                                    PaddingBottom: =14
+                                    PaddingLeft: =18
+                                    PaddingRight: =18
+                                    PaddingTop: =14
+                                    RadiusBottomLeft: =10
+                                    RadiusBottomRight: =10
+                                    RadiusTopLeft: =10
+                                    RadiusTopRight: =10
+                                  Children:
+                                    - ws_cand_detail_left:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =4
+                                        Children:
+                                          - ws_cand_detail_name:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(26, 26, 26, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Size: =18
+                                                Text: =varSelectedCandidate.Title
+                                          - ws_cand_detail_title:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(90, 96, 105, 1)
+                                                Font: =Font.'Segoe UI'
+                                                Size: =12
+                                                Text: =varSelectedCandidate.currenttitle & " · " & varSelectedCandidate.tenuresource
+                                    - ws_cand_select_btn:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderThickness: =0
+                                          Color: =RGBA(255, 255, 255, 1)
+                                          Fill: =RGBA(228, 0, 43, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =36
+                                          HoverFill: =RGBA(184, 0, 34, 1)
+                                          OnSelect: |-
+                                            =Patch(
+                                                KI_roles,
+                                                varSelectedRole,
+                                                {
+                                                    selectedcandidatecode: varSelectedCandidate.candidatecode,
+                                                    status: {Value: "Filled"},
+                                                    filledon: Now()
+                                                }
+                                            );
+                                            ClearCollect(colRoles, KI_roles);
+                                            Set(varSelectedRole, LookUp(colRoles, rolecode = varSelectedRole.rolecode));
+                                            Notify(varSelectedCandidate.Title & " selected for role", NotificationType.Success)
+                                          Size: =11
+                                          Text: ="Set as selected"
+                                          Width: =130
+                              - ws_attest_gallery:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    Items: =Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode && isrequired)
+                                    TemplateSize: =48
+                                    Width: =Parent.Width - 60
+                                  Children:
+                                    - ws_attest_row:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =44
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                                          PaddingLeft: =12
+                                          PaddingRight: =12
+                                          RadiusBottomLeft: =6
+                                          RadiusBottomRight: =6
+                                          RadiusTopLeft: =6
+                                          RadiusTopRight: =6
+                                          Width: =Parent.TemplateWidth - 8
+                                        Children:
+                                          - ws_attest_text:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(44, 47, 51, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                Size: =11
+                                                Text: =ThisItem.statement
+                                          - ws_attest_met:
+                                              Control: Classic/Button@2.2.0
+                                              Properties:
+                                                BorderThickness: =1
+                                                Color: =RGBA(255, 255, 255, 1)
+                                                Fill: =If(LookUp(colAttestations, candidatecode = varSelectedCandidate.candidatecode && (itemcode = ThisItem.itemcode || requirementcode = ThisItem.requirementcode)).status.Value = "Met", RGBA(31, 138, 84, 1), RGBA(240, 240, 240, 1))
+                                                Font: =Font.'Segoe UI'
+                                                Height: =28
+                                                OnSelect: |-
+                                                  =With(
+                                                      {
+                                                          existing: LookUp(
+                                                              colAttestations,
+                                                              candidatecode = varSelectedCandidate.candidatecode &&
+                                                              (itemcode = ThisItem.itemcode || requirementcode = ThisItem.requirementcode)
+                                                          )
+                                                      },
+                                                      If(
+                                                          IsBlank(existing),
+                                                          Patch(
+                                                              KI_attestations,
+                                                              Defaults(KI_attestations),
+                                                              {
+                                                                  Title: varSelectedCandidate.candidatecode & " " & Coalesce(ThisItem.itemcode, ThisItem.requirementcode),
+                                                                  attestationcode: "ATT-" & Text(CountRows(colAttestations) + 1, "000"),
+                                                                  candidatecode: varSelectedCandidate.candidatecode,
+                                                                  itemcode: ThisItem.itemcode,
+                                                                  requirementcode: ThisItem.requirementcode,
+                                                                  rolecode: If(ThisItem.iscustom, varSelectedRole.rolecode, ""),
+                                                                  status: {Value: "Met"},
+                                                                  attestedon: Now(),
+                                                                  attestedbyemail: varCurrentUserEmail
+                                                              }
+                                                          ),
+                                                          Patch(KI_attestations, existing, {status: {Value: "Met"}, attestedon: Now()})
+                                                      );
+                                                      ClearCollect(colAttestations, KI_attestations)
+                                                  )
+                                                Size: =9
+                                                Text: ="Met"
+                                                Width: =56
+                                          - ws_attest_partial:
+                                              Control: Classic/Button@2.2.0
+                                              Properties:
+                                                BorderThickness: =1
+                                                Color: =RGBA(255, 255, 255, 1)
+                                                Fill: =If(LookUp(colAttestations, candidatecode = varSelectedCandidate.candidatecode && (itemcode = ThisItem.itemcode || requirementcode = ThisItem.requirementcode)).status.Value = "Partial", RGBA(185, 119, 11, 1), RGBA(240, 240, 240, 1))
+                                                Font: =Font.'Segoe UI'
+                                                Height: =28
+                                                OnSelect: |-
+                                                  =With(
+                                                      {
+                                                          existing: LookUp(
+                                                              colAttestations,
+                                                              candidatecode = varSelectedCandidate.candidatecode &&
+                                                              (itemcode = ThisItem.itemcode || requirementcode = ThisItem.requirementcode)
+                                                          )
+                                                      },
+                                                      If(
+                                                          IsBlank(existing),
+                                                          Patch(
+                                                              KI_attestations,
+                                                              Defaults(KI_attestations),
+                                                              {
+                                                                  Title: varSelectedCandidate.candidatecode & " " & Coalesce(ThisItem.itemcode, ThisItem.requirementcode),
+                                                                  attestationcode: "ATT-" & Text(CountRows(colAttestations) + 1, "000"),
+                                                                  candidatecode: varSelectedCandidate.candidatecode,
+                                                                  itemcode: ThisItem.itemcode,
+                                                                  requirementcode: ThisItem.requirementcode,
+                                                                  rolecode: If(ThisItem.iscustom, varSelectedRole.rolecode, ""),
+                                                                  status: {Value: "Partial"},
+                                                                  attestedon: Now(),
+                                                                  attestedbyemail: varCurrentUserEmail
+                                                              }
+                                                          ),
+                                                          Patch(KI_attestations, existing, {status: {Value: "Partial"}, attestedon: Now()})
+                                                      );
+                                                      ClearCollect(colAttestations, KI_attestations)
+                                                  )
+                                                Size: =9
+                                                Text: ="Partial"
+                                                Width: =56
+                                          - ws_attest_gap:
+                                              Control: Classic/Button@2.2.0
+                                              Properties:
+                                                BorderThickness: =1
+                                                Color: =RGBA(255, 255, 255, 1)
+                                                Fill: =If(LookUp(colAttestations, candidatecode = varSelectedCandidate.candidatecode && (itemcode = ThisItem.itemcode || requirementcode = ThisItem.requirementcode)).status.Value = "Gap", RGBA(138, 144, 153, 1), RGBA(240, 240, 240, 1))
+                                                Font: =Font.'Segoe UI'
+                                                Height: =28
+                                                OnSelect: |-
+                                                  =With(
+                                                      {
+                                                          existing: LookUp(
+                                                              colAttestations,
+                                                              candidatecode = varSelectedCandidate.candidatecode &&
+                                                              (itemcode = ThisItem.itemcode || requirementcode = ThisItem.requirementcode)
+                                                          )
+                                                      },
+                                                      If(
+                                                          IsBlank(existing),
+                                                          Patch(
+                                                              KI_attestations,
+                                                              Defaults(KI_attestations),
+                                                              {
+                                                                  Title: varSelectedCandidate.candidatecode & " " & Coalesce(ThisItem.itemcode, ThisItem.requirementcode),
+                                                                  attestationcode: "ATT-" & Text(CountRows(colAttestations) + 1, "000"),
+                                                                  candidatecode: varSelectedCandidate.candidatecode,
+                                                                  itemcode: ThisItem.itemcode,
+                                                                  requirementcode: ThisItem.requirementcode,
+                                                                  rolecode: If(ThisItem.iscustom, varSelectedRole.rolecode, ""),
+                                                                  status: {Value: "Gap"},
+                                                                  attestedon: Now(),
+                                                                  attestedbyemail: varCurrentUserEmail
+                                                              }
+                                                          ),
+                                                          Patch(KI_attestations, existing, {status: {Value: "Gap"}, attestedon: Now()})
+                                                      );
+                                                      ClearCollect(colAttestations, KI_attestations)
+                                                  )
+                                                Size: =9
+                                                Text: ="Gap"
+                                                Width: =48
+                        - ws_comp_panel:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              FillPortions: =1
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =10
+                              Visible: =varRoleTab = "comp"
+                            Children:
+                              - ws_comp_summary:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(90, 96, 105, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    Size: =12
+                                    Text: |-
+                                      =Text(CountRows(Filter(colRoleCandidates, rolecode = varSelectedRole.rolecode))) & " candidates · " &
+                                      Text(CountRows(Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode && iscritical))) & " critical requirements"
+                              - ws_comp_legend:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(90, 96, 105, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    Size: =12
+                                    Text: |-
+                                      ="Legend:  Y = Met    ~ = Partial    - = Gap"
+                              - ws_comp_header:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    PaddingBottom: =10
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =10
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                  Children:
+                                    - ws_comp_hdr_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(90, 96, 105, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Size: =11
+                                          Text: ="Requirement"
+                                          Width: =280
+                                    - ws_comp_hdr_cands:
+                                        Control: Gallery@2.15.0
+                                        Variant: BrowseLayout_Horizontal_TwoTextOneImageVariant_ver5.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =1
+                                          Height: =36
+                                          Items: =colWsRoleCands
+                                          TemplateSize: =110
+                                          Width: =Parent.Width - 300
+                                        Children:
+                                          - ws_comp_hdr_name:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Center
+                                                Color: =RGBA(26, 26, 26, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Size: =11
+                                                Text: =ThisItem.Title
+                                                Width: =Parent.TemplateWidth - 8
+                              - ws_comp_matrix:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    FillPortions: =1
+                                    Items: =Filter(colRoleRequirements, rolecode = varSelectedRole.rolecode && isrequired)
+                                    TemplatePadding: =8
+                                    TemplateSize: =56
+                                    Width: =Parent.Width
+                                  Children:
+                                    - ws_comp_row:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =Parent.TemplateHeight - 4
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          PaddingLeft: =12
+                                          PaddingRight: =12
+                                          RadiusBottomLeft: =6
+                                          RadiusBottomRight: =6
+                                          RadiusTopLeft: =6
+                                          RadiusTopRight: =6
+                                          Width: =Parent.TemplateWidth - 8
+                                        Children:
+                                          - ws_comp_stmt:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(44, 47, 51, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                Size: =11
+                                                Text: =ThisItem.statement & If(ThisItem.iscritical, " [CRIT]", "")
+                                                Width: =280
+                                          - ws_comp_cells:
+                                              Control: Gallery@2.15.0
+                                              Variant: BrowseLayout_Horizontal_TwoTextOneImageVariant_ver5.0
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                FillPortions: =1
+                                                Height: =32
+                                                Items: |-
+                                                  =AddColumns(
+                                                      colWsRoleCands,
+                                                      attStatus,
+                                                      With(
+                                                          {
+                                                              att: LookUp(
+                                                                  colAttestations,
+                                                                  candidatecode = candidatecode &&
+                                                                  (itemcode = ThisItem.itemcode || requirementcode = ThisItem.requirementcode)
+                                                              )
+                                                          },
+                                                          Coalesce(att.status.Value, "Gap")
+                                                      )
+                                                  )
+                                                TemplateSize: =110
+                                                Width: =Parent.Width - 300
+                                              Children:
+                                                - ws_comp_cell:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: ManualLayout
+                                                    Properties:
+                                                      Fill: |-
+                                                        =Switch(
+                                                            ThisItem.attStatus,
+                                                            "Met", RGBA(232, 246, 238, 1),
+                                                            "Partial", RGBA(251, 241, 223, 1),
+                                                            RGBA(241, 242, 244, 1)
+                                                        )
+                                                      Height: =28
+                                                      Width: =Parent.TemplateWidth - 8
+                                                    Children:
+                                                      - ws_comp_mark:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Align: =Align.Center
+                                                            Color: |-
+                                                              =Switch(
+                                                                  ThisItem.attStatus,
+                                                                  "Met", RGBA(31, 138, 84, 1),
+                                                                  "Partial", RGBA(185, 119, 11, 1),
+                                                                  RGBA(138, 144, 153, 1)
+                                                              )
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Bold
+                                                            Size: =11
+                                                            Text: |-
+                                                              =Switch(
+                                                                  ThisItem.attStatus,
+                                                                  "Met", "Y",
+                                                                  "Partial", "~",
+                                                                  "-"
+                                                              )
+                                                            Width: =Parent.Width
+                        - ws_add_modal:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              Fill: =RGBA(0, 0, 0, 0.45)
+                              Height: =Parent.Height
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              Visible: =varShowAddCandidate
+                              Width: =Parent.Width
+                            Children:
+                              - ws_modal_card:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =12
+                                    PaddingBottom: =22
+                                    PaddingLeft: =22
+                                    PaddingRight: =22
+                                    PaddingTop: =22
+                                    RadiusBottomLeft: =14
+                                    RadiusBottomRight: =14
+                                    RadiusTopLeft: =14
+                                    RadiusTopRight: =14
+                                    Width: =460
+                                  Children:
+                                    - ws_modal_title:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(26, 26, 26, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =24
+                                          Size: =16
+                                          Text: ="Add candidate"
+                                    - ws_modal_new:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(228, 0, 43, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(26, 26, 26, 1)
+                                          Fill: =RGBA(253, 236, 238, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =56
+                                          HoverFill: =RGBA(252, 227, 231, 1)
+                                          OnSelect: |-
+                                            =With(
+                                                {_code: "CAND-" & Text(CountRows(colCandidates) + 1, "000")},
+                                                Patch(
+                                                    KI_candidates,
+                                                    Defaults(KI_candidates),
+                                                    {
+                                                        Title: "New Candidate",
+                                                        candidatecode: _code,
+                                                        currenttitle: "Current title",
+                                                        tenuresource: "Added to Talent Pool",
+                                                        assessornote: "New candidate - assess below.",
+                                                        isactive: true,
+                                                        createdbyemail: varCurrentUserEmail
+                                                    }
+                                                );
+                                                Patch(
+                                                    KI_role_candidates,
+                                                    Defaults(KI_role_candidates),
+                                                    {
+                                                        Title: "New Candidate - " & varSelectedRole.rolecode,
+                                                        rolecandidatecode: "RC-" & Text(CountRows(colRoleCandidates) + 1, "000"),
+                                                        rolecode: varSelectedRole.rolecode,
+                                                        candidatecode: _code,
+                                                        addedon: Now(),
+                                                        addedbyemail: varCurrentUserEmail
+                                                    }
+                                                );
+                                                ClearCollect(colCandidates, Filter(KI_candidates, isactive = true));
+                                                ClearCollect(colRoleCandidates, KI_role_candidates);
+                                                Set(varSelectedCandidate, LookUp(colCandidates, candidatecode = _code));
+                                                Set(varShowAddCandidate, false)
+                                            )
+                                          Size: =12
+                                          Text: ="Create a new candidate"
+                                          Width: =400
+                                    - ws_modal_or:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(124, 130, 139, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =18
+                                          Size: =11
+                                          Text: ="OR ADD SOMEONE ALREADY IN THE TALENT POOL"
+                                    - ws_modal_pool_gallery:
+                                        Control: Gallery@2.15.0
+                                        Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          Height: =200
+                                          Items: |-
+                                            =Filter(
+                                                colCandidates As c,
+                                                IsBlank(
+                                                    LookUp(
+                                                        colRoleCandidates,
+                                                        rolecode = varSelectedRole.rolecode && candidatecode = c.candidatecode
+                                                    )
+                                                )
+                                            )
+                                          TemplateSize: =56
+                                          Width: =400
+                                        Children:
+                                          - ws_modal_pool_row:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                Height: =50
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                                                Width: =Parent.TemplateWidth - 8
+                                              Children:
+                                                - ws_modal_pool_left:
+                                                    Control: GroupContainer@1.5.0
+                                                    Variant: AutoLayout
+                                                    Properties:
+                                                      FillPortions: =1
+                                                      LayoutDirection: =LayoutDirection.Vertical
+                                                      LayoutGap: =2
+                                                      LayoutMinWidth: =0
+                                                    Children:
+                                                      - ws_modal_pool_name:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =RGBA(26, 26, 26, 1)
+                                                            Font: =Font.'Segoe UI'
+                                                            FontWeight: =FontWeight.Semibold
+                                                            Height: =18
+                                                            Size: =13
+                                                            Text: =ThisItem.Title
+                                                      - ws_modal_pool_sub:
+                                                          Control: Label@2.5.1
+                                                          Properties:
+                                                            Color: =RGBA(90, 96, 105, 1)
+                                                            Font: =Font.'Segoe UI'
+                                                            Height: =16
+                                                            Size: =11
+                                                            Text: =ThisItem.currenttitle & " · " & ThisItem.tenuresource
+                                                - ws_modal_pool_add:
+                                                    Control: Classic/Button@2.2.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(228, 0, 43, 1)
+                                                      Color: =RGBA(228, 0, 43, 1)
+                                                      Fill: =RGBA(255, 255, 255, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =28
+                                                      OnSelect: |-
+                                                        =Patch(
+                                                            KI_role_candidates,
+                                                            Defaults(KI_role_candidates),
+                                                            {
+                                                                Title: ThisItem.Title & " - " & varSelectedRole.rolecode,
+                                                                rolecandidatecode: "RC-" & Text(CountRows(colRoleCandidates) + 1, "000"),
+                                                                rolecode: varSelectedRole.rolecode,
+                                                                candidatecode: ThisItem.candidatecode,
+                                                                addedon: Now(),
+                                                                addedbyemail: varCurrentUserEmail
+                                                            }
+                                                        );
+                                                        ClearCollect(colRoleCandidates, KI_role_candidates);
+                                                        Set(varShowAddCandidate, false);
+                                                        Notify(ThisItem.Title & " added from pool", NotificationType.Success)
+                                                      Text: ="Add"
+                                                      Width: =60
+                                    - ws_modal_close:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderThickness: =0
+                                          Color: =RGBA(90, 96, 105, 1)
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          Font: =Font.'Segoe UI'
+                                          OnSelect: =Set(varShowAddCandidate, false)
+                                          Text: ="Close"

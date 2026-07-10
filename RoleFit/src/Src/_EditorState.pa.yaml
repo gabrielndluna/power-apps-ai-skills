@@ -8,12 +8,8 @@
 # ************************************************************************************************
 EditorState:
   ScreensOrder:
-    - Welcome screen
-    - Create New Package
-    - Package Details
-  ComponentDefinitionsOrder:
-    - Search_Bar
-    - Create_Subtitle
-    - ButtonInverted
-    - ButtonMain
-    - BackButton
+    - Home
+    - All Roles
+    - Talent Pool
+    - Role Workspace
+    - New Role

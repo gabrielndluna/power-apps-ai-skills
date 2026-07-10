@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aecon · Key Individual Assessment</title>
+<style>
+/* ============ THEME TOKENS — swap --aecon-red for the exact brand hex ============ */
+:root{
+  --aecon-red:#E4002B;
+  --aecon-red-dark:#B80022;
+  --aecon-red-tint:#FDECEE;
+  --ink:#1A1A1A;
+  --charcoal:#2C2F33;
+  --slate:#5A6069;
+  --slate-2:#858B93;
+  --line:#E4E7EB;
+  --line-2:#EEF0F3;
+  --bg:#F3F4F6;
+  --surface:#FFFFFF;
+  --surface-2:#FAFBFC;
+  --met:#1F8A54;
+  --met-bg:#E8F5EE;
+  --partial:#B9770B;
+  --partial-bg:#FBF1DF;
+  --gap:#8A9099;
+  --gap-bg:#F1F2F4;
+  --crit:#E4002B;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+  --shadow-lg:0 8px 24px rgba(16,24,40,.12);
+  --radius:10px;
+  --radius-sm:7px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:"Segoe UI","Segoe UI Web (West European)",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--ink);background:var(--bg);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer;}
+.hidden{display:none !important;}
+
+/* ============ APP SHELL ============ */
+.app{display:flex;min-height:100vh;}
+.rail{
+  width:224px;background:var(--charcoal);color:#D7DADE;flex-shrink:0;
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+}
+.brand{padding:18px 18px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.08);}
+.brand .logo{font-weight:700;font-size:22px;color:var(--aecon-red);letter-spacing:-.5px;line-height:1;}
+.brand .logo::after{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--aecon-red);margin-left:1px;vertical-align:baseline;}
+.brand .sub{font-size:10.5px;color:#9AA0A8;text-transform:uppercase;letter-spacing:.7px;margin-top:3px;}
+.nav{padding:10px 8px;flex:1;}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:var(--radius-sm);
+  color:#C6CACF;font-size:13.5px;font-weight:500;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav-item.active{background:var(--aecon-red);color:#fff;}
+.nav-item .ic{width:17px;height:17px;flex-shrink:0;opacity:.9;}
+.nav-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:#7C828B;}
+.nav-foot .who{color:#C6CACF;font-weight:600;font-size:12px;}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{
+  height:56px;background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:30;
+}
+.topbar .crumbs{font-size:13px;color:var(--slate);display:flex;align-items:center;gap:8px;}
+.topbar .crumbs b{color:var(--ink);font-weight:600;}
+.topbar .crumbs .sep{color:var(--slate-2);}
+.pill-proto{
+  font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--aecon-red);
+  background:var(--aecon-red-tint);border:1px solid #F6C9D1;padding:3px 9px;border-radius:20px;text-transform:uppercase;
+}
+.content{padding:26px 30px 60px;max-width:1180px;width:100%;margin:0 auto;}
+
+/* ============ TYPO / SHARED ============ */
+h1.page{font-size:22px;font-weight:700;margin:0 0 4px;letter-spacing:-.2px;}
+.page-sub{color:var(--slate);font-size:13.5px;margin:0 0 22px;max-width:720px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--aecon-red);margin-bottom:8px;}
+.btn{
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 16px;border-radius:var(--radius-sm);
+  font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:.12s;
+}
+.btn:hover{background:var(--surface-2);border-color:#D2D6DC;}
+.btn.primary{background:var(--aecon-red);border-color:var(--aecon-red);color:#fff;}
+.btn.primary:hover{background:var(--aecon-red-dark);border-color:var(--aecon-red-dark);}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--slate);}
+.btn.ghost:hover{background:var(--line-2);color:var(--ink);}
+.btn.sm{padding:6px 12px;font-size:12.5px;}
+
+/* ============ HOME ============ */
+.assigned-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:22px 24px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:16px;
+  border-left:4px solid var(--aecon-red);
+}
+.assigned-card .meta-row{display:flex;gap:26px;flex-wrap:wrap;margin-top:14px;}
+.mini{font-size:12px;}
+.mini .k{color:var(--slate-2);text-transform:uppercase;letter-spacing:.4px;font-size:10.5px;font-weight:600;margin-bottom:2px;}
+.mini .v{color:var(--charcoal);font-weight:600;font-size:13px;}
+.status-tag{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:6px;}
+.status-tag.pending{background:var(--partial-bg);color:var(--partial);}
+.status-tag.done{background:var(--met-bg);color:var(--met);}
+.status-tag.searching{background:#E7F0FB;color:#2C6EBD;}
+.status-tag .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+.section-label{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--slate-2);margin:30px 0 12px;}
+.role-row{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 18px;
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;transition:.12s;
+}
+.role-row:hover{border-color:#D2D6DC;box-shadow:var(--shadow);}
+.role-row .t{font-weight:600;font-size:14px;}
+.role-row .d{font-size:12px;color:var(--slate);margin-top:2px;}
+
+/* ============ ROLE WORKSPACE HEADER ============ */
+.role-head{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:18px;}
+.role-head h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.2px;}
+.role-head .meta-row{display:flex;gap:28px;flex-wrap:wrap;margin-top:14px;}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:22px;}
+.tab{
+  border:none;background:none;padding:12px 18px;font-size:13.5px;font-weight:600;color:var(--slate);
+  border-bottom:2.5px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:8px;
+}
+.tab:hover{color:var(--ink);}
+.tab.active{color:var(--aecon-red);border-bottom-color:var(--aecon-red);}
+.tab .count{background:var(--line-2);color:var(--slate);font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;}
+.tab.active .count{background:var(--aecon-red-tint);color:var(--aecon-red);}
+
+/* ============ REQUIREMENTS (accordion) ============ */
+.sticky-progress{
+  position:sticky;top:56px;z-index:20;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.progress-stats{display:flex;gap:26px;align-items:center;}
+.stat{display:flex;flex-direction:column;}
+.stat .num{font-size:20px;font-weight:700;line-height:1;color:var(--ink);}
+.stat .num.red{color:var(--aecon-red);}
+.stat .lbl{font-size:10.5px;color:var(--slate-2);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-top:4px;}
+.bar-wrap{flex:1;max-width:320px;}
+.bar{height:7px;background:var(--line-2);border-radius:6px;overflow:hidden;}
+.bar > span{display:block;height:100%;background:var(--aecon-red);border-radius:6px;transition:width .25s;}
+.bar-cap{font-size:11px;color:var(--slate);margin-top:6px;}
+
+.instr{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;color:var(--slate);margin-bottom:18px;display:flex;gap:10px;align-items:flex-start;}
+.instr b{color:var(--charcoal);}
+
+.pillar{margin-bottom:14px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:var(--shadow);}
+.pillar-head{display:flex;align-items:center;justify-content:space-between;padding:15px 20px;cursor:pointer;user-select:none;border-left:4px solid var(--pcolor,var(--aecon-red));}
+.pillar-head:hover{background:var(--surface-2);}
+.pillar-head .l{display:flex;align-items:center;gap:12px;}
+.pillar-head .chev{transition:transform .2s;color:var(--slate-2);}
+.pillar.collapsed .chev{transform:rotate(-90deg);}
+.pillar-title{font-size:15.5px;font-weight:700;}
+.pillar-desc{font-size:11.5px;color:var(--slate);margin-top:2px;max-width:520px;}
+.pillar-count{font-size:12px;font-weight:700;color:var(--slate);background:var(--line-2);padding:3px 11px;border-radius:20px;white-space:nowrap;}
+.pillar-count b{color:var(--pcolor,var(--aecon-red));}
+.pillar-body{padding:4px 20px 14px;}
+.pillar.collapsed .pillar-body{display:none;}
+
+.cat{border-top:1px solid var(--line-2);}
+.cat:first-child{border-top:none;}
+.cat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;cursor:pointer;user-select:none;}
+.cat-head:hover .cat-title{color:var(--aecon-red);}
+.cat-head .l{display:flex;align-items:center;gap:10px;}
+.cat-title{font-size:13.5px;font-weight:600;}
+.cat-chev{color:var(--slate-2);transition:transform .2s;font-size:11px;}
+.cat.collapsed .cat-chev{transform:rotate(-90deg);}
+.cat-count{font-size:11px;color:var(--slate-2);font-weight:600;}
+.cat-count.has{color:var(--met);}
+.cat-body{padding:2px 0 10px;}
+.cat.collapsed .cat-body{display:none;}
+
+.item{display:flex;align-items:flex-start;gap:11px;padding:8px 10px;border-radius:var(--radius-sm);transition:.1s;}
+.item:hover{background:var(--surface-2);}
+.item.on{background:var(--aecon-red-tint);}
+.item.on:hover{background:#FCE3E7;}
+.chk{
+  width:19px;height:19px;border:2px solid #C4C9CF;border-radius:5px;flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;background:var(--surface);transition:.1s;
+}
+.item.on .chk{background:var(--aecon-red);border-color:var(--aecon-red);}
+.chk svg{opacity:0;transform:scale(.6);transition:.1s;}
+.item.on .chk svg{opacity:1;transform:scale(1);}
+.item-main{flex:1;min-width:0;}
+.item-text{font-size:13px;color:var(--charcoal);cursor:pointer;}
+.item.on .item-text{color:var(--ink);font-weight:500;}
+.item-tools{display:flex;align-items:center;gap:4px;flex-shrink:0;opacity:0;transition:.1s;}
+.item:hover .item-tools,.item.on .item-tools{opacity:1;}
+.tool-btn{
+  border:1px solid transparent;background:none;border-radius:6px;padding:4px 8px;font-size:11.5px;font-weight:600;
+  color:var(--slate-2);display:inline-flex;align-items:center;gap:5px;
+}
+.tool-btn:hover{background:var(--line-2);color:var(--charcoal);}
+.tool-btn.crit-on{color:var(--crit);background:var(--aecon-red-tint);}
+.tool-btn.note-on{color:var(--aecon-red);}
+.star{font-size:13px;line-height:1;}
+.crit-badge{font-size:9.5px;font-weight:800;letter-spacing:.4px;color:#fff;background:var(--crit);padding:2px 6px;border-radius:4px;text-transform:uppercase;margin-left:8px;vertical-align:middle;}
+.note-box{margin:6px 0 2px;}
+.note-box textarea{
+  width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px 10px;font-family:inherit;font-size:12.5px;
+  resize:vertical;min-height:44px;color:var(--charcoal);background:var(--surface);
+}
+.note-box textarea:focus{outline:none;border-color:var(--aecon-red);box-shadow:0 0 0 3px var(--aecon-red-tint);}
+.add-custom{display:flex;gap:8px;align-items:center;padding:8px 10px;margin-top:4px;}
+.add-custom input{flex:1;border:1px dashed #C4C9CF;border-radius:var(--radius-sm);padding:8px 10px;font-family:inherit;font-size:12.5px;background:var(--surface-2);}
+.add-custom input:focus{outline:none;border-color:var(--aecon-red);border-style:solid;background:var(--surface);}
+.custom-flag{font-size:9.5px;font-weight:800;letter-spacing:.4px;color:var(--slate);background:var(--line-2);padding:2px 6px;border-radius:4px;text-transform:uppercase;margin-left:8px;}
+
+/* ============ CANDIDATES LIST ============ */
+.cand-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
+.cand-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;transition:.12s;cursor:pointer;position:relative;}
+.cand-card:hover{border-color:#D2D6DC;box-shadow:var(--shadow-lg);transform:translateY(-1px);}
+.cand-card.selected{border-color:var(--aecon-red);}
+.cand-card.selected::before{content:"SELECTED FOR ROLE";position:absolute;top:-9px;left:16px;background:var(--aecon-red);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.5px;padding:3px 9px;border-radius:4px;}
+.cand-top{display:flex;gap:13px;align-items:center;margin-bottom:14px;}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--charcoal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;}
+.cand-name{font-weight:700;font-size:15px;}
+.cand-title{font-size:12px;color:var(--slate);}
+.cand-score-row{display:flex;gap:18px;align-items:center;padding-top:14px;border-top:1px solid var(--line-2);}
+.score-block{display:flex;flex-direction:column;}
+.score-block .big{font-size:19px;font-weight:700;line-height:1;}
+.score-block .big small{font-size:12px;color:var(--slate-2);font-weight:600;}
+.score-block .cap{font-size:10px;color:var(--slate-2);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-top:4px;}
+.ring{--p:0;width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--aecon-red) calc(var(--p)*1%),var(--line-2) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto;}
+.ring i{width:36px;height:36px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-style:normal;color:var(--charcoal);}
+
+/* ============ CANDIDATE DETAIL ============ */
+.back-link{border:none;background:none;color:var(--slate);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;padding:6px 0;margin-bottom:8px;}
+.back-link:hover{color:var(--aecon-red);}
+.attest-item{display:flex;align-items:flex-start;gap:12px;padding:11px 12px;border-radius:var(--radius-sm);}
+.attest-item:hover{background:var(--surface-2);}
+.attest-text{flex:1;font-size:13px;color:var(--charcoal);}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;flex-shrink:0;background:var(--surface);}
+.seg button{border:none;background:none;padding:6px 13px;font-size:12px;font-weight:600;color:var(--slate);border-right:1px solid var(--line);}
+.seg button:last-child{border-right:none;}
+.seg button:hover{background:var(--surface-2);}
+.seg button.on-met{background:var(--met);color:#fff;}
+.seg button.on-partial{background:var(--partial);color:#fff;}
+.seg button.on-gap{background:var(--gap);color:#fff;}
+
+/* ============ COMPARE MATRIX ============ */
+.compare-summary{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;}
+.sumbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;min-width:150px;}
+.sumbox .n{font-size:22px;font-weight:700;line-height:1;}
+.sumbox .n.red{color:var(--aecon-red);}
+.sumbox .l{font-size:11px;color:var(--slate);margin-top:5px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;}
+.matrix-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+table.matrix{width:100%;border-collapse:collapse;}
+.matrix thead th{position:sticky;top:56px;background:var(--surface);z-index:10;}
+.matrix th.cand-col{padding:14px 10px;border-bottom:1px solid var(--line);text-align:center;vertical-align:top;border-left:1px solid var(--line-2);min-width:132px;}
+.matrix th.req-col{text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--slate-2);font-weight:700;width:46%;}
+.cch-name{font-weight:700;font-size:13.5px;}
+.cch-title{font-size:10.5px;color:var(--slate);margin:2px 0 8px;font-weight:500;}
+.cch-score{font-size:17px;font-weight:700;}
+.cch-score small{font-size:11px;color:var(--slate-2);font-weight:600;}
+.cch-crit{font-size:10px;color:var(--slate);margin-top:3px;}
+.cch-crit b{color:var(--aecon-red);}
+.set-btn{margin-top:9px;font-size:11px;font-weight:700;padding:5px 11px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--slate);}
+.set-btn:hover{border-color:var(--aecon-red);color:var(--aecon-red);}
+.set-btn.is-sel{background:var(--aecon-red);border-color:var(--aecon-red);color:#fff;}
+.matrix .prow-head td{background:var(--surface-2);font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--charcoal);padding:9px 18px;border-top:1px solid var(--line);border-bottom:1px solid var(--line-2);}
+.matrix td.req-cell{padding:10px 18px;font-size:12.5px;color:var(--charcoal);border-top:1px solid var(--line-2);vertical-align:top;}
+.matrix td.mark{text-align:center;border-left:1px solid var(--line-2);border-top:1px solid var(--line-2);vertical-align:middle;}
+.matrix tr.selcol-hi td.selcol{background:var(--aecon-red-tint);}
+.mk{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;}
+.mk.met{background:var(--met-bg);color:var(--met);}
+.mk.partial{background:var(--partial-bg);color:var(--partial);}
+.mk.gap{background:var(--gap-bg);color:var(--gap);}
+.mk.critgap{background:var(--aecon-red-tint);color:var(--crit);border:1.5px solid var(--crit);}
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin:16px 2px 26px;font-size:12px;color:var(--slate);}
+.legend.legend-top{justify-content:flex-end;margin:0 2px 12px;gap:16px;}
+.legend span{display:inline-flex;align-items:center;gap:7px;}
+.gaps-panel{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--aecon-red);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 24px;margin-top:22px;}
+.gaps-panel h3{margin:0 0 4px;font-size:15px;}
+.gaps-panel .who{font-size:12.5px;color:var(--slate);margin-bottom:14px;}
+.gap-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid var(--line-2);font-size:13px;}
+.gap-item:first-of-type{border-top:none;}
+.gap-item .tag{font-size:9.5px;font-weight:800;letter-spacing:.4px;padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:1px;text-transform:uppercase;}
+.gap-item .tag.crit{background:var(--aecon-red-tint);color:var(--crit);}
+.gap-item .tag.dev{background:var(--partial-bg);color:var(--partial);}
+.crumb-link{color:var(--slate);cursor:pointer;}
+.crumb-link:hover{color:var(--aecon-red);}
+
+/* toast */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--charcoal);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.25s;z-index:100;display:flex;align-items:center;gap:9px;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast .ok{color:#5FD08C;font-weight:800;}
+/* homepage jump tiles */
+.home-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;}
+.action-tile{display:flex;align-items:center;gap:14px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;transition:.12s;}
+.action-tile:hover{border-color:var(--aecon-red);box-shadow:var(--shadow-lg);transform:translateY(-1px);}
+.action-tile .at-ic{width:38px;height:38px;border-radius:9px;background:var(--aecon-red-tint);color:var(--aecon-red);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.action-tile .at-t{font-weight:700;font-size:13.5px;}
+.action-tile .at-d{font-size:11.5px;color:var(--slate);margin-top:2px;}
+.action-tile .at-count{margin-left:auto;font-size:22px;font-weight:800;color:var(--charcoal);}
+.empty-note{background:var(--surface-2);border:1px dashed var(--line);border-radius:var(--radius);padding:28px;text-align:center;color:var(--slate-2);font-size:13px;}
+.cand-list-head{display:flex;gap:14px;align-items:stretch;margin-bottom:16px;}
+.name-input{font-size:19px;font-weight:700;border:1px solid var(--line);border-radius:7px;padding:6px 10px;width:100%;max-width:360px;font-family:inherit;color:var(--ink);}
+.title-input{font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:5px 10px;width:100%;max-width:360px;margin-top:6px;font-family:inherit;color:var(--slate);}
+.name-input:focus,.title-input:focus{outline:none;border-color:var(--aecon-red);box-shadow:0 0 0 3px var(--aecon-red-tint);}
+.pool-chip{font-size:10.5px;font-weight:700;color:var(--met);background:var(--met-bg);border:1px solid #BFE6CE;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
+/* add-candidate modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(16,24,40,.45);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;}
+.modal{background:var(--surface);border-radius:14px;box-shadow:var(--shadow-lg);width:100%;max-width:460px;max-height:82vh;overflow:auto;padding:20px 22px 22px;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:700;margin-bottom:16px;}
+.modal-x{border:none;background:none;font-size:15px;color:var(--slate-2);border-radius:6px;padding:4px 8px;}
+.modal-x:hover{background:var(--line-2);color:var(--ink);}
+.new-cand-btn{display:flex;align-items:center;gap:13px;width:100%;text-align:left;border:1.5px solid var(--aecon-red);background:var(--aecon-red-tint);border-radius:var(--radius);padding:14px 16px;}
+.new-cand-btn:hover{background:#FCE3E7;}
+.new-cand-btn .ncb-ic{width:34px;height:34px;border-radius:8px;background:var(--aecon-red);color:#fff;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.new-cand-btn .ncb-t{display:block;font-weight:700;font-size:13.5px;color:var(--ink);}
+.new-cand-btn .ncb-d{display:block;font-size:11.5px;color:var(--slate);margin-top:2px;}
+.modal-or{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--slate-2);margin:18px 0 10px;}
+.pool-picker{display:flex;flex-direction:column;gap:6px;}
+.picker-row{display:flex;align-items:center;gap:12px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius-sm);}
+.picker-row:hover{border-color:#D2D6DC;background:var(--surface-2);}
+.pr-name{font-weight:600;font-size:13px;}
+.pr-title{font-size:11px;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pr-match{font-size:14px;font-weight:700;color:var(--charcoal);text-align:right;line-height:1;}
+.pr-match span{display:block;font-size:9px;font-weight:600;color:var(--slate-2);text-transform:uppercase;letter-spacing:.3px;margin-top:2px;}
+@media(max-width:820px){.rail{display:none;}.content{padding:18px;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- LEFT RAIL -->
+  <aside class="rail">
+    <div class="brand">
+      <div>
+        <div class="logo">aecon</div>
+        <div class="sub">Key Individual Assessment</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-nav="home" onclick="go('home')">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+        Home
+      </button>
+      <button class="nav-item" data-nav="roles" onclick="go('roles')">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>
+        All Roles
+      </button>
+      <button class="nav-item" data-nav="pool" onclick="go('pool')">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M17 8h4M19 6v4"/></svg>
+        Talent Pool
+      </button>
+    </nav>
+    <div class="nav-foot">
+      <div class="who">M. Rossi</div>
+      Executive Sponsor · Nuclear
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="crumbs" id="crumbs"><b>Home</b></div>
+      <div class="pill-proto">Prototype</div>
+    </div>
+    <div class="content" id="content"><!-- screens injected --></div>
+  </div>
+</div>
+<div class="toast" id="toast"><span class="ok">✓</span><span id="toast-msg">Saved</span></div>
+
+<script>
+/* =========================================================================
+   HARDCODED DATA — Nuclear "New Build Project Director" reference guide
+   ========================================================================= */
+const ROLE = {
+  title:"New Build Project Director",
+  project:"Arctic Over the Horizon — Nuclear New Build",
+  location:"Ontario, Canada",
+  client:"Ontario Power / Consortium JV",
+  contract:"IPD / Progressive Design-Build",
+  band:"Executive (Band E1)",
+  reference:"KI Assessment Reference Guide — Nuclear"
+};
+
+// Pillars -> categories -> items. req = pre-marked as needed for this role, crit = critical/must-have.
+const GUIDE = [
+{ key:"tech", name:"Technical Requirements", color:"#E4002B",
+  desc:"What types of technical experience this person needs to have.",
+  cats:[
+    {name:"Years of Experience", items:[
+      {id:"t1a",text:"Demonstrated leadership managing large multi-discipline, complex projects over 15+ years.",req:true,crit:true},
+      {id:"t1b",text:"Significant experience with infrastructure and/or energy projects.",req:true,crit:false},
+      {id:"t1c",text:"Depth in civil works, earthworks, utilities, mechanical, electrical, I&C.",req:true,crit:false},
+      {id:"t1d",text:"Strong safety culture demonstrated across prior projects.",req:true,crit:true},
+      {id:"t1e",text:"Proven experience leading large, diverse teams.",req:true,crit:false},
+    ]},
+    {name:"Technical Capability & Area of Experience", items:[
+      {id:"t2a",text:"Strong technical knowledge across all phases: design, planning, construction, commissioning, operations, maintenance.",req:true,crit:false},
+      {id:"t2b",text:"Experience with mass excavation, grading, and tunneling.",req:false,crit:false},
+      {id:"t2c",text:"Power plant construction and/or refurbishment experience.",req:true,crit:true},
+      {id:"t2d",text:"Nuclear power plant experience (strong asset).",req:true,crit:true},
+      {id:"t2e",text:"Construction in a highly regulated environment.",req:true,crit:false},
+      {id:"t2f",text:"Sound understanding of integrated civil, mechanical, and electrical systems.",req:true,crit:false},
+      {id:"t2g",text:"Experience leading multidisciplinary teams across joint ventures and consortiums, recognizing commercial impacts.",req:true,crit:false},
+      {id:"t2h",text:"Excellent command of EPC and/or IPD delivery models, commercial matters, and budget control.",req:true,crit:false},
+      {id:"t2i",text:"Knowledge of Continuous Improvement / OPEX and their impact on project performance.",req:false,crit:false},
+    ]},
+    {name:"Specific Project Experience", items:[
+      {id:"t3a",text:"Experience constructing power plants; nuclear power plants an asset.",req:true,crit:true},
+      {id:"t3b",text:"Experience constructing nuclear island, conventional island, site infrastructure, deep-water intakes, switch yards, support buildings.",req:true,crit:false},
+      {id:"t3c",text:"Working in a highly regulated environment (nuclear, oil & gas, mining) — critical to the role.",req:true,crit:true},
+      {id:"t3d",text:"Experience with and understanding of contract models and specifications.",req:true,crit:false},
+      {id:"t3e",text:"Led complex projects from initiation to completion, including JV projects as both lead and minority partner.",req:true,crit:false},
+      {id:"t3f",text:"Knowledge in the use of Hit Teams to address issues quickly.",req:false,crit:false},
+    ]},
+    {name:"Indigenous Engagement", items:[
+      {id:"t4a",text:"Understanding and delivery of Indigenous engagement requirements and commitments.",req:true,crit:false},
+      {id:"t4b",text:"Experience with Indigenous relations in specific locations.",req:false,crit:false},
+      {id:"t4c",text:"Engaged meaningfully with Indigenous partners and communities during field visits.",req:false,crit:false},
+    ]},
+    {name:"Environmental Impact & Sustainability", items:[
+      {id:"t5a",text:"Understanding of environmental impacts including sustainability practices.",req:true,crit:false},
+      {id:"t5b",text:"Balances schedule, operations, and production with sensitive environmental requirements.",req:false,crit:false},
+      {id:"t5c",text:"Knowledge of impacts from working in a nuclear environment (asset).",req:false,crit:false},
+    ]},
+    {name:"Claims & Contract Experience", items:[
+      {id:"t6a",text:"Experience with specific contract types — EPC, IPD.",req:true,crit:false},
+      {id:"t6b",text:"Familiarity with target price, progressive design-build, and cost-plus contract models.",req:true,crit:false},
+      {id:"t6c",text:"Strong handle of claims and providing notice.",req:true,crit:false},
+      {id:"t6d",text:"Successfully navigated claims processes with positive financial outcomes.",req:false,crit:false},
+      {id:"t6e",text:"Managed change-order requests, ensuring compliance with contractual obligations.",req:false,crit:false},
+    ]},
+    {name:"Constructability Reviews", items:[
+      {id:"t7a",text:"Ability to participate in and lead constructability reviews.",req:true,crit:false},
+      {id:"t7b",text:"Knowledge of fit-for-purpose and design-to-cost, working closely with designers and OEM partners.",req:false,crit:false},
+    ]},
+    {name:"Design Management", items:[
+      {id:"t8a",text:"Ability to manage designers, design schedules, and design creep, including quantity growth impacts.",req:true,crit:false},
+      {id:"t8b",text:"Develop and implement design/construction plans that maximize efficiency of people, equipment, and resources.",req:false,crit:false},
+    ]},
+    {name:"Education & Certifications", items:[
+      {id:"t9a",text:"Certified in project management, sustainability, or contract law as appropriate.",req:true,crit:false},
+      {id:"t9b",text:"Completion of PMA or equivalent internal training frameworks.",req:false,crit:false},
+      {id:"t9c",text:"Committed to continuous professional development and industry best practices.",req:false,crit:false},
+    ]},
+    {name:"Quality Assurance & Control", items:[
+      {id:"t10a",text:"Understanding of QA/QC processes and regulatory frameworks.",req:true,crit:false},
+      {id:"t10b",text:"Experience implementing QA/QC measures to ensure project standards are met.",req:false,crit:false},
+    ]},
+    {name:"Technology", items:[
+      {id:"t11a",text:"Experience with innovative construction techniques and technologies.",req:false,crit:false},
+      {id:"t11b",text:"Proficiency in BIM / Civil 3D / digital delivery environments.",req:false,crit:false},
+    ]},
+    {name:"Financial & Schedule Management", items:[
+      {id:"t12a",text:"Strong understanding of cost estimation, forecasting, and budget control.",req:true,crit:false},
+      {id:"t12b",text:"Experienced in monitoring cost overruns and implementing mitigation strategies.",req:true,crit:false},
+      {id:"t12c",text:"Strong understanding of scheduling, critical path, forecasting, and performance indicators.",req:true,crit:false},
+    ]},
+  ]},
+
+{ key:"comp", name:"Competencies", color:"#2C6EBD",
+  desc:"What skills and capabilities enable successful project outcomes.",
+  cats:[
+    {name:"Managing Up", items:[
+      {id:"c1a",text:"Provides timely, relevant, solution-oriented updates to senior executives and internal leadership.",req:true,crit:false},
+      {id:"c1b",text:"Comfortable briefing executives on opportunities and challenges, including delivery risks and mitigation plans.",req:true,crit:false},
+      {id:"c1c",text:"Delivers executive-level presentations and reports with clarity, precision, and strategic relevance.",req:true,crit:false},
+    ]},
+    {name:"Creating Positive & Inclusive Team Culture", items:[
+      {id:"c2a",text:"Fosters a positive, productive work environment, remaining resilient through difficult times.",req:true,crit:false},
+      {id:"c2b",text:"Creates a psychologically safe environment where open communication and mutual respect are encouraged.",req:true,crit:false},
+      {id:"c2c",text:"Track record of leading, mentoring, and coaching team members.",req:false,crit:false},
+    ]},
+    {name:"Building High-Performing Teams", items:[
+      {id:"c3a",text:"Extensive experience managing large-scale EPC projects with sizeable direct reports and subcontractors.",req:true,crit:true},
+      {id:"c3b",text:"Conveys project vision and keeps it alive through the ups and downs of a multi-year project.",req:true,crit:false},
+      {id:"c3c",text:"Resolves team conflicts constructively and maintains alignment with strategic project goals.",req:true,crit:false},
+      {id:"c3d",text:"Builds and develops high-performing teams and holds members accountable for performance.",req:true,crit:false},
+    ]},
+    {name:"Communication Skills", items:[
+      {id:"c4a",text:"Fosters a \u201cno surprise\u201d communication style so leadership is aware of developments in a timely manner.",req:true,crit:false},
+      {id:"c4b",text:"Communicates confidently in high-stakes situations, including defending company interests with clients or authorities.",req:true,crit:true},
+      {id:"c4c",text:"Tailors messaging effectively for different audiences — executives, clients, community groups, trades, partners.",req:true,crit:false},
+      {id:"c4d",text:"Communicates complex technical challenges to non-technical stakeholders clearly and persuasively.",req:false,crit:false},
+    ]},
+    {name:"Change Management", items:[
+      {id:"c5a",text:"Leads change initiatives with clear vision, structured planning, and stakeholder engagement.",req:true,crit:false},
+      {id:"c5b",text:"Maintains focus and decisiveness amid uncertainty and shifting conditions.",req:false,crit:false},
+    ]},
+    {name:"Problem Solving + Innovation", items:[
+      {id:"c6a",text:"Experience in root-cause investigations and troubleshooting project issues, minimizing disruption.",req:true,crit:false},
+      {id:"c6b",text:"Manages conflicting production and safety priorities under pressure without compromising safety.",req:true,crit:true},
+    ]},
+    {name:"Risk Management", items:[
+      {id:"c7a",text:"Identifies, assesses, and prioritizes project risks throughout the lifecycle, pre-contract to closeout.",req:true,crit:true},
+      {id:"c7b",text:"Develops and implements effective risk mitigation strategies that safeguard company interests.",req:true,crit:false},
+      {id:"c7c",text:"Maintains oversight of safety and regulatory risk, ensuring full compliance.",req:true,crit:true},
+    ]},
+    {name:"Commercial & Financial Acumen", items:[
+      {id:"c8a",text:"Understands and has operated within different contractual models — Lump Sum, Target, and others.",req:true,crit:false},
+      {id:"c8b",text:"Manages budgets, forecasts, and actuals with precision to meet or exceed financial targets.",req:true,crit:false},
+      {id:"c8c",text:"Oversees commercial administration including change orders, claims, and vendor negotiations.",req:false,crit:false},
+    ]},
+    {name:"Stakeholder & Relationship Building", items:[
+      {id:"c9a",text:"Builds trusted relationships with clients, partners, and authorities.",req:true,crit:false},
+      {id:"c9b",text:"Sustains alignment across JV / consortium / alliance partners.",req:true,crit:false},
+    ]},
+  ]},
+
+{ key:"beh", name:"Behaviour", color:"#5B4B8A",
+  desc:"What personality traits would be most successful on this project.",
+  cats:[
+    {name:"Collaborative", items:[
+      {id:"b1a",text:"Naturally inclined to work cooperatively, valuing diverse perspectives to reach common goals.",req:true,crit:false},
+      {id:"b1b",text:"Builds inclusive relationships rooted in trust, transparency, and shared success.",req:true,crit:false},
+      {id:"b1c",text:"Demonstrates a genuine belief in \u201cteam over self.\u201d",req:false,crit:false},
+    ]},
+    {name:"Transparent", items:[
+      {id:"b2a",text:"Displays instinctive openness, preferring clarity over ambiguity in interactions.",req:true,crit:false},
+      {id:"b2b",text:"Values honesty and directness, even when the message is difficult to deliver.",req:true,crit:false},
+      {id:"b2c",text:"Approaches challenges with a \u201cno surprises\u201d mindset and models transparent decision-making.",req:true,crit:true},
+    ]},
+    {name:"Resilient & Calm Under Pressure", items:[
+      {id:"b3a",text:"Possesses internal steadiness and the ability to self-regulate under stress or adversity.",req:true,crit:true},
+      {id:"b3b",text:"Reacts with grace and control in the face of ambiguity, conflict, or change.",req:true,crit:false},
+      {id:"b3c",text:"Demonstrates a presence that calms others and inspires confidence.",req:false,crit:false},
+    ]},
+    {name:"Decisive", items:[
+      {id:"b4a",text:"Comfortable taking ownership for tough calls without hesitation.",req:true,crit:false},
+      {id:"b4b",text:"Shows a preference for action over over-analysis or indecision.",req:true,crit:false},
+      {id:"b4c",text:"Once a decision is made, communicates effectively to ensure alignment and execution.",req:false,crit:false},
+    ]},
+    {name:"Assertive", items:[
+      {id:"b5a",text:"Confident and self-assured in voicing ideas, needs, or concerns.",req:true,crit:false},
+      {id:"b5b",text:"Not afraid to challenge others respectfully when the situation demands it.",req:false,crit:false},
+      {id:"b5c",text:"Balances directness with diplomacy to maintain relationships while getting results.",req:false,crit:false},
+    ]},
+    {name:"Self-Aware", items:[
+      {id:"b6a",text:"Reflective and attuned to how their actions, tone, and presence affect others.",req:true,crit:false},
+      {id:"b6b",text:"Open to feedback and growth, with a grounded sense of strengths and limitations.",req:false,crit:false},
+      {id:"b6c",text:"Quick to own mistakes and course-correct without ego or deflection.",req:false,crit:false},
+    ]},
+  ]},
+];
+
+/* ---- lookup helpers ---- */
+const ITEM = {};
+GUIDE.forEach(p=>p.cats.forEach(c=>c.items.forEach(it=>{ITEM[it.id]={...it,pillar:p.name,cat:c.name};})));
+function requiredIds(){return Object.values(ITEM).filter(i=>state.req.has(i.id)).map(i=>i.id);}
+function criticalIds(){return requiredIds().filter(id=>state.crit.has(id));}
+
+/* ---- mutable state (starts from the pre-marked guide) ---- */
+const state = {req:new Set(), crit:new Set(), notes:{}, selectedCand:null, reqsFinalized:false};
+Object.values(ITEM).forEach(i=>{ if(i.req) state.req.add(i.id); if(i.crit) state.crit.add(i.id); });
+// a couple of illustrative pre-filled comments
+state.notes["t2d"]="Must have hands-on nuclear new-build, not just refurb. Confirm CANDU/SMR exposure.";
+state.notes["c4b"]="Will front CNSC and client executive reviews — non-negotiable.";
+
+/* =========================================================================
+   CANDIDATES — attested against the role's required items
+   met = fully demonstrates · partial = some exposure · (absent) = gap
+   extra = strengths beyond this role's requirements (feeds Talent Pool)
+   ========================================================================= */
+const CANDIDATES = [
+ { id:"c_amara", name:"Amara Chen", initials:"AC", title:"Project Director — Refurbishment", tenure:"Aecon · 9 yrs",
+   met:new Set(["t1a","t1b","t1c","t1d","t1e","t2a","t2c","t2d","t2e","t2f","t2g","t2h","t3a","t3c","t3d","t3e","t4a","t5a","t6a","t6b","t6c","t7a","t8a","t9a","t10a","t12a","t12b","t12c","c1a","c1b","c1c","c2a","c2b","c3a","c3b","c3c","c3d","c4b","c4c","c6a","c6b","c7a","c7b","c7c","c8a","c8b","c9a","c9b","b1a","b1b","b2a","b2b","b2c","b3a","b3b","b4a","b4b","b5a","b6a"]),
+   partial:new Set(["t3b","c4a","c5a"]),
+   extra:new Set(["mining refurb outage","utility interconnection","P6 mastery"]),
+   note:"Strongest overall fit. Deep nuclear refurb background; new-build island scope is the main stretch." },
+
+ { id:"c_deniz", name:"Deniz Okafor", initials:"DO", title:"Sr. Construction Manager — Civil/Energy", tenure:"External · 14 yrs",
+   met:new Set(["t1a","t1b","t1c","t1e","t2a","t2b","t2e","t2f","t2g","t2h","t3d","t3e","t4a","t5a","t6a","t6b","t6c","t7a","t8a","t9a","t10a","t12a","t12b","t12c","c1a","c1b","c3a","c3b","c3c","c3d","c4c","c6a","c7a","c7b","c8a","c8b","c9a","b1a","b1b","b3a","b3b","b4a","b4b","b5a"]),
+   partial:new Set(["t1d","t2c","c1c","c4b","c7c","b2a","b2c"]),
+   extra:new Set(["large-scale tunneling","cost-plus claims wins"]),
+   note:"Excellent civil/energy delivery leader. No nuclear-regulated exposure — the critical gap for this role." },
+
+ { id:"c_soren", name:"Søren Vidal", initials:"SV", title:"Deputy Project Director — Nuclear JV", tenure:"External · 20 yrs",
+   met:new Set(["t1a","t1b","t1c","t1d","t1e","t2a","t2c","t2d","t2e","t2f","t2g","t2h","t3a","t3b","t3c","t3d","t3e","t6a","t6b","t7a","t9a","t10a","t12a","t12c","c1a","c1b","c1c","c3a","c3b","c3c","c3d","c4b","c4c","c6a","c6b","c7a","c7b","c7c","c8a","c9a","c9b","b1a","b2a","b2b","b2c","b3a","b3b","b4a","b4b","b5a","b6a"]),
+   partial:new Set(["t4a","t5a","t6c","t8a","c2a","c2b"]),
+   extra:new Set(["CANDU new-build","two-unit SMR pilot","regulator relationships"]),
+   note:"Deepest nuclear new-build pedigree. Lighter on Indigenous engagement and inclusive-culture evidence." },
+
+ /* --- Talent Pool members vetted on OTHER roles — available to add to this role --- */
+ { id:"c_priya", name:"Priya Rao", initials:"PR", title:"Program Director — Rail & Transit", tenure:"Aecon · 11 yrs",
+   met:new Set(["t1a","t1b","t1c","t1e","t2a","t2e","t2g","t2h","t3d","t3e","t6a","t6b","t7a","t8a","t9a","t10a","t12a","t12b","t12c","c1a","c1b","c1c","c3a","c3b","c3c","c3d","c4c","c5a","c6a","c7a","c7b","c8a","c8b","c9a","c9b","b1a","b1b","b4a","b4b","b5a"]),
+   partial:new Set(["t2c","c4b","b2a"]),
+   extra:new Set(),
+   note:"Assessed for the Transit Expansion role. Strong delivery leader; no nuclear-regulated exposure." },
+
+ { id:"c_marcus", name:"Marcus Webb", initials:"MW", title:"Construction Director — Oil & Gas", tenure:"External · 17 yrs",
+   met:new Set(["t1a","t1b","t1c","t1d","t1e","t2a","t2c","t2e","t2f","t2g","t2h","t3c","t3d","t3e","t5a","t6a","t6b","t6c","t7a","t10a","t12a","t12b","t12c","c1a","c1b","c3a","c3b","c3c","c3d","c6a","c6b","c7a","c7b","c7c","c8a","c8b","b1a","b3a","b3b","b4a","b5a"]),
+   partial:new Set(["t2d","c4b","c9a"]),
+   extra:new Set(),
+   note:"Assessed for the Marine Works package. Heavy-regulated experience; nuclear specifics are the gap." },
+
+ { id:"c_lena", name:"Lena Fischer", initials:"LF", title:"Nuclear Operations Lead", tenure:"External · 13 yrs",
+   met:new Set(["t1a","t1b","t1d","t2a","t2c","t2d","t2e","t2f","t3a","t3c","t9a","t10a","c6a","c6b","c7a","c7c","b2a","b2b","b2c","b3a","b6a"]),
+   partial:new Set(["t1c","t2g","c1a","c3a"]),
+   extra:new Set(),
+   note:"Assessed for the SMR Pilot role. Deep nuclear ops/safety; lighter on large-team construction leadership." },
+];
+const CAND = {}; CANDIDATES.forEach(c=>CAND[c.id]=c);
+/* candidates currently attached to THIS role (a subset of the pool) */
+state.roleCands = ["c_amara","c_deniz","c_soren"];
+function roleCandList(){ return state.roleCands.map(id=>CAND[id]).filter(Boolean); }
+
+/* =========================================================================
+   ROLE PORTFOLIO — lifecycle:  pending reqs  ->  not-filled  ->  filled
+   The flagship role (interactive) derives its status from live state so it
+   visibly moves between stages as you finalize requirements / pick a person.
+   ========================================================================= */
+const ROLES = [
+  { id:"r_nuclear", interactive:true, title:ROLE.title, project:ROLE.project, location:ROLE.location },
+  { id:"r_ehs",     status:"pending",   title:"Director, EHS — Nuclear Portfolio",        project:"Nuclear Portfolio · Ontario" },
+  { id:"r_vpcomm",  status:"pending",   title:"VP, Commercial — Utilities Program",       project:"Utility Infrastructure · Alberta" },
+  { id:"r_transit", status:"searching", title:"Construction Director — Transit Expansion", project:"Urban Transit Line 4 · Toronto" },
+  { id:"r_smr",     status:"searching", title:"Site Manager — SMR Pilot",                  project:"SMR Pilot Unit · Ontario" },
+  { id:"r_marine",  status:"searching", title:"Package Manager — Marine Works",            project:"Deep-Water Intake · Ontario" },
+  { id:"r_comm",    status:"filled", filledBy:"J. Marchetti", title:"Commissioning Lead — Refurb Unit 3",   project:"Refurbishment Program · Ontario" },
+  { id:"r_proc",    status:"filled", filledBy:"L. Nguyen",    title:"Procurement Director — Major Projects", project:"Procurement · Ontario" },
+];
+const STATUS = {
+  pending:  { key:"pending",   label:"Pending reqs", tag:"Requirements to define", cls:"pending",   action:"Open assessment",  tab:"req"  },
+  searching:{ key:"searching", label:"Not-Filled",   tag:"Searching — not filled", cls:"searching", action:"Review candidates", tab:"cand" },
+  filled:   { key:"filled",    label:"Filled",       tag:"Filled",                 cls:"done",       action:"View role",         tab:"comp" },
+};
+function roleStatus(r){
+  if(!r.interactive) return r.status;
+  if(!state.reqsFinalized) return "pending";
+  if(!state.selectedCand)  return "searching";
+  return "filled";
+}
+
+function candStatus(candId, itemId){
+  const c=CAND[candId];
+  if(c.met.has(itemId)) return "met";
+  if(c.partial.has(itemId)) return "partial";
+  return "gap";
+}
+function candScore(candId){
+  const req=requiredIds();
+  let met=0; req.forEach(id=>{ if(candStatus(candId,id)==="met") met++; });
+  return {met, total:req.length, pct: req.length? Math.round(met/req.length*100):0};
+}
+function candCrit(candId){
+  const crits=criticalIds();
+  let ok=0; crits.forEach(id=>{ if(candStatus(candId,id)==="met") ok++; });
+  return {ok,total:crits.length};
+}
+
+/* =========================================================================
+   NAVIGATION
+   ========================================================================= */
+let current={screen:"home", tab:"req", cand:null, rolesTab:"pending"};
+function go(screen, opts={}){
+  current.screen=screen;
+  if(opts.tab){ current.tab=opts.tab; current.cand=null; }
+  if(opts.cand!==undefined) current.cand=opts.cand;
+  if(opts.rolesTab) current.rolesTab=opts.rolesTab;
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.toggle("active", n.dataset.nav===screen || (screen==="role"&&n.dataset.nav==="home")));
+  render();
+  window.scrollTo(0,0);
+}
+function setTab(t){ current.tab=t; current.cand=null; render(); window.scrollTo(0,0); }
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+function render(){
+  const c=document.getElementById("content");
+  const crumbs=document.getElementById("crumbs");
+  if(current.screen==="home"){ crumbs.innerHTML="<b>Home</b>"; c.innerHTML=viewHome(); }
+  else if(current.screen==="roles"){ crumbs.innerHTML="<b>All Roles</b>"; c.innerHTML=viewRoles(); }
+  else if(current.screen==="pool"){ crumbs.innerHTML="<b>Talent Pool</b>"; c.innerHTML=viewPool(); }
+  else if(current.screen==="role"){
+    crumbs.innerHTML=`<span class="crumb-link" onclick="go('home')">Home</span> <span class="sep">/</span> <b>${ROLE.title}</b>`;
+    c.innerHTML=viewRole();
+  }
+}
+
+/* ---------- HOME ---------- */
+function viewHome(){
+  const r=ROLES.find(x=>x.interactive);
+  const st=STATUS[roleStatus(r)];
+  const buckets={pending:0,searching:0,filled:0};
+  ROLES.forEach(x=>buckets[roleStatus(x)]++);
+  const arrow='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  return `
+  <div class="eyebrow">Assigned to you</div>
+  <h1 class="page">Requirements to define</h1>
+  <p class="page-sub">You've been asked to define what this key individual must bring to the project. Open the assessment, tick the requirements from the reference guide, flag the critical ones, and add any notes.</p>
+
+  <div class="assigned-card">
+    <div>
+      <div style="font-size:16px;font-weight:700;">${ROLE.title}</div>
+      <div style="font-size:12.5px;color:var(--slate);margin-top:2px;">${ROLE.project}</div>
+      <div class="meta-row">
+        <div class="mini"><div class="k">Location</div><div class="v">${ROLE.location}</div></div>
+        <div class="mini"><div class="k">Client</div><div class="v">${ROLE.client}</div></div>
+        <div class="mini"><div class="k">Contract</div><div class="v">${ROLE.contract}</div></div>
+        <div class="mini"><div class="k">Band</div><div class="v">${ROLE.band}</div></div>
+      </div>
+    </div>
+    <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:14px;">
+      <span class="status-tag ${st.cls}"><span class="dot"></span>${st.tag}</span>
+      <button class="btn primary" onclick="go('role',{tab:'${st.tab}'})">${st.action} ${arrow}</button>
+    </div>
+  </div>
+
+  <div class="section-label">Jump to</div>
+  <div class="home-actions">
+    <button class="action-tile" onclick="go('roles',{rolesTab:'pending'})">
+      <span class="at-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+      <div><div class="at-t">Roles pending requirements</div><div class="at-d">Requirements not yet finalized</div></div>
+      <span class="at-count">${buckets.pending}</span>
+    </button>
+    <button class="action-tile" onclick="go('roles',{rolesTab:'searching'})">
+      <span class="at-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
+      <div><div class="at-t">Roles to fill</div><div class="at-d">Requirements set — searching for a candidate</div></div>
+      <span class="at-count">${buckets.searching}</span>
+    </button>
+    <button class="action-tile" onclick="go('roles',{rolesTab:'filled'})">
+      <span class="at-ic"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
+      <div><div class="at-t">Filled roles</div><div class="at-d">A key individual has been selected</div></div>
+      <span class="at-count">${buckets.filled}</span>
+    </button>
+  </div>`;
+}
+
+/* ---------- ALL ROLES ---------- */
+function viewRoles(){
+  const tab=current.rolesTab||"pending";
+  const buckets={pending:[],searching:[],filled:[]};
+  ROLES.forEach(r=>buckets[roleStatus(r)].push(r));
+  const tabDef=[["pending","Pending reqs"],["searching","Not-Filled"],["filled","Filled"]];
+  const tabsHtml=`<div class="tabs" style="margin-bottom:18px;">${tabDef.map(([k,label])=>
+    `<button class="tab ${tab===k?'active':''}" onclick="go('roles',{rolesTab:'${k}'})">${label} <span class="count">${buckets[k].length}</span></button>`
+  ).join("")}</div>`;
+
+  const list=buckets[tab];
+  const rowsHtml = list.length ? list.map(r=>{
+    const st=STATUS[roleStatus(r)];
+    const meta = r.filledBy ? `${r.project} · Filled by ${r.filledBy}`
+               : r.interactive ? `${r.project} · Assigned to you`
+               : r.project;
+    const onclick = r.interactive ? `go('role',{tab:'${st.tab}'})` : "showToast('Prototype — this role is illustrative')";
+    return `<div class="role-row" onclick="${onclick}">
+      <div><div class="t">${r.title}</div><div class="d">${meta}</div></div>
+      <span class="status-tag ${st.cls}"><span class="dot"></span>${st.label}</span>
+    </div>`;
+  }).join("") : `<div class="empty-note">No roles in this stage right now.</div>`;
+
+  return `
+  <h1 class="page">All Roles</h1>
+  <p class="page-sub">Every role moves through the same pathway: define requirements, find someone, then filled. The tabs show where each role sits and what needs attention.</p>
+  ${tabsHtml}
+  ${rowsHtml}`;
+}
+
+/* ---------- TALENT POOL ---------- */
+function viewPool(){
+  return `
+  <h1 class="page">Talent Pool</h1>
+  <div class="cand-grid">
+    ${CANDIDATES.map(c=>{
+      const s=candScore(c.id); const cc=candCrit(c.id);
+      return `<div class="cand-card ${c.id===state.selectedCand?'selected':''}" onclick="go('role',{tab:'cand',cand:'${c.id}'})">
+        <div class="cand-top">
+          <div class="avatar">${c.initials}</div>
+          <div><div class="cand-name">${c.name}</div><div class="cand-title">${c.title} · ${c.tenure}</div></div>
+        </div>
+        <div class="cand-score-row" style="border-top:none;padding-top:2px;">
+          <div class="score-block"><span class="big">${s.met}<small>/${s.total}</small></span><span class="cap">Requirements met</span></div>
+          <div class="score-block"><span class="big">${cc.ok}<small>/${cc.total}</small></span><span class="cap">Criticals met</span></div>
+          <div class="ring" style="--p:${s.pct}"><i>${s.pct}%</i></div>
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+/* ---------- ROLE WORKSPACE ---------- */
+function viewRole(){
+  const reqN=state.req.size, critN=criticalIds().length;
+  const st=STATUS[roleStatus(ROLES.find(x=>x.interactive))];
+  const head=`
+  <div class="role-head">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1>${ROLE.title}</h1>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:7px;">
+          <span class="status-tag ${st.cls}"><span class="dot"></span>${st.label}</span>
+          <span style="font-size:12.5px;color:var(--slate);">${ROLE.project}</span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--slate-2);text-align:right;">Reference guide<br><b style="color:var(--charcoal);font-size:12.5px;">${ROLE.reference}</b></div>
+    </div>
+    <div class="meta-row">
+      <div class="mini"><div class="k">Location</div><div class="v">${ROLE.location}</div></div>
+      <div class="mini"><div class="k">Client</div><div class="v">${ROLE.client}</div></div>
+      <div class="mini"><div class="k">Contract</div><div class="v">${ROLE.contract}</div></div>
+      <div class="mini"><div class="k">Band</div><div class="v">${ROLE.band}</div></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab ${current.tab==='req'?'active':''}" onclick="setTab('req')">Requirements <span class="count">${reqN}</span></button>
+    <button class="tab ${current.tab==='cand'?'active':''}" onclick="setTab('cand')">Candidates <span class="count">${roleCandList().length}</span></button>
+    <button class="tab ${current.tab==='comp'?'active':''}" onclick="setTab('comp')">Compare</button>
+  </div>`;
+  let body="";
+  if(current.tab==="req") body=viewRequirements();
+  else if(current.tab==="cand") body= current.cand? viewCandidateDetail(current.cand) : viewCandidateList();
+  else body=viewCompare();
+  return head+body;
+}
+
+/* ---------- REQUIREMENTS TAB ---------- */
+function viewRequirements(){
+  const total=Object.keys(ITEM).length;
+  const reqN=state.req.size, critN=criticalIds().length;
+  const pct=Math.round(reqN/total*100);
+  const progress=`
+  <div class="sticky-progress">
+    <div class="progress-stats">
+      <div class="stat"><span class="num red">${reqN}</span><span class="lbl">Required</span></div>
+      <div class="stat"><span class="num">${critN}</span><span class="lbl">Critical</span></div>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar"><span style="width:${pct}%"></span></div>
+      <div class="bar-cap">${reqN} of ${total} statements selected across all pillars</div>
+    </div>
+    <button class="btn primary" onclick="finalizeReqs()">Save requirements</button>
+  </div>`;
+  const instr=`<div class="instr"><span>📋</span><div>Tick every statement this individual must demonstrate. Use <b>★ Critical</b> to flag non-negotiable must-haves, and <b>💬 Note</b> to add context or your own criteria. Expand or collapse any pillar to move quickly.</div></div>`;
+  const pillars=GUIDE.map(p=>renderPillar(p)).join("");
+  return progress+instr+pillars;
+}
+function renderPillar(p){
+  const ids=[]; p.cats.forEach(c=>c.items.forEach(i=>ids.push(i.id)));
+  const on=ids.filter(id=>state.req.has(id)).length;
+  const collapsed = p.key!=="tech" ? "" : ""; // all expanded by default
+  return `
+  <div class="pillar ${p._collapsed?'collapsed':''}" id="pillar-${p.key}" style="--pcolor:${p.color}">
+    <div class="pillar-head" onclick="togglePillar('${p.key}')">
+      <div class="l">
+        <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+        <div><div class="pillar-title">${p.name}</div><div class="pillar-desc">${p.desc}</div></div>
+      </div>
+      <div class="pillar-count"><b>${on}</b> / ${ids.length} selected</div>
+    </div>
+    <div class="pillar-body">
+      ${p.cats.map((c,ci)=>renderCat(p,c,ci)).join("")}
+    </div>
+  </div>`;
+}
+function renderCat(p,c,ci){
+  const on=c.items.filter(i=>state.req.has(i.id)).length;
+  const key=`${p.key}-${ci}`;
+  return `
+  <div class="cat ${c._collapsed?'collapsed':''}" id="cat-${key}">
+    <div class="cat-head" onclick="toggleCat('${key}')">
+      <div class="l">
+        <svg class="cat-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
+        <span class="cat-title">${c.name}</span>
+      </div>
+      <span class="cat-count ${on?'has':''}">${on} of ${c.items.length}</span>
+    </div>
+    <div class="cat-body">
+      ${c.items.map(i=>renderItem(i)).join("")}
+      <div class="add-custom">
+        <span style="color:var(--slate-2);font-weight:700;">+</span>
+        <input type="text" placeholder="Add your own requirement for this role…" onkeydown="if(event.key==='Enter'){addCustom('${key}',this)}">
+      </div>
+    </div>
+  </div>`;
+}
+function renderItem(i){
+  const on=state.req.has(i.id), crit=state.crit.has(i.id), note=state.notes[i.id]||"";
+  return `
+  <div class="item ${on?'on':''}" id="item-${i.id}">
+    <div class="chk" onclick="toggleReq('${i.id}')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2"><path d="M5 12l5 5L19 7"/></svg>
+    </div>
+    <div class="item-main">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+        <span class="item-text" onclick="toggleReq('${i.id}')">${i.text}${crit?'<span class="crit-badge">Critical</span>':''}${i._custom?'<span class="custom-flag">Custom</span>':''}</span>
+        <div class="item-tools">
+          <button class="tool-btn ${crit?'crit-on':''}" onclick="toggleCrit('${i.id}')" title="Flag as critical"><span class="star">${crit?'★':'☆'}</span>Critical</button>
+          <button class="tool-btn ${note?'note-on':''}" onclick="toggleNote('${i.id}')" title="Add a note">💬 Note</button>
+        </div>
+      </div>
+      <div class="note-box ${note?'':'hidden'}" id="note-${i.id}">
+        <textarea placeholder="Add context, examples, or a custom criterion…" oninput="saveNote('${i.id}',this.value)">${note}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- CANDIDATE LIST ---------- */
+function viewCandidateList(){
+  const list=roleCandList();
+  return `
+  <div class="cand-list-head">
+    <div style="flex:1;"></div>
+    <button class="btn primary" style="white-space:nowrap;align-self:center;" onclick="openAddCandidate()">+ Add candidate</button>
+  </div>
+  <div class="cand-grid">
+    ${list.map(c=>{
+      const s=candScore(c.id); const cc=candCrit(c.id);
+      return `<div class="cand-card ${c.id===state.selectedCand?'selected':''}" onclick="openCand('${c.id}')">
+        <div class="cand-top">
+          <div class="avatar">${c.initials}</div>
+          <div><div class="cand-name">${c.name}</div><div class="cand-title">${c.title}</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--slate);margin-bottom:12px;">${c.tenure}</div>
+        <div class="cand-score-row">
+          <div class="score-block"><span class="big">${s.met}<small>/${s.total}</small></span><span class="cap">Requirements met</span></div>
+          <div class="score-block"><span class="big" style="color:${cc.ok===cc.total?'var(--met)':'var(--aecon-red)'}">${cc.ok}<small>/${cc.total}</small></span><span class="cap">Criticals met</span></div>
+          <div class="ring" style="--p:${s.pct}"><i>${s.pct}%</i></div>
+        </div>
+      </div>`;
+    }).join("")}
+  </div>
+  ${state.addOpen?renderAddModal():""}`;
+}
+
+function renderAddModal(){
+  const available=CANDIDATES.filter(c=>!state.roleCands.includes(c.id));
+  return `
+  <div class="modal-overlay" onclick="closeAddModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <span>Add candidate</span>
+        <button class="modal-x" onclick="closeAddModal()">✕</button>
+      </div>
+      <button class="new-cand-btn" onclick="createNewCandidate()">
+        <span class="ncb-ic">+</span>
+        <span><span class="ncb-t">Create a new candidate</span><span class="ncb-d">Add a brand-new person and assess them from scratch</span></span>
+      </button>
+      <div class="modal-or">Or add someone already in the Talent Pool</div>
+      <div class="pool-picker">
+        ${available.length? available.map(c=>{
+          const s=candScore(c.id);
+          return `<div class="picker-row">
+            <div class="avatar" style="width:36px;height:36px;font-size:13px;">${c.initials}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="pr-name">${c.name}</div>
+              <div class="pr-title">${c.title} · ${c.tenure}</div>
+            </div>
+            <div class="pr-match">${s.pct}%<span>match</span></div>
+            <button class="btn sm" onclick="attachFromPool('${c.id}')">Add</button>
+          </div>`;
+        }).join("") : `<div class="empty-note" style="padding:20px;">Everyone in the Talent Pool is already on this role.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- CANDIDATE DETAIL (attestation) ---------- */
+function openCand(id){ current.cand=id; render(); window.scrollTo(0,0); }
+function viewCandidateDetail(id){
+  const c=CAND[id];
+  const reqByPillar=GUIDE.map(p=>{
+    const items=[];
+    p.cats.forEach(cat=>cat.items.forEach(it=>{ if(state.req.has(it.id)) items.push(it); }));
+    return {p, items};
+  }).filter(g=>g.items.length);
+  return `
+  <button class="back-link" onclick="setTab('cand')">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> All candidates
+  </button>
+  <div class="role-head" style="margin-bottom:16px;">
+    <div style="display:flex;gap:15px;align-items:center;">
+      <div class="avatar" style="width:52px;height:52px;font-size:19px;">${c.initials}</div>
+      <div style="flex:1;">
+        ${c._new
+          ? `<input class="name-input" value="${c.name}" placeholder="Full name" oninput="CAND['${id}'].name=this.value;CAND['${id}'].initials=initialsFrom(this.value)" onchange="render()">
+             <input class="title-input" value="${c.title}" placeholder="Current title" oninput="CAND['${id}'].title=this.value" onchange="render()">`
+          : `<h1 style="font-size:19px;">${c.name}</h1>
+             <div style="font-size:12.5px;color:var(--slate);margin-top:2px;">${c.title} · ${c.tenure}</div>`}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:9px;">
+        <span class="pool-chip">✓ In Talent Pool</span>
+        ${id===state.selectedCand?'<span class="status-tag done"><span class="dot"></span>Selected for role</span>':`<button class="btn sm" onclick="selectCand('${id}')">Set as selected</button>`}
+      </div>
+    </div>
+    <div style="margin-top:14px;font-size:12.5px;color:var(--slate);border-top:1px solid var(--line-2);padding-top:12px;"><b style="color:var(--charcoal)">Assessor note:</b> ${c.note}</div>
+  </div>
+  <div class="instr"><span>✍️</span><div>Mark what <b>${c.name}</b> demonstrates against each required statement. This is filled by HR or an executive assessor — only this role's required items are shown.</div></div>
+  ${reqByPillar.map(g=>`
+    <div class="pillar" style="--pcolor:${g.p.color}">
+      <div class="pillar-head" style="cursor:default;">
+        <div class="l"><div><div class="pillar-title">${g.p.name}</div></div></div>
+        <div class="pillar-count">${g.items.filter(i=>candStatus(id,i.id)==='met').length} / ${g.items.length} met</div>
+      </div>
+      <div class="pillar-body">
+        ${g.items.map(it=>{
+          const st=candStatus(id,it.id); const crit=state.crit.has(it.id);
+          return `<div class="attest-item">
+            <div class="attest-text">${it.text}${crit?'<span class="crit-badge">Critical</span>':''}</div>
+            <div class="seg">
+              <button class="${st==='met'?'on-met':''}" onclick="setAttest('${id}','${it.id}','met')">Met</button>
+              <button class="${st==='partial'?'on-partial':''}" onclick="setAttest('${id}','${it.id}','partial')">Partial</button>
+              <button class="${st==='gap'?'on-gap':''}" onclick="setAttest('${id}','${it.id}','gap')">Gap</button>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`).join("")}
+  `;
+}
+
+/* ---------- COMPARE ---------- */
+function viewCompare(){
+  const req=requiredIds();
+  const critN=criticalIds().length;
+  const cands=roleCandList();
+  // group required items by pillar for the matrix
+  const groups=GUIDE.map(p=>{
+    const items=[];
+    p.cats.forEach(cat=>cat.items.forEach(it=>{ if(state.req.has(it.id)) items.push(it); }));
+    return {p, items};
+  }).filter(g=>g.items.length);
+
+  const header=`<tr>
+    <th class="req-col">Required statement</th>
+    ${cands.map(c=>{
+      const s=candScore(c.id), cc=candCrit(c.id), sel=c.id===state.selectedCand;
+      return `<th class="cand-col ${sel?'selcol':''}">
+        <div class="cch-name">${c.name}</div>
+        <div class="cch-title">${c.title}</div>
+        <div class="cch-score" style="color:${s.pct>=80?'var(--met)':s.pct>=60?'var(--partial)':'var(--charcoal)'}">${s.met}<small>/${s.total}</small></div>
+        <div class="cch-crit">criticals <b style="color:${cc.ok===cc.total?'var(--met)':'var(--aecon-red)'}">${cc.ok}/${cc.total}</b></div>
+        <button class="set-btn ${sel?'is-sel':''}" onclick="selectCand('${c.id}')">${sel?'✓ Selected':'Set as selected'}</button>
+      </th>`;
+    }).join("")}
+  </tr>`;
+
+  const rows=groups.map(g=>{
+    const phead=`<tr class="prow-head"><td colspan="${1+cands.length}" style="border-left:4px solid ${g.p.color}">${g.p.name}</td></tr>`;
+    const irows=g.items.map(it=>{
+      const crit=state.crit.has(it.id);
+      const cells=cands.map(c=>{
+        const st=candStatus(c.id,it.id);
+        const sel=c.id===state.selectedCand;
+        let cls=st, glyph= st==='met'?'✓':st==='partial'?'◑':'–';
+        if(st!=='met' && crit){ cls='critgap'; glyph='✕'; }
+        return `<td class="mark ${sel?'selcol':''}"><span class="mk ${cls}">${glyph}</span></td>`;
+      }).join("");
+      return `<tr class="${state.selectedCand?'selcol-hi':''}"><td class="req-cell">${it.text}${crit?'<span class="crit-badge">Critical</span>':''}</td>${cells}</tr>`;
+    }).join("");
+    return phead+irows;
+  }).join("");
+
+  const legend=`<div class="legend legend-top">
+    <span><span class="mk met" style="width:20px;height:20px;font-size:11px;">✓</span> Met</span>
+    <span><span class="mk partial" style="width:20px;height:20px;font-size:11px;">◑</span> Partial</span>
+    <span><span class="mk gap" style="width:20px;height:20px;font-size:11px;">–</span> Gap</span>
+    <span><span class="mk critgap" style="width:20px;height:20px;font-size:11px;">✕</span> Critical gap</span>
+  </div>`;
+
+  return legend+`<div class="matrix-wrap"><table class="matrix"><thead>${header}</thead><tbody>${rows}</tbody></table></div>`;
+}
+
+/* =========================================================================
+   INTERACTIONS
+   ========================================================================= */
+function toggleReq(id){
+  if(state.req.has(id)){ state.req.delete(id); state.crit.delete(id); }
+  else state.req.add(id);
+  render();
+}
+function toggleCrit(id){
+  if(!state.req.has(id)) state.req.add(id);      // critical implies required
+  state.crit.has(id)? state.crit.delete(id) : state.crit.add(id);
+  render();
+}
+function toggleNote(id){
+  const box=document.getElementById("note-"+id);
+  if(!box) return;
+  box.classList.toggle("hidden");
+  if(!box.classList.contains("hidden")){ const ta=box.querySelector("textarea"); ta&&ta.focus(); }
+}
+function saveNote(id,v){ if(v.trim()) state.notes[id]=v; else delete state.notes[id]; }
+let customSeq=0;
+function addCustom(catKey,input){
+  const v=input.value.trim(); if(!v) return;
+  const [pk,ci]=catKey.split("-");
+  const pillar=GUIDE.find(p=>p.key===pk); const cat=pillar.cats[+ci];
+  const id="cx"+(customSeq++);
+  const it={id,text:v,req:true,crit:false,_custom:true};
+  cat.items.push(it);
+  ITEM[id]={...it,pillar:pillar.name,cat:cat.name};
+  state.req.add(id);
+  render();
+  showToast("Custom requirement added");
+}
+function togglePillar(k){ const p=GUIDE.find(x=>x.key===k); p._collapsed=!p._collapsed; render(); }
+function toggleCat(key){ const [pk,ci]=key.split("-"); const cat=GUIDE.find(p=>p.key===pk).cats[+ci]; cat._collapsed=!cat._collapsed; render(); }
+function setAttest(candId,itemId,val){
+  const c=CAND[candId];
+  c.met.delete(itemId); c.partial.delete(itemId);
+  if(val==="met") c.met.add(itemId);
+  else if(val==="partial") c.partial.add(itemId);
+  render();
+}
+function selectCand(id){ state.selectedCand=id; render(); showToast(CAND[id].name+" selected — role marked as Filled"); }
+
+function finalizeReqs(){
+  state.reqsFinalized=true;
+  render();
+  showToast("Requirements saved — role is now searching for a candidate");
+}
+
+/* ---- add a person from a role; they persist in the Talent Pool ---- */
+let newCandSeq=0;
+function initialsFrom(name){
+  const parts=(name||"").trim().split(/\s+/).filter(Boolean);
+  return (parts.map(w=>w[0]).slice(0,2).join("")||"?").toUpperCase();
+}
+function openAddCandidate(){ state.addOpen=true; render(); }
+function closeAddModal(e){ if(e && e.target && !e.target.classList.contains("modal-overlay")) return; state.addOpen=false; render(); }
+function createNewCandidate(){
+  const id="c_new"+(newCandSeq++);
+  const c={ id, name:"New candidate", initials:"+", title:"Current title", tenure:"Added to Talent Pool",
+            met:new Set(), partial:new Set(), extra:new Set(), _new:true,
+            note:"New candidate. Mark what they already demonstrate below — it saves to the Talent Pool for future roles." };
+  CANDIDATES.push(c); CAND[id]=c;
+  state.roleCands.push(id);
+  state.addOpen=false; current.tab="cand"; current.cand=id;
+  render(); window.scrollTo(0,0);
+  showToast("New candidate created — now mark what they have");
+}
+function attachFromPool(id){
+  if(!state.roleCands.includes(id)) state.roleCands.push(id);
+  state.addOpen=false; current.tab="cand"; current.cand=id;
+  render(); window.scrollTo(0,0);
+  showToast(CAND[id].name+" added from the Talent Pool");
+}
+
+let toastT;
+function showToast(msg){
+  const t=document.getElementById("toast"); document.getElementById("toast-msg").textContent=msg;
+  t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2200);
+}
+
+/* boot */
+render();
+</script>
+</body>
+</html>

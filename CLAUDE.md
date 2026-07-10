@@ -19,8 +19,12 @@ This workspace uses an offline offline-first Canvas Apps source workflow with `p
    - Avoid Premium-only features, Managed Environments, Git integration, Code Apps, or Dataverse-specific premium connectors.
 
 4. PACK (you)
-   - Use `pac canvas pack --msapp <app>.msapp --sources ./src`.
-   - This re-creates a packed `.msapp` for import.
+   - Refresh `src/*.msapr` by re-unpacking if the user changed seed connections.
+   - Use `pac canvas pack --sources ./src --msapp <app>.msapp --layout SourceCode --overwrite`.
+   - Do **not** use `--disable-load-from-yaml`.
+   - Avoid `CanvasComponent` in YAML-only packs until the user provides a Studio-validated export.
+   - Prefer incremental screen adds; user imports after each major step.
+   - See `.cursor/skills/canvas-yaml-pack/SKILL.md` and `_canvas-notes/yaml-pack-import.md`.
 
 5. IMPORT/PUBLISH (my job, browser)
    - In Power Apps Studio, use File > Open > Browse to import the packed `.msapp`.
@@ -56,4 +60,5 @@ This workspace uses an offline offline-first Canvas Apps source workflow with `p
 - Do not rely on external MCP servers for app source generation.
 - Use the `_reference/` clone only for guidance and offline reference.
 - Check `_canvas-notes/` before adding new icons or AutoLayout patterns; update it after import validation.
+- Read `.cursor/skills/canvas-yaml-pack/SKILL.md` when packing or debugging `ErrOpeningDocument_UnknownError`.
 - For SharePoint lists with large row counts, follow `_canvas-notes/delegation.md` (preload collections, avoid `in` on connector sources).

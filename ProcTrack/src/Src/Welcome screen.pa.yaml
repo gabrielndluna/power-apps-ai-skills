@@ -11,7 +11,18 @@ Screens:
     Properties:
       Fill: =RGBA(214, 221, 224, 1)
       LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
-      OnVisible: =Set(varPackageFilter, "all")
+      OnVisible: |-
+        =Set(varPackageFilter, "all");
+        If(
+            !IsBlank(varSelectedProject),
+            ClearCollect(
+                colProjectPackages,
+                Filter(
+                    'ProcTrack - Packages',
+                    projectidentifier = varSelectedProject.projectidentifier
+                )
+            )
+        )
     Children:
       - main_container_2:
           Control: GroupContainer@1.5.0

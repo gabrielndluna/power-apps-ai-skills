@@ -113,6 +113,41 @@ wrapper: ManualLayout, FillPortions: 0, Width/Height: 32
 | Section title | `Text@0.0.51` with `Weight: Bold` |
 | Card surface | `GroupContainer@1.5.0` AutoLayout, white fill, `DropShadow.Light`, radius 8–10 |
 
-## Pack / import reminder
+### AddColumns column names
+
+In `AddColumns(source, columnName, formula)`, the new column name is an **identifier**, not a string:
+
+```powerapps
+AddColumns(colWsRoleCands, attStatus, ...)
+```
+
+Do **not** write `"attStatus"` — Studio flags it as an error.
+
+### Status indicator dots
+
+Use `Rectangle@2.3.0` (8×8) for pill dots. `GroupContainer` ManualLayout 7×7 renders as a **broken control** (red X) in Studio.
+
+### Page titles and gallery cards (RoleFit)
+
+| Control | Height | Size |
+|---------|--------|------|
+| Page title | 34 | 22 bold |
+| Page subtitle | 20–40 | 12–13, Wrap if long |
+| Tab button | 40 | 12 semibold |
+| Gallery row card | `=Parent.TemplateHeight - 4` |
+| Label in card | explicit Height; `Width: =Parent.Width` inside card columns |
+
+## RoleFit screen stack
+
+Match ProcTrack Project Dashboard. Do **not** use `Height: =Parent.Height - N` on galleries inside AutoLayout — use `FillPortions: =1` on `content`, tab panels, and galleries.
+
+```
+main (vertical, FillPortions: 1)
+  topbar   FillPortions: 0, Height: 56
+  content  FillPortions: 1
+    gallery FillPortions: 1, TemplatePadding: 8, Width: Parent.Width
+```
+
+Nav rail on every screen: **RoleFit** brand (no subtitle), left-aligned nav buttons, user block at bottom.
 
 `pac canvas pack` with SourceCode layout does not catch invalid icons or layout issues. Always validate with a **small import** in Studio.

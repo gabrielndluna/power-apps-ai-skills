@@ -874,7 +874,9 @@ Screens:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
+                                          AlignInContainer: =AlignInContainer.Stretch
                                           DropShadow: =DropShadow.None
+                                          FillPortions: =1
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutMinHeight: =16
@@ -889,31 +891,54 @@ Screens:
                                                 Size: =16
                                                 Text: |-
                                                   ="Package #"
-                                          - item_input_text:
-                                              Control: ModernTextInput@1.1.0
+                                          - package_number_row:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
-                                                BorderColor: =RGBA(214, 221, 224, 1)
-                                                BorderThickness: =2
-                                                Default: =First(colPackageDetails).projectidentifier & "-" & First(colPackageDetails).itemnumber
-                                                DisplayMode: |-
-                                                  =// DisplayMode
-                                                  If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
-                                                Fill: =RGBA(255, 255, 255, 1)
+                                                DropShadow: =DropShadow.None
                                                 Height: =40
-                                                LayoutMinHeight: =16
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutGap: =4
+                                                LayoutMinHeight: =40
                                                 LayoutMinWidth: =16
-                                                OnChange: |-
-                                                  =Patch(colPackageDetails, First(colPackageDetails), {itemnumber: Self.Text})
-                                                RadiusBottomLeft: =5
-                                                RadiusBottomRight: =5
-                                                RadiusTopLeft: =5
-                                                RadiusTopRight: =5
+                                              Children:
+                                                - package_prefix_label:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      Size: =14
+                                                      Text: =First(colPackageDetails).projectidentifier & " - "
+                                                      VerticalAlign: =VerticalAlign.Middle
+                                                - item_number_input:
+                                                    Control: ModernTextInput@1.1.0
+                                                    Properties:
+                                                      AlignInContainer: =AlignInContainer.Stretch
+                                                      BorderColor: =RGBA(214, 221, 224, 1)
+                                                      BorderThickness: =2
+                                                      Default: =First(colPackageDetails).itemnumber
+                                                      DisplayMode: |-
+                                                        =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Fill: =RGBA(255, 255, 255, 1)
+                                                      FillPortions: =1
+                                                      Height: =40
+                                                      LayoutMinHeight: =16
+                                                      LayoutMinWidth: =16
+                                                      OnChange: |-
+                                                        =Patch(colPackageDetails, First(colPackageDetails), {itemnumber: Self.Text})
+                                                      RadiusBottomLeft: =5
+                                                      RadiusBottomRight: =5
+                                                      RadiusTopLeft: =5
+                                                      RadiusTopRight: =5
                                     - Container7_6:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
+                                          AlignInContainer: =AlignInContainer.Stretch
                                           DropShadow: =DropShadow.None
+                                          FillPortions: =1
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutMinHeight: =16
@@ -3802,73 +3827,84 @@ Screens:
                         LayoutMinHeight: =0
                         OnPressAction: |-
                           =IfError(
-                              Patch(
-                                  'ProcTrack - Packages',
-                                  LookUp(
+                              Set(
+                                  varSavedPackage,
+                                  Patch(
                                       'ProcTrack - Packages',
-                                      packageidentifier = First(colPackageDetails).packageidentifier
+                                      LookUp(
+                                          'ProcTrack - Packages',
+                                          packageidentifier = First(colPackageDetails).packageidentifier
+                                      ),
+                                      {
+                                          // Package Basics
+                                          itemnumber:                         First(colPackageDetails).itemnumber,
+                                          mplcode:                            First(colPackageDetails).mplcode,
+                                          packagedescription:                 First(colPackageDetails).packagedescription,
+                                          packagetype:                        First(colPackageDetails).packagetype,
+                                          qualityprogram:                     First(colPackageDetails).qualityprogram,
+                                          prerequisitedesigndeliverable:      First(colPackageDetails).prerequisitedesigndeliverable,
+                                          bopsite:                            First(colPackageDetails).bopsite,
+                                          contracttype:                       First(colPackageDetails).contracttype,
+                                          operationspackagebundle:            First(colPackageDetails).operationspackagebundle,
+                                          comments:                           First(colPackageDetails).comments,
+                                          sole_source:                        First(colPackageDetails).sole_source,
+                                          packagefolderurl:                   First(colPackageDetails).packagefolderurl,
+
+                                          // Leads
+                                          procpackageleadname:                First(colPackageDetails).procpackageleadname,
+                                          procurementpackageleadid:           First(colPackageDetails).procurementpackageleadid,
+                                          opspackageleadname:                 First(colPackageDetails).opspackageleadname,
+                                          operationspackageleadid:            First(colPackageDetails).operationspackageleadid,
+                                          engineeringcontactname:             First(colPackageDetails).engineeringcontactname,
+                                          engineeringcontactid:               First(colPackageDetails).engineeringcontactid,
+
+                                          // Durations
+                                          leadtimesowtorfqissuedays:          First(colPackageDetails).leadtimesowtorfqissuedays,
+                                          leadtimerfqissuetoclosingdays:      First(colPackageDetails).leadtimerfqissuetoclosingdays,
+                                          leadtimeclosingtoevaluationdays:    First(colPackageDetails).leadtimeclosingtoevaluationdays,
+                                          leadtimeevaluationtoawarddays:      First(colPackageDetails).leadtimeevaluationtoawarddays,
+                                          standardleadtimemonths:             First(colPackageDetails).standardleadtimemonths,
+
+                                          // Planned dates
+                                          originalplannedsowdate:             First(colPackageDetails).originalplannedsowdate,
+                                          originalplannedrfqissuedate:        First(colPackageDetails).originalplannedrfqissuedate,
+                                          originalplannedrfqclosingdate:      First(colPackageDetails).originalplannedrfqclosingdate,
+                                          originalplannedevaluationcompleti:  First(colPackageDetails).originalplannedevaluationcompleti,
+                                          originalplannedawarddate:           First(colPackageDetails).originalplannedawarddate,
+                                          requiredatsitedate:                 First(colPackageDetails).requiredatsitedate,
+
+                                          // Actual dates
+                                          actualsowdate:                      First(colPackageDetails).actualsowdate,
+                                          actualrfqissuedate:                 First(colPackageDetails).actualrfqissuedate,
+                                          actualrfqclosingdate:               First(colPackageDetails).actualrfqclosingdate,
+                                          actualevaluationcompletiondate:     First(colPackageDetails).actualevaluationcompletiondate,
+                                          actualawarddate:                    First(colPackageDetails).actualawarddate,
+
+                                          // Revised Planned dates
+                                          revisedplannedsowdate:              First(colPackageDetails).revisedplannedsowdate,
+                                          revisedplannedrfqissuedate:         First(colPackageDetails).revisedplannedrfqissuedate,
+                                          revisedplannedrfqclosingdate:       First(colPackageDetails).revisedplannedrfqclosingdate,
+                                          revisedplannedevaluationcompletio:  First(colPackageDetails).revisedplannedevaluationcompletio,
+                                          revisedplannedawarddate:            First(colPackageDetails).revisedplannedawarddate,
+
+                                          // Post Award
+                                          subcontractorname:                  First(colPackageDetails).subcontractorname,
+                                          purchaseordernumber:                First(colPackageDetails).purchaseordernumber,
+                                          awardvalue:                         First(colPackageDetails).awardvalue,
+                                          indigenous_award:                   First(colPackageDetails).indigenous_award,
+                                          ontario_award:                      First(colPackageDetails).ontario_award,
+                                          budgetamount:                       First(colPackageDetails).budgetamount,
+                                          buybackresaletarget:                First(colPackageDetails).buybackresaletarget
+                                      }
+                                  )
+                              );
+                              Patch(
+                                  colProjectPackages,
+                                  LookUp(
+                                      colProjectPackages,
+                                      packageidentifier = varSavedPackage.packageidentifier
                                   ),
-                                  {
-                                      // Package Basics
-                                      itemnumber:                         First(colPackageDetails).itemnumber,
-                                      mplcode:                            First(colPackageDetails).mplcode,
-                                      packagedescription:                 First(colPackageDetails).packagedescription,
-                                      packagetype:                        First(colPackageDetails).packagetype,
-                                      qualityprogram:                     First(colPackageDetails).qualityprogram,
-                                      prerequisitedesigndeliverable:      First(colPackageDetails).prerequisitedesigndeliverable,
-                                      bopsite:                            First(colPackageDetails).bopsite,
-                                      contracttype:                       First(colPackageDetails).contracttype,
-                                      operationspackagebundle:            First(colPackageDetails).operationspackagebundle,
-                                      comments:                           First(colPackageDetails).comments,
-                                      sole_source:                        First(colPackageDetails).sole_source,
-                                      packagefolderurl:                   First(colPackageDetails).packagefolderurl,
-
-                                      // Leads
-                                      procpackageleadname:                First(colPackageDetails).procpackageleadname,
-                                      procurementpackageleadid:           First(colPackageDetails).procurementpackageleadid,
-                                      opspackageleadname:                 First(colPackageDetails).opspackageleadname,
-                                      operationspackageleadid:            First(colPackageDetails).operationspackageleadid,
-                                      engineeringcontactname:             First(colPackageDetails).engineeringcontactname,
-                                      engineeringcontactid:               First(colPackageDetails).engineeringcontactid,
-
-                                      // Durations
-                                      leadtimesowtorfqissuedays:          First(colPackageDetails).leadtimesowtorfqissuedays,
-                                      leadtimerfqissuetoclosingdays:      First(colPackageDetails).leadtimerfqissuetoclosingdays,
-                                      leadtimeclosingtoevaluationdays:    First(colPackageDetails).leadtimeclosingtoevaluationdays,
-                                      leadtimeevaluationtoawarddays:      First(colPackageDetails).leadtimeevaluationtoawarddays,
-                                      standardleadtimemonths:             First(colPackageDetails).standardleadtimemonths,
-
-                                      // Planned dates
-                                      originalplannedsowdate:             First(colPackageDetails).originalplannedsowdate,
-                                      originalplannedrfqissuedate:        First(colPackageDetails).originalplannedrfqissuedate,
-                                      originalplannedrfqclosingdate:      First(colPackageDetails).originalplannedrfqclosingdate,
-                                      originalplannedevaluationcompleti:  First(colPackageDetails).originalplannedevaluationcompleti,
-                                      originalplannedawarddate:           First(colPackageDetails).originalplannedawarddate,
-                                      requiredatsitedate:                 First(colPackageDetails).requiredatsitedate,
-
-                                      // Actual dates
-                                      actualsowdate:                      First(colPackageDetails).actualsowdate,
-                                      actualrfqissuedate:                 First(colPackageDetails).actualrfqissuedate,
-                                      actualrfqclosingdate:               First(colPackageDetails).actualrfqclosingdate,
-                                      actualevaluationcompletiondate:     First(colPackageDetails).actualevaluationcompletiondate,
-                                      actualawarddate:                    First(colPackageDetails).actualawarddate,
-
-                                      // Revised Planned dates
-                                      revisedplannedsowdate:              First(colPackageDetails).revisedplannedsowdate,
-                                      revisedplannedrfqissuedate:         First(colPackageDetails).revisedplannedrfqissuedate,
-                                      revisedplannedrfqclosingdate:       First(colPackageDetails).revisedplannedrfqclosingdate,
-                                      revisedplannedevaluationcompletio:  First(colPackageDetails).revisedplannedevaluationcompletio,
-                                      revisedplannedawarddate:            First(colPackageDetails).revisedplannedawarddate,
-
-                                      // Post Award
-                                      subcontractorname:                  First(colPackageDetails).subcontractorname,
-                                      purchaseordernumber:                First(colPackageDetails).purchaseordernumber,
-                                      awardvalue:                         First(colPackageDetails).awardvalue,
-                                      indigenous_award:                   First(colPackageDetails).indigenous_award,
-                                      ontario_award:                      First(colPackageDetails).ontario_award,
-                                      budgetamount:                       First(colPackageDetails).budgetamount,
-                                      buybackresaletarget:                First(colPackageDetails).buybackresaletarget
-                                  }
+                                  varSavedPackage
                               );
                               Notify("All changes saved successfully!", NotificationType.Success),
 

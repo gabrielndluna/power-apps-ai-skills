@@ -1,0 +1,454 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  All Roles:
+    Properties:
+      Fill: =RGBA(243, 244, 246, 1)
+      OnVisible: |-
+        =ClearCollect(colRoles, KI_roles);
+        ClearCollect(colCandidates, Filter(KI_candidates, isactive = true))
+    Children:
+      - roles_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Horizontal
+            Width: =Parent.Width
+          Children:
+            - roles_rail:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Fill: =RGBA(44, 47, 51, 1)
+                  FillPortions: =0
+                  Height: =Parent.Height
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =4
+                  PaddingBottom: =14
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =18
+                  Width: =224
+                Children:
+                  - roles_brand_title:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(228, 0, 43, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =28
+                        Size: =20
+                        Text: ="RoleFit"
+                  - roles_nav_home:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(198, 202, 207, 1)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Navigate(Home, ScreenTransition.Fade)
+                        Text: ="Home"
+                        Width: =200
+                  - roles_nav_roles:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        Fill: =RGBA(228, 0, 43, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        Text: ="All Roles"
+                        Width: =200
+                  - roles_nav_pool:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(198, 202, 207, 1)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Navigate('Talent Pool', ScreenTransition.Fade)
+                        Text: ="Talent Pool"
+                        Visible: =varIsCreator
+                        Width: =200
+                  - roles_rail_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        FillPortions: =1
+                        LayoutMinHeight: =40
+                  - roles_user_name:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(198, 202, 207, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =18
+                        Size: =12
+                        Text: =User().FullName
+                  - roles_user_role:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(124, 130, 139, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =16
+                        Size: =11
+                        Text: =If(varIsCreator, "HR Assessor", "Executive Sponsor")
+            - roles_main:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  FillPortions: =1
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMinWidth: =0
+                Children:
+                  - roles_topbar:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Height: =56
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                        PaddingLeft: =26
+                        PaddingRight: =26
+                      Children:
+                        - roles_crumb:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(26, 26, 26, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Size: =13
+                              Text: ="All Roles"
+                        - roles_new_btn:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(228, 0, 43, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =36
+                              HoverFill: =RGBA(184, 0, 34, 1)
+                              OnSelect: =Navigate('New Role', ScreenTransition.Fade)
+                              Size: =11
+                              Text: ="+ New Role"
+                              Visible: =varIsCreator
+                              Width: =120
+                  - roles_content:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderThickness: =0
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =12
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =30
+                        PaddingLeft: =30
+                        PaddingRight: =30
+                        PaddingTop: =24
+                      Children:
+                        - roles_page_title:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(26, 26, 26, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =32
+                              Size: =22
+                              Text: ="All Roles"
+                              Width: =Parent.Width
+                        - roles_tabs:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(0, 0, 0, 0)
+                              FillPortions: =0
+                              Height: =40
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - roles_tab_pending:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varRolesListTab = "pending", RGBA(228, 0, 43, 1), RGBA(228, 228, 228, 1))
+                                    Color: =If(varRolesListTab = "pending", RGBA(228, 0, 43, 1), RGBA(90, 96, 105, 1))
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    OnSelect: =Set(varRolesListTab, "pending")
+                                    Size: =12
+                                    Text: ="Pending reqs (" & Text(CountRows(Filter(colRoles, status.Value = "Pending Requirements"))) & ")"
+                                    Width: =168
+                              - roles_tab_searching:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varRolesListTab = "searching", RGBA(228, 0, 43, 1), RGBA(228, 228, 228, 1))
+                                    Color: =If(varRolesListTab = "searching", RGBA(228, 0, 43, 1), RGBA(90, 96, 105, 1))
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    OnSelect: =Set(varRolesListTab, "searching")
+                                    Size: =12
+                                    Text: ="Not-Filled (" & Text(CountRows(Filter(colRoles, status.Value = "Searching"))) & ")"
+                                    Width: =148
+                              - roles_tab_filled:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varRolesListTab = "filled", RGBA(228, 0, 43, 1), RGBA(228, 228, 228, 1))
+                                    Color: =If(varRolesListTab = "filled", RGBA(228, 0, 43, 1), RGBA(90, 96, 105, 1))
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    OnSelect: =Set(varRolesListTab, "filled")
+                                    Size: =12
+                                    Text: ="Filled (" & Text(CountRows(Filter(colRoles, status.Value = "Filled"))) & ")"
+                                    Width: =120
+                        - roles_gallery:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Fill: =RGBA(0, 0, 0, 0)
+                              FillPortions: =1
+                              Items: |-
+                                =Switch(
+                                    varRolesListTab,
+                                    "pending", Filter(colRoles, status.Value = "Pending Requirements"),
+                                    "searching", Filter(colRoles, status.Value = "Searching"),
+                                    Filter(colRoles, status.Value = "Filled")
+                                )
+                              LayoutMinHeight: =0
+                              OnSelect: |-
+                                =Set(varSelectedRole, ThisItem);
+                                Set(
+                                    varRoleTab,
+                                    Switch(
+                                        ThisItem.status.Value,
+                                        "Pending Requirements", "req",
+                                        "Searching", "cand",
+                                        "comp"
+                                    )
+                                );
+                                Navigate('Role Workspace', ScreenTransition.Fade)
+                              TemplatePadding: =8
+                              TemplateSize: =88
+                              Width: =Parent.Width
+                            Children:
+                              - roles_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =Parent.TemplateHeight - 4
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =12
+                                    LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =12
+                                    PaddingLeft: =16
+                                    PaddingRight: =16
+                                    PaddingTop: =12
+                                    RadiusBottomLeft: =7
+                                    RadiusBottomRight: =7
+                                    RadiusTopLeft: =7
+                                    RadiusTopRight: =7
+                                    Width: =Parent.TemplateWidth - 4
+                                  Children:
+                                    - roles_row_left:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =1
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - roles_row_title:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(26, 26, 26, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =22
+                                                OnSelect: |-
+                                                  =Set(varSelectedRole, ThisItem);
+                                                  Set(
+                                                      varRoleTab,
+                                                      Switch(
+                                                          ThisItem.status.Value,
+                                                          "Pending Requirements", "req",
+                                                          "Searching", "cand",
+                                                          "comp"
+                                                      )
+                                                  );
+                                                  Navigate('Role Workspace', ScreenTransition.Fade)
+                                                Size: =14
+                                                Text: =ThisItem.Title
+                                                Width: =Parent.Width
+                                          - roles_row_sub:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: =RGBA(90, 96, 105, 1)
+                                                Font: =Font.'Segoe UI'
+                                                Height: =18
+                                                OnSelect: |-
+                                                  =Set(varSelectedRole, ThisItem);
+                                                  Set(
+                                                      varRoleTab,
+                                                      Switch(
+                                                          ThisItem.status.Value,
+                                                          "Pending Requirements", "req",
+                                                          "Searching", "cand",
+                                                          "comp"
+                                                      )
+                                                  );
+                                                  Navigate('Role Workspace', ScreenTransition.Fade)
+                                                Size: =12
+                                                Text: |-
+                                                  =ThisItem.project & " · " & ThisItem.sponsorname & If(
+                                                      ThisItem.status.Value = "Filled" && !IsBlank(ThisItem.selectedcandidatecode),
+                                                      " · Filled by " & LookUp(colCandidates, candidatecode = ThisItem.selectedcandidatecode).Title,
+                                                      ""
+                                                  )
+                                                Width: =Parent.Width
+                                    - roles_row_status_pill:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Fill: |-
+                                            =Switch(
+                                                ThisItem.status.Value,
+                                                "Pending Requirements", RGBA(251, 241, 223, 1),
+                                                "Searching", RGBA(231, 240, 251, 1),
+                                                RGBA(232, 246, 238, 1)
+                                            )
+                                          Height: =28
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =6
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          PaddingLeft: =10
+                                          PaddingRight: =10
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                          Width: =130
+                                        Children:
+                                          - roles_row_status_dot:
+                                              Control: Rectangle@2.3.0
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Fill: |-
+                                                  =Switch(
+                                                      ThisItem.status.Value,
+                                                      "Pending Requirements", RGBA(185, 119, 11, 1),
+                                                      "Searching", RGBA(44, 110, 189, 1),
+                                                      RGBA(31, 138, 84, 1)
+                                                  )
+                                                FillPortions: =0
+                                                Height: =8
+                                                OnSelect: |-
+                                                  =Set(varSelectedRole, ThisItem);
+                                                  Set(
+                                                      varRoleTab,
+                                                      Switch(
+                                                          ThisItem.status.Value,
+                                                          "Pending Requirements", "req",
+                                                          "Searching", "cand",
+                                                          "comp"
+                                                      )
+                                                  );
+                                                  Navigate('Role Workspace', ScreenTransition.Fade)
+                                                Width: =8
+                                          - roles_row_status_text:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                Color: |-
+                                                  =Switch(
+                                                      ThisItem.status.Value,
+                                                      "Pending Requirements", RGBA(185, 119, 11, 1),
+                                                      "Searching", RGBA(44, 110, 189, 1),
+                                                      RGBA(31, 138, 84, 1)
+                                                  )
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =24
+                                                OnSelect: |-
+                                                  =Set(varSelectedRole, ThisItem);
+                                                  Set(
+                                                      varRoleTab,
+                                                      Switch(
+                                                          ThisItem.status.Value,
+                                                          "Pending Requirements", "req",
+                                                          "Searching", "cand",
+                                                          "comp"
+                                                      )
+                                                  );
+                                                  Navigate('Role Workspace', ScreenTransition.Fade)
+                                                Size: =11
+                                                Text: |-
+                                                  =Switch(
+                                                      ThisItem.status.Value,
+                                                      "Pending Requirements", "Pending reqs",
+                                                      "Searching", "Not-Filled",
+                                                      "Filled"
+                                                  )
+                                                Width: =100

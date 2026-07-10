@@ -13,6 +13,7 @@ Update these files whenever Studio import confirms or rejects something.
 | [dashboard-spec.md](./dashboard-spec.md) | Project Dashboard exact pixel measures |
 | [delegation.md](./delegation.md) | SharePoint delegable formulas & preload pattern |
 | [sharepoint-hyperlinks.md](./sharepoint-hyperlinks.md) | Hyperlink columns — use field directly in `Launch()` |
+| [yaml-pack-import.md](./yaml-pack-import.md) | pac pack/unpack, Studio import failures, incremental build |
 
 ## How to maintain
 

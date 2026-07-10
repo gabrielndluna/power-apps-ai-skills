@@ -1,0 +1,321 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  New Role:
+    Properties:
+      Fill: =RGBA(243, 244, 246, 1)
+    Children:
+      - newrole_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Horizontal
+            Width: =Parent.Width
+          Children:
+            - newrole_rail:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Fill: =RGBA(44, 47, 51, 1)
+                  FillPortions: =0
+                  Height: =Parent.Height
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =4
+                  PaddingBottom: =14
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =18
+                  Width: =224
+                Children:
+                  - newrole_brand_title:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(228, 0, 43, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =28
+                        Size: =20
+                        Text: ="RoleFit"
+                  - newrole_nav_home:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(198, 202, 207, 1)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Navigate(Home, ScreenTransition.Fade)
+                        Text: ="Home"
+                        Width: =200
+                  - newrole_nav_roles:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(198, 202, 207, 1)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Navigate('All Roles', ScreenTransition.Fade)
+                        Text: ="All Roles"
+                        Visible: =varIsCreator
+                        Width: =200
+                  - newrole_nav_pool:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Align: =Align.Left
+                        BorderThickness: =0
+                        Color: =RGBA(198, 202, 207, 1)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Navigate('Talent Pool', ScreenTransition.Fade)
+                        Text: ="Talent Pool"
+                        Visible: =varIsCreator
+                        Width: =200
+                  - newrole_rail_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        FillPortions: =1
+                        LayoutMinHeight: =40
+                  - newrole_user_name:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(198, 202, 207, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =18
+                        Size: =12
+                        Text: =User().FullName
+                  - newrole_user_role:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(124, 130, 139, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =16
+                        Size: =11
+                        Text: =If(varIsCreator, "HR Assessor", "Executive Sponsor")
+            - newrole_main:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  FillPortions: =1
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMinWidth: =0
+                Children:
+                  - newrole_topbar:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Height: =56
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        PaddingLeft: =26
+                      Children:
+                        - newrole_crumb:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(26, 26, 26, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =20
+                              Size: =13
+                              Text: ="Create New Role"
+                  - newrole_content:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =16
+                        PaddingBottom: =30
+                        PaddingLeft: =30
+                        PaddingRight: =30
+                        PaddingTop: =24
+                      Children:
+                        - newrole_title:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(26, 26, 26, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =34
+                              Size: =22
+                              Text: ="Create New Role"
+                        - newrole_form:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =12
+                              PaddingBottom: =24
+                              PaddingLeft: =24
+                              PaddingRight: =24
+                              PaddingTop: =24
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              Width: =Min(640, Parent.Width - 60)
+                            Children:
+                              - newrole_input_title:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    HintText: ="Role title"
+                                    Width: =Parent.Width - 48
+                              - newrole_input_project:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    HintText: ="Project"
+                                    Width: =Parent.Width - 48
+                              - newrole_input_location:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    HintText: ="Location"
+                                    Width: =Parent.Width - 48
+                              - newrole_input_client:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    HintText: ="Client"
+                                    Width: =Parent.Width - 48
+                              - newrole_input_contract:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    HintText: ="Contract"
+                                    Width: =Parent.Width - 48
+                              - newrole_input_band:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    HintText: ="Band"
+                                    Width: =Parent.Width - 48
+                              - newrole_input_sponsor_email:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    HintText: ="Sponsor email"
+                                    Width: =Parent.Width - 48
+                              - newrole_input_sponsor_name:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    HintText: ="Sponsor name"
+                                    Width: =Parent.Width - 48
+                              - newrole_guide_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(90, 96, 105, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    Size: =12
+                                    Text: ="Reference guide"
+                              - newrole_guide_combo:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    DisplayFields: =["Title"]
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    Items: =colGuides
+                                    SearchFields: =["Title"]
+                                    SelectMultiple: =false
+                                    Width: =Parent.Width - 48
+                        - newrole_actions:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                            Children:
+                              - newrole_cancel:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(200, 200, 200, 1)
+                                    Color: =RGBA(90, 96, 105, 1)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    OnSelect: =Navigate('All Roles', ScreenTransition.Fade)
+                                    Text: ="Cancel"
+                                    Width: =100
+                              - newrole_save:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderThickness: =0
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Fill: =RGBA(228, 0, 43, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    HoverFill: =RGBA(184, 0, 34, 1)
+                                    OnSelect: |-
+                                      =With(
+                                          {
+                                              _code: "ROLE-" & Text(CountRows(colRoles) + 1, "000")
+                                          },
+                                          Patch(
+                                              KI_roles,
+                                              Defaults(KI_roles),
+                                              {
+                                                  Title: newrole_input_title.Text,
+                                                  rolecode: _code,
+                                                  guidecode: First(newrole_guide_combo.SelectedItems).guidecode,
+                                                  project: newrole_input_project.Text,
+                                                  location: newrole_input_location.Text,
+                                                  client: newrole_input_client.Text,
+                                                  contract: newrole_input_contract.Text,
+                                                  band: newrole_input_band.Text,
+                                                  sponsoremail: newrole_input_sponsor_email.Text,
+                                                  sponsorname: newrole_input_sponsor_name.Text,
+                                                  createdbyemail: varCurrentUserEmail,
+                                                  status: {Value: "Pending Requirements"},
+                                                  requirementsfinalized: false
+                                              }
+                                          );
+                                          ClearCollect(colRoles, KI_roles);
+                                          Set(varSelectedRole, LookUp(colRoles, rolecode = _code));
+                                          Set(varRoleTab, "req");
+                                          Navigate('Role Workspace', ScreenTransition.Fade);
+                                          Notify("Role created", NotificationType.Success)
+                                      )
+                                    Size: =12
+                                    Text: ="Create role"
+                                    Width: =140

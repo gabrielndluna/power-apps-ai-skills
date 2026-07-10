@@ -12,3 +12,11 @@ _reference/
 Thumbs.db
 node_modules/
 .vscode/
+
+# Canvas YAML pack debug artifacts (do not commit)
+**/src_bisect_*/
+**/src_fresh*/
+**/src_step*/
+**/_diag/
+**/_tmp_inspect*/
+**/_cmp_*.zip
