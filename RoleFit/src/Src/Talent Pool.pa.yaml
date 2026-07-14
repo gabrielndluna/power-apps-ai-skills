@@ -12,8 +12,16 @@ Screens:
       Fill: =RGBA(243, 244, 246, 1)
       OnVisible: |-
         =ClearCollect(colCandidates, Filter(KI_candidates, isactive = true));
+        ClearCollect(colRoles, KI_roles);
         ClearCollect(colRoleRequirements, KI_role_requirements);
-        ClearCollect(colAttestations, KI_attestations)
+        ClearCollect(colAttestations, KI_attestations);
+        If(
+            varShowCreateCandidate,
+            Reset(pool_create_name);
+            Reset(pool_create_jobtitle);
+            Reset(pool_create_tenure);
+            Reset(pool_create_note)
+        )
     Children:
       - pool_root:
           Control: GroupContainer@1.5.0
@@ -95,12 +103,15 @@ Screens:
                   - pool_user_name:
                       Control: Label@2.5.1
                       Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderThickness: =0
                         Color: =RGBA(198, 202, 207, 1)
                         Font: =Font.'Segoe UI'
                         FontWeight: =FontWeight.Semibold
-                        Height: =18
+                        Height: =22
                         Size: =12
                         Text: =User().FullName
+                        Width: =200
                   - pool_user_role:
                       Control: Label@2.5.1
                       Properties:
@@ -125,7 +136,10 @@ Screens:
                         FillPortions: =0
                         Height: =56
                         LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
                         PaddingLeft: =26
+                        PaddingRight: =26
                       Children:
                         - pool_crumb:
                             Control: Label@2.5.1
@@ -135,6 +149,28 @@ Screens:
                               FontWeight: =FontWeight.Semibold
                               Size: =13
                               Text: ="Talent Pool"
+                        - pool_add_btn:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(228, 0, 43, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =36
+                              HoverFill: =RGBA(184, 0, 34, 1)
+                              OnSelect: |-
+                                =Set(varCreateCandidateLinkRole, "");
+                                Reset(pool_create_name);
+                                Reset(pool_create_jobtitle);
+                                Reset(pool_create_tenure);
+                                Reset(pool_create_note);
+                                Set(varShowCreateCandidate, true)
+                              Size: =11
+                              Text: ="+ Add candidate"
+                              Visible: =varIsCreator
+                              Width: =140
                   - pool_content:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
@@ -150,27 +186,29 @@ Screens:
                         - pool_title:
                             Control: Label@2.5.1
                             Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
                               Color: =RGBA(26, 26, 26, 1)
                               FillPortions: =0
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Bold
-                              Height: =34
+                              Height: =32
                               Size: =22
                               Text: ="Talent Pool"
+                              Width: =Parent.Width
                         - pool_context:
                             Control: Label@2.5.1
                             Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
                               Color: =RGBA(90, 96, 105, 1)
                               FillPortions: =0
                               Font: =Font.'Segoe UI'
-                              Height: =20
+                              Height: =22
                               Size: =12
-                              Text: |-
-                                =If(
-                                    !IsBlank(varTalentContextRole),
-                                    "Match scores vs: " & varTalentContextRole.Title,
-                                    "No active searching role for context scoring."
-                                )
+                              Text: ="People in the talent pool. Selected candidates show their filled role and project."
+                              Width: =Parent.Width
+                              Wrap: =true
                         - pool_gallery:
                             Control: Gallery@2.15.0
                             Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
@@ -179,16 +217,8 @@ Screens:
                               Fill: =RGBA(0, 0, 0, 0)
                               FillPortions: =1
                               Items: =colCandidates
-                              OnSelect: |-
-                                =If(
-                                    !IsBlank(varTalentContextRole),
-                                    Set(varSelectedRole, varTalentContextRole);
-                                    Set(varSelectedCandidate, ThisItem);
-                                    Set(varRoleTab, "cand");
-                                    Navigate('Role Workspace', ScreenTransition.Fade)
-                                )
                               TemplatePadding: =8
-                              TemplateSize: =180
+                              TemplateSize: =150
                               Width: =Parent.Width
                               WrapCount: =Max(1, RoundDown((Self.Width - 16) / 360, 0))
                             Children:
@@ -201,6 +231,8 @@ Screens:
                                     Height: =Parent.TemplateHeight - 4
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutGap: =6
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     PaddingBottom: =12
                                     PaddingLeft: =14
                                     PaddingRight: =14
@@ -214,106 +246,321 @@ Screens:
                                     - pool_card_name:
                                         Control: Label@2.5.1
                                         Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
                                           Color: =RGBA(26, 26, 26, 1)
                                           Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Bold
                                           Height: =22
                                           Size: =15
                                           Text: =ThisItem.Title
+                                          Width: =Parent.Width
                                     - pool_card_title:
                                         Control: Label@2.5.1
                                         Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
                                           Color: =RGBA(90, 96, 105, 1)
                                           Font: =Font.'Segoe UI'
-                                          Height: =32
+                                          Height: =40
                                           Size: =12
                                           Text: =ThisItem.currenttitle & " · " & ThisItem.tenuresource
+                                          Width: =Parent.Width
                                           Wrap: =true
-                                    - pool_card_scores:
-                                        Control: GroupContainer@1.5.0
-                                        Variant: AutoLayout
+                                    - pool_card_selected:
+                                        Control: Label@2.5.1
                                         Properties:
-                                          FillPortions: =0
-                                          LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutGap: =18
-                                        Children:
-                                          - pool_card_score_reqs:
-                                              Control: Label@2.5.1
-                                              Properties:
-                                                Color: =RGBA(44, 47, 51, 1)
-                                                Font: =Font.'Segoe UI'
-                                                FontWeight: =FontWeight.Bold
-                                                Height: =36
-                                                Size: =12
-                                                Text: |-
-                                                  =With(
-                                                      {
-                                                          reqs: Filter(colRoleRequirements, rolecode = varTalentContextRole.rolecode && isrequired),
-                                                          met: Filter(
-                                                              colAttestations,
-                                                              candidatecode = ThisItem.candidatecode && status.Value = "Met"
-                                                          )
-                                                      },
-                                                      If(
-                                                          CountRows(reqs) = 0,
-                                                          "- / -" & Char(10) & "Requirements met",
-                                                          With(
-                                                              {
-                                                                  metCount: CountRows(
-                                                                      Filter(
-                                                                          reqs As r,
-                                                                          !IsBlank(
-                                                                              LookUp(
-                                                                                  met,
-                                                                                  itemcode = r.itemcode || requirementcode = r.requirementcode
-                                                                              )
-                                                                          )
-                                                                      )
-                                                                  )
-                                                              },
-                                                              Text(metCount) & "/" & Text(CountRows(reqs)) & Char(10) & "Requirements met"
-                                                          )
-                                                      )
-                                                  )
-                                                Width: =120
-                                                Wrap: =true
-                                          - pool_card_score_crit:
-                                              Control: Label@2.5.1
-                                              Properties:
-                                                Color: =RGBA(44, 47, 51, 1)
-                                                Font: =Font.'Segoe UI'
-                                                FontWeight: =FontWeight.Bold
-                                                Height: =36
-                                                Size: =12
-                                                Text: |-
-                                                  =With(
-                                                      {
-                                                          crits: Filter(colRoleRequirements, rolecode = varTalentContextRole.rolecode && iscritical),
-                                                          met: Filter(
-                                                              colAttestations,
-                                                              candidatecode = ThisItem.candidatecode && status.Value = "Met"
-                                                          )
-                                                      },
-                                                      If(
-                                                          CountRows(crits) = 0,
-                                                          "- / -" & Char(10) & "Criticals met",
-                                                          With(
-                                                              {
-                                                                  metCount: CountRows(
-                                                                      Filter(
-                                                                          crits As r,
-                                                                          !IsBlank(
-                                                                              LookUp(
-                                                                                  met,
-                                                                                  itemcode = r.itemcode || requirementcode = r.requirementcode
-                                                                              )
-                                                                          )
-                                                                      )
-                                                                  )
-                                                              },
-                                                              Text(metCount) & "/" & Text(CountRows(crits)) & Char(10) & "Criticals met"
-                                                          )
-                                                      )
-                                                  )
-                                                Width: =110
-                                                Wrap: =true
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          Color: =RGBA(228, 0, 43, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =40
+                                          Size: =11
+                                          Text: |-
+                                            =With(
+                                                {
+                                                    filledRole: LookUp(
+                                                        colRoles,
+                                                        selectedcandidatecode = ThisItem.candidatecode
+                                                    )
+                                                },
+                                                If(
+                                                    IsBlank(filledRole),
+                                                    "",
+                                                    "Selected · " & filledRole.Title & Char(10) & filledRole.project
+                                                )
+                                            )
+                                          Visible: |-
+                                            =!IsBlank(
+                                                LookUp(
+                                                    colRoles,
+                                                    selectedcandidatecode = ThisItem.candidatecode
+                                                )
+                                            )
+                                          Width: =Parent.Width
+                                          Wrap: =true
+      - pool_create_modal:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(0, 0, 0, 0.45)
+            Height: =Parent.Height
+            Visible: =varShowCreateCandidate
+            Width: =Parent.Width
+            X: =0
+            Y: =0
+          Children:
+            - pool_create_backdrop:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderThickness: =0
+                  Color: =RGBA(0, 0, 0, 0)
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Height: =Parent.Height
+                  HoverFill: =RGBA(0, 0, 0, 0)
+                  OnSelect: |-
+                    =Set(varShowCreateCandidate, false);
+                    Set(varCreateCandidateLinkRole, "")
+                  PressedFill: =RGBA(0, 0, 0, 0)
+                  Text: =""
+                  Width: =Parent.Width
+                  X: =0
+                  Y: =0
+            - pool_create_card:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =520
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  Width: =480
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - pool_create_body:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =Parent.Height
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =20
+                        PaddingLeft: =22
+                        PaddingRight: =22
+                        PaddingTop: =18
+                        Width: =Parent.Width
+                        X: =0
+                        Y: =0
+                      Children:
+                        - pool_create_title_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =36
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =436
+                            Children:
+                              - pool_create_title:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    Color: =RGBA(26, 26, 26, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: ="New candidate"
+                              - pool_create_cancel:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderThickness: =0
+                                    Color: =RGBA(90, 96, 105, 1)
+                                    Fill: =RGBA(241, 242, 244, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =32
+                                    OnSelect: |-
+                                      =Set(varShowCreateCandidate, false);
+                                      Set(varCreateCandidateLinkRole, "")
+                                    Size: =11
+                                    Text: ="Cancel"
+                                    Width: =88
+                        - pool_create_hint:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(90, 96, 105, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =32
+                              Size: =11
+                              Text: |-
+                                =If(
+                                    !IsBlank(varCreateCandidateLinkRole),
+                                    "Saved to Talent Pool and added to this role.",
+                                    "Saved to Talent Pool. Assign to a role later from Role Workspace."
+                                )
+                              Width: =436
+                              Wrap: =true
+                        - pool_create_name_lbl:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(90, 96, 105, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =16
+                              Size: =11
+                              Text: ="Full name *"
+                              Width: =436
+                        - pool_create_name:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              Default: =""
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =40
+                              HintText: ="e.g. Amara Chen"
+                              Width: =436
+                        - pool_create_title_lbl:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(90, 96, 105, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =16
+                              Size: =11
+                              Text: ="Current title"
+                              Width: =436
+                        - pool_create_jobtitle:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              Default: =""
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =40
+                              HintText: ="e.g. Project Director"
+                              Width: =436
+                        - pool_create_tenure_lbl:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(90, 96, 105, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =16
+                              Size: =11
+                              Text: ="Tenure / source"
+                              Width: =436
+                        - pool_create_tenure:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              Default: =""
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =40
+                              HintText: ="e.g. Aecon · 9 yrs"
+                              Width: =436
+                        - pool_create_note_lbl:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(90, 96, 105, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =16
+                              Size: =11
+                              Text: ="Assessor note"
+                              Width: =436
+                        - pool_create_note:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              Default: =""
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =72
+                              HintText: ="Optional notes for assessors"
+                              Mode: =TextMode.MultiLine
+                              Width: =436
+                        - pool_create_save:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(228, 0, 43, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              HoverFill: =RGBA(184, 0, 34, 1)
+                              OnSelect: |-
+                                =If(
+                                    IsBlank(Trim(pool_create_name.Text)),
+                                    Notify("Full name is required", NotificationType.Error),
+                                    With(
+                                        {
+                                            _code: "CAND-" & Text(CountRows(colCandidates) + 1, "000"),
+                                            _name: Trim(pool_create_name.Text),
+                                            _title: If(IsBlank(Trim(pool_create_jobtitle.Text)), "Title not set", Trim(pool_create_jobtitle.Text)),
+                                            _tenure: If(IsBlank(Trim(pool_create_tenure.Text)), "Talent Pool", Trim(pool_create_tenure.Text)),
+                                            _note: Trim(pool_create_note.Text),
+                                            _linkRole: varCreateCandidateLinkRole
+                                        },
+                                        Patch(
+                                            KI_candidates,
+                                            Defaults(KI_candidates),
+                                            {
+                                                Title: _name,
+                                                candidatecode: _code,
+                                                currenttitle: _title,
+                                                tenuresource: _tenure,
+                                                assessornote: _note,
+                                                isactive: true,
+                                                createdbyemail: varCurrentUserEmail
+                                            }
+                                        );
+                                        ClearCollect(colCandidates, Filter(KI_candidates, isactive = true));
+
+                                        Reset(pool_create_name);
+                                        Reset(pool_create_jobtitle);
+                                        Reset(pool_create_tenure);
+                                        Reset(pool_create_note);
+                                        Set(varShowCreateCandidate, false);
+                                        Set(varCreateCandidateLinkRole, "");
+                                        Notify(_name & " added to Talent Pool", NotificationType.Success)
+                                    )
+                                )
+                              Size: =12
+                              Text: ="Save candidate"
+                              Width: =436

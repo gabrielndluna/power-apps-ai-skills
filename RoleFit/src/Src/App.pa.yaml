@@ -22,11 +22,14 @@ App:
       Set(varSelectedCandidate, Blank());
       Set(varRolesListTab, "pending");
       Set(varShowAddCandidate, false);
+      Set(varShowCreateCandidate, false);
+      Set(varCreateCandidateLinkRole, "");
       Set(varShowNewRole, false);
       Set(varTalentContextRole, Blank());
       Set(varScreenRefresh, true);
       Set(varWsExpandedPillar, "");
       Set(varWsExpandedCategory, "");
+      Set(varCompFilter, "all");
 
       ClearCollect(colGuides, Filter(KI_reference_guides, isactive = true));
       ClearCollect(colPillars, KI_pillars);

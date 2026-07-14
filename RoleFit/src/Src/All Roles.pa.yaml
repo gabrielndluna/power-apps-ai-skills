@@ -94,12 +94,15 @@ Screens:
                   - roles_user_name:
                       Control: Label@2.5.1
                       Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderThickness: =0
                         Color: =RGBA(198, 202, 207, 1)
                         Font: =Font.'Segoe UI'
                         FontWeight: =FontWeight.Semibold
-                        Height: =18
+                        Height: =22
                         Size: =12
                         Text: =User().FullName
+                        Width: =200
                   - roles_user_role:
                       Control: Label@2.5.1
                       Properties:
@@ -125,24 +128,59 @@ Screens:
                         Height: =56
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
                         PaddingLeft: =26
                         PaddingRight: =26
                       Children:
                         - roles_crumb:
                             Control: Label@2.5.1
                             Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
                               Color: =RGBA(26, 26, 26, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
+                              Height: =28
                               Size: =13
                               Text: ="All Roles"
+                        - roles_topbar_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              Height: =1
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =1
+                        - roles_add_cand_btn:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(228, 0, 43, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(228, 0, 43, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =36
+                              OnSelect: |-
+                                =Set(varCreateCandidateLinkRole, "");
+                                Set(varShowCreateCandidate, true);
+                                Navigate('Talent Pool', ScreenTransition.Fade)
+                              Size: =11
+                              Text: ="+ Add candidate"
+                              Visible: =varIsCreator
+                              Width: =140
                         - roles_new_btn:
                             Control: Classic/Button@2.2.0
                             Properties:
                               BorderThickness: =0
                               Color: =RGBA(255, 255, 255, 1)
                               Fill: =RGBA(228, 0, 43, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
                               Height: =36

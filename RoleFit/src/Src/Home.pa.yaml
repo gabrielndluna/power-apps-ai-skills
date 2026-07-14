@@ -107,12 +107,15 @@ Screens:
                   - home_user_name:
                       Control: Label@2.5.1
                       Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderThickness: =0
                         Color: =RGBA(198, 202, 207, 1)
                         Font: =Font.'Segoe UI'
                         FontWeight: =FontWeight.Semibold
-                        Height: =18
+                        Height: =22
                         Size: =12
                         Text: =User().FullName
+                        Width: =200
                   - home_user_role:
                       Control: Label@2.5.1
                       Properties:
