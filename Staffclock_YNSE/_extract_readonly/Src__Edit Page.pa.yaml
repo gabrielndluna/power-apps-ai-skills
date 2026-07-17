@@ -1,0 +1,931 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Edit Page:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - Title_Edits:
+          Control: Label@2.5.1
+          Group: TopBanner_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =47
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =27.09
+            Text: ="Edit Page"
+            Width: =535.07
+            X: =342
+            Y: =26
+      - EditSquare_Edits:
+          Control: Rectangle@2.3.0
+          Group: TopBanner_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =55
+            Width: =85.79
+            X: =1415.57
+            Y: =39
+      - ApprovalIcon_Edits:
+          Control: Classic/Icon@2.5.0
+          Group: TopBanner_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =42
+            Icon: =Icon.DockCheckProperties
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Tooltip: ="Approvals"
+            Width: =47.41
+            X: =1338.81
+            Y: =45
+      - TrackIcon_Edits:
+          Control: Classic/Icon@2.5.0
+          Group: TopBanner_Edits
+          Properties:
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =37
+            Icon: =Icon.Add
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Tooltip: ="Add Records"
+            Width: =39.51
+            X: =1241.73
+            Y: =48
+      - EditIcon_Edits:
+          Control: Classic/Icon@2.5.0
+          Group: TopBanner_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Height: =37
+            Icon: =Icon.ColorPicker
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Tooltip: ="Edit Records"
+            Width: =41.77
+            X: =1437.02
+            Y: =48
+      - Border_Edits:
+          Control: Rectangle@2.3.0
+          Group: TopBanner_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =3
+            Width: =1493.46
+            X: =21.45
+            Y: =93
+      - ApprovalSquare_Edits:
+          Control: Rectangle@2.3.0
+          Group: TopBanner_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =55
+            OnSelect: |-
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Hours Tracking (Permissions)',
+                          User_Email = User().Email && Approver = 1
+                      )
+                  ),
+                  Navigate('Approvals', ScreenTransition.Fade, 
+                      {
+                          SelectedProject: SelectedProject, 
+                          Selected_PowerBI: Selected_PowerBI,
+                          Selected_ProjectID: Selected_ProjectID
+                      }
+                  ),
+                  Notify("You do not have permission to access this page.", NotificationType.Error)
+              )
+            Tooltip: ="Approval Page"
+            Width: =85.79
+            X: =1317.36
+            Y: =39
+      - TrackSquare_Edits:
+          Control: Rectangle@2.3.0
+          Group: TopBanner_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =55
+            OnSelect: |-
+              =Navigate('Hours Tracking', ScreenTransition.Fade, 
+              	{
+              	SelectedProject: SelectedProject, 
+              	Selected_PowerBI: Selected_PowerBI,
+              	Selected_ProjectID: Selected_ProjectID
+              	})
+            Tooltip: ="Hours Tracking Page"
+            Width: =85.79
+            X: =1219.15
+            Y: =39
+      - SaveRectangle_Edits:
+          Control: Rectangle@2.3.0
+          Group: SaveEdits_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            OnSelect: =
+            Width: =189.65
+            X: =1321.88
+            Y: =130
+      - SaveIcon_Edits:
+          Control: Classic/Icon@2.5.0
+          Group: SaveEdits_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =36
+            Icon: =Icon.Save
+            OnSelect: |+
+              =// Update hours table
+              If(
+                  CountRows(colHoursUpdates) > 0,
+                  Patch(
+                      'Hours Tracking (Hours)',
+                      ShowColumns(
+                          colHoursUpdates,
+                          ID,
+                          Cost_code,
+                          Employee,
+                          Date,
+                          Standard_time,
+                          Overtime,
+                          Vacation_time,
+                          Holiday,
+                          Comments,
+                          ApprovalStatus_1,
+                          ApprovalStatus_2)
+                  )
+              );
+              Clear(colHoursUpdates);
+
+              // Notify user
+              Notify("Records updated successfully!", NotificationType.Success);
+
+              // Refresh the data source
+              Refresh('Hours Tracking (Hours)');
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =40.64
+            X: =1329.78
+            Y: =132
+      - SaveEditsText_Edits:
+          Control: Label@2.5.1
+          Group: SaveEdits_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            Height: =34
+            OnSelect: =
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: ="Save Changes"
+            Width: =130.95
+            X: =1374.93
+            Y: =133
+      - Text_CostCode_Edits:
+          Control: Label@2.5.1
+          Group: User_Selections_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Cost Code"
+            Width: =141.11
+            X: =28
+            Y: =96
+      - Dropdown_CostCode_Edits:
+          Control: Classic/ComboBox@2.4.0
+          Group: User_Selections_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            ChevronBackground: =RGBA(0, 18, 107, 1)
+            ChevronFill: =RGBA(255, 255, 255, 1)
+            ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            ChevronHoverFill: =RGBA(255, 255, 255, 1)
+            DisplayFields: =["Value"]
+            Font: =Font.'Open Sans'
+            HoverFill: =RGBA(186, 202, 226, 1)
+            InputTextPlaceholder: ="Select your activity"
+            IsSearchable: =false
+            Items: |-
+              =Distinct(
+              colCostCodes
+              ,Network_Activity_Name)
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(0, 18, 107, 1)
+            SearchFields: =["Value"]
+            SelectMultiple: =false
+            SelectionColor: =RGBA(255, 255, 255, 1)
+            SelectionFill: =RGBA(56, 96, 178, 1)
+            Size: =10
+            Width: =370.26
+            X: =28
+            Y: =130
+      - Rectangle_Header_3:
+          Control: Rectangle@2.3.0
+          Group: Gallery_Header_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =41
+            Width: =1475
+            X: =11.29
+            Y: =189
+      - Employee_Header_4:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Edits
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_3.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Employee"
+            Width: =Rectangle_Header_3.Width/9
+            X: =Rectangle_Header_3.X
+            Y: =Rectangle_Header_3.Y
+      - CostCode_Header_4:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Edits
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Cost Code"
+            Width: =Rectangle_Header_3.Width/5.8
+            X: =Employee_Header_4.X + Employee_Header_4.Width
+            Y: =Rectangle_Header_3.Y
+      - Date_Header_4:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Edits
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_3.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Date"
+            Width: =Rectangle_Header_3.Width/16
+            X: =CostCode_Header_4.X + CostCode_Header_4.Width
+            Y: =Rectangle_Header_3.Y
+      - Standard_Header_4:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Edits
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_3.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Hours"
+            Width: =Rectangle_Header_3.Width/21
+            X: =Date_Header_4.X + Date_Header_4.Width
+            Y: =Rectangle_Header_3.Y
+      - Gallery_Hours_Edits:
+          Control: Gallery@2.15.0
+          Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =533
+            Items: |+
+              =//Filter(
+              //    'Hours Tracking (Hours)',
+              //    (Project = Selected_ProjectID) &&
+              //    (Employee = User().Email) &&
+              //    (IsBlank(Dropdown_CostCode_Edits.Selected.Value) || Cost_code = Dropdown_CostCode_Edits.Selected.Value) &&
+              //    (IsBlank(DatePicker_Date_Edits.SelectedDate) || Date = DatePicker_Date_Edits.SelectedDate)
+              //)
+
+              Filter(
+                  'Hours Tracking (Hours)',
+                  (Project = Selected_ProjectID) &&
+                  (Employee = User().Email) &&
+                  (IsBlank(Dropdown_CostCode_Edits.Selected.Value) || Cost_code = Dropdown_CostCode_Edits.Selected.Value) &&
+                  (
+                      IsBlank(DatePicker_DateFrom_App_1.SelectedDate) || 
+                      IsBlank(DatePicker_DateTo_App_1.SelectedDate) || 
+                      (Date >= DatePicker_DateFrom_App_1.SelectedDate && Date <= DatePicker_DateTo_App_1.SelectedDate)
+                  )
+              )
+
+            TemplateSize: =40
+            Width: =1527.33
+            X: =Rectangle_Header_3.X
+            Y: =230
+          Children:
+            - Separator2_4:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =8
+                  OnSelect: =Select(Parent)
+                  Width: =1527.33
+                  X: =0.00
+                  Y: =Parent.TemplateHeight - Self.Height
+            - TextInput_Employee_4:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.Employee
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |+
+                    =// Track changes related to hours table
+                    If(
+                        IsBlank(
+                            LookUp(
+                                colHoursUpdates,
+                                ID = ThisItem.ID
+                            )
+                        ),
+                        Collect(
+                            colHoursUpdates,
+                            {
+                                ID: ThisItem.ID,
+                                Cost_code: TextInput_CostCode_4.Text,
+                                Employee: TextInput_Employee_4.Text,
+                                Date: DateValue(TextInput_Date_4.Text),
+                                Standard_time: Value(TextInput_Standard_4.Text),
+                                Comments: TextInput_Comments_4.Text,
+                                ApprovalStatus_1: "Pending",
+                                ApprovalStatus_2: "Pending"
+                            }
+                        )
+                    );
+
+                    UpdateIf(
+                        colHoursUpdates,
+                        ID = ThisItem.ID,
+                        {
+                            Cost_code: TextInput_CostCode_4.Text,
+                            Employee: TextInput_Employee_4.Text,
+                            Date: DateValue(TextInput_Date_4.Text),
+                            Standard_time: Value(TextInput_Standard_4.Text),
+                            Comments: TextInput_Comments_4.Text,
+                            ApprovalStatus_1: "Pending",
+                            ApprovalStatus_2: "Pending"
+                        }
+                    );
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =9
+                  Width: =Employee_Header_4.Width
+                  X: =Employee_Header_4.X - Rectangle_Header_3.X
+            - TextInput_CostCode_4:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.Cost_code
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |+
+                    =// Track changes related to hours table
+                    If(
+                        IsBlank(
+                            LookUp(
+                                colHoursUpdates,
+                                ID = ThisItem.ID
+                            )
+                        ),
+                        Collect(
+                            colHoursUpdates,
+                            {
+                                ID: ThisItem.ID,
+                                Cost_code: TextInput_CostCode_4.Text,
+                                Employee: TextInput_Employee_4.Text,
+                                Date: DateValue(TextInput_Date_4.Text),
+                                Standard_time: Value(TextInput_Standard_4.Text),
+                                Comments: TextInput_Comments_4.Text,
+                                ApprovalStatus_1: "Pending",
+                                ApprovalStatus_2: "Pending"
+                            }
+                        )
+                    );
+
+                    UpdateIf(
+                        colHoursUpdates,
+                        ID = ThisItem.ID,
+                        {
+                            Cost_code: TextInput_CostCode_4.Text,
+                            Employee: TextInput_Employee_4.Text,
+                            Date: DateValue(TextInput_Date_4.Text),
+                            Standard_time: Value(TextInput_Standard_4.Text),
+                            Comments: TextInput_Comments_4.Text,
+                            ApprovalStatus_1: "Pending",
+                            ApprovalStatus_2: "Pending"
+                        }
+                    );
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =9
+                  Width: =CostCode_Header_4.Width
+                  X: =CostCode_Header_4.X-Rectangle_Header_3.X
+            - TextInput_Date_4:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.Date
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |+
+                    =// Track changes related to hours table
+                    If(
+                        IsBlank(
+                            LookUp(
+                                colHoursUpdates,
+                                ID = ThisItem.ID
+                            )
+                        ),
+                        Collect(
+                            colHoursUpdates,
+                            {
+                                ID: ThisItem.ID,
+                                Cost_code: TextInput_CostCode_4.Text,
+                                Employee: TextInput_Employee_4.Text,
+                                Date: DateValue(TextInput_Date_4.Text),
+                                Standard_time: Value(TextInput_Standard_4.Text),
+                                Comments: TextInput_Comments_4.Text,
+                                ApprovalStatus_1: "Pending",
+                                ApprovalStatus_2: "Pending"
+                            }
+                        )
+                    );
+
+                    UpdateIf(
+                        colHoursUpdates,
+                        ID = ThisItem.ID,
+                        {
+                            Cost_code: TextInput_CostCode_4.Text,
+                            Employee: TextInput_Employee_4.Text,
+                            Date: DateValue(TextInput_Date_4.Text),
+                            Standard_time: Value(TextInput_Standard_4.Text),
+                            Comments: TextInput_Comments_4.Text,
+                            ApprovalStatus_1: "Pending",
+                            ApprovalStatus_2: "Pending"
+                        }
+                    );
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =9
+                  Width: =Date_Header_4.Width
+                  X: =Date_Header_4.X - Rectangle_Header_3.X
+            - TextInput_Standard_4:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.Standard_time
+                  Font: =Font.'Open Sans'
+                  HintText: =
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |+
+                    =// Track changes related to hours table
+                    If(
+                        IsBlank(
+                            LookUp(
+                                colHoursUpdates,
+                                ID = ThisItem.ID
+                            )
+                        ),
+                        Collect(
+                            colHoursUpdates,
+                            {
+                                ID: ThisItem.ID,
+                                Cost_code: TextInput_CostCode_4.Text,
+                                Employee: TextInput_Employee_4.Text,
+                                Date: DateValue(TextInput_Date_4.Text),
+                                Standard_time: Value(TextInput_Standard_4.Text),
+                                Comments: TextInput_Comments_4.Text,
+                                ApprovalStatus_1: "Pending",
+                                ApprovalStatus_2: "Pending"
+                            }
+                        )
+                    );
+
+                    UpdateIf(
+                        colHoursUpdates,
+                        ID = ThisItem.ID,
+                        {
+                            Cost_code: TextInput_CostCode_4.Text,
+                            Employee: TextInput_Employee_4.Text,
+                            Date: DateValue(TextInput_Date_4.Text),
+                            Standard_time: Value(TextInput_Standard_4.Text),
+                            Comments: TextInput_Comments_4.Text,
+                            ApprovalStatus_1: "Pending",
+                            ApprovalStatus_2: "Pending"
+                        }
+                    );
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =9
+                  Width: =Standard_Header_4.Width
+                  X: =Standard_Header_4.X - Rectangle_Header_3.X
+            - TextInput_Comments_4:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.Comments
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |+
+                    =// Track changes related to hours table
+                    If(
+                        IsBlank(
+                            LookUp(
+                                colHoursUpdates,
+                                ID = ThisItem.ID
+                            )
+                        ),
+                        Collect(
+                            colHoursUpdates,
+                            {
+                                ID: ThisItem.ID,
+                                Cost_code: TextInput_CostCode_4.Text,
+                                Employee: TextInput_Employee_4.Text,
+                                Date: DateValue(TextInput_Date_4.Text),
+                                Standard_time: Value(TextInput_Standard_4.Text),
+                                Comments: TextInput_Comments_4.Text,
+                                ApprovalStatus_1: "Pending",
+                                ApprovalStatus_2: "Pending"
+                            }
+                        )
+                    );
+
+                    UpdateIf(
+                        colHoursUpdates,
+                        ID = ThisItem.ID,
+                        {
+                            Cost_code: TextInput_CostCode_4.Text,
+                            Employee: TextInput_Employee_4.Text,
+                            Date: DateValue(TextInput_Date_4.Text),
+                            Standard_time: Value(TextInput_Standard_4.Text),
+                            Comments: TextInput_Comments_4.Text,
+                            ApprovalStatus_1: "Pending",
+                            ApprovalStatus_2: "Pending"
+                        }
+                    );
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =9
+                  Width: =Comments_Header_4.Width
+                  X: =Comments_Header_4.X - Rectangle_Header_3.X
+            - TextApproval1_4:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: |-
+                    =If(
+                        ThisItem.ApprovalStatus_1 = "Approved", RGBA(108, 212, 136, 1), // Green
+                        ThisItem.ApprovalStatus_1 = "Rejected", RGBA(252, 124, 124, 1), // Red
+                        ThisItem.ApprovalStatus_1 = "Pending", RGBA(252, 250, 124, 1), // Yellow
+                        RGBA(0, 0, 0, 0) // Transparent
+                    )
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  Size: =9
+                  Text: =ThisItem.ApprovalStatus_1
+                  Width: =Approval1_Header_4.Width
+                  X: =Approval1_Header_4.X - Rectangle_Header_3.X
+            - TextApproval2_4:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: |-
+                    =If(
+                        ThisItem.ApprovalStatus_2 = "Approved", RGBA(108, 212, 136, 1), // Green
+                        ThisItem.ApprovalStatus_2 = "Rejected", RGBA(252, 124, 124, 1), // Red
+                        ThisItem.ApprovalStatus_2 = "Pending", RGBA(252, 250, 124, 1), // Yellow
+                        RGBA(0, 0, 0, 0) // Transparent
+                    )
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  Size: =9
+                  Text: =ThisItem.ApprovalStatus_2
+                  Width: =Approval2_Header_4.Width
+                  X: =Approval2_Header_4.X - Rectangle_Header_3.X
+            - Delete_Icon:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =40
+                  Icon: =Icon.Trash
+                  OnSelect: |+
+                    =// Remove the current item from 'Hours Tracking (Hours)'
+                    Remove('Hours Tracking (Hours)', ThisItem);
+
+                  PaddingRight: =0.00
+                  PaddingTop: =0.00
+                  Width: =28.22
+                  X: =AppComment_4.X + AppComment_4.Width + 3
+            - AppComment_4:
+                Control: Label@2.5.1
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  Size: =9
+                  Text: =ThisItem.Approver_Comments
+                  Width: =AppComments_Header_4.Width
+                  X: =TextApproval2_4.X + TextApproval2_4.Width
+      - Comments_Header_4:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Edits
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_3.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Task"
+            Width: =Rectangle_Header_3.Width/4.3
+            X: =Standard_Header_4.X + Standard_Header_4.Width
+            Y: =Rectangle_Header_3.Y
+      - Approval1_Header_4:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Edits
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_3.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Approval 1"
+            Width: =Rectangle_Header_3.Width/14
+            X: =Comments_Header_4.X + Comments_Header_4.Width
+            Y: =Rectangle_Header_3.Y
+      - Approval2_Header_4:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Edits
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_3.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Approval 2"
+            Width: =Rectangle_Header_3.Width/14
+            X: =Approval1_Header_4.X + Approval1_Header_4.Width
+            Y: =Rectangle_Header_3.Y
+      - Slicer 1 - Text_2:
+          Control: Label@2.5.1
+          Group: Top Section_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: ="Project"
+            Width: =141.11
+            X: =897.43
+            Y: =49
+      - Back_Button_Hours_2:
+          Control: Classic/Icon@2.5.0
+          Group: Top Section_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =40
+            Icon: =Icon.ChevronLeft
+            OnSelect: =Navigate('Main Page',ScreenTransition.Fade)
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =37.25
+            X: =860.18
+            Y: =46
+      - Label1_4:
+          Control: Label@2.5.1
+          Group: Top Section_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            OnSelect: =
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: =SelectedProject
+            Width: =203.19
+            X: =994.51
+            Y: =46
+      - AppComments_Header_4:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Edits
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_3.Height
+            Text: ="Approver Comment"
+            Width: =Rectangle_Header_3.Width/4.3
+            X: =Approval2_Header_4.X + Approval2_Header_4.Width
+            Y: =Rectangle_Header_3.Y
+      - IOC_Logo_Edits:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =49
+            Image: ='Logo Cropped'
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =120
+            X: =731
+            Y: =763
+      - Crewclock_Logo_Edits:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =94
+            Image: ='App Names'
+            Width: =298
+            X: =25
+            Y: =3
+      - Text_Date_App_2:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Date to"
+            Width: =141.11
+            X: =703
+            Y: =96
+      - DatePicker_DateTo_App_1:
+          Control: Classic/DatePicker@2.6.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            DefaultDate: =
+            DisplayMode: =
+            EndYear: =Year(Today())+100
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.'Segoe UI'
+            Height: =41
+            IconBackground: =RGBA(0, 18, 107, 1)
+            IconFill: =RGBA(255, 255, 255, 1)
+            IsEditable: =true
+            PaddingBottom: =0
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5.64
+            PaddingTop: =0.00
+            Size: =13
+            StartYear: =1899
+            Tooltip: =
+            Width: =209.96
+            X: =703
+            Y: =129
+      - Text_Date_App_3:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Date from"
+            Width: =141.11
+            X: =451
+            Y: =96
+      - DatePicker_DateFrom_App_1:
+          Control: Classic/DatePicker@2.6.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            DefaultDate: =
+            DisplayMode: =
+            EndYear: =Year(Today())+100
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.'Segoe UI'
+            Height: =41
+            IconBackground: =RGBA(0, 18, 107, 1)
+            IconFill: =RGBA(255, 255, 255, 1)
+            IsEditable: =true
+            PaddingBottom: =0
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5.64
+            PaddingTop: =0.00
+            Size: =13
+            StartYear: =1899
+            Tooltip: =
+            Width: =209.96
+            X: =451
+            Y: =129

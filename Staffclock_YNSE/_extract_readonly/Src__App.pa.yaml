@@ -1,0 +1,78 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =// Collection for Cost Codes
+      ClearCollect(colCostCodes, CostCodes);
+
+      // Collection for Hours Updates
+      ClearCollect(
+          colHoursUpdates,
+          ShowColumns(
+              Table(Defaults('Hours Tracking (Hours)')),
+              ID,
+              Cost_code,
+              Employee,
+              Date,
+              Standard_time,
+              Overtime,
+              Vacation_time,
+              Holiday,
+              Comments,
+              ApproverID_1,
+              ApprovalStatus_1,
+              ApproverID_2,
+              ApprovalStatus_2,
+              Approver_Comments
+          )
+      );
+      Clear(colHoursUpdates);
+
+      // GUID Start for hour tracking
+      Set(GUID_Var, GUID());
+
+      // Check first time user
+      Set(varFirstTimeUser, IsEmpty(Filter('Hours Tracking (Active Users)', Title = User().Email)));
+
+      // Approvers
+      Set(
+          varApprovers,
+          LookUp(
+              Approvers,
+              Email_Address = User().Email
+          )
+      );
+
+      Set(varApprover1Email, varApprovers.'Approver 1 Email');
+      Set(varApprover2Email, varApprovers.'Approver 2 Email');
+
+      Set(varMyEmail, User().Email);
+
+      // Step 1: pull Approver 1 records (delegable)
+      ClearCollect(
+          colAllApprovals,
+          Filter('Hours Tracking (Hours)', ApproverID_1 = varMyEmail)
+      );
+
+      // Step 2: pull Approver 2 records into a temp collection (delegable)
+      ClearCollect(
+          colApprover2Temp,
+          Filter('Hours Tracking (Hours)', ApproverID_2 = varMyEmail)
+      );
+
+      // Step 3: add only the records not already in colAllApprovals (local, fast - small dataset)
+      ForAll(
+          Filter(colApprover2Temp, !(ID in colAllApprovals.ID)),
+          Collect(colAllApprovals, ThisRecord)
+      );
+
+      // Cleanup
+      Clear(colApprover2Temp);
+    Theme: =PowerAppsTheme

@@ -1,0 +1,590 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen_Home:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: "=Set(varPendingApprovalWeeks,\r\n    CountRows(\r\n        Distinct(\r\n            Filter(\r\n                'StaffClock Hours',\r\n                ApproverID_1 = User().Email &&\r\n                ApprovalStatus_1 = \"Pending\"\r\n            ),\r\n            Text(DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), \"Days\"), \"yyyy-mm-dd\") & field_3\r\n        )\r\n    )\r\n);\r\n\r\nClearCollect(\r\n    colMyHours,\r\n    Filter(\r\n        'StaffClock Hours',\r\n        Employee = User().Email\r\n    )\r\n);\r\n\r\nClearCollect(colMissingWeeks,\r\n    ForAll(\r\n        Sequence(\r\n            RoundDown(DateDiff(varAppStartDate, Today(), \"Days\") / 7, 0) + 1,\r\n            0,\r\n            1\r\n        ),\r\n        With(\r\n            { weekStart: DateAdd(varAppStartDate, Value * 7 - Weekday(varAppStartDate, StartOfWeek.Monday) + 1, \"Days\") },\r\n            If(\r\n                weekStart <= varThisWeekStart &&\r\n                weekStart >= varAppStartDate &&\r\n                CountRows(\r\n                \r\n                 Filter(\r\n                     colMyHours,\r\n                    'Date' >= weekStart &&\r\n                     'Date' <= DateAdd(weekStart, 6, TimeUnit.Days)\r\n)\r\n\r\n                ) < 5,\r\n                {\r\n                    WeekStart: weekStart,\r\n                    WeekEnd: DateAdd(weekStart, 6, \"Days\"),\r\n                    WeekLabel: Text(weekStart, \"mmm d\") & \" – \" & Text(DateAdd(weekStart, 6, \"Days\"), \"mmm d, yyyy\")\r\n                }\r\n            )\r\n        )\r\n    )\r\n);"
+    Children:
+      - Crewclock_Logo_2:
+          Control: Image@2.2.3
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =81
+            Image: ='App Names'
+            Width: =198
+            X: =46
+            Y: =10
+      - Image1_2:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =72
+            Image: ='stc logo'
+            Width: =187
+            X: =262
+            Y: =13
+      - Home_Tab_Background_2:
+          Control: Classic/Button@2.2.0
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Height: =68
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Text: =
+            Tooltip: ="Home Page"
+            Width: =81
+            X: |+
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Staffclock (Approvers)',
+                          Lower('Approver 1 Email') = Lower(User().Email)
+                      )
+                  ),
+                  1214,
+                  1314
+              )
+
+            Y: =39
+      - Approval_Tab_Background_4:
+          Control: Classic/Button@2.2.0
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =4
+            Color: =RGBA(0, 18, 107, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            Height: =68
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: |-
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Staffclock (Approvers)',
+                          Lower('Approver 1 Email') = Lower(User().Email)
+                      )
+                  ),
+                  Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade),
+                  Notify("No timesheets for approval.", NotificationType.Error)
+              )
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =9
+            Text: ="Approver"
+            Tooltip: ="Approval Page"
+            VerticalAlign: =VerticalAlign.Top
+            Visible: |+
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Staffclock (Approvers)',
+                          Lower('Approver 1 Email') = Lower(User().Email)
+                      )
+                  ),
+                  true,
+                  false
+              )
+            Width: =81
+            X: =1313
+            Y: =39
+      - Approval_Tab_Background_5:
+          Control: Classic/Button@2.2.0
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =4
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            Height: =68
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Launch("https://app.powerbi.com/groups/4869fc83-1ec9-47dc-95fa-0136a4cd7345/rdlreports/399896f0-2a6c-4981-bd82-7c33a0fa5da7?ctid=7c4c3c29-f085-4e7d-b144-70b02e8de0f0&pbi_source=linkShare")
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Text: =
+            Width: =81
+            X: =1413
+            Y: =39
+      - Home_Icon_2:
+          Control: Classic/Icon@2.5.0
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Height: =46
+            Icon: =Icon.Home
+            OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
+            Tooltip: ="Home Page"
+            Width: =48
+            X: |+
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Staffclock (Approvers)',
+                          Lower('Approver 1 Email') = Lower(User().Email)
+                      )
+                  ),
+                  1231,
+                  1331
+              )
+
+            Y: =45
+      - Calendar_Icon_2:
+          Control: Classic/Icon@2.5.0
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =35
+            Icon: =Icon.CalendarBlank
+            OnSelect: =Launch("https://app.powerbi.com/groups/4869fc83-1ec9-47dc-95fa-0136a4cd7345/rdlreports/399896f0-2a6c-4981-bd82-7c33a0fa5da7?ctid=7c4c3c29-f085-4e7d-b144-70b02e8de0f0&pbi_source=linkShare")
+            Width: =38
+            X: =1435
+            Y: =49
+      - Approval_Icon_2:
+          Control: Classic/Icon@2.5.0
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =36
+            Icon: =Icon.Check
+            OnSelect: |-
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Staffclock (Approvers)',
+                          Lower('Approver 1 Email') = Lower(User().Email)
+                      )
+                  ),
+                  Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade),
+                  Notify("No timesheets for approval.", NotificationType.Error)
+              )
+            Tooltip: ="Approval Page"
+            Visible: |+
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Staffclock (Approvers)',
+                          Lower('Approver 1 Email') = Lower(User().Email)
+                      )
+                  ),
+                  true,
+                  false
+              )
+            Width: =39
+            X: =1334
+            Y: =60
+      - Border 2_4:
+          Control: Rectangle@2.3.0
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =4
+            Width: =1450
+            X: =46
+            Y: =96
+      - Tabs_Block_2:
+          Control: Rectangle@2.3.0
+          Group: Header_3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =16
+            OnSelect: =
+            Tooltip: ="Approval Page"
+            Width: =440
+            X: =1058
+            Y: =99
+      - Text_Date_To_7:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            OnSelect: |-
+              =Launch(
+                  "mailto:staffclock@stconnect.ca" &
+                  "?subject=" & EncodeUrl("StaffClock Support Request") &
+                  "&body=" & EncodeUrl("Hi StaffClock team," & Char(10) & Char(10) & "I need help with...")
+              )
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Help"
+            Width: =60
+            X: =48
+            Y: =766
+      - Icon1_2:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =30
+            Icon: =Icon.Help
+            OnSelect: |-
+              =Launch(
+                  "mailto:staffclock@stconnect.ca" &
+                  "?subject=" & EncodeUrl("StaffClock Support Request") &
+                  "&body=" & EncodeUrl("Hi StaffClock team," & Char(10) & Char(10) & "I need help with...")
+              )
+            Width: =30
+            X: =18
+            Y: =769
+      - Label_Welcome:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Right
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =57
+            Size: =24
+            Text: ="Welcome " & User().FullName
+            Width: =499
+            X: =48
+            Y: =136
+      - Label_Welcome_1:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Right
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =31
+            Size: =10
+            Text: ="Supervisor - " & varApprover1Email
+            Width: =333
+            X: =214
+            Y: =193
+      - Container1:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Height: =496
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutGap: =15
+            PaddingBottom: =8
+            PaddingLeft: =8
+            PaddingRight: =8
+            PaddingTop: =8
+            Width: =1448
+            X: =46
+            Y: =250
+          Children:
+            - Container_MyTimesheet:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  BorderColor: =RGBA(166, 166, 166, 1)
+                  BorderThickness: =2
+                  DropShadow: =DropShadow.Bold
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =5
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingBottom: =8
+                  PaddingLeft: =8
+                  PaddingRight: =8
+                  PaddingTop: =8
+                Children:
+                  - Container2:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =45
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                      Children:
+                        - Icon3:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =35
+                              Icon: =Icon.CalendarBlank
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                        - Label_MyTimesheetTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              FillPortions: =1
+                              Font: =Font.'Open Sans'
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              Size: =20
+                              Text: ="My Timesheet"
+                              X: =40
+                              Y: =40
+                  - Icon2:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        BorderThickness: =3
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =1
+                        Icon: =Icon.HorizontalLine
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                  - Container2_3:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =40
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutJustifyContent: =LayoutJustifyContent.End
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                      Children:
+                        - Label3:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Right
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              FillPortions: =1
+                              Font: =Font.'Open Sans'
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              Text: =If(CountRows(colMissingWeeks) = 0, "All timesheets up to date", Text(CountRows(colMissingWeeks)) & " week(s) not submitted")
+                              Width: =300
+                              X: =40
+                              Y: =40
+                        - Icon_GoToWeek_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =35
+                              Icon: =Icon.NextArrow
+                              OnSelect: =Navigate('Hours Tracking', ScreenTransition.Cover);
+                              X: =40
+                              Y: =40
+                  - pending_submissions_gallery:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        AlignInContainer: =AlignInContainer.SetByContainer
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =250
+                        Items: =colMissingWeeks
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        TemplateSize: =70
+                      Children:
+                        - Label_MissingWeekLabel:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(50, 49, 48, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                              Height: =Self.Size * 1.8
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =14
+                              Text: =ThisItem.WeekLabel
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =Parent.TemplateWidth - 173
+                              X: =15
+                              Y: =5
+                        - Label_NotSubmitted:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+                              Height: =Self.Size * 1.8
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =12
+                              Text: ="Not Submitted"
+                              VerticalAlign: =VerticalAlign.Top
+                              Width: =Label_MissingWeekLabel.Width
+                              X: =Label_MissingWeekLabel.X
+                              Y: =36
+                        - Separator1:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =8
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =62
+                        - Icon_GoToWeek:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =35
+                              Icon: =Icon.NextArrow
+                              OnSelect: |-
+                                =Set(varCurrentWeekStart, ThisItem.WeekStart);
+                                Set(varDrillFromWeekly, false);
+                                Navigate('Hours Tracking', ScreenTransition.Cover);
+                              Width: =35
+                              X: =634
+                              Y: =16
+            - Container_Approvals:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  BorderColor: =RGBA(166, 166, 166, 1)
+                  BorderThickness: =2
+                  DropShadow: =DropShadow.Bold
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =5
+                  LayoutMaxHeight: =130
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingBottom: =8
+                  PaddingLeft: =8
+                  PaddingRight: =8
+                  PaddingTop: =8
+                  Visible: =!IsBlank(LookUp('Staffclock (Approvers)', Lower('Approver 1 Email') = Lower(User().Email)))
+                Children:
+                  - Container2_1:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =45
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                      Children:
+                        - Icon3_1:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =35
+                              Icon: =Icon.CheckBadge
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                        - Label_ApprovalsTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              FillPortions: =1
+                              Font: =Font.'Open Sans'
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              Size: =20
+                              Text: ="Approvals"
+                              X: =40
+                              Y: =40
+                  - Icon2_1:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        BorderThickness: =3
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =1
+                        Icon: =Icon.HorizontalLine
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                  - Container2_2:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =40
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutJustifyContent: =LayoutJustifyContent.End
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                      Children:
+                        - Label_PendingApprovals:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Right
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              FillPortions: =1
+                              Font: =Font.'Open Sans'
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              Text: =Text(varPendingApprovalWeeks) & " timesheet week(s) waiting for approval"
+                              Width: =300
+                              X: =40
+                              Y: =40
+                        - Icon_GoToApprovals:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Height: =35
+                              Icon: =Icon.NextArrow
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                              OnSelect: =Navigate(Screen_WeeklyApprovals, ScreenTransition.Cover)
+                              X: =40
+                              Y: =40

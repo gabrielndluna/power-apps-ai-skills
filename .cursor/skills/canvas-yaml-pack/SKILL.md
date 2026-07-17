@@ -30,6 +30,35 @@ pac canvas unpack --msapp RoleFit/RoleFit.msapp --sources RoleFit/src --layout S
 # then edit Src/*.pa.yaml and pack
 ```
 
+For a Studio export with newly added connectors, unpack to a temporary folder first and copy the refreshed `.msapr` into the working `src/` so current YAML edits are not overwritten. For Office 365 Users search formulas, follow `_canvas-notes/office365-users.md`.
+
+### Office 365 Users ComboBox (validated Staffclock YNSE)
+
+People search ComboBoxes must use this exact pattern (do not "improve" it without Studio re-validation):
+
+```powerfx
+DisplayFields = ["DisplayName"]
+SearchFields = ["DisplayName", "Mail"]   // only these two
+Items =
+If(
+    !IsBlank(Trim(Self.SearchText)),
+    ShowColumns(
+        Office365Users.SearchUser(
+            { searchTerm: Trim(Self.SearchText), top: 15 }
+        ),
+        Id, DisplayName, Mail, UserPrincipalName, Department
+    )
+)
+```
+
+Known failures:
+
+- `DisplayFields = ["UserLabel"]` or any custom `AddColumns` label → search/display breaks
+- `SearchFields` including `UserPrincipalName` → search stops returning results
+- Calling `SearchUser` when `SearchText` is blank → noisy / empty behavior
+
+OnChange should store `Lower(Coalesce(Selected.Mail, Selected.UserPrincipalName))` and filter **local collections** with `Lower(Employee) = varEmail`, not SharePoint directly. Full notes: `_canvas-notes/office365-users.md`.
+
 ### No CanvasComponents in YAML-only packs
 
 `CanvasComponent` / custom component `.pa.yaml` files often fail Studio deserialization until the app is opened and saved once in Studio (which compiles components to `Components/*.json`).
@@ -71,6 +100,7 @@ Round-trip test (unpack seed → pack unchanged) must pass before adding YAML.
 - [ ] No CanvasComponent unless Studio-validated seed exists
 - [ ] packed.json has LoadFromYaml: true
 - [ ] User tests import after each major screen addition
+- [ ] Large SharePoint loads are bounded by delegable date/status filters (see `_canvas-notes/delegation.md`)
 ```
 
 ## Folder layout (per app)

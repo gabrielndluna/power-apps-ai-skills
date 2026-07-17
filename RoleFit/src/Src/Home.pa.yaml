@@ -394,30 +394,41 @@ Screens:
                               - home_exec_eyebrow:
                                   Control: Label@2.5.1
                                   Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
                                     Color: =RGBA(228, 0, 43, 1)
+                                    FillPortions: =0
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Bold
+                                    Height: =18
                                     Size: =11
                                     Text: ="ASSIGNED TO YOU"
+                                    Width: =Parent.Width
                               - home_exec_title:
                                   Control: Label@2.5.1
                                   Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
                                     Color: =RGBA(26, 26, 26, 1)
                                     FillPortions: =0
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Bold
-                                    Height: =34
+                                    Height: =32
                                     Size: =22
                                     Text: ="Requirements to define"
+                                    Width: =Parent.Width
                               - home_exec_sub:
                                   Control: Label@2.5.1
                                   Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
                                     Color: =RGBA(90, 96, 105, 1)
                                     FillPortions: =0
                                     Font: =Font.'Segoe UI'
                                     Height: =40
                                     Size: =13
                                     Text: ="Open the assessment, tick requirements, flag critical ones, and add notes."
+                                    Width: =Parent.Width
                                     Wrap: =true
                               - home_sponsor_gallery:
                                   Control: Gallery@2.15.0
@@ -428,23 +439,28 @@ Screens:
                                     FillPortions: =1
                                     Items: =colMySponsorRoles
                                     TemplatePadding: =8
-                                    TemplateSize: =200
+                                    TemplateSize: =148
                                     Width: =Parent.Width
                                   Children:
                                     - home_sponsor_card:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
                                           DropShadow: =DropShadow.Light
                                           Fill: =RGBA(255, 255, 255, 1)
                                           Height: =Parent.TemplateHeight - 4
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Horizontal
                                           LayoutGap: =0
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
                                           RadiusBottomLeft: =10
                                           RadiusBottomRight: =10
                                           RadiusTopLeft: =10
                                           RadiusTopRight: =10
-                                          Width: =Parent.TemplateWidth - 4
+                                          Width: =Parent.TemplateWidth - 12
                                         Children:
                                           - home_sponsor_accent:
                                               Control: Rectangle@2.3.0
@@ -458,60 +474,92 @@ Screens:
                                               Control: GroupContainer@1.5.0
                                               Variant: AutoLayout
                                               Properties:
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                BorderThickness: =0
+                                                DropShadow: =DropShadow.None
                                                 FillPortions: =1
+                                                LayoutAlignItems: =LayoutAlignItems.Center
                                                 LayoutDirection: =LayoutDirection.Horizontal
-                                                LayoutGap: =16
-                                                LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
-                                                PaddingBottom: =16
-                                                PaddingLeft: =18
-                                                PaddingRight: =18
-                                                PaddingTop: =16
+                                                LayoutGap: =12
+                                                LayoutMinHeight: =0
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =14
+                                                PaddingLeft: =16
+                                                PaddingRight: =16
+                                                PaddingTop: =14
                                               Children:
                                                 - home_sponsor_card_left:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: AutoLayout
                                                     Properties:
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      DropShadow: =DropShadow.None
                                                       FillPortions: =1
+                                                      LayoutAlignItems: =LayoutAlignItems.Stretch
                                                       LayoutDirection: =LayoutDirection.Vertical
-                                                      LayoutGap: =6
+                                                      LayoutGap: =4
+                                                      LayoutMinHeight: =0
+                                                      LayoutMinWidth: =200
                                                     Children:
                                                       - home_sponsor_role_title:
                                                           Control: Label@2.5.1
                                                           Properties:
+                                                            BorderColor: =RGBA(0, 0, 0, 0)
+                                                            BorderThickness: =0
                                                             Color: =RGBA(26, 26, 26, 1)
+                                                            FillPortions: =0
                                                             Font: =Font.'Segoe UI'
                                                             FontWeight: =FontWeight.Bold
-                                                            Height: =22
-                                                            Size: =16
+                                                            Height: =40
+                                                            Size: =15
                                                             Text: =ThisItem.Title
-                                                            Width: =Parent.Width
+                                                            Width: =home_sponsor_gallery.TemplateWidth - 220
+                                                            Wrap: =true
                                                       - home_sponsor_project:
                                                           Control: Label@2.5.1
                                                           Properties:
+                                                            BorderColor: =RGBA(0, 0, 0, 0)
+                                                            BorderThickness: =0
                                                             Color: =RGBA(90, 96, 105, 1)
+                                                            FillPortions: =0
                                                             Font: =Font.'Segoe UI'
                                                             Height: =18
                                                             Size: =12
                                                             Text: =ThisItem.project
-                                                            Width: =Parent.Width
+                                                            Width: =home_sponsor_gallery.TemplateWidth - 220
                                                       - home_sponsor_meta_row:
                                                           Control: GroupContainer@1.5.0
                                                           Variant: AutoLayout
                                                           Properties:
+                                                            BorderColor: =RGBA(0, 0, 0, 0)
+                                                            BorderThickness: =0
+                                                            DropShadow: =DropShadow.None
+                                                            FillPortions: =0
                                                             LayoutDirection: =LayoutDirection.Horizontal
-                                                            LayoutGap: =20
-                                                            LayoutWrap: =true
+                                                            LayoutGap: =16
+                                                            LayoutMinHeight: =0
+                                                            LayoutMinWidth: =0
+                                                            Width: =home_sponsor_gallery.TemplateWidth - 220
                                                           Children:
                                                             - home_sponsor_loc:
                                                                 Control: GroupContainer@1.5.0
                                                                 Variant: AutoLayout
                                                                 Properties:
+                                                                  BorderColor: =RGBA(0, 0, 0, 0)
+                                                                  BorderThickness: =0
+                                                                  DropShadow: =DropShadow.None
+                                                                  FillPortions: =1
                                                                   LayoutDirection: =LayoutDirection.Vertical
                                                                   LayoutGap: =2
+                                                                  LayoutMinHeight: =0
+                                                                  LayoutMinWidth: =80
                                                                 Children:
                                                                   - home_sponsor_loc_lbl:
                                                                       Control: Label@2.5.1
                                                                       Properties:
+                                                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                                                        BorderThickness: =0
                                                                         Color: =RGBA(124, 130, 139, 1)
                                                                         Font: =Font.'Segoe UI'
                                                                         FontWeight: =FontWeight.Semibold
@@ -521,6 +569,8 @@ Screens:
                                                                   - home_sponsor_loc_val:
                                                                       Control: Label@2.5.1
                                                                       Properties:
+                                                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                                                        BorderThickness: =0
                                                                         Color: =RGBA(44, 47, 51, 1)
                                                                         Font: =Font.'Segoe UI'
                                                                         FontWeight: =FontWeight.Semibold
@@ -531,12 +581,20 @@ Screens:
                                                                 Control: GroupContainer@1.5.0
                                                                 Variant: AutoLayout
                                                                 Properties:
+                                                                  BorderColor: =RGBA(0, 0, 0, 0)
+                                                                  BorderThickness: =0
+                                                                  DropShadow: =DropShadow.None
+                                                                  FillPortions: =1
                                                                   LayoutDirection: =LayoutDirection.Vertical
                                                                   LayoutGap: =2
+                                                                  LayoutMinHeight: =0
+                                                                  LayoutMinWidth: =80
                                                                 Children:
                                                                   - home_sponsor_band_lbl:
                                                                       Control: Label@2.5.1
                                                                       Properties:
+                                                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                                                        BorderThickness: =0
                                                                         Color: =RGBA(124, 130, 139, 1)
                                                                         Font: =Font.'Segoe UI'
                                                                         FontWeight: =FontWeight.Semibold
@@ -546,6 +604,8 @@ Screens:
                                                                   - home_sponsor_band_val:
                                                                       Control: Label@2.5.1
                                                                       Properties:
+                                                                        BorderColor: =RGBA(0, 0, 0, 0)
+                                                                        BorderThickness: =0
                                                                         Color: =RGBA(44, 47, 51, 1)
                                                                         Font: =Font.'Segoe UI'
                                                                         FontWeight: =FontWeight.Semibold
@@ -556,14 +616,24 @@ Screens:
                                                     Control: GroupContainer@1.5.0
                                                     Variant: AutoLayout
                                                     Properties:
-                                                      LayoutAlignItems: =LayoutAlignItems.End
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      BorderThickness: =0
+                                                      DropShadow: =DropShadow.None
+                                                      FillPortions: =0
+                                                      LayoutAlignItems: =LayoutAlignItems.Stretch
                                                       LayoutDirection: =LayoutDirection.Vertical
-                                                      LayoutGap: =14
+                                                      LayoutGap: =8
+                                                      LayoutMinHeight: =0
+                                                      LayoutMinWidth: =168
+                                                      Width: =168
                                                     Children:
                                                       - home_sponsor_status_pill:
                                                           Control: GroupContainer@1.5.0
                                                           Variant: AutoLayout
                                                           Properties:
+                                                            BorderColor: =RGBA(0, 0, 0, 0)
+                                                            BorderThickness: =0
+                                                            DropShadow: =DropShadow.None
                                                             FillPortions: =0
                                                             Fill: |-
                                                               =Switch(
@@ -572,16 +642,20 @@ Screens:
                                                                   "Searching", RGBA(231, 240, 251, 1),
                                                                   RGBA(232, 246, 238, 1)
                                                               )
-                                                            Height: =28
+                                                            Height: =26
                                                             LayoutAlignItems: =LayoutAlignItems.Center
                                                             LayoutDirection: =LayoutDirection.Horizontal
                                                             LayoutGap: =6
-                                                            PaddingLeft: =10
-                                                            PaddingRight: =10
-                                                            RadiusBottomLeft: =14
-                                                            RadiusBottomRight: =14
-                                                            RadiusTopLeft: =14
-                                                            RadiusTopRight: =14
+                                                            LayoutJustifyContent: =LayoutJustifyContent.Center
+                                                            LayoutMinHeight: =26
+                                                            LayoutMinWidth: =0
+                                                            PaddingLeft: =8
+                                                            PaddingRight: =8
+                                                            RadiusBottomLeft: =13
+                                                            RadiusBottomRight: =13
+                                                            RadiusTopLeft: =13
+                                                            RadiusTopRight: =13
+                                                            Width: =168
                                                           Children:
                                                             - home_sponsor_status_dot:
                                                                 Control: Rectangle@2.3.0
@@ -594,11 +668,14 @@ Screens:
                                                                         "Searching", RGBA(44, 110, 189, 1),
                                                                         RGBA(31, 138, 84, 1)
                                                                     )
+                                                                  FillPortions: =0
                                                                   Height: =8
                                                                   Width: =8
                                                             - home_sponsor_status_text:
                                                                 Control: Label@2.5.1
                                                                 Properties:
+                                                                  BorderColor: =RGBA(0, 0, 0, 0)
+                                                                  BorderThickness: =0
                                                                   Color: |-
                                                                     =Switch(
                                                                         ThisItem.status.Value,
@@ -606,26 +683,29 @@ Screens:
                                                                         "Searching", RGBA(44, 110, 189, 1),
                                                                         RGBA(31, 138, 84, 1)
                                                                     )
+                                                                  FillPortions: =0
                                                                   Font: =Font.'Segoe UI'
                                                                   FontWeight: =FontWeight.Bold
-                                                                  Height: =18
+                                                                  Height: =16
                                                                   Size: =11
                                                                   Text: |-
                                                                     =Switch(
                                                                         ThisItem.status.Value,
-                                                                        "Pending Requirements", "Requirements to define",
-                                                                        "Searching", "Searching - not filled",
+                                                                        "Pending Requirements", "Pending reqs",
+                                                                        "Searching", "Not filled",
                                                                         "Filled"
                                                                     )
+                                                                  Width: =120
                                                       - home_sponsor_open:
                                                           Control: Classic/Button@2.2.0
                                                           Properties:
                                                             BorderThickness: =0
                                                             Color: =RGBA(255, 255, 255, 1)
                                                             Fill: =RGBA(228, 0, 43, 1)
+                                                            FillPortions: =0
                                                             Font: =Font.'Segoe UI'
                                                             FontWeight: =FontWeight.Semibold
-                                                            Height: =36
+                                                            Height: =34
                                                             HoverFill: =RGBA(184, 0, 34, 1)
                                                             OnSelect: |-
                                                               =Set(varSelectedRole, ThisItem);
@@ -647,4 +727,4 @@ Screens:
                                                                   "Searching", "Review candidates",
                                                                   "View role"
                                                               )
-                                                            Width: =170
+                                                            Width: =168

@@ -1,0 +1,200 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =Set(varIsSaving, false);
+
+      // Week variables — must be set first
+      Set(
+          varCurrentWeekStart,
+          DateAdd(Today(), -(Weekday(Today(), StartOfWeek.Monday) - 1), "Days")
+      );
+      Set(varThisWeekStart, varCurrentWeekStart);
+      Set(varApprovalWeekStart, varCurrentWeekStart);
+      Set(varApprovalStatusFilter, "All");
+      Set(varAppStartDate, Date(2026, 6, 1));
+
+      ////////////Homepage////////////
+      ClearCollect(
+          colMissingWeeks,
+          {
+              WeekStart: Today(),
+              WeekEnd: Today(),
+              WeekLabel: ""
+          }
+      );
+      Clear(colMissingWeeks);
+
+      ClearCollect(
+          colMyHours,
+          {
+              ID: 0,
+              Employee: "",
+              Date: Today(),
+              ApprovalStatus_1: ""
+          }
+      );
+      Clear(colMyHours);
+
+      Set(varPendingApprovalWeeks, 0);
+      ////////////Homepage////////////
+
+      // Collection for Cost Codes
+      ClearCollect(colCostCodes, 'Staffclock (Cost Codes)');
+
+      // Collection for all employees for admin submit-as dropdown
+      ClearCollect(colEmployeesAll, 'Staffclock (Approvers)');
+
+      // Vacation reminder popup
+      Set(varShowVacationReminder, false);
+
+      // Variable for filter from weekly to daily approval view
+      Set(varDrillFromWeekly, false);
+
+      // Collection for Employees - case insensitive
+      ClearCollect(colEmployees, Filter('Staffclock (Approvers)', Lower(Email_Address) = Lower(User().Email)));
+
+      // Collection for Holidays
+      ClearCollect(
+          colHolidays,
+          ForAll(
+              'Staffclock (Holidays)',
+              {
+                  Holiday: Holiday,
+                  Date: DateAdd(DateValue(Text(Date)), 1, "Days")
+              }
+          )
+      );
+
+      // Get current user's approver record - case insensitive
+      Set(
+          varApprovers,
+          LookUp(
+              'Staffclock (Approvers)',
+              Email_Address = User().Email
+          )
+      );
+
+      // Get user's assigned Role ID
+      Set(varUserRoleID, varApprovers.'Role ID');
+
+      // Get user's offboarding date
+      Set(varOffboardingDate, IfError(varApprovers.'Offboarding Date', Blank()));
+
+      // Get user's assigned cost code(s)
+      Set(varUserCostCodes, varApprovers.CostCodes);
+
+      // Set the default cost code (first one in the list)
+      Set(
+          varUserCostCodeDefault,
+          LookUp(
+              colCostCodes,
+              Trim(Cost_Code) = Trim(Left(varUserCostCodes, Find(",", varUserCostCodes & ",") - 1))
+          )
+      );
+      Set(varSelectedCostCode, varUserCostCodeDefault.Cost_Code_Description);
+      Set(varSelectedCostCodeID, varUserCostCodeDefault.Cost_Code);
+
+      // Collection for Hours Updates
+      ClearCollect(
+          colHoursUpdates,
+          {
+              ID: Blank(),
+              Cost_Code_Description: "",
+              Task_Code_Description: "",
+              Cost_Code: "",
+              Task_Code: "",
+              Team: "",
+              Discipline: "",
+              Employee: "",
+              Date: Today(),
+              Standard_time: 0,
+              Overtime: 0,
+              Comments: "",
+              ApproverID_1: Blank(),
+              ApprovalStatus_1: "",
+              Approver_Comments: ""
+          }
+      );
+      Clear(colHoursUpdates);
+
+      // Initialize weekly summary collections with typed schema
+      ClearCollect(
+          colWeeklySummaryDisplay,
+          {
+              Employee_Name: "",
+              Employee: "",
+              WeekStart: Today(),
+              WeekEnd: Today(),
+              TotalStandard: 0,
+              TotalOvertime: 0,
+              TotalDays: 0,
+              WeekStatus: ""
+          }
+      );
+      Clear(colWeeklySummaryDisplay);
+
+      ClearCollect(
+          colAllPendingHours,
+          {
+              ID: 0,
+              Employee: "",
+              Employee_Name: "",
+              Date: Today(),
+              Standard_time: 0,
+              Overtime: 0,
+              ApprovalStatus_1: "",
+              Cost_Code_Description: "",
+              Task_Code: "",
+              ApproverID_1: ""
+          }
+      );
+      Clear(colAllPendingHours);
+
+      ClearCollect(
+          colRawHours,
+          {
+              ID: 0,
+              Employee: "",
+              Employee_Name: "",
+              Date: Today(),
+              Standard_time: 0,
+              Overtime: 0,
+              ApprovalStatus_1: "",
+              Cost_Code_Description: "",
+              Task_Code: "",
+              ApproverID_1: ""
+          }
+      );
+      Clear(colRawHours);
+
+      // GUID Start
+      Set(GUID_Var, GUID());
+
+      // Check first time user
+      Set(varFirstTimeUser, IsEmpty(Filter('StaffClock Hours', Title = User().Email)));
+
+      Set(varApprover1Email, varApprovers.'Approver 1 Email');
+
+      // Admin setup
+      Set(
+          varIsAdmin,
+          !IsBlank(LookUp('StaffClock Admins', Email = User().Email))
+      );
+      Set(varSubmitAsEmployee, varApprovers);
+      Set(varSubmitAsEmail, User().Email);
+      Set(varSubmitAsName, User().FullName);
+
+      Set(varResetGallery, false);
+      Set(varHasDuplicates, false);
+      Set(varShowAllWeeks, false);
+      Set(varSelectedWeekEmployee, "");
+      Set(varSelectedWeekEmployeeName, "");
+    Theme: =PowerAppsTheme

@@ -4386,7 +4386,8 @@ Screens:
                                     )
                                 )
                               LayoutMinHeight: =0
-                              TemplateSize: =74
+                              TemplatePadding: =4
+                              TemplateSize: =86
                               Width: =436
                             Children:
                               - ws_modal_pool_row:
@@ -4396,13 +4397,15 @@ Screens:
                                     BorderColor: =RGBA(0, 0, 0, 0)
                                     BorderThickness: =0
                                     DropShadow: =DropShadow.None
-                                    Height: =68
+                                    Height: =Parent.TemplateHeight - 6
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =10
                                     LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
                                     LayoutMinHeight: =0
                                     LayoutMinWidth: =0
-                                    Width: =Parent.TemplateWidth - 8
+                                    PaddingRight: =4
+                                    Width: =Parent.TemplateWidth - 24
                                   Children:
                                     - ws_modal_pool_left:
                                         Control: GroupContainer@1.5.0
@@ -4423,21 +4426,25 @@ Screens:
                                                 BorderColor: =RGBA(0, 0, 0, 0)
                                                 BorderThickness: =0
                                                 Color: =RGBA(26, 26, 26, 1)
+                                                FillPortions: =0
                                                 Font: =Font.'Segoe UI'
                                                 FontWeight: =FontWeight.Semibold
                                                 Height: =18
                                                 Size: =13
                                                 Text: =ThisItem.Title
+                                                Width: =Parent.Width
                                           - ws_modal_pool_sub:
                                               Control: Label@2.5.1
                                               Properties:
                                                 BorderColor: =RGBA(0, 0, 0, 0)
                                                 BorderThickness: =0
                                                 Color: =RGBA(90, 96, 105, 1)
+                                                FillPortions: =0
                                                 Font: =Font.'Segoe UI'
-                                                Height: =34
+                                                Height: =36
                                                 Size: =11
                                                 Text: =ThisItem.currenttitle & " · " & ThisItem.tenuresource
+                                                Width: =Parent.Width
                                                 Wrap: =true
                                     - ws_modal_pool_add:
                                         Control: Classic/Button@2.2.0

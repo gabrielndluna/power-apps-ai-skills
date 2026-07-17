@@ -1,0 +1,1086 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen_WeeklyApprovals:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |-
+        =ClearCollect(
+            colRawHours,
+            Filter(
+                'StaffClock Hours',
+                (
+                    ApproverID_1 = User().Email ||
+                    (varIsAdmin && !IsBlank(Dropdown_Employee_Weekly.Selected.Value) && Employee_Name = Dropdown_Employee_Weekly.Selected.Value)
+                ) &&
+                (
+                    ApprovalStatus_1 = "Pending" ||
+                    ApprovalStatus_1 = "Approved" ||
+                    ApprovalStatus_1 = "Rejected"
+                )
+            )
+        );
+
+        ClearCollect(colAllPendingHours,
+            ForAll(
+                colRawHours,
+                {
+                    ID: ThisRecord.ID,
+                    Employee: ThisRecord.field_4,
+                    Employee_Name: ThisRecord.field_3,
+                    Date: ThisRecord.Date,
+                    Standard_time: ThisRecord.Standard_time,
+                    Overtime: ThisRecord.Overtime,
+                    ApprovalStatus_1: ThisRecord.ApprovalStatus_1,
+                    Cost_Code_Description: ThisRecord.Cost_Code_Description,
+                    Task_Code: ThisRecord.Task_Code,
+                    ApproverID_1: ThisRecord.ApproverID_1
+                }
+            )
+        );
+
+        ClearCollect(colWeeklySummary,
+            GroupBy(
+                AddColumns(
+                    colAllPendingHours,
+                    WeekStart, DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days")
+                ),
+                Employee_Name, Employee, WeekStart,
+                WeekRecords
+            )
+        );
+
+        ClearCollect(colWeeklySummaryDisplay,
+            AddColumns(
+                colWeeklySummary,
+                WeekEnd, DateAdd(WeekStart, 6, "Days"),
+                TotalStandard, Sum(WeekRecords, Standard_time),
+                TotalOvertime, Sum(WeekRecords, Overtime),
+                TotalDays, CountRows(WeekRecords),
+                WeekStatus, If(
+                    CountIf(WeekRecords, ApprovalStatus_1 = "Rejected") = CountRows(WeekRecords),
+                    "Rejected",
+                    If(
+                        CountIf(WeekRecords, ApprovalStatus_1 = "Approved") = CountRows(WeekRecords),
+                        "Approved",
+                        If(
+                            CountIf(WeekRecords, ApprovalStatus_1 = "Pending") > 0,
+                            "Pending",
+                            "Mixed"
+                        )
+                    )
+                )
+            )
+        );
+
+        Set(varShowAllWeeks, false);
+    Children:
+      - Rectangle_Header_4:
+          Control: Rectangle@2.3.0
+          Group: Gallery_Header_Approvals_1
+          Properties:
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =41
+            Width: =1480
+            X: =30
+            Y: =276
+      - Crewclock_Logo_3:
+          Control: Image@2.2.3
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =81
+            Image: ='App Names'
+            Width: =198
+            X: =46
+            Y: =10
+      - Image1_3:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =72
+            Image: ='stc logo'
+            Width: =187
+            X: =262
+            Y: =13
+      - Home_Tab_Background_3:
+          Control: Classic/Button@2.2.0
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =4
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            Height: =68
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Text: =
+            Tooltip: ="Home Page"
+            Width: =81
+            X: =1214
+            Y: =39
+      - Approval_Tab_Background_6:
+          Control: Classic/Button@2.2.0
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Height: =68
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: |-
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Staffclock (Approvers)',
+                          Lower('Approver 1 Email') = Lower(User().Email)
+                      )
+                  ),
+                  Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade),
+                  Notify("No timesheets for approval.", NotificationType.Error)
+              )
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =9
+            Text: ="Approver"
+            Tooltip: ="Approval Page"
+            VerticalAlign: =VerticalAlign.Top
+            Width: =81
+            X: =1313
+            Y: =39
+      - Approval_Tab_Background_7:
+          Control: Classic/Button@2.2.0
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =4
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            Height: =68
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Launch("https://app.powerbi.com/groups/4869fc83-1ec9-47dc-95fa-0136a4cd7345/rdlreports/399896f0-2a6c-4981-bd82-7c33a0fa5da7?ctid=7c4c3c29-f085-4e7d-b144-70b02e8de0f0&pbi_source=linkShare")
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Text: =
+            Width: =81
+            X: =1413
+            Y: =39
+      - Home_Icon_3:
+          Control: Classic/Icon@2.5.0
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =46
+            Icon: =Icon.Home
+            OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
+            Tooltip: ="Home Page"
+            Width: =48
+            X: =1231
+            Y: =45
+      - Calendar_Icon_3:
+          Control: Classic/Icon@2.5.0
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =35
+            Icon: =Icon.CalendarBlank
+            OnSelect: =Launch("https://app.powerbi.com/groups/4869fc83-1ec9-47dc-95fa-0136a4cd7345/rdlreports/399896f0-2a6c-4981-bd82-7c33a0fa5da7?ctid=7c4c3c29-f085-4e7d-b144-70b02e8de0f0&pbi_source=linkShare")
+            Width: =38
+            X: =1435
+            Y: =49
+      - Approval_Icon_3:
+          Control: Classic/Icon@2.5.0
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Height: =36
+            Icon: =Icon.Check
+            OnSelect: |-
+              =If(
+                  !IsBlank(
+                      LookUp(
+                          'Staffclock (Approvers)',
+                          Lower('Approver 1 Email') = Lower(User().Email)
+                      )
+                  ),
+                  Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade),
+                  Notify("No timesheets for approval.", NotificationType.Error)
+              )
+            Tooltip: ="Approval Page"
+            Width: =39
+            X: =1334
+            Y: =60
+      - Border 2_5:
+          Control: Rectangle@2.3.0
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =4
+            Width: =1450
+            X: =46
+            Y: =96
+      - Tabs_Block_3:
+          Control: Rectangle@2.3.0
+          Group: Header_2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =16
+            OnSelect: =
+            Tooltip: ="Approval Page"
+            Width: =440
+            X: =1058
+            Y: =99
+      - Text_Date_To_3:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Week"
+            Visible: =false
+            Width: =141.11
+            X: =923
+            Y: =106
+      - Text_Employee_App_1:
+          Control: Label@2.5.1
+          Group: User_Inputs_1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Employee"
+            Width: =141.11
+            X: =30
+            Y: =108
+      - Text_CostCode_App_1:
+          Control: Label@2.5.1
+          Group: User_Inputs_1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Description"
+            Width: =141.11
+            X: =325
+            Y: =108
+      - Dropdown_Employee_Weekly:
+          Control: Classic/ComboBox@2.4.0
+          Group: User_Inputs_1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            ChevronBackground: =RGBA(0, 18, 107, 1)
+            ChevronFill: =RGBA(255, 255, 255, 1)
+            ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            ChevronHoverFill: =RGBA(255, 255, 255, 1)
+            DisplayFields: =["Value"]
+            Font: =Font.'Segoe UI'
+            HoverFill: =RGBA(186, 202, 226, 1)
+            InputTextPlaceholder: ="Select your activity"
+            Items: |-
+              =If(
+                  varIsAdmin,
+                  AddColumns(
+                      Filter(colEmployeesAll, !IsBlank('Employee Name')),
+                      Value, 'Employee Name'
+                  ),
+                  AddColumns(
+                      Filter(colEmployeesAll, 'Approver 1 Email' = User().Email && !IsBlank('Employee Name')),
+                      Value, 'Employee Name'
+                  )
+              )
+            OnChange: =Select(Button_ReloadWeeklySummary)
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(0, 18, 107, 1)
+            SearchFields: =["Value"]
+            SelectMultiple: =false
+            SelectionColor: =RGBA(255, 255, 255, 1)
+            SelectionFill: =RGBA(56, 96, 178, 1)
+            Size: =14.67
+            Width: =270
+            X: =30
+            Y: =140
+      - Dropdown_CostCode_App_1:
+          Control: Classic/ComboBox@2.4.0
+          Group: User_Inputs_1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            ChevronBackground: =RGBA(0, 18, 107, 1)
+            ChevronFill: =RGBA(255, 255, 255, 1)
+            ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            ChevronHoverFill: =RGBA(255, 255, 255, 1)
+            DisplayFields: =["Value"]
+            Font: =Font.'Segoe UI'
+            HoverFill: =RGBA(186, 202, 226, 1)
+            InputTextPlaceholder: ="Select your Cost Code"
+            IsSearchable: =false
+            Items: =["Work Day", "Weekend", "Stat. Holiday", "Vacation Paid", "Bereavement Paid", "Bereavement Unpaid", "Jury Duty Paid", "Jury Duty Unpaid", "Personal Emergency Paid", "Personal Emergency Unpaid", "Sick Leave Paid", "Sick Leave Unpaid"]
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(0, 18, 107, 1)
+            SearchFields: =["Value"]
+            SelectMultiple: =false
+            SelectionColor: =RGBA(255, 255, 255, 1)
+            SelectionFill: =RGBA(56, 96, 178, 1)
+            Size: =14.67
+            Width: =390
+            X: =325
+            Y: =140
+      - Label_ApprovalWeek_1:
+          Control: Classic/TextInput@2.3.2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Default: ="Week of " & Text(varApprovalWeekStart, "mmm d") & " – " & Text(DateAdd(varApprovalWeekStart, 4, "Days"), "mmm d")
+            DisplayMode: =DisplayMode.View
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.'Segoe UI'
+            HintText: =
+            HoverBorderColor: =RGBA(0, 18, 107, 1)
+            HoverFill: =RGBA(186, 202, 226, 1)
+            Visible: =false
+            Width: =222
+            X: =959
+            Y: =141
+      - Button_ApprovalPrevWeek_1:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =36
+            Icon: =Icon.BackArrow
+            OnSelect: =Set(varApprovalWeekStart, DateAdd(varApprovalWeekStart, -7, "Days"))
+            Visible: =false
+            Width: =36
+            X: =923
+            Y: =145
+      - Button_ApprovalNextWeek_1:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =36
+            Icon: =Icon.NextArrow
+            OnSelect: =Set(varApprovalWeekStart, DateAdd(varApprovalWeekStart, 7, "Days"))
+            Visible: =false
+            Width: =36
+            X: =1181
+            Y: =145
+      - save_button_2:
+          Control: Classic/Button@2.2.0
+          Group: Button_ApproveAll_weekly
+          Properties:
+            Align: =Align.Right
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(141, 198, 63, 1)
+            Font: =Font.'Segoe UI'
+            Height: =45
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: |-
+              =ClearCollect(
+                  colApproveAllWeeks,
+                  Filter(
+                      'StaffClock Hours',
+                      (
+                          ApproverID_1 = User().Email ||
+                          (varIsAdmin && !IsBlank(Dropdown_Employee_Weekly.Selected.Value))
+                      ) &&
+                      ApprovalStatus_1 = "Pending" &&
+                      (
+                          IsBlank(Dropdown_Employee_Weekly.Selected.Value) ||
+                          Employee_Name = Dropdown_Employee_Weekly.Selected.Value
+                      )
+                  )
+              );
+
+              Refresh('StaffClock Hours');
+
+              ForAll(
+                  colApproveAllWeeks,
+                  Patch(
+                      'StaffClock Hours',
+                      {ID: ThisRecord.ID},
+                      {ApprovalStatus_1: "Approved"}
+                  )
+              );
+
+              Clear(colApproveAllWeeks);
+              Notify("All visible weeks approved", NotificationType.Success);
+              Refresh('StaffClock Hours');
+              Select(Button_ReloadWeeklySummary);
+            PaddingRight: =15
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =14
+            Text: ="Approve All"
+            Width: =190
+            X: =1316
+            Y: =210
+      - SaveIcon_App_3:
+          Control: Classic/Icon@2.5.0
+          Group: Button_ApproveAll_weekly
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Height: =36
+            Icon: =Icon.Check
+            OnSelect: |-
+              =ClearCollect(
+                  colApproveAllWeeks,
+                  Filter(
+                      'StaffClock Hours',
+                      (
+                          ApproverID_1 = User().Email ||
+                          (varIsAdmin && !IsBlank(Dropdown_Employee_Weekly.Selected.Value))
+                      ) &&
+                      ApprovalStatus_1 = "Pending" &&
+                      (
+                          IsBlank(Dropdown_Employee_Weekly.Selected.Value) ||
+                          Employee_Name = Dropdown_Employee_Weekly.Selected.Value
+                      )
+                  )
+              );
+
+              Refresh('StaffClock Hours');
+
+              ForAll(
+                  colApproveAllWeeks,
+                  Patch(
+                      'StaffClock Hours',
+                      {ID: ThisRecord.ID},
+                      {ApprovalStatus_1: "Approved"}
+                  )
+              );
+
+              Clear(colApproveAllWeeks);
+              Notify("All visible weeks approved", NotificationType.Success);
+              Refresh('StaffClock Hours');
+              Select(Button_ReloadWeeklySummary);
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =40.64
+            X: =1326
+            Y: =216
+      - Button_ShowPending:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =If(!varShowAllWeeks, RGBA(255, 255, 255, 1), RGBA(0, 18, 107, 1))
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =If(!varShowAllWeeks, RGBA(0, 18, 107, 1), RGBA(255, 255, 255, 1))
+            Font: =Font.'Segoe UI'
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Set(varShowAllWeeks, false);
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =12
+            Text: ="Pending Only"
+            Width: =130
+            X: =27
+            Y: =210
+      - Button_ShowAll:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =If(varShowAllWeeks, RGBA(255, 255, 255, 1), RGBA(0, 18, 107, 1))
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =If(varShowAllWeeks, RGBA(0, 18, 107, 1), RGBA(255, 255, 255, 1))
+            Font: =Font.'Segoe UI'
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Set(varShowAllWeeks, true);
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =12
+            Text: ="All Requests"
+            Width: =130
+            X: =169
+            Y: =210
+      - Gallery_Background_3:
+          Control: Classic/Button@2.2.0
+          Group: Gallery_Header_Approvals_1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Height: |
+              =With(
+                  {
+                      userRows: Filter(
+                      colWeeklySummaryDisplay,
+                      (
+                          IsBlank(Dropdown_Employee_Weekly.Selected.Value) ||
+                          Employee_Name = Dropdown_Employee_Weekly.Selected.Value
+                      ) &&
+                      (
+                          varShowAllWeeks ||
+                          WeekStatus = "Pending" ||
+                          WeekStatus = "Rejected"
+                      )
+                  )
+                  },
+                  With(
+                      {
+                          rowCount: Min(CountRows(userRows), 14)
+                      },
+                      If(
+                          rowCount >= 14,
+                          Gallery_WeeklySummary.Height+ 50,
+                          50 + 40 * rowCount
+                      )
+                  )
+              )
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Text: =
+            Width: =1479
+            X: =27
+            Y: =273
+      - CostCode_Header_7:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_4.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Week"
+            Width: =Rectangle_Header_4.Width/5
+            X: =Employee_Header_5.X + Employee_Header_5.Width + 1
+            Y: =273
+      - CostCode_Header_8:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_4.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Overtime Hours"
+            Width: =Rectangle_Header_4.Width/8
+            X: =CostCode_Header_9.X + CostCode_Header_9.Width + 1
+            Y: =273
+      - day_header_1:
+          Control: Label@2.5.1
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_4.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Days Submitted"
+            Width: =Rectangle_Header_4.Width/10
+            X: =CostCode_Header_8.X + CostCode_Header_8.Width + 1
+            Y: =273
+      - Employee_Header_5:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Approvals_1
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_4.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Employee"
+            Width: =Rectangle_Header_4.Width/6
+            X: =28
+            Y: =276
+      - CostCode_Header_9:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Approvals_1
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_4.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Standard Hours"
+            Width: =Rectangle_Header_4.Width/8
+            X: =CostCode_Header_7.X + CostCode_Header_7.Width + 1
+            Y: =276
+      - Date_Header_5:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Approvals_1
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_4.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Status"
+            Width: =Rectangle_Header_4.Width/14
+            X: =day_header_1.X + day_header_1.Width + 1
+            Y: =276
+      - Gallery_WeeklySummary:
+          Control: Gallery@2.15.0
+          Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =468
+            Items: |-
+              =SortByColumns(
+                  Filter(
+                      colWeeklySummaryDisplay,
+                      (
+                          IsBlank(Dropdown_Employee_Weekly.Selected.Value) ||
+                          Employee_Name = Dropdown_Employee_Weekly.Selected.Value
+                      ) &&
+                      (
+                          varShowAllWeeks ||
+                          WeekStatus = "Pending" ||
+                          WeekStatus = "Rejected"
+                      )
+                  ),
+                  "WeekStart", SortOrder.Ascending,
+                  "Employee_Name", SortOrder.Ascending
+              )
+            TemplateSize: =40
+            Width: =1498
+            X: =28
+            Y: =317
+          Children:
+            - Icon_GoToDaily:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  Height: =30
+                  Icon: =Icon.NextArrow
+                  OnSelect: |-
+                    =Set(varSelectedWeekEmployee, ThisItem.Employee);
+                    Set(varSelectedWeekEmployeeName, ThisItem.Employee_Name);
+                    Set(varApprovalWeekStart, ThisItem.WeekStart);
+                    Set(varDrillFromWeekly, true);
+                    Navigate(Approvals, ScreenTransition.Cover);
+                  Width: =30
+                  X: =1436
+            - Button_RejectWeek:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(252, 124, 124, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =35
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: |-
+                    =ClearCollect(
+                        colApproveAll,
+                        Filter(
+                            'StaffClock Hours',
+                            Lower(field_4) = Lower(ThisItem.Employee) &&
+                            Date >= ThisItem.WeekStart &&
+                            Date <= ThisItem.WeekEnd &&
+                            Lower(ApproverID_1) = Lower(User().Email) &&
+                            ApprovalStatus_1 = "Pending"
+                        )
+                    );
+
+                    ForAll(
+                        colApproveAll,
+                        Patch(
+                            'StaffClock Hours',
+                            {ID: ThisRecord.ID},
+                            {ApprovalStatus_1: "Rejected"}
+                        )
+                    );
+
+                    Office365Outlook.SendEmailV2(
+                        ThisItem.Employee,
+                        "Timesheet Rejected — Week of " & Text(ThisItem.WeekStart, "mmm d") & " – " & Text(ThisItem.WeekEnd, "mmm d, yyyy"),
+                        "<p>Hi " & Left(ThisItem.Employee_Name, Find(" ", ThisItem.Employee_Name) - 1) & ",</p>" &
+                        "<br>" &
+                        "<p>Your timesheet for the week of <strong>" & Text(ThisItem.WeekStart, "mmmm d") & " – " & Text(ThisItem.WeekEnd, "mmmm d, yyyy") & "</strong> has been rejected by " & User().FullName & ".</p>" &
+                        "<br>" &
+                        "<p>View your timesheet on <a href='https://apps.powerapps.com/play/e/default-7c4c3c29-f085-4e7d-b144-70b02e8de0f0/a/703dce0f-7a51-4cbf-b089-e021efe4964b?tenantId=7c4c3c29-f085-4e7d-b144-70b02e8de0f0&hint=777b3a11-f3d6-4f4b-987f-599dfbb9cb37&sourcetime=1775141766396'>StaffClock App</a></p>" &
+                        "<br>" &
+                        "<p>Thank you,</p>",
+                        {IsHtml: true}
+                    );
+
+                    Clear(colApproveAll);
+                    Notify("Week rejected for " & ThisItem.Employee_Name, NotificationType.Warning);
+                    Refresh('StaffClock Hours');
+                    Select(Button_ReloadWeeklySummary);
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Size: =10
+                  Text: ="Reject"
+                  Width: =90
+                  X: =1304
+            - Button_ApproveWeek:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(108, 212, 136, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =35
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: |-
+                    =ClearCollect(
+                        colApproveAll,
+                        Filter(
+                            'StaffClock Hours',
+                            Lower(field_4) = Lower(ThisItem.Employee) &&
+                            Date >= ThisItem.WeekStart &&
+                            Date <= ThisItem.WeekEnd &&
+                            Lower(ApproverID_1) = Lower(User().Email) &&
+                            ApprovalStatus_1 = "Pending"
+                        )
+                    );
+
+                    Refresh('StaffClock Hours');
+
+                    ForAll(
+                        colApproveAll,
+                        Patch(
+                            'StaffClock Hours',
+                            {ID: ThisRecord.ID},
+                            {ApprovalStatus_1: "Approved"}
+                        )
+                    );
+
+                    Clear(colApproveAll);
+                    Notify("Week approved for " & ThisItem.Employee_Name, NotificationType.Success);
+                    Refresh('StaffClock Hours');
+                    Select(Button_ReloadWeeklySummary);
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Size: =10
+                  Text: ="Approve"
+                  Width: =90
+                  X: =1196
+            - Label_EmployeeName:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.Employee_Name
+                  DisabledBorderColor: =RGBA(0, 18, 107, 1)
+                  DisabledColor: =RGBA(0, 18, 107, 1)
+                  DisplayMode: =DisplayMode.View
+                  Fill: =Color.White
+                  Font: =Font.'Segoe UI'
+                  Height: =38
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: =
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =Employee_Header_5.Width
+            - Label_WeekPeriod:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =Text(ThisItem.WeekStart, "mmm d") & " – " & Text(ThisItem.WeekEnd, "mmm d, yyyy")
+                  DisplayMode: =DisplayMode.View
+                  Fill: =Color.White
+                  Font: =Font.'Segoe UI'
+                  Height: =38
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: =
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =CostCode_Header_7.Width
+                  X: =Label_EmployeeName.X + Label_EmployeeName.Width + 1
+            - Label_TotalStandard:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =Text(ThisItem.TotalStandard, "0.##")
+                  DisabledBorderColor: =RGBA(0, 18, 107, 1)
+                  DisplayMode: =DisplayMode.View
+                  Fill: =Color.White
+                  Font: =Font.'Segoe UI'
+                  Height: =38
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =CostCode_Header_9.Width
+                  X: =Label_WeekPeriod.X + Label_WeekPeriod.Width + 1
+            - Label_TotalOvertime:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =Text(ThisItem.TotalOvertime, "0.##")
+                  DisplayMode: =DisplayMode.View
+                  Fill: =Color.White
+                  Font: =Font.'Segoe UI'
+                  Height: =38
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =CostCode_Header_8.Width
+                  X: =Label_TotalStandard.X + Label_TotalStandard.Width + 1
+            - Label_TotalDays:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =Text(ThisItem.TotalDays)
+                  DisplayMode: =DisplayMode.View
+                  Fill: =Color.White
+                  Font: =Font.'Segoe UI'
+                  Height: =38
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =day_header_1.Width
+                  X: =Label_TotalOvertime.X + Label_TotalOvertime.Width + 1
+            - Label_WeekStatus:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.WeekStatus
+                  DisplayMode: =DisplayMode.View
+                  Fill: |-
+                    =If(
+                        ThisItem.WeekStatus = "Approved", RGBA(108, 212, 136, 1), // Green
+                        ThisItem.WeekStatus = "Rejected", RGBA(252, 124, 124, 1), // Red
+                        ThisItem.WeekStatus = "Pending", RGBA(252, 250, 124, 1), // Yellow
+                        RGBA(255, 255, 255, 1) // Transparent
+                    )
+                  Font: =Font.'Segoe UI'
+                  Height: =38
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =Date_Header_5.Width
+                  X: =Label_TotalDays.X + Label_TotalDays.Width + 1
+            - Separator2_5:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 0, 0, 0)
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Height: =2
+                  OnSelect: =Select(Parent)
+                  Width: =1478
+                  X: =0.00
+                  Y: =Parent.TemplateHeight - Self.Height
+      - Button_ReloadWeeklySummary:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(56, 96, 178, 1)
+            Font: =Font.'Open Sans'
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: |-
+              =ClearCollect(
+                  colRawHours,
+                  Filter(
+                      'StaffClock Hours',
+                      (
+                          ApproverID_1 = User().Email ||
+                          (varIsAdmin && !IsBlank(Dropdown_Employee_Weekly.Selected.Value) && Employee_Name = Dropdown_Employee_Weekly.Selected.Value)
+                      ) &&
+                      (
+                          ApprovalStatus_1 = "Pending" ||
+                          ApprovalStatus_1 = "Approved" ||
+                          ApprovalStatus_1 = "Rejected"
+                      )
+                  )
+              );
+
+              ClearCollect(colAllPendingHours,
+                  ForAll(
+                      colRawHours,
+                      {
+                          ID: ThisRecord.ID,
+                          Employee: ThisRecord.field_4,
+                          Employee_Name: ThisRecord.field_3,
+                          Date: ThisRecord.Date,
+                          Standard_time: ThisRecord.Standard_time,
+                          Overtime: ThisRecord.Overtime,
+                          ApprovalStatus_1: ThisRecord.ApprovalStatus_1,
+                          Cost_Code_Description: ThisRecord.Cost_Code_Description,
+                          Task_Code: ThisRecord.Task_Code,
+                          ApproverID_1: ThisRecord.ApproverID_1
+                      }
+                  )
+              );
+
+              ClearCollect(colWeeklySummary,
+                  GroupBy(
+                      AddColumns(
+                          colAllPendingHours,
+                          WeekStart, DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days")
+                      ),
+                      Employee_Name, Employee, WeekStart,
+                      WeekRecords
+                  )
+              );
+
+              ClearCollect(colWeeklySummaryDisplay,
+                  AddColumns(
+                      colWeeklySummary,
+                      WeekEnd, DateAdd(WeekStart, 6, "Days"),
+                      TotalStandard, Sum(WeekRecords, Standard_time),
+                      TotalOvertime, Sum(WeekRecords, Overtime),
+                      TotalDays, CountRows(WeekRecords),
+                      WeekStatus, If(
+                          CountIf(WeekRecords, ApprovalStatus_1 = "Rejected") = CountRows(WeekRecords),
+                          "Rejected",
+                          If(
+                              CountIf(WeekRecords, ApprovalStatus_1 = "Approved") = CountRows(WeekRecords),
+                              "Approved",
+                              If(
+                                  CountIf(WeekRecords, ApprovalStatus_1 = "Pending") > 0,
+                                  "Pending",
+                                  "Mixed"
+                              )
+                          )
+                      )
+                  )
+              );
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Visible: =false
+            X: =605
+            Y: =29

@@ -1,0 +1,188 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Main Page:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - User:
+          Control: Label@2.5.1
+          Group: Selection_Main
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Font: =Font.'Open Sans'
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: =User().Email
+            Width: =332
+            X: =749
+            Y: =455
+      - Project_Dropdown:
+          Control: Classic/DropDown@2.3.1
+          Group: Selection_Main
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            ChevronBackground: =RGBA(56, 96, 178, 1)
+            ChevronFill: =RGBA(255, 255, 255, 1)
+            ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            ChevronHoverFill: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            HoverFill: =RGBA(186, 202, 226, 1)
+            Items: |-
+              =Distinct(
+                  'Hours Tracking (List of Projects)',
+                  Project_Name
+              )
+            Items.Value: =Value
+            PaddingRight: =11.29
+            PaddingTop: =11.29
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(0, 18, 107, 1)
+            SelectionColor: =RGBA(255, 255, 255, 1)
+            SelectionFill: =RGBA(56, 96, 178, 1)
+            Size: =14.67
+            Width: =275.44
+            X: =418
+            Y: =455
+      - Project_Title:
+          Control: Label@2.5.1
+          Group: Selection_Main
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: ="Project Name"
+            Width: =169.33
+            X: =418
+            Y: =415
+      - User_Title:
+          Control: Label@2.5.1
+          Group: Selection_Main
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: ="User"
+            Width: =169.33
+            X: =749
+            Y: =415
+      - Arrow_Button:
+          Control: Classic/Icon@2.5.0
+          Group: Selection_Main
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+              =Navigate('Hours Tracking', ScreenTransition.Fade, 
+              	{
+              	SelectedProject: Project_Dropdown.Selected.Value, 
+              	Selected_PowerBI:
+              	Label_PowerBI.Text,
+              	Selected_ProjectID:
+              	Label_ProjectID.Text
+              	});
+
+              //Collection for unique employees
+              ClearCollect(
+                  colUniqueEmployees,
+                  Sort(
+                      ShowColumns(
+                          Approvers,
+                          Email_Address,
+                          'Employee Name'
+                      ),
+                      'Employee Name',
+                      SortOrder.Ascending
+                  )
+              )
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =72.25
+            X: =1081
+            Y: =443
+      - Rectangle2_2:
+          Control: Rectangle@2.3.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =3
+            Width: =1493.46
+            X: =27
+            Y: =112
+      - Label_PowerBI:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Font: =Font.'Open Sans'
+            Height: =240
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: |-
+              =First(
+                  Filter(
+                      'Hours Tracking (List of Projects)', 
+                      Project_Name = Project_Dropdown.Selected.Value
+                  )
+              ).PowerBI_URL
+            Visible: =false
+            Width: =275.44
+            X: =258.51
+            Y: =523
+      - Label_ProjectID:
+          Control: Label@2.5.1
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Font: =Font.'Open Sans'
+            Height: =67
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: |-
+              =First(
+                  Filter(
+                      'Hours Tracking (List of Projects)', 
+                      Project_Name = Project_Dropdown.Selected.Value
+                  )
+              ).Title
+            Visible: =false
+            Width: =275.44
+            X: =589.26
+            Y: =523
+      - Image1_2:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =49
+            Image: ='Logo Cropped'
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =120
+            X: =713
+            Y: =763
+      - Image1:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =107
+            Image: ='App Names'
+            Width: =337
+            X: =27
+            Y: =5

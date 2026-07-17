@@ -98,6 +98,33 @@ If a user has many projects and package volume exceeds comfortable memory:
 3. Consider SharePoint indexed columns for any remaining server-side filters.
 4. For very large tenants, evaluate Dataverse or a view narrowed in SharePoint.
 
+## Status-only loads can still truncate
+
+Validated in Staffclock YNSE (2026-07-16): the Hours list had 708 Pending rows. This formula was delegable, but `ClearCollect` still materialized only the first data-row-limit page, which tended to contain older records:
+
+```powerfx
+Collect(colRawHours, Filter('Hours Tracking (Hours)', ApprovalStatus_1 = "Pending"))
+```
+
+Applying From/To afterward to `colRawHours` could not recover recent rows that were never loaded.
+
+For high-volume statuses, include a delegable date window in the connector query:
+
+```powerfx
+Filter(
+    'Hours Tracking (Hours)',
+    ApprovalStatus_1 = "Pending" &&
+    Date >= varLoadFrom &&
+    Date <= varLoadTo
+)
+```
+
+- When the UI filters whole weeks by overlap, pad the requested range by six days on both sides.
+- Reload the connector when From/To changes; do not only filter a stale local collection.
+- With blank dates, use a bounded default window (Staffclock uses 56 days back through 21 days ahead).
+- When an **employee** is selected without dates, push `Employee = varWeeklyEmployeeEmail` into the connector `Filter` and widen From to `varAppStartDate` (employee-scoped queries are small). Reload on ComboBox `OnChange`, not only when From/To change — otherwise the gallery filters a truncated all-employee page and recent users appear missing.
+- Keep the app data row limit at 2,000, but do not depend on it as the primary fix.
+
 ## Checklist for new formulas
 
 1. Is the data source SharePoint (or another connector with limits)?

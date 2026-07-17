@@ -1,0 +1,808 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Hours Tracking:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+    Children:
+      - TrackSquare:
+          Control: Rectangle@2.3.0
+          Group: TopBanner
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =55
+            Width: =85.79
+            X: =1219.15
+            Y: =39
+      - Border 2:
+          Control: Rectangle@2.3.0
+          Group: TopBanner
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =3
+            Width: =1493.46
+            X: =21.45
+            Y: =93
+      - Slicer 1 - Text:
+          Control: Label@2.5.1
+          Group: Top Section
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: ="Project"
+            Width: =141.11
+            X: =894.04
+            Y: =48
+      - Back_Button_Hours:
+          Control: Classic/Icon@2.5.0
+          Group: Top Section
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =40
+            Icon: =Icon.ChevronLeft
+            OnSelect: =Navigate('Main Page',ScreenTransition.Fade)
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =37.25
+            X: =856.79
+            Y: =45
+      - Label1_2:
+          Control: Label@2.5.1
+          Group: Top Section
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            OnSelect: =
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =14.67
+            Text: =SelectedProject
+            Width: =203.19
+            X: =991.12
+            Y: =45
+      - EditIcon:
+          Control: Classic/Icon@2.5.0
+          Group: TopBanner
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =37
+            Icon: =Icon.ColorPicker
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Tooltip: ="Edit Records"
+            Width: =41.77
+            X: =1437.02
+            Y: =48
+      - ApprovalIcon:
+          Control: Classic/Icon@2.5.0
+          Group: TopBanner
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =42
+            Icon: =Icon.DockCheckProperties
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Tooltip: ="Approvals"
+            Width: =47.41
+            X: =1334.29
+            Y: =45
+      - TrackIcon:
+          Control: Classic/Icon@2.5.0
+          Group: TopBanner
+          Properties:
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Height: =37
+            Icon: =Icon.Add
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Tooltip: ="Add Records"
+            Width: =39.51
+            X: =1241.73
+            Y: =48
+      - ApprovalSquare:
+          Control: Rectangle@2.3.0
+          Group: TopBanner
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =55
+            OnSelect: |-
+              =If(
+                  Or(
+                      !IsBlank(
+                          LookUp(
+                              'Hours Tracking (Hours)',
+                              ApproverID_1 = User().Email ||
+                              ApproverID_2 = User().Email 
+                          )
+                      ),
+                      !IsBlank(
+                          LookUp(
+                              'Hours Tracking (Permissions)',
+                              User_Email = User().Email
+                          )
+                      )
+                  ),
+                  Navigate('Approvals', ScreenTransition.Fade, 
+                      {
+                          SelectedProject: SelectedProject, 
+                          Selected_PowerBI: Selected_PowerBI,
+                          Selected_ProjectID: Selected_ProjectID
+                      }
+                  ),
+                  Notify("You do not have permission to access this page.", NotificationType.Error)
+              )
+            Tooltip: ="Approval Page"
+            Width: =85.79
+            X: =1317.36
+            Y: =39
+      - EditSquare:
+          Control: Rectangle@2.3.0
+          Group: TopBanner
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =55
+            OnSelect: |-
+              =Navigate('Edit Page', ScreenTransition.Fade, 
+              	{
+              	SelectedProject: SelectedProject, 
+              	Selected_PowerBI: Selected_PowerBI,
+              	Selected_ProjectID: Selected_ProjectID
+              	})
+            Tooltip: ="Edit Page"
+            Width: =85.79
+            X: =1415.57
+            Y: =39
+      - Rectangle_Header_1:
+          Control: Rectangle@2.3.0
+          Group: Gallery_Header_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =41
+            Width: |+
+              =1440
+            X: =41.29
+            Y: =250
+      - Employee_Header_2:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Tracking
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Employee"
+            Width: =Rectangle_Header_1.Width/5.1
+            X: =Rectangle_Header_1.X
+            Y: =Rectangle_Header_1.Y
+      - Date_Header_2:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Tracking
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Date"
+            Width: =Rectangle_Header_1.Width/16
+            X: =CostCode_Header_2.X + CostCode_Header_2.Width
+            Y: =Rectangle_Header_1.Y
+      - CostCode_Header_2:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Tracking
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Cost Code"
+            Tooltip: =false
+            Width: =Rectangle_Header_1.Width/5.1
+            X: =Employee_Header_2.X + Employee_Header_2.Width
+            Y: =Rectangle_Header_1.Y
+      - Standard_Header_2:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Tracking
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Hours"
+            Width: =Rectangle_Header_1.Width/16
+            X: =Date_Header_2.X + Date_Header_2.Width
+            Y: =Rectangle_Header_1.Y
+      - Gallery_Hours:
+          Control: Gallery@2.15.0
+          Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =450
+            Items: =SortByColumns(colHoursGallery, "WorkDate", SortOrder.Ascending)
+            TemplateSize: =40
+            Width: =Rectangle_Header_1.Width + 80
+            X: |+
+              =Rectangle_Header_1.X - 30
+            Y: =Rectangle_Header_1.Y + Rectangle_Header_1.Height
+          Children:
+            - Separator2_2:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =8
+                  OnSelect: =Select(Parent)
+                  Width: =1521.68
+                  X: =0.00
+                  Y: =Parent.TemplateHeight - Self.Height
+            - TextInput_Employee_2:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =User().FullName
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: =
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =Employee_Header_2.Width
+                  X: =30
+            - TextInput_CostCode_2:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  AllowEmptySelection: =true
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  ChevronBackground: =RGBA(0, 18, 107, 1)
+                  ChevronFill: =RGBA(255, 255, 255, 1)
+                  ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                  Default: =Dropdown_CostCode.Selected.Value
+                  Font: =Font.'Open Sans'
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  Items: |-
+                    =Distinct(
+                    colCostCodes
+                    ,Network_Activity_Name)
+                  Items.Value: =Value
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =11.29
+                  PaddingTop: =11.29
+                  PressedColor: =RGBA(255, 255, 255, 1)
+                  PressedFill: =RGBA(0, 18, 107, 1)
+                  SelectionColor: =RGBA(255, 255, 255, 1)
+                  SelectionFill: =RGBA(56, 96, 178, 1)
+                  Size: =10
+                  Width: =CostCode_Header_2.Width
+                  X: =TextInput_Employee_2.X + TextInput_Employee_2.Width
+            - TextInput_Date_2:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.WorkDate
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =Date_Header_2.Width
+                  X: =TextInput_CostCode_2.X + TextInput_CostCode_2.Width
+            - TextInput_Standard_2:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =
+                  Font: =Font.'Open Sans'
+                  HintText: ="hours"
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =Standard_Header_2.Width
+                  X: =TextInput_Date_2.X + TextInput_Date_2.Width
+            - TextInput_Comments_2:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnSelect: =Select(Parent)
+                  PaddingRight: =5.64
+                  PaddingTop: =5.64
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =Comments_Header_2.Width
+                  X: =TextInput_Standard_2.X + TextInput_Standard_2.Width
+            - AddRow_Button:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =40
+                  Icon: =Icon.AddUser
+                  OnSelect: |+
+                    =Collect(
+                        colHoursGallery,
+                        {
+                            WorkDate: ThisItem.WorkDate,
+                            Employee: ThisItem.Employee,
+                            CostCode: ThisItem.CostCode,
+                            Comments: ""
+                        }
+                    )
+                  PaddingRight: =0.00
+                  PaddingTop: =0.00
+                  Width: =19.19
+                  X: |+
+                    =
+            - RemoveRow_Button:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =40
+                  Icon: =Icon.Trash
+                  OnSelect: =Remove(colHoursGallery, ThisItem)
+                  Width: =23
+                  X: =TextInput_Comments_2.X + TextInput_Comments_2.Width + 12
+      - Text_CostCode:
+          Control: Label@2.5.1
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Cost Code"
+            Width: =141.11
+            X: =360
+            Y: =97
+      - Dropdown_CostCode:
+          Control: Classic/ComboBox@2.4.0
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            ChevronBackground: =RGBA(0, 18, 107, 1)
+            ChevronFill: =RGBA(255, 255, 255, 1)
+            ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            ChevronHoverFill: =RGBA(255, 255, 255, 1)
+            DisplayFields: =["Value"]
+            Font: =Font.'Open Sans'
+            HoverFill: =RGBA(186, 202, 226, 1)
+            InputTextPlaceholder: ="Select your activity"
+            IsSearchable: =false
+            Items: |-
+              =Distinct(
+              colCostCodes
+              ,Network_Activity_Name)
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(0, 18, 107, 1)
+            SearchFields: =["Value"]
+            SelectMultiple: =false
+            SelectionColor: =RGBA(255, 255, 255, 1)
+            SelectionFill: =RGBA(56, 96, 178, 1)
+            Width: =370.26
+            X: =360
+            Y: =130
+      - Comments_Header_2:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Tracking
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(255, 255, 255, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Size: =12
+            Text: ="Task"
+            Width: =Rectangle_Header_1.Width/2.07
+            X: =Standard_Header_2.X + Standard_Header_2.Width
+            Y: =Rectangle_Header_1.Y
+      - Text_Date:
+          Control: Label@2.5.1
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Date From"
+            Width: =141.11
+            X: =796
+            Y: =97
+      - DatePicker_Date:
+          Control: Classic/DatePicker@2.6.0
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            DefaultDate: =
+            DisplayMode: =
+            EndYear: =Year(Today())+100
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.'Segoe UI'
+            Height: =41
+            IconBackground: =RGBA(0, 18, 107, 1)
+            IconFill: =RGBA(255, 255, 255, 1)
+            IsEditable: =true
+            PaddingBottom: =0
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5.64
+            PaddingTop: =0.00
+            Size: =13
+            StartYear: =1899
+            Tooltip: =
+            Width: =209.96
+            X: =796
+            Y: =130
+      - AddRecord_Button:
+          Control: Classic/Icon@2.5.0
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =37
+            Icon: =Icon.Add
+            OnSelect: |-
+              =// Collect only valid records
+              ClearCollect(
+                  HoursCollection,
+                  Filter(
+                      Gallery_Hours.AllItems,
+                      !IsBlank(Value(TextInput_Standard_2.Text))
+                  )
+              );
+
+              // Patch records into 'Hours Tracking (Hours)' and create related approvals
+              ForAll(
+                  HoursCollection,
+                  With(
+                      {
+                          logID: GUID()
+                      },
+                      // Add record to 'Hours Tracking (Hours)'
+                      Patch(
+                          'Hours Tracking (Hours)',
+                          Defaults('Hours Tracking (Hours)'),
+                          {
+                              Title: logID,
+                              LOG_ID: logID,
+                              Employee_Name:User().FullName,
+                              Employee: User().Email,
+                              Project: Selected_ProjectID,
+                              Cost_code: TextInput_CostCode_2.Selected.Value,
+                              Date: DateValue(TextInput_Date_2.Text),
+                              Standard_time: Value(TextInput_Standard_2.Text),
+                              Comments: TextInput_Comments_2.Text,
+                              App_Name: "Staffclock",
+                              ApproverID_1: varApprover1Email,
+                              ApprovalStatus_1: "Pending",
+                              ApproverID_2: varApprover2Email,
+                              ApprovalStatus_2: If(
+                                  IsBlank(varApprover2Email) || varApprover2Email = "None",
+                                  "None",
+                                  "Pending"
+                              )
+                          }
+                      );
+                  )
+              );
+
+              // Notify user
+              Notify("Hours Saved", NotificationType.Success);
+
+              // Refresh and clear collection
+              Refresh('Hours Tracking (Hours)');
+              Clear(HoursCollection);
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =39.51
+            X: =1399
+            Y: =197
+      - AddHours_Button:
+          Control: Classic/Button@2.2.0
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            BorderThickness: =0
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Height: =37
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: |+
+              =If(
+                  Or(
+                      IsBlank(DatePicker_Date.SelectedDate),
+                      IsBlank(DatePicker_To.SelectedDate),
+                      DatePicker_Date.SelectedDate > DatePicker_To.SelectedDate
+                  ),
+                  Notify("Please fill out dates correctly", NotificationType.Error),
+                  Select(AddRecord_Button)
+              );
+
+              // Add user to active users list
+              If(
+                 varFirstTimeUser,
+                 Patch(
+                    'Hours Tracking (Active Users)',
+                    Defaults('Hours Tracking (Active Users)'),
+                    {
+                       Title: User().Email,
+                       Name: User().FullName
+                    }
+                 )
+              );
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =10
+            Text: |-
+              ="Submit
+              "
+            Width: =91
+            X: =1365
+            Y: =198
+      - Sum_Total_Hours:
+          Control: Label@2.5.1
+          Group: User_Selections_Tracking
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Font: =Font.'Open Sans'
+            Text: |+
+              =Sum(Gallery_Hours.AllItems, Value(TextInput_Standard_2.Text))
+            Width: =100
+            X: =1180
+            Y: =194
+      - Text_Total_Hours:
+          Control: Label@2.5.1
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Total Hours"
+            Width: =111
+            X: =1069
+            Y: =197
+      - IOC_Logo:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =49
+            Image: ='Logo Cropped'
+            PaddingRight: =0.00
+            PaddingTop: =0.00
+            Width: =120
+            X: =711
+            Y: =763
+      - Crewclock_Logo:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =94
+            Image: ='App Names'
+            Width: =298
+            X: =21
+            Y: =3
+      - Text_Date_1:
+          Control: Label@2.5.1
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Date To"
+            Width: =141.11
+            X: =1069
+            Y: =97
+      - DatePicker_To:
+          Control: Classic/DatePicker@2.6.0
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            DefaultDate: =
+            DisplayMode: =
+            EndYear: =Year(Today())+100
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.'Segoe UI'
+            Height: =41
+            IconBackground: =RGBA(0, 18, 107, 1)
+            IconFill: =RGBA(255, 255, 255, 1)
+            IsEditable: =true
+            PaddingBottom: =0
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5.64
+            PaddingTop: =0.00
+            Size: =13
+            StartYear: =1899
+            Tooltip: =
+            Width: =209.96
+            X: =1069
+            Y: =130
+      - Input_Employee:
+          Control: Classic/TextInput@2.3.2
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Default: =User().FullName
+            Font: =Font.'Open Sans'
+            HintText: ="user@aecon.com"
+            HoverBorderColor: =RGBA(0, 18, 107, 1)
+            HoverFill: =RGBA(186, 202, 226, 1)
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Width: =265
+            X: =28
+            Y: =130
+      - Text_Employee:
+          Control: Label@2.5.1
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Employee"
+            Width: =141.11
+            X: =28
+            Y: =97
+      - generate_gallery_button:
+          Control: Classic/Button@2.2.0
+          Group: User_Selections_Tracking
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            BorderThickness: =0
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Height: =37
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: |-
+              =If(
+                  !IsBlank(DatePicker_Date.SelectedDate) &&
+                  !IsBlank(DatePicker_To.SelectedDate) &&
+                  !IsBlank(Dropdown_CostCode.Selected.Value),
+
+                  ClearCollect(
+                      colHoursGallery,
+                      ForAll(
+                          Sequence(
+                              DateDiff(DatePicker_Date.SelectedDate, DatePicker_To.SelectedDate) + 1,
+                              1,
+                              1
+                          ),
+                          With(
+                              { currentDate: DateAdd(DatePicker_Date.SelectedDate, Value - 1) },
+                              {
+                                  WorkDate: currentDate,
+                                  CostCode: Dropdown_CostCode.Selected.Value,
+                                  Comments: ""
+                              }
+                          )
+                      )
+                  ),
+                  Notify("Please fill out all inputs", NotificationType.Error)
+              );
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =10
+            Text: |-
+              ="Generate
+              "
+            Width: =91
+            X: =1365
+            Y: =130
