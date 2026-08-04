@@ -1,0 +1,67 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  ManagePublicHolidays:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      OnPressAction:
+        PropertyKind: Event
+        DisplayName: OnPressAction
+        Description: A custom property
+        ReturnType: None
+        Default: =
+    Properties:
+      Fill: |+
+        =
+      Height: =260
+      Width: |+
+        =280
+
+    Children:
+      - Button4:
+          Control: Classic/Button@2.2.0
+          Properties:
+            BorderColor: =ColorValue("#D60C30")
+            BorderThickness: =3
+            Color: =ColorValue("#D60C30")
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =ColorValue("#D60C3000")
+            Font: =Font.'Segoe UI'
+            Height: =250
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =ColorValue("#D60c30")
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =ManagePublicHolidays.OnPressAction()
+            PaddingBottom: =50
+            PaddingTop: =50
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            RadiusBottomLeft: =30
+            RadiusBottomRight: =30
+            RadiusTopLeft: =30
+            RadiusTopRight: =30
+            Size: =24
+            Text: ="Manage" & Char(10) & "Public Holidays"
+            VerticalAlign: =VerticalAlign.Bottom
+            Width: |+
+              =270
+            X: =(Parent.Width - Self.Width)/2
+            Y: =(Parent.Height - Self.Height)/2
+      - Icon1_6:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =ColorValue("#002959")
+            Height: =75
+            Icon: =Icon.CalendarBlank
+            OnSelect: =ManagePublicHolidays.OnPressAction()
+            Width: =75
+            X: =(Parent.Width - Self.Width)/2
+            Y: =50

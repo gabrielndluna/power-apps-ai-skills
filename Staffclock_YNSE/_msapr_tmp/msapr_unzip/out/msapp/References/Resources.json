@@ -1,0 +1,88 @@
+{
+  "Resources": [
+    {
+      "Name": "SampleImage",
+      "Schema": "i",
+      "IsSampleData": true,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "/ctrllib/image/images/SampleImage.svg",
+      "Path": "/ctrllib/image/images/SampleImage.svg",
+      "Content": "Image",
+      "ResourceKind": "Uri",
+      "RootPath": "ms-appx:///ctrllib/image/images/SampleImage.svg"
+    },
+    {
+      "Name": "Logo Cropped",
+      "Schema": "i",
+      "IsSampleData": false,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "75699f7c-6e73-4c00-b84e-d61b62af070d.jpg",
+      "Path": "Assets\\Images\\75699f7c-6e73-4c00-b84e-d61b62af070d.jpg",
+      "Content": "Image",
+      "ResourceKind": "LocalFile",
+      "RootPath": "https://dsprdil102eca.blob.core.windows.net/4aaf737e-669c-4a2a-957e-cea6ddc2f34e-1/resource/NzU2OTlmN2MtNmU3My00YzAwLWI4NGUtZDYxYjYyYWYwNzBk.jpg?skoid=58690ece-ec83-4ce2-9ce8-883d4d6a54ee&sktid=975f013f-7f24-47e8-a7d3-abc4752bf346&skt=2026-08-04T17%3A07%3A34Z&ske=2026-08-05T17%3A22%3A34Z&sks=b&skv=2023-01-03&sv=2023-01-03&spr=https&se=2026-08-05T17%3A22%3A34Z&sr=b&sp=r&sig=d0sFmjY1WyYhR4sFTnzLDWfNbMpPLzpf%2FfNYoRSw6nw%3D"
+    },
+    {
+      "Name": "Power-Bi-logo-transparent-1",
+      "Schema": "i",
+      "IsSampleData": false,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "91b3e2fc-67ae-4239-b766-480673fbc1cf.png",
+      "Path": "Assets\\Images\\91b3e2fc-67ae-4239-b766-480673fbc1cf.png",
+      "Content": "Image",
+      "ResourceKind": "LocalFile",
+      "RootPath": "https://dsprdil102eca.blob.core.windows.net/4aaf737e-669c-4a2a-957e-cea6ddc2f34e-1/resource/OTFiM2UyZmMtNjdhZS00MjM5LWI3NjYtNDgwNjczZmJjMWNm.png?skoid=58690ece-ec83-4ce2-9ce8-883d4d6a54ee&sktid=975f013f-7f24-47e8-a7d3-abc4752bf346&skt=2026-08-04T17%3A07%3A34Z&ske=2026-08-05T17%3A22%3A34Z&sks=b&skv=2023-01-03&sv=2023-01-03&spr=https&se=2026-08-05T17%3A22%3A34Z&sr=b&sp=r&sig=Gi0S8sQpjWWsevJ2DsZmCatFMGlKeELjNLsPWRL%2BDC4%3D"
+    },
+    {
+      "Name": "Crewclock Logo - With name",
+      "Schema": "i",
+      "IsSampleData": false,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "6c9d0069-73a3-4c8c-9222-2e66c15f3755.png",
+      "Path": "Assets\\Images\\6c9d0069-73a3-4c8c-9222-2e66c15f3755.png",
+      "Content": "Image",
+      "ResourceKind": "LocalFile",
+      "RootPath": "https://dsprdil102eca.blob.core.windows.net/4aaf737e-669c-4a2a-957e-cea6ddc2f34e-1/resource/NmM5ZDAwNjktNzNhMy00YzhjLTkyMjItMmU2NmMxNWYzNzU1.png?skoid=58690ece-ec83-4ce2-9ce8-883d4d6a54ee&sktid=975f013f-7f24-47e8-a7d3-abc4752bf346&skt=2026-08-04T17%3A07%3A34Z&ske=2026-08-05T17%3A22%3A34Z&sks=b&skv=2023-01-03&sv=2023-01-03&spr=https&se=2026-08-05T17%3A22%3A34Z&sr=b&sp=r&sig=Un4togUxSjOPH9zN0iGMxr%2FeT8j%2FM4xIfmggMvj4F7w%3D"
+    },
+    {
+      "Name": "PowerBI",
+      "Schema": "i",
+      "IsSampleData": false,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "ac6ec06a-64ea-4c16-884b-8fc6697199c2.png",
+      "Path": "Assets\\Images\\ac6ec06a-64ea-4c16-884b-8fc6697199c2.png",
+      "Content": "Image",
+      "ResourceKind": "LocalFile",
+      "RootPath": "https://dsprdil102eca.blob.core.windows.net/4aaf737e-669c-4a2a-957e-cea6ddc2f34e-1/resource/YWM2ZWMwNmEtNjRlYS00YzE2LTg4NGItOGZjNjY5NzE5OWMy.png?skoid=58690ece-ec83-4ce2-9ce8-883d4d6a54ee&sktid=975f013f-7f24-47e8-a7d3-abc4752bf346&skt=2026-08-04T17%3A07%3A34Z&ske=2026-08-05T17%3A22%3A34Z&sks=b&skv=2023-01-03&sv=2023-01-03&spr=https&se=2026-08-05T17%3A22%3A34Z&sr=b&sp=r&sig=vRkXS0GVErYCARKEjCrlaif0dEoijRdWDf2svin8%2BKs%3D"
+    },
+    {
+      "Name": "App Names",
+      "Schema": "i",
+      "IsSampleData": false,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "4f5818a1-5626-437b-a3a9-a53276b2b74b.png",
+      "Path": "Assets\\Images\\4f5818a1-5626-437b-a3a9-a53276b2b74b.png",
+      "Content": "Image",
+      "ResourceKind": "LocalFile",
+      "RootPath": "https://dsprdil102eca.blob.core.windows.net/4aaf737e-669c-4a2a-957e-cea6ddc2f34e-1/resource/NGY1ODE4YTEtNTYyNi00MzdiLWEzYTktYTUzMjc2YjJiNzRi.png?skoid=58690ece-ec83-4ce2-9ce8-883d4d6a54ee&sktid=975f013f-7f24-47e8-a7d3-abc4752bf346&skt=2026-08-04T17%3A07%3A35Z&ske=2026-08-05T17%3A22%3A35Z&sks=b&skv=2023-01-03&sv=2023-01-03&spr=https&se=2026-08-05T17%3A22%3A35Z&sr=b&sp=r&sig=JXh62r8DhTesm1r8gCx6dkKHOZxo70MrpaKulp%2BJUf8%3D"
+    },
+    {
+      "Name": "App Names_1",
+      "Schema": "i",
+      "IsSampleData": false,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "7277c1a1-4ec2-472a-8bf6-8905426aa4c4.png",
+      "Path": "Assets\\Images\\7277c1a1-4ec2-472a-8bf6-8905426aa4c4.png",
+      "Content": "Image",
+      "ResourceKind": "LocalFile",
+      "RootPath": "https://dsprdil102eca.blob.core.windows.net/4aaf737e-669c-4a2a-957e-cea6ddc2f34e-1/resource/NzI3N2MxYTEtNGVjMi00NzJhLThiZjYtODkwNTQyNmFhNGM0.png?skoid=58690ece-ec83-4ce2-9ce8-883d4d6a54ee&sktid=975f013f-7f24-47e8-a7d3-abc4752bf346&skt=2026-08-04T17%3A07%3A35Z&ske=2026-08-05T17%3A22%3A35Z&sks=b&skv=2023-01-03&sv=2023-01-03&spr=https&se=2026-08-05T17%3A22%3A35Z&sr=b&sp=r&sig=RdwZcABLgMJqOi2JLYtPxrWcRpkHXS9IGSLzjUKn8zk%3D"
+    }
+  ]
+}

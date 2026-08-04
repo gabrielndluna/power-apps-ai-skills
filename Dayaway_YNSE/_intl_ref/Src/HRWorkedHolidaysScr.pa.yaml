@@ -1,0 +1,996 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  HRWorkedHolidaysScr:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |-
+        =UpdateContext({ locSection: "MainConManager" });
+
+        Set(
+            varPendingCount,
+            CountRows(
+                Filter(
+                    'Vacations Tracking (Days)',
+                    Lower(ApproverID_1) = Lower(User().Email) || Lower(ProjectDirector_Email) = Lower(User().Email),
+                    ApprovalStatus_1 = "Pending" || ProjectDirector_ApprovalStatus.Value = "Pending",
+                    EndDate >= varYearStart,
+                    StartDate <= varYearEnd
+                )
+            )
+        );
+    Children:
+      - WebLayoutManager_3:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =Color.White
+            Height: |+
+              =768
+            Visible: =App.Width >= 680
+            Width: =1366
+            X: =(App.Width - Self.Width) / 2
+            Y: =(App.Height - Self.Height) / 2
+          Children:
+            - SideBarConManager_3:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =ColorValue("#D60C30")
+                  Height: =Parent.Height
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =16
+                  Width: =Parent.Width * 0.085
+                Children:
+                  - IOCLogoWhite_4:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =75
+                        Image: ='IOC Logo White-No text'
+                        Width: =75
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =14
+                  - DashboardButton_4:
+                      Control: CanvasComponent
+                      ComponentName: DashboardButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: =Launch("https://app.powerbi.com/Redirect?action=OpenApp&appId=8b5f2e86-7dff-4932-bc91-59b17008279b&ctid=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&experience=power-bi")
+                        Width: =115
+                        Y: =678
+                  - SubmitRequestsButton_4:
+                      Control: CanvasComponent
+                      ComponentName: SubmitRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varEmployeeRow),
+                              Notify("Access denied. Your account is not registered in Employees.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(EmployeeDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        Y: =377
+                  - ManageRequestsButton_4:
+                      Control: CanvasComponent
+                      ComponentName: ManageRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varManagerRow),
+                              Notify("Access denied. Your account is not registered as a Manager.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(ManagerDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        X: =1
+                        Y: =294
+            - MainConManager_4:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =Color.White
+                  Height: =Parent.Height
+                  Visible: =locSection = "MainConManager"
+                  Width: =Parent.Width * 0.915
+                  X: =SideBarConManager_3.Width
+                Children:
+                  - BackButton_4:
+                      Control: CanvasComponent
+                      ComponentName: BackButton
+                      Properties:
+                        Fill: =ColorValue("#FFFFFF00")
+                        Height: =75
+                        OnPressAction: =Navigate(HRManageHomeScr, ScreenTransition.Fade)
+                        Width: =115
+                        X: =7
+                  - NewWorkedHolidays_1:
+                      Control: CanvasComponent
+                      ComponentName: NewWorkedHolidays
+                      Properties:
+                        Height: =60
+                        OnPressAction: |-
+                          =UpdateContext({ locShowWorkHolidayNew: true });
+                        Width: =350
+                        X: =(Parent.Width- Self.Width)/2
+                        Y: =Gallery2_7.Y + Gallery2_7.Height + 20
+                  - DayAwayLogoOnly_6:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Image: ='AECON Logo - Red with Transparent Back Ground'
+                        ImagePosition: =ImagePosition.Fill
+                        Width: =263
+                        X: =944
+                  - GreetingText_6:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =60
+                        PaddingLeft: =25
+                        PaddingRight: =25
+                        Size: =34
+                        Text: ="Manage Worked Holidays"
+                        Width: =Parent.Width - DayAwayLogoOnly_6.Width -20
+                        Wrap: =false
+                        Y: |+
+                          =85
+                  - Container1_3:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =50
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width - 60
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =159
+                      Children:
+                        - Label12:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Employee Name"
+                              X: =75
+                        - Label12_1:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Employee Email"
+                              X: =361
+                        - Label12_2:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Year"
+                              X: =570
+                        - Label12_3:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Holidays Worked"
+                              Width: =200
+                              X: =716
+                        - Label12_4:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Comments"
+                              Width: =200
+                              X: =925
+                  - TextInput3_2:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        Default: =
+                        Font: =Font.'Open Sans'
+                        Height: |
+                          =35
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Width: |
+                          =200
+                        X: =Container1_3.X + Container1_3.Width -Self.Width
+                        Y: =114
+                  - Label7_2:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        PaddingLeft: =0
+                        Size: =11
+                        Text: ="Filter by Employee Name"
+                        Width: =170
+                        X: =TextInput3_2.X
+                        Y: =84
+                  - Gallery2_7:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: |+
+                          =450
+                        Items: |+
+                          =
+
+
+                          // Gallery.Items
+                          With(
+                              { q: Trim(TextInput3_2.Text) },
+                              If(
+                                  IsBlank(q),
+                                  'Vacations Tracking (Worked Holidays)',
+                                  Filter(
+                                      'Vacations Tracking (Worked Holidays)',
+                                      // Replace these column names with your actual ones
+                                      StartsWith(Employee_Name, q)
+                                  )
+                              )
+                          )
+                        TemplateSize: =45
+                        Width: =Container1_3.Width
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Container1_3.Y + Container1_3.Height
+                      Children:
+                        - Rectangle_7:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("White")
+                              Height: =Parent.TemplateHeight - Separator_7.Height
+                              OnSelect: =Select(Parent)
+                              Visible: =ThisItem.IsSelected
+                              Width: =4
+                        - TableIcon_6:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              AccessibleLabel: =Self.Tooltip
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: |+
+                                =ColorValue("#494949")
+                              DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                              DisabledColor: =RGBA(119, 119, 119, 1)
+                              Height: =50
+                              Icon: =Icon.ChevronRight
+                              OnSelect: |-
+                                =// Select current gallery employee
+                                Set(varSelectedWorkedHoliday, ThisItem);
+
+
+                                UpdateContext({ locShowWorkDetails: true });
+                              PaddingBottom: =16
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              PaddingTop: =16
+                              Tooltip: ="View item details"
+                              Width: =50
+                              X: =Parent.TemplateWidth - Self.Width
+                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                        - StartDateLabel_7:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.Employee_email
+                              Width: =230
+                              X: =323
+                              Y: =(Rectangle_7.Height - Self.Height) / 2
+                        - EndDateLabel_8:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.Year
+                              X: =575
+                              Y: =(Rectangle_7.Height - Self.Height) / 2
+                        - DateCreatedLabel_7:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(50, 49, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Normal, FontWeight.Normal)
+                              Height: =37
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =12
+                              Text: =ThisItem.Employee_Name
+                              Width: =200
+                              Wrap: =false
+                              X: =52
+                              Y: =(Rectangle_7.Height - Self.Height) / 2
+                        - Separator_7:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("#D9ECFA")
+                              Height: =4
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =Parent.TemplateHeight - Self.Height
+                        - EndDateLabel_9:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.Total
+                              Width: =200
+                              X: =721
+                              Y: =1
+                        - EndDateLabel_12:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.Comments
+                              Width: =200
+                              X: =927
+                              Y: =1
+            - BackDrop_4:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |-
+                    =UpdateContext({ locShowWorkDetails: false })
+                  Visible: =locShowWorkDetails
+                  Width: =Parent.Width
+            - SubmitRequestBox_3:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =locShowWorkDetails
+                  Width: |
+                    =Parent.Width * 0.50
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_5:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Worked Holidays Summary"
+                        Width: =550
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y - 20
+                  - Button3_4:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: "=Set(\n    varWorkedHolidaySaved,\n    Patch(\n        'Vacations Tracking (Worked Holidays)',\n        LookUp('Vacations Tracking (Worked Holidays)', ID = varSelectedWorkedHoliday.ID),\n        {\n            \n            Year: Value(ManagerNameField_23.Text),\n            Total: Value(ManagerNameField_24.Text),\n            Comments: ManagerNameField_43.Text\n        }\n    )\n);\n\nIf(\n    IsEmpty(Errors('Vacations Tracking (Worked Holidays)', varWorkedHolidaySaved)),\n    Set(varSelectedWorkedHoliday, varWorkedHolidaySaved);\n    Refresh('Vacations Tracking (Worked Holidays)');\n    Notify(\"Worked holiday saved successfully.\", NotificationType.Success),\n    Notify(\n        \"Save failed: \" & First(Errors('Vacations Tracking (Worked Holidays)', varWorkedHolidaySaved)).Message,\n        NotificationType.Error\n    )\n);\n\n\nUpdateContext({ locShowWorkDetails: false });"
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Save Changes"
+                        Width: =200
+                        X: =138
+                        Y: =573
+                  - Icon8_2:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#d60C30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |-
+                          =UpdateContext({ locShowWorkDetails: false });
+                          Reset(ManagerNameField_24);
+                          Reset(ManagerNameField_23);
+                          Reset(ManagerNameField_43);
+                        Width: =28
+                        X: =630
+                        Y: =40
+                  - Label4_48:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Email"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =289
+                  - ManagerNameField_22:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedWorkedHoliday.Employee_email
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =314
+                  - Label4_49:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Year"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =289
+                  - ManagerNameField_23:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedWorkedHoliday.Year
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =314
+                  - Label4_50:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Worked Holidays"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =188
+                        Y: =383
+                  - ManagerNameField_24:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedWorkedHoliday.Total
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =(Parent.Width- Self.Width)/2
+                        Y: =408
+                  - Image1_1:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Image: |-
+                          =With(
+                              { e: varSelectedWorkedHoliday.Employee_email,
+                                img: Office365Users.UserPhotoV2(varSelectedWorkedHoliday.Employee_email)
+                              },
+                              If(
+                                  IsBlankOrError(img),
+                                  SampleImage,                // your fallback image (add a media asset or icon)
+                                  img
+                              )
+                          )
+                        RadiusBottomLeft: =100
+                        RadiusBottomRight: =100
+                        RadiusTopLeft: =100
+                        RadiusTopRight: =100
+                        X: =(Parent.Width- Self.Width)/2
+                        Y: =SummaryHeaderLabel_5.Y + SummaryHeaderLabel_5.Height + 20
+                  - Label4_51:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =ManagerNameField_25.X
+                        Y: =Image1_1.Y + Image1_1.Height + 20
+                  - ManagerNameField_25:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedWorkedHoliday.Employee_Name
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: |+
+                          =(Parent.Width- Self.Width)/2
+                        Y: =Image1_1.Y + Image1_1.Height + 40
+                  - Button3_7:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =Remove('Vacations Tracking (Worked Holidays)', varSelectedWorkedHoliday); Refresh('Vacations Tracking (Worked Holidays)'); Notify("Record Deleted");
+                          UpdateContext({ locShowWorkDetails: false });
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Delete Item"
+                        Width: =200
+                        X: =351
+                        Y: =573
+                  - ManagerNameField_43:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedWorkedHoliday.Comments
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.92
+                        X: =28
+                        Y: =494
+                  - Label4_106:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Comments"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =469
+            - BackDrop_5:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |-
+                    =UpdateContext({ locShowWorkHolidayNew: false })
+                  Visible: =locShowWorkHolidayNew
+                  Width: =Parent.Width
+            - SubmitRequestBox_4:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =locShowWorkHolidayNew
+                  Width: |
+                    =Parent.Width * 0.50
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_6:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Add Worked Holidays"
+                        Width: =550
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y - 20
+                  - Button3_5:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =Set(
+                              varNewWorkedHoliday,
+                              Patch(
+                                  'Vacations Tracking (Worked Holidays)',
+                                  Defaults('Vacations Tracking (Worked Holidays)'),
+                                  {
+                                      Title: GUID(),
+                                      Employee_Name: ComboBox1.Selected.DisplayName,
+                                      Employee_email: ComboBox1.Selected.Mail,
+                                      Year: Value(ManagerNameField_27.Text),
+                                      Total: Value(ManagerNameField_28.Text),
+                                      Comments: ManagerNameField_42.Text
+                                  }
+                              )
+                          );
+
+                          Notify("Worked holiday added successfully.", NotificationType.Success);
+
+
+                          Reset(ComboBox1);
+                          Reset(ManagerNameField_27);
+                          Reset(ManagerNameField_28);
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Submit"
+                        Width: =200
+                        X: =(Parent.Width- Self.Width)/2
+                        Y: =573
+                  - Icon8_3:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#d60C30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |-
+                          =UpdateContext({ locShowWorkHolidayNew: false });
+                          Reset(ManagerNameField_28);
+                          Reset(ManagerNameField_27);
+                          Reset(ComboBox1);
+                        Width: =28
+                        X: =630
+                        Y: =40
+                  - Label4_52:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Email"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =289
+                  - ManagerNameField_26:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =ComboBox1.Selected.Mail
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =314
+                  - Label4_53:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Year"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =289
+                  - ManagerNameField_27:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =314
+                  - Label4_54:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Worked Holidays"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =188
+                        Y: =376
+                  - ManagerNameField_28:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: |+
+                          =(Parent.Width- Self.Width)/2
+                        Y: =401
+                  - Image1_2:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Image: |-
+                          =With(
+                              { e: ComboBox1.Selected.Mail,
+                                img: Office365Users.UserPhotoV2(ComboBox1.Selected.Mail)
+                              },
+                              If(
+                                  IsBlankOrError(img),
+                                  SampleImage,                // your fallback image (add a media asset or icon)
+                                  img
+                              )
+                          )
+                        RadiusBottomLeft: =100
+                        RadiusBottomRight: =100
+                        RadiusTopLeft: =100
+                        RadiusTopRight: =100
+                        X: =(Parent.Width- Self.Width)/2
+                        Y: =82
+                  - Label4_55:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =188
+                        Y: =201
+                  - ComboBox1:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |+
+                          =1
+                        ChevronBackground: =ColorValue("#D60c30")
+                        ChevronFill: =RGBA(255, 255, 255, 1)
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        DisplayFields: =["DisplayName"]
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: |-
+                          =If(
+                              !IsBlank(Trim(Self.SearchText)),
+                              ShowColumns(
+                                  Office365Users.SearchUser(
+                                      { searchTerm: Trim(Self.SearchText), top: 15 }
+                                  ),
+                                  Id,            // GUID for the user
+                                  DisplayName,   // display name
+                                  Mail,          // email
+                                  UserPrincipalName,  // UPN
+                                  Department
+                              )
+                          )
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SearchFields: =["DisplayName","Mail","UserPrincipalName"]
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Width: =Parent.Width * 0.45
+                        X: =(Parent.Width- Self.Width)/2
+                        Y: =228
+                  - Label4_105:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Comments"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =29
+                        Y: =467
+                  - ManagerNameField_42:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |+
+                          =Parent.Width * 0.92
+
+
+                        X: =29
+                        Y: =492

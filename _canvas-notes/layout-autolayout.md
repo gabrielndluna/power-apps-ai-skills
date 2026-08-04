@@ -151,3 +151,30 @@ main (vertical, FillPortions: 1)
 Nav rail on every screen: **RoleFit** brand (no subtitle), left-aligned nav buttons, user block at bottom.
 
 `pac canvas pack` with SourceCode layout does not catch invalid icons or layout issues. Always validate with a **small import** in Studio.
+
+## LayoutMinWidth / LayoutMinHeight defaults (critical)
+
+Power Apps **defaults** AutoLayout `GroupContainer` to:
+
+| Property | Default | Effect on phone (~390px) |
+|----------|---------|---------------------------|
+| `LayoutMinWidth` | **250** | Nested containers refuse to shrink → gallery/forms look squeezed |
+| `LayoutMinHeight` | **100** | Chips/pills overflow parents (bottom clipped) |
+
+**Always set both to `=0`** on every `GroupContainer` unless you intentionally need a floor.
+
+Validated on DayAway (2026-07-29) after phone width compression: Microsoft [responsive canvas guidance](https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/build-responsive-apps) + container Stretch / FillPortions.
+
+## Scale to fit (DayAway phone compression)
+
+If **Scale to fit** is ON (`DocumentLayoutScaleToFit: true`) with a tablet design size (e.g. 1366×768):
+
+- Phone shows a **shrunk tablet layout** — buttons/labels look tiny
+- `App.Width` stays ~1366, so `App.Width < 680` phone branches **never run**
+- Gallery `TemplateWidth` from browse variants can stay narrow → cards leave empty space on the right
+
+**Required for responsive DayAway:** Scale to fit **OFF**, Lock aspect **OFF**, Lock orientation **OFF** (Microsoft [responsive apps](https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/build-responsive-apps)).
+
+Set in `src/*.msapr` → `msapp/Properties.json` before pack, and confirm in Studio after import: **Settings → Display**.
+
+Galleries (`BrowseLayout_Vertical_*`): do **not** set `TemplateWidth` (PA2108). Use `Width: =Parent.Width`, `WrapCount: =1`, and AutoLayout cards with `Width: =Parent.TemplateWidth`.

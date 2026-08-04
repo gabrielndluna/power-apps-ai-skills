@@ -1,0 +1,77 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |+
+      =
+      // 0) Visual constants
+      Set(varBarMaxWidth, 500);
+
+      Set(varUserEmailLower, Lower(User().Email));
+
+      // 1) Load current employee row (Employees list uses a text Email column)
+      Set(
+          varEmployeeRow,
+          LookUp(
+              'Vacations Tracking (Employees)',   // <-- double-check the list name spelling; use your exact name
+              Lower(Email) = Lower(User().Email)
+          )
+      );
+
+
+      Set(
+          varProjectRow,
+          LookUp(
+              'Vacations Tracking (Projects)',
+              Lower('Project Name') = Lower(varEmployeeRow.'Project Name')
+          )
+      );
+
+
+      // Finds the first record that matches the current user's email across 3 lists
+
+      With(
+          {
+              rPerm: LookUp('Vacations Tracking (Permissions)', Lower(User_Email) = Lower(User().Email)),
+              rEmp:  LookUp('Vacations Tracking (Employees)',   Lower('Approver Email')      = Lower(User().Email)),
+              rMan:  LookUp('Vacations Tracking (Days)',   Lower(ApproverID_1)      = Lower(User().Email)),
+              rProj: LookUp('Vacations Tracking (Projects)',    Lower('Project Director Email') = Lower(User().Email)),
+              rManPD:LookUp('Vacations Tracking (Days)',   Lower(ProjectDirector_Email)      = Lower(User().Email))
+          },
+          Set(varManagerRow, Coalesce(rPerm, rEmp, rProj, rMan, rManPD));
+          Set(HRManager, rPerm);
+      );
+
+      // 2) Profile/entitlement variables (use empty strings "" as fallbacks for text)
+
+      Set(varFirstName,          Coalesce(varEmployeeRow.'First Name', ""));
+      Set(varLastName,           Coalesce(varEmployeeRow.'Last Name', ""));
+      Set(varUserDisplayName,    Trim($"{varFirstName} {varLastName}"));   // safer than using 0 fallback for text
+      Set(varUserProject,        Coalesce(varEmployeeRow.'Project Name', ""));
+      Set(varEmployeeRole,        Coalesce(varEmployeeRow.'Employee Title', 0));
+
+      // 3) Year window (calendar year)
+      Set(varYearStart, Date(Year(Today()), 1, 1));
+      Set(varYearEnd,   Date(Year(Today()), 12, 31));
+
+      // 4) Days used this year by current user (only Approved/Approved)
+
+      // 5) Available days (never below zero)
+
+      Set(
+          varIsHR,
+          !IsBlank(
+              LookUp(
+                  'Vacations Tracking (Permissions)',
+                  User_Email = User().Email
+              )
+          )
+      );
+    SizeBreakpoints: =[680, 900, 1200]
+    Theme: =PowerAppsTheme

@@ -1,0 +1,2125 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Vacations Tracking:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |+
+        =
+    Children:
+      - Header Container:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Height: =95.5
+            Width: =1366
+          Children:
+            - PowerBI_Tab_Background:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =68
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: =Launch("https://app.powerbi.com/Redirect?action=OpenApp&appId=8b5f2e86-7dff-4932-bc91-59b17008279b&ctid=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&experience=power-bi")
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Text: =
+                  Width: =76
+                  X: =1182
+                  Y: =40
+            - Approval_Tab_Background_1:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =68
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: |-
+                    =If(
+                        !IsBlank(
+                            LookUp(
+                                'Vacations Tracking (Days)',
+                                ApproverID_1 = User().Email
+                            )
+                        ),
+                        Navigate(Approvals, ScreenTransition.Fade, 
+                            {
+                                SelectedProject: SelectedProject, 
+                                Selected_ProjectID: Selected_ProjectID
+                            }
+                        ),
+                        Notify("This page is only for approvers. Request permissions if needed.", NotificationType.Error)
+                    )
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Text: =
+                  Width: =76
+                  X: =1269
+                  Y: =40
+            - Approval_Tab_Background:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =68
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: |-
+                    =If(
+                        !IsBlank(
+                            LookUp(
+                                'Vacations Tracking (Days)',
+                                ApproverID_1 = User().Email
+                            )
+                        ),
+                        Navigate('Approvals', ScreenTransition.Fade, 
+                            {
+                                SelectedProject: SelectedProject, 
+                                Selected_ProjectID: Selected_ProjectID
+                            }
+                        ),
+                        Notify("This page is only for approvers. Request permissions if needed.", NotificationType.Error)
+                    )
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Text: =
+                  Width: =76
+                  X: =1095
+                  Y: =40
+            - Home_Tab_Background:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(0, 18, 107, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =68
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Text: =
+                  Width: =76
+                  X: =1008
+                  Y: =40
+            - Approval_Icon:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =36
+                  Icon: =Icon.Check
+                  OnSelect: |-
+                    =If(
+                        Or(
+                            !IsBlank(
+                                LookUp(
+                                    'Vacations Tracking (Days)',
+                                    ApproverID_1 = User().Email
+                                )
+                            ),
+                            !IsBlank(
+                                LookUp(
+                                    'Vacations Tracking (Permissions)',
+                                    User_Email = User().Email
+                                )
+                            )
+                        ),
+                        Navigate('Approvals', ScreenTransition.Fade, 
+                            {
+                                SelectedProject: SelectedProject, 
+                                Selected_ProjectID: Selected_ProjectID
+                            }
+                        ),
+                        Notify("This page is only for approvers. Request permissions if needed.", NotificationType.Error)
+                    )
+                  Tooltip: ="Click to view the Approver Page"
+                  Width: =36
+                  X: =1099
+                  Y: =50
+            - Approval_Icon2:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =36
+                  Icon: =Icon.Cancel
+                  OnSelect: |-
+                    =If(
+                        Or(
+                            !IsBlank(
+                                LookUp(
+                                    'Vacations Tracking (Days)',
+                                    ApproverID_1 = User().Email
+                                )
+                            ),
+                            !IsBlank(
+                                LookUp(
+                                    'Vacations Tracking (Permissions)',
+                                    User_Email = User().Email
+                                )
+                            )
+                        ),
+                        Navigate('Approvals', ScreenTransition.Fade, 
+                            {
+                                SelectedProject: SelectedProject, 
+                                Selected_ProjectID: Selected_ProjectID
+                            }
+                        ),
+                        Notify("This page is only for approvers. Request permissions if needed.", NotificationType.Error)
+                    )
+                  Tooltip: ="Click to view the Approver Page"
+                  Width: =36
+                  X: =1131
+                  Y: =50
+            - Home_Icon:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(255, 255, 255, 1)
+                  Height: =46
+                  Icon: =Icon.Home
+                  Width: =46
+                  X: =1023
+                  Y: =42
+            - Calendar_Icon:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =35
+                  Icon: =Icon.CalendarBlank
+                  OnSelect: |-
+                    =If(
+                        Or(
+                            !IsBlank(
+                                LookUp(
+                                    'Vacations Tracking (Days)',
+                                    ApproverID_1 = User().Email
+                                )
+                            ),
+                            !IsBlank(
+                                LookUp(
+                                    'Vacations Tracking (Permissions)',
+                                    User_Email = User().Email
+                                )
+                            )
+                        ),
+                        Launch("https://app.powerbi.com/reportEmbed?reportId=2bd14c4b-3365-4c62-bca2-26a488a7cb4e&autoAuth=true&ctid=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a"),
+
+                        Notify("This page is only for approvers. Request permissions if needed.", NotificationType.Error)
+                    )
+                  Tooltip: ="Click to View Dashboard"
+                  Width: =35
+                  X: =1202
+                  Y: =50
+            - HelpIcon:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =35
+                  Icon: =Icon.Help
+                  OnSelect: =Launch("https://neconnectors.sharepoint.com/:p:/r/_layouts/15/Doc.aspx?sourcedoc=%7B8657E87D-D8AC-4086-BF16-A973373F3852%7D&file=Dayaway%20How-To.pptx&action=embedview")
+                  Tooltip: ="Click to view the How to Guide"
+                  Width: =35
+                  X: =1290
+                  Y: =50
+            - Tabs_Block:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =19
+                  OnSelect: =
+                  Tooltip: ="Approval Page"
+                  Width: =370
+                  X: =990
+                  Y: =97
+            - Border 2:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: =RGBA(0, 18, 107, 1)
+                  Height: =3
+                  Width: =1320
+                  X: =26
+                  Y: =94
+      - Flight_Checkbox:
+          Control: Classic/CheckBox@2.1.0
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            CheckboxBorderColor: =RGBA(0, 18, 107, 1)
+            CheckmarkFill: =RGBA(0, 0, 0, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            HoverColor: =RGBA(0, 18, 107, 1)
+            OnCheck: =Set(ViewFlightMenu, true);
+            OnUncheck: |-
+              =UpdateIf(
+                  FlightEntries,
+                  true,
+                  {
+                      DepartureDate: Blank(),
+                      ArrivalDate: Blank(),
+                      DepartureLocation: Blank(),
+                      ArrivalLocation: Blank(),
+                      Companion: Blank()
+                  }
+              );
+            Size: =10
+            Text: ="Add Flight"
+            Visible: |-
+              =// Not(CountRows(colVacationsUpdates)>0)
+              false
+            Width: =91
+            X: =1010
+            Y: =150
+      - SaveButton_Background:
+          Control: Classic/Button@2.2.0
+          Group: Save_Undo_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Launch("https://app.powerbi.com/Redirect?action=OpenApp&appId=8b5f2e86-7dff-4932-bc91-59b17008279b&ctid=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&experience=power-bi")
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Text: =
+            Visible: =CountRows(colVacationsUpdates)>0
+            Width: =168
+            X: =1140
+            Y: =250
+      - Gallery_Background:
+          Control: Classic/Button@2.2.0
+          Group: Gallery_Header_Hours
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Height: |-
+              =With(
+                  {
+                      sortedRows: SortByColumns(
+                          Filter(
+                              'Vacations Tracking (Days)',
+                              'Created By'.Email = User().Email
+                          ),
+                          "EndDate",
+                          SortOrder.Descending
+                      ),
+                      rowCount: CountRows(
+                          SortByColumns(
+                              Filter(
+                                  'Vacations Tracking (Days)',
+                                  'Created By'.Email = User().Email
+                              ),
+                              "EndDate",
+                              SortOrder.Descending
+                          )
+                      )
+                  },
+                  If(
+                      rowCount >= 10,
+                      446, // Max height if more than 10 rows
+                      52 + 40 * rowCount
+                  )
+              )
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Text: =
+            Width: |+
+              =1292.5
+
+            X: |+
+              =16
+            Y: =300
+      - Gallery_Hours:
+          Control: Gallery@2.15.0
+          Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =393
+            Items: |+
+              =SortByColumns(
+                  Filter(
+                  'Vacations Tracking (Days)',
+                  Employee = User().Email
+                  )
+              ,
+              "EndDate",
+              SortOrder.Descending)
+            TemplateSize: =40
+            Width: =Rectangle_Header_1.Width + 50
+            X: =Rectangle_Header_1.X
+            Y: =345
+          Children:
+            - Separator2_2:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0, 0, 0, 0)
+                  Height: =8
+                  OnSelect: =Select(Parent)
+                  Width: =Parent.TemplateWidth
+                  Y: =Parent.TemplateHeight - Self.Height
+            - TextInput_StartDate:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.StartDate
+                  Fill: =RGBA(237, 237, 237, 1)
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |-
+                    =// Track changes related to hours table
+                    If(
+                        IsBlank(
+                            LookUp(
+                                colVacationsUpdates,
+                                ID = ThisItem.ID
+                            )
+                        ),
+                        Collect(
+                            colVacationsUpdates,
+                            {
+                                ID: ThisItem.ID,
+                                StartDate: DateValue(TextInput_StartDate.Text),
+                                EndDate: DateValue(TextInput_EndDate.Text),
+                                Days: Value(TextLabel_Days.Text),
+                                Comments: TextInput_Comments.Text,
+                                ApprovalStatus_1: "Pending"
+                            }
+                        ),
+                        UpdateIf(
+                            colVacationsUpdates,
+                            ID = ThisItem.ID,
+                            {
+                                StartDate: DateValue(TextInput_StartDate.Text),
+                                EndDate: DateValue(TextInput_EndDate.Text),
+                                Days: Value(TextLabel_Days.Text),
+                                Comments: TextInput_Comments.Text,
+                                ApprovalStatus_1: "Pending"
+                            }
+                        )
+                    );
+                  OnSelect: =Select(Parent)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =9
+                  Width: =StartDate_Header.Width
+                  X: =TextLabel_Employee.X + TextLabel_Employee.Width
+            - TextInput_EndDate:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.EndDate
+                  Fill: =RGBA(237, 237, 237, 1)
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |-
+                    =// Track changes related to hours table
+                    If(
+                        IsBlank(
+                            LookUp(
+                                colVacationsUpdates,
+                                ID = ThisItem.ID
+                            )
+                        ),
+                        Collect(
+                            colVacationsUpdates,
+                            {
+                                ID: ThisItem.ID,
+                                StartDate: DateValue(TextInput_StartDate.Text),
+                                EndDate: DateValue(TextInput_EndDate.Text),
+                                Days: Value(TextLabel_Days.Text),
+                                Comments: TextInput_Comments.Text,
+                                ApprovalStatus_1: "Pending"
+                            }
+                        ),
+                        UpdateIf(
+                            colVacationsUpdates,
+                            ID = ThisItem.ID,
+                            {
+                                StartDate: DateValue(TextInput_StartDate.Text),
+                                EndDate: DateValue(TextInput_EndDate.Text),
+                                Days: Value(TextLabel_Days.Text),
+                                Comments: TextInput_Comments.Text,
+                                ApprovalStatus_1: "Pending"
+                            }
+                        )
+                    );
+                  OnSelect: =Select(Parent)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =9
+                  Width: =EndDate_Header.Width
+                  X: =TextInput_StartDate.X + TextInput_StartDate.Width
+            - TextLabel_Employee:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  Size: =9
+                  Text: =ThisItem.Employee_Name
+                  Tooltip: =ThisItem.Employee
+                  Width: =Employee_Header.Width
+            - TextLabel_Days:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: |+
+                    =If(
+                        TextLabel_Days.Text = "0", RGBA(252, 124, 124, 1), // Red if days = 0
+                        RGBA(255, 255, 255, 1) // Transparent
+                    )
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  Size: =9
+                  Text: |+
+                    =With(
+                        {
+                            varStartText: Text(DateValue(TextInput_StartDate.Text)),
+                            varEndText: Text(DateValue(TextInput_EndDate.Text))
+                        },
+                        If(
+                            ThisItem.Leave_Time <> "Full Day",
+                            0.5,
+                            If(
+                                Or(
+                                    !IsMatch(varStartText, "^\d{1,2}/\d{1,2}/\d{4}$"),
+                                    !IsMatch(varEndText, "^\d{1,2}/\d{1,2}/\d{4}$"),
+                                    DateDiff(DateValue(varStartText), DateValue(varEndText)) + 1 <= 0,
+                                    DateDiff(DateValue(varStartText), DateValue(varEndText)) + 1 > 50000
+                                ),
+                                0,
+                                With(
+                                    {
+                                        varStart: DateValue(varStartText),
+                                        varEnd: DateValue(varEndText),
+                                        varDiff: DateDiff(DateValue(varStartText), DateValue(varEndText)) + 1
+                                    },
+                                    CountIf(
+                                        ForAll(
+                                            Sequence(varDiff),
+                                            varStart + Value - 1
+                                        ),
+                                        And(
+                                            Weekday(Value) in [2, 3, 4, 5, 6],
+                                            Not(
+                                                Value in ForAll(colPublic_Holidays, DateValue(CleanDate))
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ) - ThisItem.Travel_Days
+                  Width: =Days_Header.Width
+                  X: =TextInput_EndDate.X + TextInput_EndDate.Width
+            - TextInput_Comments:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Default: =ThisItem.Comments
+                  Fill: =RGBA(237, 237, 237, 1)
+                  Font: =Font.'Open Sans'
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |-
+                    =// Track changes related to hours table
+                    If(
+                        IsBlank(
+                            LookUp(
+                                colVacationsUpdates,
+                                ID = ThisItem.ID
+                            )
+                        ),
+                        Collect(
+                            colVacationsUpdates,
+                            {
+                                ID: ThisItem.ID,
+                                StartDate: DateValue(TextInput_StartDate.Text),
+                                EndDate: DateValue(TextInput_EndDate.Text),
+                                Days: Value(TextLabel_Days.Text),
+                                Comments: TextInput_Comments.Text,
+                                ApprovalStatus_1: "Pending"
+                            }
+                        ),
+                        UpdateIf(
+                            colVacationsUpdates,
+                            ID = ThisItem.ID,
+                            {
+                                StartDate: DateValue(TextInput_StartDate.Text),
+                                EndDate: DateValue(TextInput_EndDate.Text),
+                                Days: Value(TextLabel_Days.Text),
+                                Comments: TextInput_Comments.Text,
+                                ApprovalStatus_1: "Pending"
+                            }
+                        )
+                    );
+                  OnSelect: =Select(Parent)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =9
+                  Width: =Comments_Header.Width
+                  X: =TextLabel_Days.X + TextLabel_Days.Width
+            - TextLabel_AppComment:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  Size: =9
+                  Text: =ThisItem.Approver_Comments
+                  Width: =App_Comments_Header.Width
+                  X: =TextLabel_Approval1.X + TextLabel_Approval1.Width
+            - DeleteIcon:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =40
+                  Icon: =Icon.Trash
+                  OnSelect: =UpdateContext({varShowConfirmation:true})
+                  Visible: |-
+                    =!(ThisItem.ApprovalStatus_1 = "Approved"
+                    ||
+                    ThisItem.ApprovalStatus_1 = "Rejected" 
+                    )
+                  Width: |+
+                    =32
+                  X: =TextLabel_Type.X+TextLabel_Type.Width+6
+            - TextLabel_Approval1:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: |-
+                    =If(
+                        ThisItem.ApprovalStatus_1 = "Approved", RGBA(108, 212, 136, 1), // Green
+                        ThisItem.ApprovalStatus_1 = "Rejected", RGBA(252, 124, 124, 1), // Red
+                        ThisItem.ApprovalStatus_1 = "Pending", RGBA(252, 250, 124, 1), // Yellow
+                        RGBA(0, 0, 0, 0) // Transparent
+                    )
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  Size: =9
+                  Text: =ThisItem.ApprovalStatus_1
+                  Width: =Approval1_Header.Width
+                  X: =TextInput_Comments.X + TextInput_Comments.Width
+            - TextLabel_Approval2:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: |-
+                    =If(
+                        ThisItem.ApprovalStatus_2 = "Approved", RGBA(108, 212, 136, 1), // Green
+                        ThisItem.ApprovalStatus_2 = "Rejected", RGBA(252, 124, 124, 1), // Red
+                        ThisItem.ApprovalStatus_2 = "Pending", RGBA(252, 250, 124, 1), // Yellow
+                        RGBA(255, 255, 255, 1) // Transparent
+                    )
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  Size: =9
+                  Text: =ThisItem.ApprovalStatus_2
+                  Visible: =false
+                  Width: =Approval2_Header.Width
+                  X: =TextLabel_Approval1.X + TextLabel_Approval1.Width
+            - Flight_Icon:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =40
+                  Icon: =Icon.Airplane
+                  OnSelect: |-
+                    =ClearCollect(
+                        SelectedFlightSegments,
+                        {
+                            SegmentID: 1,
+                            Role: User().FullName,
+                            DepartureDate: ThisItem.Flight_DepartureDate,
+                            DepartureLocation: ThisItem.Flight_DepartureLocation,
+                            ArrivalDate: ThisItem.Flight_ArrivalDate,
+                            ArrivalLocation: ThisItem.Flight_ArrivalLocation
+                        },
+                        {
+                            SegmentID: 2,
+                            Role: ThisItem.Companion_1,
+                            DepartureDate: ThisItem.Comp1_DepartureDate,
+                            DepartureLocation: ThisItem.Comp1_DepartureLocation,
+                            ArrivalDate: ThisItem.Comp1_ArrivalDate,
+                            ArrivalLocation: ThisItem.Comp1_ArrivalLocation
+                        },
+                        {
+                            SegmentID: 3,
+                            Role: ThisItem.Companion_2,
+                            DepartureDate: ThisItem.Comp2_DepartureDate,
+                            DepartureLocation: ThisItem.Comp2_DepartureLocation,
+                            ArrivalDate: ThisItem.Comp2_ArrivalDate,
+                            ArrivalLocation: ThisItem.Comp2_ArrivalLocation
+                        }
+                    );
+                    Set(ViewFlightMenuApp, true);
+                  Visible: |-
+                    =//ThisItem.ApprovalStatus_2 <> "N/A"
+                    false
+                  Width: =23
+                  X: =TextLabel_Type.X+TextLabel_Type.Width + 2
+            - TextLabel_Type:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FocusedBorderThickness: =1
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  Size: =8
+                  Text: =ThisItem.Type_of_leave
+                  Width: =Type_Header.Width
+                  X: =TextLabel_AppComment.X + TextLabel_AppComment.Width
+            - TextLabel_TravelDays:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: |
+                    =If(
+                        TextLabel_TravelDays.Text = "0", RGBA(252, 124, 124, 1), // Red if days = 0
+                        RGBA(255, 255, 255, 1) // Transparent
+                    )
+                  Font: =Font.'Open Sans'
+                  OnSelect: =Select(Parent)
+                  Size: =9
+                  Text: =ThisItem.Travel_Days
+                  Visible: =false
+                  Width: =TravelDays_Header.Width
+                  X: =TextLabel_Days.X + TextLabel_Days.Width
+      - Text_Employee:
+          Control: Label@2.5.1
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Employee"
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =105
+            X: =457
+            Y: =130
+      - Employee_Text:
+          Control: Label@2.5.1
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Font: =Font.'Open Sans'
+            Text: =User().Email
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =328
+            X: =562
+            Y: =130
+      - Approver_Text:
+          Control: Label@2.5.1
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Font: =Font.'Open Sans'
+            Text: =LookUp(colEmployees, Lower(Email) = Lower(User().Email)).'Approver Email'
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =302
+            X: =129
+            Y: =130
+      - Approver_Label:
+          Control: Label@2.5.1
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Text: ="Approver"
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =104
+            X: =20
+            Y: =130
+      - StartDateText_Label:
+          Control: Label@2.5.1
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Start Date"
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =104
+            X: =20
+            Y: =196
+      - StartDatePicker_Date:
+          Control: Classic/DatePicker@2.6.0
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            DefaultDate: =
+            DisplayMode: =
+            EndYear: =// Year(Today())+100
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.'Segoe UI'
+            IconBackground: =RGBA(0, 18, 107, 1)
+            IconFill: =RGBA(255, 255, 255, 1)
+            IsEditable: =true
+            PaddingBottom: =0
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5.64
+            PaddingTop: =0.00
+            Size: =13
+            StartYear: =1899
+            Tooltip: =
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =184
+            X: =20
+            Y: =236
+      - EndDatePicker_Label:
+          Control: Label@2.5.1
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="End Date"
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =104
+            X: =245
+            Y: =196
+      - EndDatePicker_Date:
+          Control: Classic/DatePicker@2.6.0
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            DefaultDate: =
+            DisplayMode: =
+            EndYear: =// Year(Today())+100
+            Fill: =RGBA(0, 0, 0, 0)
+            Font: =Font.'Segoe UI'
+            IconBackground: =RGBA(0, 18, 107, 1)
+            IconFill: =RGBA(255, 255, 255, 1)
+            IsEditable: =true
+            PaddingBottom: =0
+            PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+            PaddingRight: =5.64
+            PaddingTop: =0.00
+            Size: =13
+            StartYear: =1899
+            Tooltip: =
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =184
+            X: =245
+            Y: =236
+      - Text_Comments:
+          Control: Label@2.5.1
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =34
+            PaddingRight: =5.64
+            PaddingTop: =5.64
+            Text: ="Comments"
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =141.11
+            X: =562
+            Y: =196
+      - Input_Comments:
+          Control: Classic/TextInput@2.3.2
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Default: =
+            Font: =Font.'Open Sans'
+            HintText: =
+            HoverBorderColor: =RGBA(0, 18, 107, 1)
+            HoverFill: =RGBA(186, 202, 226, 1)
+            Mode: =TextMode.MultiLine
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =10
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =462
+            X: =562
+            Y: =236
+      - AddRecord_Button:
+          Control: Classic/Icon@2.5.0
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =35
+            Icon: =Icon.Add
+            OnSelect: |-
+              =Concurrent(
+                  // 1. Add new record to SharePoint list
+                  Patch(
+                      'Vacations Tracking (Days)',
+                      Defaults('Vacations Tracking (Days)'),
+                      {
+                          Title: GUID_Var,
+                          LOG_ID: GUID_Var,
+                          Employee: Employee_Text.Text,
+                          Employee_Name: User().FullName,
+                          Project: Selected_ProjectID,
+                          StartDate: StartDatePicker_Date.SelectedDate,
+                          EndDate: EndDatePicker_Date.SelectedDate,
+                          Days: If(
+                              Flight_Checkbox.Value,
+                              Max(Value('Days_w/o_weekends'.Text)),
+                              Value('Days_w/o_weekends'.Text)
+                          ),
+                          Travel_Days: If(Flight_Checkbox.Value, Value(varFlightEntitlement), Blank()),
+                          Leave_Time: Leave_Time.Selected.Value,
+                          Type_of_leave: Input_Comments_1.Text,
+                          Comments: Input_Comments.Text,
+                          App_Name: "Dayaway_HR_Vacations",
+                          ApproverID_1: Approver_Text.Text,
+                          ApprovalStatus_1: "Pending"
+                      }
+                  ),
+
+                  // 2. Send email to ApproverID_1
+                  Office365Outlook.SendEmailV2(
+                      Approver_Text.Text, // ApproverID_1 email
+                      Leave_Type.Selected.Value & " Request Submitted",
+                      "A new " & Leave_Type.Selected.Value & " request has been submitted by " & Employee_Text.Text &
+                      ". Please review and approve/reject in the DayAway application.<br><br>" &
+                      "<b>Type of Leave:</b> " & Leave_Type.Selected.Value & "<br>" &
+                      "<b>Dates:</b> " & Text(StartDatePicker_Date.SelectedDate, "[$-en-US]dd-mmm-yyyy") &
+                      " to " & Text(EndDatePicker_Date.SelectedDate, "[$-en-US]dd-mmm-yyyy") & "<br>" &
+                      "<b>Comments:</b> " & Input_Comments.Text,
+                      {
+                          IsHtml: true
+                      }
+                  )
+              );
+
+              // 3. Notify user
+              Notify("Hours submitted!", NotificationType.Success, 1000);
+
+              // 4. Reset form fields
+              Set(GUID_Var, GUID());
+              Reset(StartDatePicker_Date);
+              Reset(Leave_Time);
+              Reset(EndDatePicker_Date);
+              Reset(Input_Comments);
+              Reset(Flight_Checkbox);
+              Reset(Leave_Type);
+              Reset(Leave_Time);
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =44
+            X: =1089
+            Y: =238
+      - AddHours_Button:
+          Control: Classic/Button@2.2.0
+          Group: User_Selections
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            BorderThickness: =0
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: |+
+              =
+              If(
+                  Or(
+                      IsBlank(StartDatePicker_Date.SelectedDate),
+                      IsBlank(EndDatePicker_Date.SelectedDate),
+                      StartDatePicker_Date.SelectedDate > EndDatePicker_Date.SelectedDate
+                  ),
+                  Notify("Please fill out dates correctly", NotificationType.Error),
+                  If(
+                      Year(StartDatePicker_Date.SelectedDate) <> Year(EndDatePicker_Date.SelectedDate),
+                      Notify("Please submit days for the next year in a separate record", NotificationType.Error),
+                      If(
+                          !IsBlank(
+                              LookUp(
+                                  'Vacations Tracking (Days)',
+                                  StartsWith(Employee, Employee_Text.Text) &&
+                                  StartDate <= EndDatePicker_Date.SelectedDate &&
+                                  EndDate >= StartDatePicker_Date.SelectedDate &&
+                                  ApprovalStatus_1 <> "Rejected"
+                              )
+                          ),
+                          Notify("You already have a vacation or sick day recorded for these dates.", NotificationType.Error),
+                          // Removed the "current year only" restriction:
+                          // If( Year(StartDatePicker_Date.SelectedDate) = Year(Today()), Select(AddRecord_Button) )
+                          // Now we just submit when all validations pass:
+                          Select(AddRecord_Button)
+                      )
+                  )
+              );
+
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =10
+            Text: ="Add Days"
+            Visible: =Not(CountRows(colVacationsUpdates)>0)
+            Width: =91
+            X: =1051
+            Y: =236
+      - Rectangle_Header_1:
+          Control: Rectangle@2.3.0
+          Group: Gallery_Header_Hours
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 0)
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =41
+            Width: |+
+              =1290
+            X: =17
+            Y: =300
+      - Employee_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: ="Employee"
+            Width: =Rectangle_Header_1.Width/8.8
+            X: =Rectangle_Header_1.X
+            Y: =300
+      - StartDate_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: ="Start Date"
+            Width: |+
+              =Rectangle_Header_1.Width/12
+            X: =Employee_Header.X + Employee_Header.Width
+            Y: =300
+      - Comments_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: ="Comments"
+            Width: =Rectangle_Header_1.Width/4
+            X: =Days_Header.X + Days_Header.Width
+            Y: =300
+      - Approval1_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: |-
+              ="Approval
+              "
+            Width: |+
+              =Rectangle_Header_1.Width/12
+            X: =Comments_Header.X + Comments_Header.Width
+            Y: =300
+      - EndDate_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: ="End Date"
+            Width: |+
+              =Rectangle_Header_1.Width/12
+            X: =StartDate_Header.X + StartDate_Header.Width
+            Y: =300
+      - Days_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: ="Days"
+            Width: |+
+              =Rectangle_Header_1.Width/18
+            X: =EndDate_Header.X + EndDate_Header.Width
+            Y: =300
+      - Approval2_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: |-
+              =" HR Approval
+              "
+            Visible: =false
+            Width: =Rectangle_Header_1.Width/16
+            X: =Approval1_Header.X + Approval1_Header.Width
+            Y: =300
+      - SaveIcon:
+          Control: Classic/Icon@2.5.0
+          Group: Save_Undo_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =36
+            Icon: =Icon.Save
+            OnSelect: |
+              =
+              If(
+                  CountRows(colVacationsUpdates) > 0,
+                      Patch(
+                          'Vacations Tracking (Days)',
+                          ShowColumns(
+                              colVacationsUpdates,
+                              ID,
+                              Employee,
+                              StartDate,
+                              EndDate,
+                              Days,
+                              Comments,
+                              ApprovalStatus_1,
+                              ApprovalStatus_2
+                          )
+                      )
+                  );
+                  Clear(colVacationsUpdates);
+                  Notify("Records updated successfully!", NotificationType.Success);
+                  Refresh('Vacations Tracking (Days)');
+            Visible: =CountRows(colVacationsUpdates)>0
+            Width: =36
+            X: =1147
+            Y: =252
+      - SaveEditsText:
+          Control: Label@2.5.1
+          Group: Save_Undo_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            Height: =34
+            OnSelect: =
+            Text: ="Save Changes"
+            Visible: =CountRows(colVacationsUpdates)>0
+            Width: =116
+            X: =1187
+            Y: =253
+      - WarningIcon:
+          Control: Classic/Icon@2.5.0
+          Group: WarningLabel
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(184, 0, 0, 1)
+            Height: =40
+            Icon: =Icon.Warning
+            Visible: =CountRows(colVacationsUpdates)>0
+            Width: =25
+            X: =25
+            Y: =254
+      - WarningText:
+          Control: Label@2.5.1
+          Group: WarningLabel
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(184, 0, 0, 1)
+            Font: =Font.'Segoe UI'
+            Text: ="You have pending changes to be saved"
+            Visible: =CountRows(colVacationsUpdates)>0
+            Width: =317
+            X: =50
+            Y: =250
+      - UndoEditsText:
+          Control: Label@2.5.1
+          Group: Save_Undo_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Segoe UI'
+            Height: =34
+            OnSelect: =
+            Text: ="Undo"
+            Visible: =CountRows(colVacationsUpdates)>0
+            Width: =55
+            X: =1055
+            Y: =253
+      - UndoIcon:
+          Control: Classic/Icon@2.5.0
+          Group: Save_Undo_Edits
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =31
+            Icon: =Icon.Undo
+            OnSelect: |-
+              =//Remove changes
+              Clear(colVacationsUpdates);
+
+              // Refresh the data source
+              Refresh('Vacations Tracking (Days)');
+            Visible: =CountRows(colVacationsUpdates)>0
+            Width: =31
+            X: =1024
+            Y: =257
+      - App_Comments_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: ="Approver Comment"
+            Width: =Rectangle_Header_1.Width/3.72
+            X: =Approval1_Header.X + Approval1_Header.Width
+            Y: =300
+      - Days_w/o_weekends:
+          Control: Label@2.5.1
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            Text: |+
+              =With(
+                  {
+                      varStart: StartDatePicker_Date.SelectedDate,
+                      varEnd: EndDatePicker_Date.SelectedDate,
+                      varDiff: DateDiff(StartDatePicker_Date.SelectedDate, EndDatePicker_Date.SelectedDate) + 1
+                  },
+                  If(
+                      Or(
+                          IsBlank(varStart),
+                          IsBlank(varEnd),
+                          varDiff <= 0,
+                          varDiff > 50000
+                      ),
+                      0,
+                      If(
+                          Leave_Time.Selected.Value <> "Full Day",
+                          0.5,
+                          With(
+                              {
+                                  varDateRange: ForAll(
+                                      Sequence(varDiff),
+                                      varStart + Value - 1
+                                  )
+                              },
+                              CountIf(
+                                  varDateRange,
+                                  And(
+                                      Weekday(Value) in [2, 3, 4, 5, 6],
+                                      Not(Value in ForAll(colPublic_Holidays, DateValue(CleanDate)))
+                                  )
+                              )
+                          )
+                      )
+                  )
+              )
+            Visible: =false
+            Width: =91
+            X: =1010
+            Y: =107
+      - Leave_Time:
+          Control: Classic/Radio@2.3.0
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Default: ="Full Day"
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =109
+            HoverColor: =RGBA(0, 18, 107, 1)
+            Items: =["Full Day","First Half", "Second Half"]
+            Items.Value: =Value
+            LineHeight: =1
+            RadioBorderColor: =RGBA(0, 18, 107, 1)
+            RadioSelectionFill: =RGBA(0, 0, 0, 1)
+            RadioSize: =20
+            Size: =8
+            Visible: |+
+              =If(
+                  Not(CountRows(colVacationsUpdates) > 0),
+                  And(
+                      StartDatePicker_Date.SelectedDate = EndDatePicker_Date.SelectedDate,
+                      !IsBlank(StartDatePicker_Date.SelectedDate)
+                  ),
+                  false
+              )
+            Width: =128
+            X: =432
+            Y: =206
+      - Leave_Type:
+          Control: Classic/Radio@2.3.0
+          Group: User_Selections
+          Properties:
+            BorderColor: =RGBA(255, 255, 255, 1)
+            Default: ="Vacation"
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =96
+            HoverColor: =RGBA(0, 18, 107, 1)
+            Items: =["Vacation","Sick Day", "Other"]
+            Items.Value: =Value
+            LineHeight: =1
+            PaddingTop: =12
+            RadioBorderColor: =RGBA(0, 18, 107, 1)
+            RadioSelectionFill: =RGBA(0, 0, 0, 1)
+            RadioSize: =20
+            Size: =10
+            Visible: =Not((CountRows(colVacationsUpdates)>0))
+            Width: =129
+            X: =896
+            Y: =100
+      - Type_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: ="Type"
+            Width: =Rectangle_Header_1.Width/16
+            X: =App_Comments_Header.X + App_Comments_Header.Width
+            Y: =300
+      - Flight_Background_App_1:
+          Control: Rectangle@2.3.0
+          Group: Flight_Menu_Review
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(237, 237, 237, 0.8)
+            Height: =768
+            Visible: =ViewFlightMenuApp
+            Width: =1366
+      - Flight_Menu_Background_App_1:
+          Control: Rectangle@2.3.0
+          Group: Flight_Menu_Review
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =389
+            Visible: =ViewFlightMenuApp
+            Width: =939
+            X: =209
+            Y: =93
+      - Cancel_Save_App_1:
+          Control: Classic/Button@2.2.0
+          Group: Flight_Menu_Review
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            BorderThickness: =0
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(189, 15, 15, 1)
+            Font: =Font.'Open Sans'
+            Height: =37
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Set(ViewFlightMenuApp, false);
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =10
+            Text: ="Close"
+            Visible: =ViewFlightMenuApp
+            Width: =91
+            X: =625
+            Y: =406
+      - Flight_Details_Title_App_1:
+          Control: Label@2.5.1
+          Group: Flight_Menu_Review
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Size: =16
+            Text: ="Flight Details"
+            Visible: =ViewFlightMenuApp
+            Width: =167
+            X: =587
+            Y: =113
+      - Flight_Details_Table:
+          Control: DataTable@1.0.3
+          Group: Flight_Menu_Review
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            HeadingColor: =RGBA(255, 255, 255, 1)
+            HeadingFill: =RGBA(0, 18, 107, 1)
+            HeadingFont: =Font.'Open Sans'
+            HeadingSize: =12
+            Height: =174
+            HoverFill: =RGBA(186, 202, 226, .2)
+            Items: =SelectedFlightSegments
+            SelectedFill: =RGBA(56, 96, 178, .2)
+            Size: =10
+            Visible: =ViewFlightMenuApp
+            Width: =868
+            X: =245
+            Y: =199
+          Children:
+            - Role_Column2:
+                Control: DataTableColumn@1.0.1
+                Variant: Textual
+                IsLocked: true
+                Properties:
+                  FieldDisplayName: ="Role"
+                  FieldName: ="Role"
+                  Order: =1
+                  Text: =ThisItem.Role
+                  Width: =160
+            - DepartureDate_Column2:
+                Control: DataTableColumn@1.0.1
+                Variant: Textual
+                IsLocked: true
+                Properties:
+                  FieldDisplayName: ="Departure Date"
+                  FieldName: ="DepartureDate"
+                  Order: =2
+                  Text: =ThisItem.DepartureDate
+                  Width: =134
+            - Departure Location:
+                Control: DataTableColumn@1.0.1
+                Variant: Textual
+                IsLocked: true
+                Properties:
+                  FieldDisplayName: ="Departure Location"
+                  FieldName: ="DepartureLocation"
+                  Order: =3
+                  Text: =ThisItem.DepartureLocation
+                  Width: =172
+            - Arrival Date:
+                Control: DataTableColumn@1.0.1
+                Variant: Textual
+                IsLocked: true
+                Properties:
+                  FieldDisplayName: ="Arrival Date"
+                  FieldName: ="ArrivalDate"
+                  Order: =4
+                  Text: =ThisItem.ArrivalDate
+                  Width: =109
+            - ArrivalLocation_Column2:
+                Control: DataTableColumn@1.0.1
+                Variant: Textual
+                IsLocked: true
+                Properties:
+                  FieldDisplayName: ="Arrival Location"
+                  FieldName: ="ArrivalLocation"
+                  Order: =5
+                  Text: =ThisItem.ArrivalLocation
+                  Width: =148
+      - TravelDays_Header:
+          Control: Label@2.5.1
+          Group: Gallery_Header_Hours
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Color: =RGBA(255, 255, 255, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =Rectangle_Header_1.Height
+            Size: =11
+            Text: ="Travel Days"
+            Visible: =false
+            Width: =Rectangle_Header_1.Width/22
+            X: =Days_Header.X + Days_Header.Width
+            Y: =300
+      - Public_Holidays_Background:
+          Control: Rectangle@2.3.0
+          Group: Public_Holidays_List
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(237, 237, 237, 0.8)
+            Height: =768
+            Visible: =varShowHolidays
+            Width: =1366
+      - Public_Holidays_Menu_Background:
+          Control: Rectangle@2.3.0
+          Group: Public_Holidays_List
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =441
+            Visible: =varShowHolidays
+            Width: =700
+            X: =312
+            Y: =110
+      - Cancel_Public_Holidays:
+          Control: Classic/Button@2.2.0
+          Group: Public_Holidays_List
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            BorderThickness: =0
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(189, 15, 15, 1)
+            Font: =Font.'Open Sans'
+            Height: =37
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =UpdateContext({varShowHolidays:false})
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =10
+            Text: ="Close"
+            Visible: =varShowHolidays
+            Width: =91
+            X: =627
+            Y: =482
+      - Public_Holidays_Title:
+          Control: Label@2.5.1
+          Group: Public_Holidays_List
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Size: =16
+            Text: ="Public Holidays"
+            Visible: =varShowHolidays
+            Width: =167
+            X: =595
+            Y: =129
+      - Public_Holidays_Table:
+          Control: DataTable@1.0.3
+          Group: Public_Holidays_List
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Font: =Font.'Open Sans'
+            HeadingColor: =RGBA(255, 255, 255, 1)
+            HeadingFill: =RGBA(0, 18, 107, 1)
+            HeadingFont: =Font.'Open Sans'
+            HeadingSize: =12
+            Height: =264
+            HoverFill: =RGBA(186, 202, 226, .2)
+            Items: =colPublic_Holidays
+            SelectedFill: =RGBA(56, 96, 178, .2)
+            Size: =10
+            Visible: =varShowHolidays
+            Width: =600
+            X: =365
+            Y: =199
+          Children:
+            - Country_Column1:
+                Control: DataTableColumn@1.0.1
+                Variant: Textual
+                IsLocked: true
+                Properties:
+                  FieldDisplayName: ="Country"
+                  FieldName: ="Country"
+                  Order: =1
+                  Text: =ThisItem.Country
+                  Width: =200
+            - Date_Column1:
+                Control: DataTableColumn@1.0.1
+                Variant: Textual
+                IsLocked: true
+                Properties:
+                  AutoWidth: =false
+                  FieldDisplayName: ="Date"
+                  FieldName: ="Date"
+                  Order: =2
+                  Text: =DateValue(ThisItem.CleanDate)
+                  Width: =200
+            - Motive_Column1:
+                Control: DataTableColumn@1.0.1
+                Variant: Textual
+                IsLocked: true
+                Properties:
+                  AutoWidth: =false
+                  FieldDisplayName: ="Motive"
+                  FieldName: ="Motive"
+                  Order: =3
+                  Text: =ThisItem.Motive
+                  Width: =200
+      - Dayaway_Logo:
+          Control: Image@2.2.3
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =96
+            Image: ='Subtitle (1)'
+            Width: =287
+      - Flight_Background:
+          Control: Rectangle@2.3.0
+          Group: Flight_Details
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Fill: =RGBA(237, 237, 237, 0.8)
+            Height: =768
+            Visible: =ViewFlightMenu
+            Width: =1366
+      - Flight_Menu_Background:
+          Control: Rectangle@2.3.0
+          Group: Flight_Details
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            BorderThickness: =2
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =230 + (CountRows(FlightEntries) * 110)
+            Visible: =ViewFlightMenu
+            Width: =651
+            X: =345
+            Y: =60
+      - Departure:
+          Control: Label@2.5.1
+          Group: Flight_Details
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Text: ="Departure"
+            Visible: =ViewFlightMenu
+            Width: =104
+            X: =597
+            Y: =115
+      - Arrival:
+          Control: Label@2.5.1
+          Group: Flight_Details
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Text: ="Return"
+            Visible: =ViewFlightMenu
+            Width: =104
+            X: =780
+            Y: =115
+      - Flight_Save:
+          Control: Classic/Button@2.2.0
+          Group: Flight_Details
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            BorderThickness: =0
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(99, 139, 44, 1)
+            Font: =Font.'Open Sans'
+            Height: =37
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Set(ViewFlightMenu, false)
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =10
+            Text: ="Save"
+            Visible: =ViewFlightMenu
+            Width: =91
+            X: =543
+            Y: =240 + (CountRows(FlightEntries) * 110)
+      - Cancel_Save:
+          Control: Classic/Button@2.2.0
+          Group: Flight_Details
+          Properties:
+            BorderColor: =ColorFade(Self.Fill, -15%)
+            BorderThickness: =0
+            Color: =RGBA(255, 255, 255, 1)
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =RGBA(189, 15, 15, 1)
+            Font: =Font.'Open Sans'
+            Height: =37
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =Set(ViewFlightMenu, false);
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =10
+            Text: ="Cancel"
+            Visible: =ViewFlightMenu
+            Width: =91
+            X: =717
+            Y: =240 + (CountRows(FlightEntries) * 110)
+      - Flight_Details_Title:
+          Control: Label@2.5.1
+          Group: Flight_Details
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Size: =16
+            Text: ="Flight Details"
+            Visible: =ViewFlightMenu
+            Width: =167
+            X: =586
+            Y: =75
+      - Flight_Gallery:
+          Control: Gallery@2.15.0
+          Variant: Vertical
+          Group: Flight_Details
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Height: =1 + (CountRows(FlightEntries) * 120)
+            Items: =FlightEntries
+            TemplatePadding: =
+            TemplateSize: =118
+            Visible: =ViewFlightMenu
+            Width: =592
+            X: =377
+            Y: =153
+          Children:
+            - Gallery_Departure_Date:
+                Control: Classic/DatePicker@2.6.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DefaultDate: |-
+                    =
+                    ThisItem.DepartureDate
+                  Font: =Font.'Open Sans'
+                  IconBackground: =RGBA(0, 18, 107, 1)
+                  IconFill: =RGBA(255, 255, 255, 1)
+                  OnChange: |+
+                    =UpdateIf(
+                        FlightEntries,
+                        FlightID = ThisItem.FlightID,
+                        {
+                            DepartureDate: Gallery_Departure_Date.SelectedDate,
+                            ArrivalDate: Gallery_Arrival_Date.SelectedDate,
+                            DepartureLocation: TextInput_Departure_Location.Text,
+                            ArrivalLocation: TextInput_Arrival_Location.Text,
+                            Companion: TextInput_Companion.Text
+                        }
+                    )
+                  OnSelect: =Select(Parent)
+                  Size: =12
+                  Width: =157
+                  X: =176
+                  Y: =12
+            - Gallery_Arrival_Date:
+                Control: Classic/DatePicker@2.6.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  DefaultDate: =ThisItem.ArrivalDate
+                  Font: =Font.'Open Sans'
+                  IconBackground: =RGBA(0, 18, 107, 1)
+                  IconFill: =RGBA(255, 255, 255, 1)
+                  OnChange: |+
+                    =UpdateIf(
+                        FlightEntries,
+                        FlightID = ThisItem.FlightID,
+                        {
+                            DepartureDate: Gallery_Departure_Date.SelectedDate,
+                            ArrivalDate: Gallery_Arrival_Date.SelectedDate,
+                            DepartureLocation: TextInput_Departure_Location.Text,
+                            ArrivalLocation: TextInput_Arrival_Location.Text,
+                            Companion: TextInput_Companion.Text
+                        }
+                    )
+                  OnSelect: =Select(Parent)
+                  Size: =12
+                  Width: =157
+                  X: =356
+                  Y: =12
+            - TextInput_Departure_Location:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Default: =ThisItem.DepartureLocation
+                  Font: =Font.'Open Sans'
+                  HintText: ="Location"
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |+
+                    =UpdateIf(
+                        FlightEntries,
+                        FlightID = ThisItem.FlightID,
+                        {
+                            DepartureDate: Gallery_Departure_Date.SelectedDate,
+                            ArrivalDate: Gallery_Arrival_Date.SelectedDate,
+                            DepartureLocation: TextInput_Departure_Location.Text,
+                            ArrivalLocation: TextInput_Arrival_Location.Text,
+                            Companion: TextInput_Companion.Text
+                        }
+                    )
+                  OnSelect: =Select(Parent)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =157
+                  X: =178
+                  Y: =65
+            - TextInput_Arrival_Location:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Default: =ThisItem.ArrivalLocation
+                  Font: =Font.'Open Sans'
+                  HintText: ="Location"
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |+
+                    =UpdateIf(
+                        FlightEntries,
+                        FlightID = ThisItem.FlightID,
+                        {
+                            DepartureDate: Gallery_Departure_Date.SelectedDate,
+                            ArrivalDate: Gallery_Arrival_Date.SelectedDate,
+                            DepartureLocation: TextInput_Departure_Location.Text,
+                            ArrivalLocation: TextInput_Arrival_Location.Text,
+                            Companion: TextInput_Companion.Text
+                        }
+                    )
+                  OnSelect: =Select(Parent)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =157
+                  X: =356
+                  Y: =65
+            - TextInput_Companion:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Default: |+
+                    =If(
+                        ThisItem.FlightID = 1,
+                        User().FullName,
+                        ThisItem.Companion
+                    )
+                  Font: =Font.'Open Sans'
+                  HintText: ="Companion"
+                  HoverBorderColor: =RGBA(0, 18, 107, 1)
+                  HoverFill: =RGBA(186, 202, 226, 1)
+                  OnChange: |+
+                    =UpdateIf(
+                        FlightEntries,
+                        FlightID = ThisItem.FlightID,
+                        {
+                            DepartureDate: Gallery_Departure_Date.SelectedDate,
+                            ArrivalDate: Gallery_Arrival_Date.SelectedDate,
+                            DepartureLocation: TextInput_Departure_Location.Text,
+                            ArrivalLocation: TextInput_Arrival_Location.Text,
+                            Companion: TextInput_Companion.Text
+                        }
+                    )
+                  OnSelect: =Select(Parent)
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =0
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =0
+                  Size: =10
+                  Width: =157
+                  Y: =40
+            - Separator:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(116, 116, 116, 1)
+                  Height: =2
+                  OnSelect: =Select(Parent)
+                  Width: =557
+            - DeleteFlight_Icon:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Color: =RGBA(0, 18, 107, 1)
+                  Height: =28
+                  Icon: =Icon.Trash
+                  OnSelect: |-
+                    =// Remove the current item from 'Hours Tracking (Hours)'
+                    Remove(FlightEntries, ThisItem);
+                  Visible: =ThisItem.FlightID > 1
+                  Width: =28
+                  X: =529
+                  Y: =40
+      - Add_Icon:
+          Control: Classic/Icon@2.5.0
+          Group: Flight_Details
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Height: =35
+            Icon: =Icon.Add
+            OnSelect: |+
+              =
+              If(
+                  CountRows(FlightEntries) < 4,
+                  Collect(
+                      FlightEntries,
+                      {
+                          FlightID: CountRows(FlightEntries) + 1,
+                          DepartureDate: Blank(),
+                          ArrivalDate: Blank(),
+                          DepartureLocation: "",
+                          ArrivalLocation: "",
+                          Companion: ""
+                      }
+                  )
+              )
+            Visible: =ViewFlightMenu && CountRows(FlightEntries) < 4
+            Width: =35
+            X: =594
+            Y: =200 + (CountRows(FlightEntries) * 105)
+      - Add_Text:
+          Control: Label@2.5.1
+          Group: Flight_Details
+          Properties:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(0, 18, 107, 1)
+            Font: =Font.'Open Sans'
+            FontWeight: =FontWeight.Semibold
+            Height: =35
+            Size: =12
+            Text: ="Add traveler"
+            Visible: =ViewFlightMenu && CountRows(FlightEntries) < 4
+            Width: =124
+            X: =629
+            Y: =200 + (CountRows(FlightEntries) * 105)
+      - Delete_Confirmation:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =RGBA(237, 237, 237, 0.8)
+            Height: =768
+            Visible: =varShowConfirmation
+            Width: =1366
+          Children:
+            - Rectangle1:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  BorderThickness: =1
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =113
+                  Width: =274
+                  X: =540
+                  Y: =279
+            - Label1:
+                Control: Label@2.5.1
+                Properties:
+                  Align: =Align.Center
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Font: =Font.'Open Sans'
+                  FontWeight: =FontWeight.Semibold
+                  Height: =57
+                  Text: ="Delete record?"
+                  Width: =274
+                  X: =540
+                  Y: =279
+            - AddHours_Button_1:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  BorderThickness: =0
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(0, 18, 107, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =37
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: |-
+                    =// Remove the current item from 'Hours Tracking (Hours)'
+                    Remove('Vacations Tracking (Days)', Gallery_Hours.Selected);
+                    UpdateContext({varShowConfirmation:false});
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Size: =10
+                  Text: ="Yes"
+                  Visible: =Not(CountRows(colVacationsUpdates)>0)
+                  Width: =91
+                  X: =568
+                  Y: =343
+            - AddHours_Button_2:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  BorderColor: =ColorFade(Self.Fill, -15%)
+                  BorderThickness: =0
+                  Color: =RGBA(255, 255, 255, 1)
+                  DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                  Fill: =RGBA(0, 18, 107, 1)
+                  Font: =Font.'Open Sans'
+                  Height: =37
+                  HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                  HoverColor: =RGBA(255, 255, 255, 1)
+                  HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                  OnSelect: =UpdateContext({varShowConfirmation:false})
+                  PressedBorderColor: =Self.Fill
+                  PressedColor: =Self.Fill
+                  PressedFill: =Self.Color
+                  Size: =10
+                  Text: ="No"
+                  Visible: =Not(CountRows(colVacationsUpdates)>0)
+                  Width: =91
+                  X: =693
+                  Y: =343
+      - Input_Comments_1:
+          Control: Classic/TextInput@2.3.2
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Default: =If(Leave_Type.Selected.Value = "Other","Write your leave type",Leave_Type.Selected.Value)
+            Font: =Font.'Open Sans'
+            Height: =26
+            HintText: =
+            HoverBorderColor: =RGBA(0, 18, 107, 1)
+            HoverFill: =RGBA(186, 202, 226, 1)
+            Mode: =TextMode.MultiLine
+            RadiusBottomLeft: =0
+            RadiusBottomRight: =0
+            RadiusTopLeft: =0
+            RadiusTopRight: =0
+            Size: =9
+            Visible: =Not(CountRows(colVacationsUpdates)>0) && Leave_Type.Selected.Value = "Other"
+            Width: =150
+            X: =902
+            Y: =194

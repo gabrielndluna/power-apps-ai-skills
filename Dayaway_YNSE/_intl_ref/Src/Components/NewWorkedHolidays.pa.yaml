@@ -1,0 +1,59 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+ComponentDefinitions:
+  NewWorkedHolidays:
+    DefinitionType: CanvasComponent
+    CustomProperties:
+      OnPressAction:
+        PropertyKind: Event
+        DisplayName: OnPressAction
+        Description: A custom property
+        ReturnType: None
+        Default: =
+    Properties:
+      Height: =60
+      Width: =350
+    Children:
+      - Button1_6:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Align: =Align.Right
+            BorderColor: =ColorValue("#D61E2C")
+            BorderThickness: =3
+            Color: =Color.White
+            DisabledBorderColor: =RGBA(166, 166, 166, 1)
+            Fill: =ColorValue("#D60C30")
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Bold
+            Height: =55
+            HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+            OnSelect: =NewWorkedHolidays.OnPressAction()
+            PaddingLeft: =10
+            PaddingRight: =10
+            PressedBorderColor: =Self.Fill
+            PressedColor: =Self.Fill
+            PressedFill: =Self.Color
+            Size: =16
+            Text: ="Worked Holidays"
+            Width: =240
+            X: =(Parent.Width - Self.Width ) /2
+            Y: =(Parent.Height - Self.Height ) /2
+      - Icon3_6:
+          Control: Classic/Icon@2.5.0
+          Properties:
+            BorderColor: =RGBA(0, 18, 107, 1)
+            Color: =RGBA(255, 255, 255, 1)
+            Height: =34
+            Icon: =Icon.Add
+            OnSelect: =NewWorkedHolidays.OnPressAction()
+            Width: =34
+            X: =65
+            Y: =13

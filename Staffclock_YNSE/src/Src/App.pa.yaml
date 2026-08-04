@@ -101,7 +101,7 @@ App:
           varApprovers,
           LookUp(
               colEmployeesAll,
-              Email_Address = User().Email
+              Lower(Email_Address) = Lower(User().Email)
           )
       );
 
@@ -109,6 +109,21 @@ App:
       Set(varMyEmail, User().Email);
       Set(varSubmitAsEmail, User().Email);
       Set(varSubmitAsName, User().FullName);
+
+      Set(SelectedProject, Trim(Coalesce(varApprovers.'Project Title', "")));
+      ClearCollect(
+          colPublic_Holidays,
+          AddColumns(
+              Filter(
+                  Public_Holidays,
+                  !IsBlank(SelectedProject) && SelectedProject in Projects
+              ),
+              CleanDate,
+              DateValue(Trim(Text(Date))),
+              CleanDateKey,
+              Text(DateValue(Trim(Text(Date))), "yyyy-mm-dd")
+          )
+      );
 
       Set(
           varIsSuperAdmin,
@@ -262,6 +277,8 @@ App:
       Set(varResetGallery, false);
       Set(varHasDuplicates, false);
       Set(varShowAllWeeks, false);
+      Set(varWeeklySortColumn, "WeekStart");
+      Set(varWeeklySortAscending, false);
       Set(varSelectedWeekEmployee, "");
       Set(varSelectedWeekEmployeeName, "");
       Set(varWeeklyFilterFrom, Blank());

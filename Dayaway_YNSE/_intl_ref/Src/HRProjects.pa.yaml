@@ -1,0 +1,845 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  HRProjects:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |-
+        =UpdateContext({ locSection: "MainConManager" });
+
+        Set(
+            varPendingCount,
+            CountRows(
+                Filter(
+                    'Vacations Tracking (Days)',
+                    Lower(ApproverID_1) = Lower(User().Email) || Lower(ProjectDirector_Email) = Lower(User().Email),
+                    ApprovalStatus_1 = "Pending" || ProjectDirector_ApprovalStatus.Value = "Pending",
+                    EndDate >= varYearStart,
+                    StartDate <= varYearEnd
+                )
+            )
+        );
+    Children:
+      - WebLayoutManager_5:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =Color.White
+            Height: |+
+              =768
+            Visible: =App.Width >= 680
+            Width: |+
+              =1366
+            X: =(App.Width - Self.Width) / 2
+            Y: =(App.Height - Self.Height) / 2
+          Children:
+            - SideBarConManager_5:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =ColorValue("#D60C30")
+                  Height: =Parent.Height
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =16
+                  Width: =Parent.Width * 0.085
+                Children:
+                  - IOCLogoWhite_6:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =75
+                        Image: ='IOC Logo White-No text'
+                        Width: =75
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =14
+                  - DashboardButton_6:
+                      Control: CanvasComponent
+                      ComponentName: DashboardButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: =Launch("https://app.powerbi.com/Redirect?action=OpenApp&appId=8b5f2e86-7dff-4932-bc91-59b17008279b&ctid=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&experience=power-bi")
+                        Width: =115
+                        X: =1
+                        Y: =678
+                  - SubmitRequestsButton_6:
+                      Control: CanvasComponent
+                      ComponentName: SubmitRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varEmployeeRow),
+                              Notify("Access denied. Your account is not registered in Employees.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(EmployeeDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        X: =1
+                        Y: =377
+                  - ManageRequestsButton_6:
+                      Control: CanvasComponent
+                      ComponentName: ManageRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varManagerRow),
+                              Notify("Access denied. Your account is not registered as a Manager.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(ManagerDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        X: =1
+                        Y: =294
+            - MainConManager_6:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =Color.White
+                  Height: =Parent.Height
+                  Visible: =locSection = "MainConManager"
+                  Width: =Parent.Width * 0.915
+                  X: =SideBarConManager_5.Width
+                Children:
+                  - BackButton_2:
+                      Control: CanvasComponent
+                      ComponentName: BackButton
+                      Properties:
+                        Fill: =ColorValue("#FFFFFF00")
+                        Height: =75
+                        OnPressAction: =Navigate(HRManageHomeScr, ScreenTransition.Fade)
+                        Width: =115
+                        X: =7
+                  - NewProjects_1:
+                      Control: CanvasComponent
+                      ComponentName: NewProjects
+                      Properties:
+                        Height: =60
+                        OnPressAction: |-
+                          =UpdateContext({ locShowProjectNew: true });
+                        Width: =350
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: =Gallery2_5.Y + Gallery2_5.Height + 20
+                  - DayAwayLogoOnly_8:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Image: ='AECON Logo - Red with Transparent Back Ground'
+                        ImagePosition: =ImagePosition.Fill
+                        Width: =263
+                        X: =944
+                  - GreetingText_8:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =60
+                        PaddingLeft: =25
+                        PaddingRight: =25
+                        Size: =34
+                        Text: ="Manage Projects"
+                        Width: =Parent.Width - DayAwayLogoOnly_8.Width -20
+                        Wrap: =false
+                        Y: |+
+                          =85
+                  - Container1_5:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =50
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width - 60
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =159
+                      Children:
+                        - Label11:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Project Name"
+                              X: =117
+                        - Label11_1:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Project Director Name"
+                              Width: =200
+                              X: =459
+                        - Label11_2:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Project Director Email"
+                              Width: =200
+                              X: =850
+                  - TextInput3_4:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        Default: =
+                        Font: =Font.'Open Sans'
+                        Height: |
+                          =35
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Width: |
+                          =200
+                        X: =1020
+                        Y: =114
+                  - Label7_4:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        PaddingLeft: =0
+                        Size: =11
+                        Text: ="Filter by Project Name"
+                        Width: =170
+                        X: =1020
+                        Y: =84
+                  - Gallery2_5:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: |+
+                          =450
+                        Items: |-
+                          =
+
+                          // Gallery.Items
+                          With(
+                              { q: Trim(TextInput3_4.Text) },
+                              If(
+                                  IsBlank(q),
+                                  'Vacations Tracking (Projects)',
+                                  Filter(
+                                      'Vacations Tracking (Projects)',
+                                      // Replace these column names with your actual ones
+                                      StartsWith('Project Name', q)
+                                  )
+                              )
+                          )
+                        TemplateSize: |+
+                          =45
+                        Width: =Container1_5.Width
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Container1_5.Y + Container1_5.Height
+                      Children:
+                        - Rectangle_5:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("White")
+                              Height: =Parent.TemplateHeight - Separator_5.Height
+                              OnSelect: =Select(Parent)
+                              Visible: =ThisItem.IsSelected
+                              Width: =4
+                        - TableIcon_4:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              AccessibleLabel: =Self.Tooltip
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: |+
+                                =ColorValue("#494949")
+                              DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                              DisabledColor: =RGBA(119, 119, 119, 1)
+                              Height: =50
+                              Icon: =Icon.ChevronRight
+                              OnSelect: |-
+                                =// Select current gallery employee
+                                Set(varSelectedProject, ThisItem);
+
+
+                                UpdateContext({ locShowProjectDetails: true });
+                              PaddingBottom: =16
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              PaddingTop: =16
+                              Tooltip: ="View item details"
+                              Width: =50
+                              X: =Parent.TemplateWidth - Self.Width
+                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                        - StartDateLabel_5:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.'Project Director Name'
+                              Width: =230
+                              X: =442
+                              Y: =(Rectangle_5.Height - Self.Height) / 2
+                        - EndDateLabel_5:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.'Project Director Email'
+                              Width: =230
+                              X: =834
+                              Y: =(Rectangle_5.Height - Self.Height) / 2
+                        - DateCreatedLabel_5:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(50, 49, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Normal, FontWeight.Normal)
+                              Height: =37
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =12
+                              Text: =ThisItem.'Project Name'
+                              Width: =200
+                              Wrap: =false
+                              X: =94
+                              Y: =(Rectangle_5.Height - Self.Height) / 2
+                        - Separator_5:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("#D9ECFA")
+                              Height: =4
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =Parent.TemplateHeight - Self.Height
+            - BackDrop_6:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |-
+                    =UpdateContext({ locShowProjectNew: false })
+                  Visible: =locShowProjectNew
+                  Width: =Parent.Width
+            - SubmitRequestBox_5:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =locShowProjectNew
+                  Width: |
+                    =Parent.Width * 0.50
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_7:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Add New Project"
+                        Width: =550
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y - 20
+                  - Button3_6:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |
+                          =Set(
+                              varNewProj,
+                              Patch(
+                                  'Vacations Tracking (Projects)',
+                                  Defaults('Vacations Tracking (Projects)'),
+                                  {
+                                      Title:GUID(),
+                                      'Project Name': ManagerNameField_30.Text,
+                                      'Project Director Email': ComboBox1_1.Selected.Mail,
+                                      'Project Director Name': ComboBox1_1.Selected.DisplayName
+                                  }
+                              )
+                          );
+
+                          Notify("Project added successfully.", NotificationType.Success);
+
+
+                          Reset(ComboBox1_1);
+                          Reset(ManagerNameField_30);
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Submit"
+                        Width: =200
+                        X: =242
+                        Y: =573
+                  - Icon8_4:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#d60C30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |-
+                          =UpdateContext({ locShowProjectNew: false });
+                          Reset(ManagerNameField_30);
+                        Width: =28
+                        X: =612
+                        Y: =29
+                  - Label4_56:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project Director Email"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =289
+                  - ManagerNameField_29:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =ComboBox1_1.Selected.Mail
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =314
+                  - Label4_57:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =289
+                  - ManagerNameField_30:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =314
+                  - Label4_59:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project Director Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: =160
+                        X: =188
+                        Y: =201
+                  - ComboBox1_1:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =RGBA(255, 255, 255, 1)
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: |+
+                          =ColorValue("#494949")
+                        DisplayFields: =["DisplayName"]
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: |
+                          =If(
+                              !IsBlank(Trim(Self.SearchText)),
+                              ShowColumns(
+                                  Office365Users.SearchUser(
+                                      { searchTerm: Trim(Self.SearchText), top: 15 }
+                                  ),
+                                  Id,            // GUID for the user
+                                  DisplayName,   // display name
+                                  Mail,          // email
+                                  UserPrincipalName,  // UPN
+                                  Department
+                              )
+                          )
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SearchFields: =["DisplayName","Mail"]
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Width: =Parent.Width * 0.45
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: =228
+            - BackDrop_7:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |-
+                    =UpdateContext({ locShowProjectDetails: false })
+                  Visible: =locShowProjectDetails
+                  Width: =Parent.Width
+            - SubmitRequestBox_6:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =locShowProjectDetails
+                  Width: |
+                    =Parent.Width * 0.50
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_8:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Project Summary"
+                        Width: =550
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y - 20
+                  - Button3_8:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |+
+                          =Set(
+                              varProjectSaved,
+                              Patch(
+                                  'Vacations Tracking (Projects)',
+                                  LookUp('Vacations Tracking (Projects)', ID = varSelectedProject.ID),
+                                  {
+                                      'Project Name': ManagerNameField_32.Text,
+                                      'Project Director Name': ComboBox1_2.Selected.DisplayName,
+                                      'Project Director Email': ComboBox1_2.Selected.Mail
+                                  }
+                              )
+                          );
+
+                          If(
+                              IsEmpty(Errors('Vacations Tracking (Projects)', varProjectSaved)),
+                              Set(varSelectedProject, varProjectSaved);
+                              Refresh('Vacations Tracking (Projects)');
+                              Notify("Project saved successfully.", NotificationType.Success),
+                              Notify(
+                                  "Save failed: " & First(Errors('Vacations Tracking (Projects)', varProjectSaved)).Message,
+                                  NotificationType.Error
+                              )
+                          );
+
+                          UpdateContext({ locShowProjectDetails: false });
+
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Save Changes"
+                        Width: =200
+                        X: =135
+                        Y: =523
+                  - Icon8_5:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#d60C30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |-
+                          =UpdateContext({ locShowProjectDetails: false });
+                          Reset(ManagerNameField_32);
+                          Reset(ComboBox1_2);
+                        Width: =28
+                        X: =612
+                        Y: =29
+                  - Label4_58:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project Director Email"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =289
+                  - ManagerNameField_31:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =ComboBox1_2.Selected.Mail
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =314
+                  - Label4_60:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =289
+                  - ManagerNameField_32:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedProject.'Project Name'
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =314
+                  - Label4_61:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project Director Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: =160
+                        X: =188
+                        Y: =201
+                  - ComboBox1_2:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =RGBA(255, 255, 255, 1)
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        DefaultSelectedItems: |-
+                          =With(
+                              { u: Office365Users.UserProfileV2(varSelectedProject.'Project Director Email') },
+                              If(
+                                  !IsBlank(u),
+                                  Table(
+                                      {
+                                          Id: u.id,
+                                          DisplayName: u.displayName,
+                                          Mail: Coalesce(u.mail, u.userPrincipalName), // fall back if Mail missing
+                                          UserPrincipalName: u.userPrincipalName,
+                                          Department: u.department
+                                      }
+                                  ))
+                          )
+                        DisplayFields: =["DisplayName"]
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: |
+                          =If(
+                              !IsBlank(Trim(Self.SearchText)),
+                              ShowColumns(
+                                  Office365Users.SearchUser(
+                                      { searchTerm: Trim(Self.SearchText), top: 15 }
+                                  ),
+                                  Id,            // GUID for the user
+                                  DisplayName,   // display name
+                                  Mail,          // email
+                                  UserPrincipalName,  // UPN
+                                  Department
+                              )
+                          )
+                        OnChange: |-
+                          =Set(
+                              varSelectedProject,
+                              Patch(
+                                  varSelectedProject,
+                                  {
+                                      'Project Director Name': Self.Selected.DisplayName,
+                                      'Project Director Email': Self.Selected.Mail
+                                  }
+                              )
+                          );
+
+                          Reset(ManagerNameField_31);
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SearchFields: =["DisplayName","Mail","UserPrincipalName"]
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Width: =Parent.Width * 0.45
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: =228
+                  - Button3_24:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |+
+                          =
+                          Remove('Vacations Tracking (Projects)', varSelectedProject);
+
+
+                          UpdateContext({ locShowProjectDetails: false });
+                          Refresh('Vacations Tracking (Projects)')
+
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Delete"
+                        Width: =200
+                        X: =351
+                        Y: =523

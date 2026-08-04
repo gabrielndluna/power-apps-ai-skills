@@ -1,0 +1,100 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =// Collection for Employees
+      ClearCollect(
+          colEmployees, Employees
+      );
+
+      // Collection for Flights
+      ClearCollect(
+          FlightEntries,
+          {
+              FlightID: 1,
+              DepartureDate: DateValue("01/01/2000"),
+              ArrivalDate: DateValue("01/01/2000"),
+              DepartureLocation: "",
+              ArrivalLocation: "",
+              Companion: ""
+          }
+      );
+      UpdateIf(
+          FlightEntries,
+          true,
+          {
+              DepartureDate: Blank(),
+              ArrivalDate: Blank(),
+              DepartureLocation: Blank(),
+              ArrivalLocation: Blank(),
+              Companion: Blank()
+          }
+      );
+
+      //Collection to show flights
+      ClearCollect(
+          SelectedFlightSegments,
+          {
+              SegmentID: Blank(),
+              Role: Blank(),
+              DepartureDate: DateValue("01/01/2000"),
+              ArrivalDate: DateValue("01/01/2000"),
+              DepartureLocation: "placeholder",
+              ArrivalLocation: "placeholder"
+          }
+      );
+
+      // Collection for Vacation Updates
+      ClearCollect(colVacationsUpdates, Defaults('Vacations Tracking (Days)'));
+      Clear(colVacationsUpdates);
+
+      // GUID Start for hour tracking
+      Set(GUID_Var, GUID());
+
+      // Store the entire employee record in a variable
+      Set(varEmployeeRecord, LookUp(colEmployees, Email = User().Email));
+
+      // Extract the specific fields from the record
+      Set(SelectedProject, varEmployeeRecord.'Project Name');
+      Set(Selected_ProjectID, varEmployeeRecord.Project);
+      Set(varHourThreshold, varEmployeeRecord.'Total Vacation Days');
+      Set(varFlightEntitlement, varEmployeeRecord.'Travel days per home leave');
+
+      // Get Public Holidays
+      ClearCollect(
+          colPublic_Holidays,
+          AddColumns(
+              Filter(
+                  Public_Holidays,
+                  SelectedProject in Projects
+              ),
+              CleanDate, DateValue(Date)+1
+          )
+      );
+
+      // Check if current user is an admin/approver in Permissions list
+      Set(
+          varIsAdmin,
+          !IsBlank(LookUp('Vacations Tracking (Permissions)', User_Email = User().Email, User_Email))
+      );
+
+      // Load approvals delegably based on role
+      If(
+          varIsAdmin,
+          ClearCollect(
+              colApprovalsSource,
+              'Vacations Tracking (Days)'
+          ),
+          ClearCollect(
+              colApprovalsSource,
+              Filter('Vacations Tracking (Days)', ApproverID_1 = User().Email)
+          )
+      );
+    Theme: =PowerAppsTheme

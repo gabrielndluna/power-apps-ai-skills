@@ -1,0 +1,174 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =ClearCollect(colEmployees, Employees);
+
+      ClearCollect(
+          colVacationsUpdates,
+          {
+              ID: 0,
+              Type_of_leave: "",
+              ApprovalStatus_1: "",
+              ApprovalStatus_2: "",
+              Approver_Comments: "",
+              Employee: "",
+              TypeofLeave: "",
+              StartDate: Today(),
+              EndDate: Today(),
+              ApproverID_1: "",
+              LOG_ID: ""
+          }
+      );
+      Clear(colVacationsUpdates);
+
+      ClearCollect(
+          colMyRequests,
+          {
+              ID: 0,
+              LOG_ID: "",
+              StartDate: Today(),
+              EndDate: Today(),
+              Days: 0,
+              Type_of_leave: "",
+              Leave_Time: "",
+              Comments: "",
+              ApprovalStatus_1: "",
+              Approver_Comments: "",
+              ApproverID_1: ""
+          }
+      );
+      Clear(colMyRequests);
+
+      ClearCollect(
+          colLeaveDates,
+          {
+              LeaveDate: Today()
+          }
+      );
+      Clear(colLeaveDates);
+
+      ClearCollect(
+          colHoursSync,
+          {
+              ID: 0,
+              LOG_ID: "",
+              Date: Today(),
+              ApprovalStatus_1: ""
+          }
+      );
+      Clear(colHoursSync);
+
+      ClearCollect(
+          colApprovalsSource,
+          {
+              ID: 0,
+              Employee: "",
+              Employee_Name: "",
+              StartDate: Today(),
+              EndDate: Today(),
+              Days: 0,
+              Type_of_leave: "",
+              Leave_Time: "",
+              Comments: "",
+              ApprovalStatus_1: "",
+              Approver_Comments: "",
+              ApproverID_1: "",
+              LOG_ID: "",
+              Project: ""
+          }
+      );
+      Clear(colApprovalsSource);
+
+      Set(GUID_Var, GUID());
+      Set(varIsSaving, false);
+      Set(varShowDeleteConfirm, false);
+      Set(varDeleteRequestID, 0);
+      Set(varDeleteRequestLog, "");
+      Set(varDeleteStart, Blank());
+      Set(varDeleteEnd, Blank());
+      Set(varFilterEmployee, "");
+      Set(varFilterFrom, Blank());
+      Set(varFilterTo, Blank());
+      Set(varApprovalStatusFilter, "Pending");
+      Set(varShowSubmitSheet, false);
+      Set(varShowRequestDetail, false);
+      Set(varDetailType, "");
+      Set(varDetailDates, "");
+      Set(varDetailStatus, "");
+      Set(varDetailDays, Value(0));
+      Set(varDetailComments, "");
+      Set(varDetailApproverComments, "");
+      Set(varLeaveTime, "Full Day");
+
+      Set(varEmployeeRecord, LookUp(colEmployees, Email = User().Email));
+      Set(SelectedProject, varEmployeeRecord.'Project Name');
+      Set(Selected_ProjectID, varEmployeeRecord.Project);
+      Set(varHourThreshold, Coalesce(varEmployeeRecord.'Total Vacation Days', 0));
+      Set(varApproverEmail, Coalesce(varEmployeeRecord.'Approver Email', ""));
+      Set(varApproverName, Coalesce(varEmployeeRecord.'Approver Name', ""));
+
+      ClearCollect(
+          colPublic_Holidays,
+          AddColumns(
+              Filter(Public_Holidays, SelectedProject in Projects),
+              CleanDate,
+              DateValue(Date) + 1
+          )
+      );
+
+      Set(
+          varIsAdmin,
+          !IsBlank(
+              LookUp(
+                  'Vacations Tracking (Permissions)',
+                  User_Email = User().Email,
+                  User_Email
+              )
+          )
+      );
+
+      Set(
+          varIsApprover,
+          varIsAdmin ||
+          !IsBlank(
+              LookUp(
+                  'Vacations Tracking (Days)',
+                  ApproverID_1 = User().Email
+              )
+          ) ||
+          !IsBlank(
+              LookUp(
+                  colEmployees,
+                  'Approver Email' = User().Email
+              )
+          )
+      );
+
+      If(
+          varIsAdmin,
+          ClearCollect(colApprovalsSource, 'Vacations Tracking (Days)'),
+          ClearCollect(
+              colApprovalsSource,
+              Filter('Vacations Tracking (Days)', ApproverID_1 = User().Email)
+          )
+      );
+
+      ClearCollect(
+          colMyRequests,
+          SortByColumns(
+              Filter('Vacations Tracking (Days)', Employee = User().Email),
+              "StartDate",
+              SortOrder.Descending
+          )
+      );
+    StartScreen: ='Vacations Tracking'
+    SizeBreakpoints: =[680, 900, 1200]
+    Theme: =PowerAppsTheme

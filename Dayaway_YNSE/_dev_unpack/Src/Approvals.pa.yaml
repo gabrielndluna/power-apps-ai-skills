@@ -1,0 +1,471 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Approvals:
+    Properties:
+      Fill: =RGBA(245, 245, 245, 1)
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |-
+        =Clear(colVacationsUpdates);
+        Set(varFilterEmployee, "");
+        Set(varFilterFrom, Blank());
+        Set(varFilterTo, Blank());
+        Reset(txt_FilterEmployee);
+        Reset(DatePicker_FilterFrom);
+        Reset(DatePicker_FilterTo);
+        Select(btn_ReloadApprovals);
+    Children:
+      - appr_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(245, 245, 245, 1)
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Vertical
+            Width: =Parent.Width
+          Children:
+            - appr_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =72
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =8
+                  PaddingBottom: =8
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =8
+                  Width: =Parent.Width
+                Children:
+                  - Logo_Dayaway_Appr:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =48
+                        Image: ='Subtitle (1)'
+                        Width: =120
+                  - appr_header_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Height: =1
+                        LayoutMinWidth: =8
+                  - btn_HomeTab_Appr:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        OnSelect: =Navigate('Vacations Tracking', ScreenTransition.Fade)
+                        Size: =11
+                        Text: ="Home"
+                        Width: =72
+                  - btn_ApproverTab_Appr:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        Fill: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =36
+                        OnSelect: =Navigate(Approvals, ScreenTransition.Fade)
+                        Size: =11
+                        Text: ="Approvals"
+                        Visible: =App.Width >= 680
+                        Width: =100
+            - appr_rule:
+                Control: Rectangle@2.3.0
+                Properties:
+                  Fill: =RGBA(0, 18, 107, 1)
+                  Height: =3
+                  Width: =Parent.Width
+            - appr_body:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Height: =400
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  PaddingBottom: =16
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  Width: =Parent.Width
+                Children:
+                  - Label_ApprTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        Size: =18
+                        Text: ="Leave approvals"
+                        Width: =Parent.Width
+                  - appr_filters:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(200, 204, 210, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Height: =148
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =8
+                        PaddingBottom: =10
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =10
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width
+                      Children:
+                        - txt_FilterEmployee:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              Default: =""
+                              Font: =Font.'Open Sans'
+                              Height: =36
+                              HintText: ="Filter by employee name or email"
+                              OnChange: =Set(varFilterEmployee, Lower(Trim(Self.Text)))
+                              Size: =12
+                              Width: =Parent.Width
+                        - appr_date_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =40
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              Width: =Parent.Width
+                            Children:
+                              - DatePicker_FilterFrom:
+                                  Control: Classic/DatePicker@2.6.0
+                                  Properties:
+                                    BorderColor: =RGBA(200, 204, 210, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    LayoutMinWidth: =100
+                                    OnChange: =Set(varFilterFrom, Self.SelectedDate)
+                              - DatePicker_FilterTo:
+                                  Control: Classic/DatePicker@2.6.0
+                                  Properties:
+                                    BorderColor: =RGBA(200, 204, 210, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    LayoutMinWidth: =100
+                                    OnChange: =Set(varFilterTo, Self.SelectedDate)
+                        - appr_filter_actions:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =36
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              Width: =Parent.Width
+                            Children:
+                              - btn_ClearFilters:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    BorderThickness: =1
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    OnSelect: |-
+                                      =Set(varFilterEmployee, "");
+                                      Set(varFilterFrom, Blank());
+                                      Set(varFilterTo, Blank());
+                                      Reset(txt_FilterEmployee);
+                                      Reset(DatePicker_FilterFrom);
+                                      Reset(DatePicker_FilterTo);
+                                    Size: =11
+                                    Text: ="Clear"
+                                    Width: =100
+                              - btn_ReloadApprovals:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    BorderThickness: =1
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    OnSelect: |-
+                                      =Refresh('Vacations Tracking (Days)');
+                                      If(
+                                          varIsAdmin,
+                                          ClearCollect(colApprovalsSource, 'Vacations Tracking (Days)'),
+                                          ClearCollect(
+                                              colApprovalsSource,
+                                              Filter('Vacations Tracking (Days)', ApproverID_1 = User().Email)
+                                          )
+                                      );
+                                    Size: =11
+                                    Text: ="Refresh"
+                                    Width: =100
+                              - Button_SaveApprovals:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderThickness: =0
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    DisplayMode: =If(CountRows(colVacationsUpdates) = 0 || varIsSaving, DisplayMode.Disabled, DisplayMode.Edit)
+                                    Fill: =RGBA(16, 124, 65, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    OnSelect: =Select(Button_SaveApprovals_Execute)
+                                    Size: =11
+                                    Text: ="Save"
+                                    Width: =100
+                  - Label_PendingHint:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(214, 12, 48, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =20
+                        Size: =11
+                        Text: =CountRows(colVacationsUpdates) & " unsaved change(s)"
+                        Visible: =CountRows(colVacationsUpdates) > 0
+                        Width: =Parent.Width
+                  - Gallery_Approvals:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =240
+                        Items: |-
+                          =Filter(
+                              colApprovalsSource,
+                              (
+                                  IsBlank(varFilterEmployee) ||
+                                  varFilterEmployee in Lower(Coalesce(Employee_Name, "")) ||
+                                  varFilterEmployee in Lower(Coalesce(Employee, ""))
+                              ) &&
+                              (
+                                  IsBlank(varFilterFrom) ||
+                                  IsBlank(varFilterTo) ||
+                                  (StartDate <= varFilterTo && EndDate >= varFilterFrom)
+                              )
+                          )
+                        TemplateSize: =132
+                        Width: =Parent.Width
+                      Children:
+                        - lbl_ApprName:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =22
+                              Text: =ThisItem.Employee_Name
+                              Width: =Parent.TemplateWidth - 24
+                              X: =12
+                              Y: =8
+                        - lbl_ApprMeta:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(80, 80, 80, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: =ThisItem.Type_of_leave & "  ·  " & Text(ThisItem.StartDate, "mmm d") & " - " & Text(ThisItem.EndDate, "mmm d") & "  ·  " & Text(ThisItem.Days) & "d"
+                              Width: =Parent.TemplateWidth - 24
+                              X: =12
+                              Y: =30
+                        - dd_ApprStatus:
+                            Control: Classic/DropDown@2.3.1
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              ChevronBackground: =RGBA(0, 18, 107, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              Default: =ThisItem.ApprovalStatus_1
+                              Fill: =If(Self.Selected.Value = "Approved", RGBA(108, 212, 136, 1), Self.Selected.Value = "Rejected", RGBA(252, 124, 124, 1), RGBA(252, 250, 124, 1))
+                              Font: =Font.'Open Sans'
+                              Height: =32
+                              Items: =["Pending", "Approved", "Rejected"]
+                              Items.Value: =Value
+                              OnChange: |-
+                                =If(
+                                    !IsBlank(LookUp(colVacationsUpdates, ID = ThisItem.ID)),
+                                    UpdateIf(
+                                        colVacationsUpdates,
+                                        ID = ThisItem.ID,
+                                        {
+                                            ApprovalStatus_1: Self.Selected.Value,
+                                            Type_of_leave: ThisItem.Type_of_leave,
+                                            TypeofLeave: ThisItem.Type_of_leave,
+                                            Employee: ThisItem.Employee,
+                                            StartDate: ThisItem.StartDate,
+                                            EndDate: ThisItem.EndDate,
+                                            ApproverID_1: ThisItem.ApproverID_1,
+                                            LOG_ID: ThisItem.LOG_ID,
+                                            Approver_Comments: Coalesce(LookUp(colVacationsUpdates, ID = ThisItem.ID).Approver_Comments, ThisItem.Approver_Comments)
+                                        }
+                                    ),
+                                    Collect(
+                                        colVacationsUpdates,
+                                        {
+                                            ID: ThisItem.ID,
+                                            ApprovalStatus_1: Self.Selected.Value,
+                                            ApprovalStatus_2: ThisItem.ApprovalStatus_2,
+                                            Type_of_leave: ThisItem.Type_of_leave,
+                                            TypeofLeave: ThisItem.Type_of_leave,
+                                            Employee: ThisItem.Employee,
+                                            StartDate: ThisItem.StartDate,
+                                            EndDate: ThisItem.EndDate,
+                                            ApproverID_1: ThisItem.ApproverID_1,
+                                            LOG_ID: ThisItem.LOG_ID,
+                                            Approver_Comments: ThisItem.Approver_Comments
+                                        }
+                                    )
+                                )
+                              Size: =11
+                              Width: =Parent.TemplateWidth - 24
+                              X: =12
+                              Y: =54
+                        - txt_ApprComments:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              Default: =ThisItem.Approver_Comments
+                              Font: =Font.'Open Sans'
+                              Height: =32
+                              HintText: ="Approver comment"
+                              OnChange: |-
+                                =If(
+                                    !IsBlank(LookUp(colVacationsUpdates, ID = ThisItem.ID)),
+                                    UpdateIf(
+                                        colVacationsUpdates,
+                                        ID = ThisItem.ID,
+                                        { Approver_Comments: Self.Text }
+                                    ),
+                                    Collect(
+                                        colVacationsUpdates,
+                                        {
+                                            ID: ThisItem.ID,
+                                            ApprovalStatus_1: ThisItem.ApprovalStatus_1,
+                                            ApprovalStatus_2: ThisItem.ApprovalStatus_2,
+                                            Type_of_leave: ThisItem.Type_of_leave,
+                                            TypeofLeave: ThisItem.Type_of_leave,
+                                            Employee: ThisItem.Employee,
+                                            StartDate: ThisItem.StartDate,
+                                            EndDate: ThisItem.EndDate,
+                                            ApproverID_1: ThisItem.ApproverID_1,
+                                            LOG_ID: ThisItem.LOG_ID,
+                                            Approver_Comments: Self.Text
+                                        }
+                                    )
+                                )
+                              Size: =11
+                              Width: =Parent.TemplateWidth - 24
+                              X: =12
+                              Y: =90
+                        - row_ApprDivider:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              Fill: =RGBA(235, 238, 242, 1)
+                              Height: =1
+                              Width: =Parent.TemplateWidth - 24
+                              X: =12
+                              Y: =128
+      - Button_SaveApprovals_Execute:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =If(
+                  CountRows(colVacationsUpdates) = 0,
+                  Notify("No changes to save", NotificationType.Information),
+                  Set(varIsSaving, true);
+                  Patch(
+                      'Vacations Tracking (Days)',
+                      ShowColumns(
+                          colVacationsUpdates,
+                          ID,
+                          Type_of_leave,
+                          ApprovalStatus_1,
+                          ApprovalStatus_2,
+                          Approver_Comments
+                      )
+                  );
+                  ForAll(
+                      colVacationsUpdates As u,
+                      If(
+                          u.ApprovalStatus_1 = "Approved" || u.ApprovalStatus_1 = "Rejected",
+                          With(
+                              {
+                                  hoursRows: Filter(
+                                      Filter(
+                                          'Hours Tracking (Hours)',
+                                          Employee = u.Employee &&
+                                          Date >= u.StartDate &&
+                                          Date <= u.EndDate
+                                      ),
+                                      StartsWith(LOG_ID, u.LOG_ID & "_")
+                                  )
+                              },
+                              If(
+                                  CountRows(hoursRows) > 0,
+                                  Patch(
+                                      'Hours Tracking (Hours)',
+                                      ForAll(
+                                          hoursRows As h,
+                                          {
+                                              ID: h.ID,
+                                              ApprovalStatus_1: u.ApprovalStatus_1,
+                                              Approver_Comments: u.Approver_Comments
+                                          }
+                                      )
+                                  )
+                              );
+                              Office365Outlook.SendEmailV2(
+                                  u.Employee,
+                                  Text(u.TypeofLeave) & " Request " & Text(u.ApprovalStatus_1),
+                                  "Your " & Text(u.TypeofLeave) & " request has been " & Text(u.ApprovalStatus_1) & ".<br><br>" &
+                                  "<b>Type:</b> " & Text(u.TypeofLeave) & "<br>" &
+                                  "<b>Dates:</b> " & Text(u.StartDate, "dd-mmm-yyyy") & " to " & Text(u.EndDate, "dd-mmm-yyyy") & "<br>" &
+                                  "<b>Comments:</b> " & Text(u.Approver_Comments),
+                                  {
+                                      Cc: u.ApproverID_1,
+                                      IsHtml: true
+                                  }
+                              )
+                          )
+                      )
+                  );
+                  Clear(colVacationsUpdates);
+                  Notify("Approvals saved", NotificationType.Success);
+                  Select(btn_ReloadApprovals);
+                  Set(varIsSaving, false)
+              )
+            Visible: =false
+            Width: =1

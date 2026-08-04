@@ -183,7 +183,10 @@ Screens:
                               FillPortions: =0
                               Font: =Font.'Segoe UI'
                               Height: =40
-                              OnSelect: =Set(varApprovalWeekStart, DateAdd(varApprovalWeekStart, -7, "Days"))
+                              OnSelect: |-
+                                =Set(varApprovalWeekStart, DateAdd(varApprovalWeekStart, -7, "Days"));
+                                Clear(colHoursUpdates);
+                                Select(Button_ReloadApprovalsWeek);
                               Text: ="<"
                               Width: =40
                         - Label_CurrentWeek_Approver:
@@ -212,7 +215,10 @@ Screens:
                               FillPortions: =0
                               Font: =Font.'Segoe UI'
                               Height: =40
-                              OnSelect: =Set(varApprovalWeekStart, DateAdd(varApprovalWeekStart, 7, "Days"))
+                              OnSelect: |-
+                                =Set(varApprovalWeekStart, DateAdd(varApprovalWeekStart, 7, "Days"));
+                                Clear(colHoursUpdates);
+                                Select(Button_ReloadApprovalsWeek);
                               Text: =">"
                               Visible: =varApprovalWeekStart < DateAdd(varThisWeekStart, 21, "Days")
                               Width: =40
@@ -497,6 +503,23 @@ Screens:
                   TemplateSize: =52
                   Width: =Parent.Width
                 Children:
+                  - row_fill_Appr:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        BorderThickness: =0
+                        Fill: |-
+                          =If(
+                              Weekday(ThisItem.Date, StartOfWeek.Monday) >= 6 ||
+                              Coalesce(Text(ThisItem.Task), "") = "Weekend" ||
+                              Coalesce(Text(ThisItem.Task), "") = "Stat. Holiday" ||
+                              Text(ThisItem.Date, "yyyy-mm-dd") in ForAll(colPublic_Holidays, CleanDateKey),
+                              RGBA(240, 240, 240, 1),
+                              RGBA(255, 255, 255, 1)
+                          )
+                        Height: =Parent.TemplateHeight
+                        Width: =Parent.TemplateWidth
+                        X: =0
+                        Y: =0
                   - lbl_AEmp:
                       Control: Label@2.5.1
                       Properties:

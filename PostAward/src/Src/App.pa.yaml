@@ -1,0 +1,63 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =Set(varCurrentUserEmail, User().Email);
+      Set(varCanEditCurrentProject, false);
+      Set(varSelectedProject, Blank());
+      Set(varSelectedSubcontract, Blank());
+      Set(varRegisterFilter, "all");
+      Set(varSearchCA, "");
+      Set(varSearchVendor, "");
+      Set(varSearchSub, "");
+      Set(varSortColumn, "subcontractnumber");
+      Set(varSortAscending, true);
+      Set(varShowAddSub, false);
+      Set(varShowSettings, false);
+      Set(varShowAddChange, false);
+      Set(varEditingChange, Blank());
+      Set(varShowValidationErrors, false);
+      Set(varCaFreeText, false);
+      Set(varBackupCaFreeText, false);
+      Set(
+          varSubcontractsListUrl,
+          "https://aecon1.sharepoint.com/sites/CivilPlanningteam/Lists/PostAward%20-%20Subcontracts/AllItems.aspx"
+      );
+
+      ClearCollect(
+          colUserPermissions,
+          Filter('ProcTrack - Permissions', Title = varCurrentUserEmail)
+      );
+
+      ClearCollect(
+          colPermittedProjects,
+          ForAll(
+              colUserPermissions As perm,
+              LookUp('ProcTrack - Projects', projectidentifier = perm.Project)
+          )
+      );
+
+      ClearCollect(colPermittedPackages, Blank());
+      ForAll(
+          colUserPermissions As perm,
+          Collect(
+              colPermittedPackages,
+              Filter('ProcTrack - Packages', projectidentifier = perm.Project)
+          )
+      );
+
+      ClearCollect(colProjectSubcontracts, Blank());
+      ClearCollect(colProjectChanges, Blank());
+      ClearCollect(colProjectPackages, Blank());
+      ClearCollect(colRegisterView, Blank());
+      ClearCollect(colAwardedAvailable, Blank());
+      ClearCollect(colSubChanges, Blank());
+    StartScreen: =Register
+    Theme: =PowerAppsTheme

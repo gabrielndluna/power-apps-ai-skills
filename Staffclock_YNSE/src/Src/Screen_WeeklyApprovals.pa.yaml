@@ -617,8 +617,15 @@ Screens:
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "Employee_Name",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "Employee_Name");
+                              Set(varWeeklySortAscending, true)
+                          )
                         Size: =12
-                        Text: ="Employee"
+                        Text: ="Employee" & If(varWeeklySortColumn = "Employee_Name", If(varWeeklySortAscending, " ↑", " ↓"), "")
                         Width: =250
                   - wh_Week:
                       Control: Label@2.5.1
@@ -628,8 +635,15 @@ Screens:
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "WeekStart",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "WeekStart");
+                              Set(varWeeklySortAscending, false)
+                          )
                         Size: =12
-                        Text: ="Week"
+                        Text: ="Week" & If(varWeeklySortColumn = "WeekStart", If(varWeeklySortAscending, " ↑", " ↓"), "")
                         Width: =250
                   - wh_Hours:
                       Control: Label@2.5.1
@@ -640,8 +654,15 @@ Screens:
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "TotalStandard",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "TotalStandard");
+                              Set(varWeeklySortAscending, false)
+                          )
                         Size: =12
-                        Text: ="Hours"
+                        Text: ="Hours" & If(varWeeklySortColumn = "TotalStandard", If(varWeeklySortAscending, " ↑", " ↓"), "")
                         Width: =88
                   - wh_Days:
                       Control: Label@2.5.1
@@ -652,8 +673,15 @@ Screens:
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "TotalDays",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "TotalDays");
+                              Set(varWeeklySortAscending, false)
+                          )
                         Size: =12
-                        Text: ="Days"
+                        Text: ="Days" & If(varWeeklySortColumn = "TotalDays", If(varWeeklySortAscending, " ↑", " ↓"), "")
                         Width: =69
                   - wh_InfoSpacer:
                       Control: GroupContainer@1.5.0
@@ -673,8 +701,15 @@ Screens:
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "WeekStatus",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "WeekStatus");
+                              Set(varWeeklySortAscending, true)
+                          )
                         Size: =12
-                        Text: ="Status"
+                        Text: ="Status" & If(varWeeklySortColumn = "WeekStatus", If(varWeeklySortAscending, " ↑", " ↓"), "")
                         Width: =110
                   - wh_ActionsSpacer:
                       Control: GroupContainer@1.5.0
@@ -694,22 +729,26 @@ Screens:
                   FillPortions: =1
                   Height: =400
                   Items: |-
-                    =Filter(
-                        colWeeklySummaryDisplay,
-                        (
-                            varShowAllWeeks ||
-                            WeekStatus = "Pending" ||
-                            WeekStatus = "Rejected"
-                        ) &&
-                        (
-                            IsBlank(varWeeklyEmployeeEmail) ||
-                            Lower(Employee) = varWeeklyEmployeeEmail
-                        ) &&
-                        (
-                            IsBlank(DatePicker_WeeklyFrom.SelectedDate) ||
-                            IsBlank(DatePicker_WeeklyTo.SelectedDate) ||
-                            (WeekStart <= DatePicker_WeeklyTo.SelectedDate && WeekEnd >= DatePicker_WeeklyFrom.SelectedDate)
-                        )
+                    =SortByColumns(
+                        Filter(
+                            colWeeklySummaryDisplay,
+                            (
+                                varShowAllWeeks ||
+                                WeekStatus = "Pending" ||
+                                WeekStatus = "Rejected"
+                            ) &&
+                            (
+                                IsBlank(varWeeklyEmployeeEmail) ||
+                                Lower(Employee) = varWeeklyEmployeeEmail
+                            ) &&
+                            (
+                                IsBlank(DatePicker_WeeklyFrom.SelectedDate) ||
+                                IsBlank(DatePicker_WeeklyTo.SelectedDate) ||
+                                (WeekStart <= DatePicker_WeeklyTo.SelectedDate && WeekEnd >= DatePicker_WeeklyFrom.SelectedDate)
+                            )
+                        ),
+                        varWeeklySortColumn,
+                        If(varWeeklySortAscending, SortOrder.Ascending, SortOrder.Descending)
                     )
                   TemplateSize: =56
                   Width: =Parent.Width

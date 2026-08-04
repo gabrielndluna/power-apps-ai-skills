@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DayAway — Design Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #00126B;
+    --navy-deep: #000A45;
+    --navy-soft: #2A3A96;
+    --paper: #F5F6FB;
+    --card: #FFFFFF;
+    --line: #E2E4F0;
+    --text: #171A33;
+    --muted: #5B6178;
+    --amber: #B8791A;
+    --amber-bg: #FCEFD9;
+    --green: #146C43;
+    --green-bg: #DFF3E8;
+    --red: #B3261E;
+    --red-bg: #FBE2E0;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--paper);
+    font-family:'Inter',sans-serif;
+    color:var(--text);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- Preview chrome (not part of the app) ---------- */
+  .preview-shell{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+  }
+  .preview-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:16px;
+    margin-bottom:22px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px;
+  }
+  .preview-header .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--navy-soft);
+    margin-bottom:6px;
+  }
+  .preview-header h1{
+    font-size:26px;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .preview-header p{
+    margin:6px 0 0;
+    color:var(--muted);
+    font-size:13.5px;
+    max-width:520px;
+  }
+  .controls{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .control-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .control-group label{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--muted);
+    font-weight:600;
+  }
+  .toggle{
+    display:flex;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px;
+    gap:2px;
+  }
+  .toggle button{
+    border:none;
+    background:transparent;
+    padding:7px 14px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--muted);
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    transition:all .15s ease;
+  }
+  .toggle button.active{
+    background:var(--navy);
+    color:#fff;
+  }
+  .breakpoint-readout{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--navy-soft);
+    background:#EEF0FB;
+    border:1px solid var(--line);
+    padding:6px 10px;
+    border-radius:8px;
+    white-space:nowrap;
+  }
+
+  /* ---------- Stage ---------- */
+  .stage{
+    display:flex;
+    justify-content:center;
+  }
+  .stage-inner{
+    width:100%;
+    transition: max-width .35s cubic-bezier(.4,0,.2,1);
+  }
+  .stage-inner.phone{ max-width:390px; }
+  .stage-inner.web{ max-width:1080px; }
+
+  .app-frame{
+    background:var(--card);
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    box-shadow:0 20px 50px -20px rgba(0,18,107,0.25);
+    overflow:hidden;
+    min-height:640px;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    transition:min-height .3s ease;
+  }
+  .stage-inner.phone .app-frame{ min-height:760px; border-radius:34px; border:8px solid var(--navy-deep); }
+  .stage-inner.phone .app-frame::before{
+    content:"";
+    position:absolute;
+    top:16px; left:50%; transform:translateX(-50%);
+    width:70px; height:5px; border-radius:4px;
+    background:rgba(255,255,255,0.35);
+    z-index:5;
+  }
+
+  /* ---------- App header ---------- */
+  .app-header{
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color:#fff;
+    padding:22px 22px 20px;
+    flex-shrink:0;
+  }
+  .stage-inner.phone .app-header{ padding-top:34px; }
+  .brand-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .brand-mark{
+    width:26px;height:26px;
+    border-radius:7px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--navy);
+    font-family:'Space Grotesk';
+    font-weight:700;
+    font-size:13px;
+  }
+  .brand-name{
+    font-family:'Space Grotesk';
+    font-weight:600;
+    font-size:16px;
+    letter-spacing:-0.01em;
+  }
+  .header-actions{
+    display:flex;
+    gap:8px;
+  }
+  .btn-header{
+    border:1px solid rgba(255,255,255,0.35);
+    background:rgba(255,255,255,0.08);
+    color:#fff;
+    font-size:12.5px;
+    font-weight:600;
+    padding:8px 14px;
+    border-radius:9px;
+    cursor:pointer;
+    font-family:'Inter';
+    display:flex;align-items:center;gap:6px;
+    transition:background .15s;
+  }
+  .btn-header:hover{ background:rgba(255,255,255,0.18); }
+  .btn-header.primary{
+    background:#fff;
+    color:var(--navy);
+    border-color:#fff;
+  }
+  .btn-header.primary:hover{ background:#EDEFFB; }
+  .greeting{
+    font-family:'Space Grotesk';
+    font-size:21px;
+    font-weight:600;
+    margin:16px 0 2px;
+  }
+  .greeting-sub{
+    font-size:12.5px;
+    color:rgba(255,255,255,0.7);
+  }
+  .metric-row{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .metric-chip{
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:11px;
+    padding:9px 13px;
+    flex:1;
+    min-width:96px;
+  }
+  .metric-chip .num{
+    font-family:'IBM Plex Mono';
+    font-size:18px;
+    font-weight:500;
+    line-height:1.1;
+  }
+  .metric-chip .lbl{
+    font-size:10.5px;
+    color:rgba(255,255,255,0.65);
+    margin-top:2px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+
+  /* ---------- Body / nav ---------- */
+  .app-body{
+    flex:1;
+    overflow-y:auto;
+    padding:18px 20px 100px;
+    background:var(--paper);
+  }
+  .stage-inner.web .app-body{ padding:24px 30px 40px; }
+  .section-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--muted);
+    font-weight:700;
+    margin:4px 0 12px;
+  }
+
+  .req-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 14px 14px 16px;
+    margin-bottom:10px;
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    position:relative;
+    overflow:hidden;
+  }
+  .req-card::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:4px;
+  }
+  .req-card.status-pending::before{ background:var(--amber); }
+  .req-card.status-approved::before{ background:var(--green); }
+  .req-card.status-rejected::before{ background:var(--red); }
+  .req-main{ flex:1; min-width:0; }
+  .req-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .req-type{ font-weight:600; font-size:14.5px; }
+  .req-dates{ font-size:12.5px; color:var(--muted); margin-top:3px; font-family:'IBM Plex Mono'; }
+  .req-sync{
+    font-size:10.5px;
+    color:var(--navy-soft);
+    background:#EEF0FB;
+    border-radius:6px;
+    padding:2px 7px;
+    margin-top:6px;
+    display:inline-block;
+  }
+  .status-pill{
+    font-size:11px;
+    font-weight:700;
+    padding:4px 9px;
+    border-radius:999px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    white-space:nowrap;
+  }
+  .status-pill.pending{ background:var(--amber-bg); color:var(--amber); }
+  .status-pill.approved{ background:var(--green-bg); color:var(--green); }
+  .status-pill.rejected{ background:var(--red-bg); color:var(--red); }
+  .req-actions{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .icon-btn{
+    border:none; background:transparent; cursor:pointer;
+    color:var(--muted); padding:4px; border-radius:6px;
+    display:flex;
+  }
+  .icon-btn:hover{ background:#F0F1F8; color:var(--red); }
+
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--muted);
+  }
+  .empty-state svg{ margin-bottom:10px; opacity:.5; }
+  .empty-state p{ font-size:13.5px; margin:0; }
+
+  /* Phone bottom nav */
+  .bottom-nav{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    background:var(--navy-deep);
+    padding:14px 24px 20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+  .fab{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:#fff;
+    color:var(--navy);
+    border:none;
+    font-size:26px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(0,0,0,0.25);
+    transition:transform .12s;
+  }
+  .fab:hover{ transform:scale(1.06); }
+
+  /* ---------- Web: request list header / new button already in header-actions ---------- */
+
+  /* ---------- New request sheet ---------- */
+  .sheet-overlay{
+    position:absolute; inset:0;
+    background:rgba(10,12,30,0.42);
+    display:none;
+    align-items:flex-end;
+    z-index:20;
+  }
+  .stage-inner.web .sheet-overlay{ align-items:center; justify-content:center; }
+  .sheet-overlay.open{ display:flex; }
+  .sheet{
+    background:#fff;
+    width:100%;
+    max-height:92%;
+    border-radius:20px 20px 0 0;
+    padding:20px 20px 24px;
+    overflow-y:auto;
+    animation:slideUp .22s ease;
+  }
+  .stage-inner.web .sheet{
+    width:480px;
+    max-width:90%;
+    border-radius:16px;
+    max-height:85%;
+  }
+  @keyframes slideUp{ from{ transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+  .sheet-header{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:14px;
+  }
+  .sheet-header h3{ font-size:17px; margin:0; }
+  .close-x{
+    border:none; background:#F0F1F8; width:30px; height:30px; border-radius:8px;
+    cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;
+  }
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px;
+  }
+  .field-row{ display:flex; gap:10px; }
+  .field-row .field{ flex:1; }
+  input[type=date], select, textarea, input[type=text]{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:10px 11px;
+    font-size:13.5px;
+    font-family:'Inter';
+    background:#FBFBFE;
+    color:var(--text);
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:2px solid var(--navy-soft);
+    outline-offset:1px;
+    background:#fff;
+  }
+  textarea{ resize:vertical; min-height:60px; }
+  .radio-row{ display:flex; gap:8px; margin-top:4px; }
+  .radio-chip{
+    flex:1; text-align:center;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 6px;
+    font-size:12px;
+    font-weight:600;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .radio-chip.sel{
+    background:var(--navy); color:#fff; border-color:var(--navy);
+  }
+  .preview-box{
+    background:#EEF0FB;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:14px 0;
+    font-size:12.5px;
+  }
+  .preview-box .num{ font-family:'IBM Plex Mono'; font-size:16px; font-weight:600; color:var(--navy); }
+  .preview-box .who{ text-align:right; color:var(--muted); }
+  .btn-submit{
+    width:100%;
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    padding:13px;
+    border-radius:10px;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+    font-family:'Inter';
+  }
+  .btn-submit:hover{ background:var(--navy-deep); }
+  .field-error{ font-size:11.5px; color:var(--red); margin-top:4px; display:none; }
+
+  /* confirm modal */
+  .confirm-box{
+    background:#fff; border-radius:14px; padding:20px; width:280px; max-width:85%;
+    text-align:center;
+  }
+  .confirm-box h3{ font-size:15px; margin:0 0 6px; }
+  .confirm-box p{ font-size:12.5px; color:var(--muted); margin:0 0 16px; }
+  .confirm-actions{ display:flex; gap:8px; }
+  .confirm-actions button{
+    flex:1; padding:10px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer; font-family:'Inter';
+  }
+  .btn-cancel{ border:1px solid var(--line); background:#fff; color:var(--text); }
+  .btn-delete{ border:none; background:var(--red); color:#fff; }
+
+  /* toast */
+  .toast{
+    position:absolute;
+    bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--navy-deep);
+    color:#fff;
+    padding:11px 18px;
+    border-radius:10px;
+    font-size:13px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.25);
+    opacity:0;
+    pointer-events:none;
+    transition:all .25s ease;
+    z-index:40;
+    max-width:85%;
+    text-align:center;
+  }
+  .toast.err{ background:var(--red); }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ---------- Approvals screen ---------- */
+  .filter-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:16px;
+  }
+  .filter-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .stage-inner.web .filter-grid{
+    grid-template-columns: 2fr 1fr 1fr auto;
+    align-items:end;
+  }
+  .filter-actions{ display:flex; gap:8px; }
+  .btn-ghost{
+    border:1px solid var(--line); background:#fff; color:var(--text);
+    padding:9px 13px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:'Inter';
+  }
+  .btn-ghost:hover{ background:#F5F6FB; }
+  .btn-save{
+    border:none; background:var(--navy); color:#fff;
+    padding:9px 16px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:'Inter';
+  }
+  .unsaved-hint{
+    font-size:11.5px; color:var(--amber); font-weight:600; margin-top:8px;
+    display:none; align-items:center; gap:5px;
+  }
+  .unsaved-hint.show{ display:flex; }
+
+  .appr-row{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .stage-inner.web .appr-row{
+    grid-template-columns: 1.4fr 1.3fr 0.9fr 1.4fr;
+    align-items:center;
+  }
+  .appr-name{ font-weight:600; font-size:14px; }
+  .appr-sub{ font-size:11.5px; color:var(--muted); }
+  .appr-meta{ font-size:12.5px; font-family:'IBM Plex Mono'; color:var(--text); }
+  .appr-days{ color:var(--muted); font-size:12px; }
+  select.status-select{
+    font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:.03em;
+    border-radius:8px; padding:8px 10px;
+  }
+  select.status-select.pending{ background:var(--amber-bg); color:var(--amber); border-color:var(--amber-bg);}
+  select.status-select.approved{ background:var(--green-bg); color:var(--green); border-color:var(--green-bg);}
+  select.status-select.rejected{ background:var(--red-bg); color:var(--red); border-color:var(--red-bg);}
+  .appr-comment{ font-size:12.5px; padding:8px 10px; }
+  .staged-dot{
+    width:7px; height:7px; border-radius:50%; background:var(--amber); display:inline-block; margin-right:5px;
+  }
+
+  /* nav pill for web (approvals link) already in header-actions */
+  .footnote{
+    text-align:center; font-size:11px; color:var(--muted); margin-top:26px;
+  }
+</style>
+</head>
+<body>
+
+<div class="preview-shell">
+  <div class="preview-header">
+    <div>
+      <div class="eyebrow">Aecon Digital · Power Apps canvas prototype</div>
+      <h1>DayAway <span style="color:var(--muted); font-weight:400;">for YNC</span></h1>
+      <p>One responsive app — the chrome and density adapt at the 680px breakpoint instead of forking into separate phone and web builds. Use the controls to preview both.</p>
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label>Preview width</label>
+        <div class="toggle" id="deviceToggle">
+          <button data-device="phone" class="active">Phone</button>
+          <button data-device="web">Web / tablet</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Viewing as</label>
+        <div class="toggle" id="roleToggle">
+          <button data-role="employee" class="active">Employee</button>
+          <button data-role="approver">Approver</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>&nbsp;</label>
+        <div class="breakpoint-readout" id="breakpointReadout">App.Width = 390 → phone layout</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-inner phone" id="stageInner">
+      <div class="app-frame" id="appFrame">
+
+        <!-- HEADER -->
+        <div class="app-header">
+          <div class="brand-row">
+            <div class="brand">
+              <div class="brand-mark">D</div>
+              <div class="brand-name">DayAway</div>
+            </div>
+            <div class="header-actions" id="headerActions">
+              <!-- populated by JS based on device/role/screen -->
+            </div>
+          </div>
+          <div class="greeting" id="homeGreeting">Hi, Maria</div>
+          <div class="greeting-sub" id="homeGreetingSub">DNNP · New Build Project</div>
+          <div class="metric-row" id="metricRow"></div>
+        </div>
+
+        <!-- BODY -->
+        <div class="app-body" id="appBody"></div>
+
+        <!-- phone bottom nav -->
+        <div class="bottom-nav" id="bottomNav" style="display:none;">
+          <button class="fab" id="fabBtn" title="New request">+</button>
+        </div>
+
+        <!-- new request sheet -->
+        <div class="sheet-overlay" id="sheetOverlay">
+          <div class="sheet">
+            <div class="sheet-header">
+              <h3>New leave request</h3>
+              <button class="close-x" id="closeSheet">✕</button>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Start date</label>
+                <input type="date" id="startDate" value="2026-08-10">
+              </div>
+              <div class="field">
+                <label>End date</label>
+                <input type="date" id="endDate" value="2026-08-10">
+              </div>
+            </div>
+            <div class="field">
+              <label>Leave type</label>
+              <select id="leaveType">
+                <option>Vacation Paid</option>
+                <option>Vacation Unpaid</option>
+                <option selected>Personal Day</option>
+                <option>Sick Leave Paid</option>
+                <option>Sick Leave Unpaid</option>
+                <option>Bereavement</option>
+                <option>Jury Duty</option>
+                <option>Stat. Holiday</option>
+              </select>
+            </div>
+            <div class="field" id="dayLengthField">
+              <label>Day length</label>
+              <div class="radio-row" id="dayLengthRow">
+                <div class="radio-chip sel" data-len="Full">Full day</div>
+                <div class="radio-chip" data-len="First Half">First half</div>
+                <div class="radio-chip" data-len="Second Half">Second half</div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Comments (optional)</label>
+              <textarea id="comments" placeholder="Add a note for your approver…"></textarea>
+            </div>
+            <div class="preview-box">
+              <div><div class="num" id="workingDaysPreview">0.5</div><div style="color:var(--muted);">working day(s)</div></div>
+              <div class="who">Approver<br><strong id="approverPreview" style="color:var(--text);">Tom Reyes</strong></div>
+            </div>
+            <div class="field-error" id="formError">Dates must fall within the same calendar year.</div>
+            <button class="btn-submit" id="submitRequest">Submit request</button>
+          </div>
+        </div>
+
+        <!-- delete confirm -->
+        <div class="sheet-overlay" id="confirmOverlay">
+          <div class="confirm-box">
+            <h3>Delete this request?</h3>
+            <p>This removes the leave request and its matching hours in Staff Club. This can't be undone.</p>
+            <div class="confirm-actions">
+              <button class="btn-cancel" id="cancelDelete">Cancel</button>
+              <button class="btn-delete" id="confirmDelete">Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">Design preview — data shown is illustrative. Component logic mirrors the DayAway product brief (Flows A–F).</div>
+</div>
+
+<script>
+// ---------------- State ----------------
+let device = 'phone';
+let role = 'employee';
+let screen = 'home'; // 'home' | 'approvals'
+let pendingDeleteId = null;
+
+const ENTITLEMENT = 15;
+const APPROVER = 'Tom Reyes';
+
+let requests = [
+  { id:1, type:'Vacation Paid', start:'2026-07-20', end:'2026-07-24', days:5, len:'Full', status:'approved', synced:true },
+  { id:2, type:'Sick Leave Paid', start:'2026-06-03', end:'2026-06-03', days:0.5, len:'First Half', status:'approved', synced:true },
+  { id:3, type:'Bereavement', start:'2026-05-05', end:'2026-05-06', days:2, len:'Full', status:'approved', synced:true },
+  { id:4, type:'Personal Day', start:'2026-08-10', end:'2026-08-10', days:1, len:'Full', status:'pending', synced:true }
+];
+let nextId = 5;
+
+let approvals = [
+  { id:101, name:'Maria Chen', project:'DNNP', type:'Personal Day', start:'2026-08-10', end:'2026-08-10', days:1, status:'pending', comment:'' },
+  { id:102, name:'Jason Okafor', project:'STC', type:'Vacation Paid', start:'2026-08-03', end:'2026-08-07', days:5, status:'pending', comment:'' },
+  { id:103, name:'Priya Nair', project:'STC', type:'Sick Leave Unpaid', start:'2026-07-28', end:'2026-07-28', days:1, status:'pending', comment:'' },
+  { id:104, name:'Diego Fernandez', project:'Arctic Over the Horizon', type:'Jury Duty', start:'2026-08-12', end:'2026-08-14', days:3, status:'pending', comment:'' },
+  { id:105, name:'Sarah Whitfield', project:'DNNP', type:'Vacation Paid', start:'2026-07-15', end:'2026-07-19', days:5, status:'approved', comment:'Enjoy the trip.' }
+];
+let staged = {}; // id -> {status, comment}
+let filters = { text:'', from:'', to:'' };
+
+// ---------------- Helpers ----------------
+function fmtDate(d){
+  const dt = new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('en-CA', { month:'short', day:'numeric' });
+}
+function dateRangeLabel(r){
+  if(r.start === r.end) return fmtDate(r.start) + (r.days < 1 ? ' · ' + r.len : '');
+  return fmtDate(r.start) + ' – ' + fmtDate(r.end);
+}
+function showToast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(()=>{ t.className = 'toast'; }, 2400);
+}
+function usedPending(){
+  return requests.filter(r=>r.status!=='rejected').reduce((s,r)=>s+r.days,0);
+}
+
+// ---------------- Header actions ----------------
+function renderHeaderActions(){
+  const el = document.getElementById('headerActions');
+  el.innerHTML = '';
+  if(device === 'web'){
+    if(role === 'approver'){
+      const b = document.createElement('button');
+      b.className = 'btn-header' + (screen==='approvals' ? ' primary' : '');
+      b.textContent = 'Approvals';
+      b.onclick = ()=>{ screen='approvals'; render(); };
+      el.appendChild(b);
+    }
+    const nb = document.createElement('button');
+    nb.className = 'btn-header' + (screen==='home' ? '' : '');
+    nb.style.background = '#fff'; nb.style.color='var(--navy)';
+    nb.textContent = screen==='approvals' ? '← Home' : '+ New request';
+    nb.onclick = ()=>{ if(screen==='approvals'){ screen='home'; render(); } else { openSheet(); } };
+    el.appendChild(nb);
+  } else {
+    // phone: only Home indicator, approvals entry hidden per spec
+    if(screen === 'approvals'){
+      const b = document.createElement('button');
+      b.className = 'btn-header';
+      b.textContent = '← Home';
+      b.onclick = ()=>{ screen='home'; render(); };
+      el.appendChild(b);
+    }
+  }
+}
+
+// ---------------- Home screen ----------------
+function renderMetrics(){
+  const el = document.getElementById('metricRow');
+  const used = usedPending();
+  let chips = [
+    { num: ENTITLEMENT, lbl:'Entitlement (days)' },
+    { num: used.toFixed(used%1===0?0:1), lbl:'Used / pending' }
+  ];
+  if(device==='web'){ chips.push({ num: APPROVER.split(' ')[0], lbl:'Approver' }); }
+  el.innerHTML = chips.map(c=>`<div class="metric-chip"><div class="num">${c.num}</div><div class="lbl">${c.lbl}</div></div>`).join('');
+}
+
+function renderHome(){
+  document.getElementById('homeGreeting').textContent = 'Hi, Maria';
+  document.getElementById('homeGreetingSub').textContent = 'DNNP · New Build Project';
+  renderMetrics();
+  const body = document.getElementById('appBody');
+  body.innerHTML = '';
+  const label = document.createElement('div');
+  label.className = 'section-label';
+  label.textContent = 'Your requests';
+  body.appendChild(label);
+
+  if(requests.length === 0){
+    body.innerHTML += `
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+        <p>No leave requests yet. ${device==='phone' ? 'Tap the + button' : 'Use New request'} to submit time off.</p>
+      </div>`;
+    return;
+  }
+
+  const sorted = [...requests].sort((a,b)=> new Date(b.start) - new Date(a.start));
+  sorted.forEach(r=>{
+    const card = document.createElement('div');
+    card.className = 'req-card status-' + r.status;
+    const canDelete = r.status === 'pending';
+    card.innerHTML = `
+      <div class="req-main">
+        <div class="req-top">
+          <span class="req-type">${r.type}</span>
+        </div>
+        <div class="req-dates">${dateRangeLabel(r)} · ${r.days} day${r.days!==1?'s':''}</div>
+      </div>
+      <div class="req-actions">
+        <span class="status-pill ${r.status}">${r.status}</span>
+        ${canDelete ? `<button class="icon-btn" data-del="${r.id}" title="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6h12z"/></svg></button>` : ''}
+      </div>`;
+    body.appendChild(card);
+  });
+
+  body.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.onclick = ()=>{
+      pendingDeleteId = parseInt(btn.dataset.del);
+      document.getElementById('confirmOverlay').classList.add('open');
+    };
+  });
+}
+
+// ---------------- New request sheet ----------------
+function openSheet(){
+  document.getElementById('sheetOverlay').classList.add('open');
+  recalcPreview();
+}
+function closeSheetFn(){
+  document.getElementById('sheetOverlay').classList.remove('open');
+  document.getElementById('formError').style.display = 'none';
+}
+function workingDaysBetween(startStr, endStr, len){
+  const start = new Date(startStr+'T00:00:00');
+  const end = new Date(endStr+'T00:00:00');
+  if(start.getTime() === end.getTime()){
+    const dow = start.getDay();
+    if(dow===0 || dow===6) return 0;
+    return len === 'Full' ? 1 : 0.5;
+  }
+  let count = 0;
+  let d = new Date(start);
+  while(d <= end){
+    const dow = d.getDay();
+    if(dow!==0 && dow!==6) count++;
+    d.setDate(d.getDate()+1);
+  }
+  return count;
+}
+function recalcPreview(){
+  const start = document.getElementById('startDate').value;
+  const end = document.getElementById('endDate').value;
+  const sameDay = start === end;
+  document.getElementById('dayLengthField').style.display = sameDay ? 'block' : 'none';
+  const selChip = document.querySelector('#dayLengthRow .radio-chip.sel');
+  const len = selChip ? selChip.dataset.len : 'Full';
+  const days = workingDaysBetween(start, end, len);
+  document.getElementById('workingDaysPreview').textContent = days;
+  document.getElementById('approverPreview').textContent = APPROVER;
+  return { start, end, len, days };
+}
+
+// ---------------- Approvals screen ----------------
+function matchesFilter(r){
+  const t = filters.text.trim().toLowerCase();
+  if(t && !r.name.toLowerCase().includes(t)) return false;
+  if(filters.from && r.start < filters.from) return false;
+  if(filters.to && r.end > filters.to) return false;
+  return true;
+}
+function renderApprovalsHeader(){
+  document.getElementById('homeGreeting').textContent = 'Leave approvals';
+  document.getElementById('homeGreetingSub').textContent = APPROVER + ' · viewing team requests';
+  const el = document.getElementById('metricRow');
+  const pendingCount = approvals.filter(a=>a.status==='pending').length;
+  el.innerHTML = `<div class="metric-chip"><div class="num">${pendingCount}</div><div class="lbl">Pending review</div></div>
+                   <div class="metric-chip"><div class="num">${approvals.length}</div><div class="lbl">Total in view</div></div>`;
+}
+function renderApprovals(){
+  renderApprovalsHeader();
+  const body = document.getElementById('appBody');
+  body.innerHTML = '';
+
+  const filterCard = document.createElement('div');
+  filterCard.className = 'filter-card';
+  filterCard.innerHTML = `
+    <div class="filter-grid">
+      <div class="field" style="margin-bottom:0;">
+        <label>Name or email</label>
+        <input type="text" id="filterText" placeholder="Filter by employee…" value="${filters.text}">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>From</label>
+        <input type="date" id="filterFrom" value="${filters.from}">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>To</label>
+        <input type="date" id="filterTo" value="${filters.to}">
+      </div>
+      <div class="filter-actions">
+        <button class="btn-ghost" id="clearFilters">Clear</button>
+        <button class="btn-ghost" id="refreshFilters">Refresh</button>
+        <button class="btn-save" id="saveApprovals">Save</button>
+      </div>
+    </div>
+    <div class="unsaved-hint" id="unsavedHint"><span class="staged-dot"></span><span id="unsavedCount">0 unsaved change(s)</span></div>
+  `;
+  body.appendChild(filterCard);
+
+  const label = document.createElement('div');
+  label.className = 'section-label';
+  label.textContent = 'Requests';
+  body.appendChild(label);
+
+  const visible = approvals.filter(matchesFilter);
+  if(visible.length === 0){
+    body.innerHTML += `<div class="empty-state"><p>No requests match this filter.</p></div>`;
+  }
+
+  visible.forEach(a=>{
+    const st = staged[a.id];
+    const curStatus = st ? st.status : a.status;
+    const curComment = st ? st.comment : a.comment;
+    const row = document.createElement('div');
+    row.className = 'appr-row';
+    row.innerHTML = `
+      <div>
+        <div class="appr-name">${a.name}</div>
+        <div class="appr-sub">${a.project}</div>
+      </div>
+      <div>
+        <div class="appr-meta">${a.type}</div>
+        <div class="appr-days">${dateRangeLabel(a)} · ${a.days} day${a.days!==1?'s':''}</div>
+      </div>
+      <div>
+        <select class="status-select ${curStatus}" data-id="${a.id}">
+          <option value="pending" ${curStatus==='pending'?'selected':''}>Pending</option>
+          <option value="approved" ${curStatus==='approved'?'selected':''}>Approved</option>
+          <option value="rejected" ${curStatus==='rejected'?'selected':''}>Rejected</option>
+        </select>
+      </div>
+      <div>
+        <textarea class="appr-comment" data-id="${a.id}" rows="1" placeholder="Approver comment…">${curComment}</textarea>
+      </div>
+    `;
+    body.appendChild(row);
+  });
+
+  body.querySelectorAll('.status-select').forEach(sel=>{
+    sel.onchange = ()=>{
+      const id = parseInt(sel.dataset.id);
+      stageEdit(id, { status: sel.value });
+      sel.className = 'status-select ' + sel.value;
+      updateUnsavedHint();
+    };
+  });
+  body.querySelectorAll('.appr-comment').forEach(ta=>{
+    ta.oninput = ()=>{
+      const id = parseInt(ta.dataset.id);
+      stageEdit(id, { comment: ta.value });
+      updateUnsavedHint();
+    };
+  });
+  document.getElementById('filterText').oninput = (e)=>{ filters.text = e.target.value; renderApprovals(); document.getElementById('filterText').focus(); };
+  document.getElementById('filterFrom').onchange = (e)=>{ filters.from = e.target.value; renderApprovals(); };
+  document.getElementById('filterTo').onchange = (e)=>{ filters.to = e.target.value; renderApprovals(); };
+  document.getElementById('clearFilters').onclick = ()=>{ filters = {text:'',from:'',to:''}; renderApprovals(); };
+  document.getElementById('refreshFilters').onclick = ()=>{ showToast('Approvals refreshed'); };
+  document.getElementById('saveApprovals').onclick = saveApprovalEdits;
+  updateUnsavedHint();
+}
+function stageEdit(id, patch){
+  const base = approvals.find(a=>a.id===id);
+  staged[id] = Object.assign({ status: base.status, comment: base.comment }, staged[id]||{}, patch);
+}
+function updateUnsavedHint(){
+  const n = Object.keys(staged).length;
+  const hint = document.getElementById('unsavedHint');
+  if(!hint) return;
+  if(n > 0){
+    hint.classList.add('show');
+    document.getElementById('unsavedCount').textContent = n + ' unsaved change(s)';
+  } else {
+    hint.classList.remove('show');
+  }
+}
+function saveApprovalEdits(){
+  const n = Object.keys(staged).length;
+  if(n === 0){ showToast('No changes to save', true); return; }
+  Object.entries(staged).forEach(([id, patch])=>{
+    const a = approvals.find(x=>x.id===parseInt(id));
+    Object.assign(a, patch);
+  });
+  staged = {};
+  showToast('Approvals saved · synced to Staff Club');
+  renderApprovals();
+}
+
+// ---------------- Master render ----------------
+function render(){
+  // frame class swap
+  document.getElementById('stageInner').className = 'stage-inner ' + device;
+  document.getElementById('bottomNav').style.display = (device==='phone' && screen==='home') ? 'flex' : 'none';
+
+  renderHeaderActions();
+  if(screen === 'home'){
+    renderHome();
+  } else {
+    renderApprovals();
+  }
+
+  const width = device === 'phone' ? 390 : 1080;
+  document.getElementById('breakpointReadout').textContent =
+    'App.Width = ' + width + ' → ' + (width < 680 ? 'phone layout' : 'web/tablet layout');
+}
+
+// ---------------- Event wiring ----------------
+document.getElementById('deviceToggle').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  device = btn.dataset.device;
+  document.querySelectorAll('#deviceToggle button').forEach(b=>b.classList.toggle('active', b===btn));
+  if(device === 'phone' && screen === 'approvals'){ screen = 'home'; } // phone hides approvals entry point
+  render();
+});
+document.getElementById('roleToggle').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  role = btn.dataset.role;
+  document.querySelectorAll('#roleToggle button').forEach(b=>b.classList.toggle('active', b===btn));
+  if(role === 'approver'){
+    // Approvals is web-primary — jump straight to it, switching width if needed
+    if(device === 'phone'){
+      device = 'web';
+      document.querySelectorAll('#deviceToggle button').forEach(b=>b.classList.toggle('active', b.dataset.device==='web'));
+    }
+    screen = 'approvals';
+  } else {
+    screen = 'home';
+  }
+  render();
+});
+document.getElementById('fabBtn').addEventListener('click', openSheet);
+document.getElementById('closeSheet').addEventListener('click', closeSheetFn);
+document.getElementById('startDate').addEventListener('change', recalcPreview);
+document.getElementById('endDate').addEventListener('change', recalcPreview);
+document.getElementById('dayLengthRow').addEventListener('click', (e)=>{
+  const chip = e.target.closest('.radio-chip'); if(!chip) return;
+  document.querySelectorAll('#dayLengthRow .radio-chip').forEach(c=>c.classList.remove('sel'));
+  chip.classList.add('sel');
+  recalcPreview();
+});
+document.getElementById('submitRequest').addEventListener('click', ()=>{
+  const { start, end, len, days } = recalcPreview();
+  const errEl = document.getElementById('formError');
+  if(!start || !end){ errEl.textContent = 'Start and end dates are required.'; errEl.style.display='block'; return; }
+  if(end < start){ errEl.textContent = 'End date must be on or after the start date.'; errEl.style.display='block'; return; }
+  if(new Date(start).getFullYear() !== new Date(end).getFullYear()){ errEl.textContent = 'Dates must fall within the same calendar year.'; errEl.style.display='block'; return; }
+  if(days <= 0){ errEl.textContent = 'Select at least one working day.'; errEl.style.display='block'; return; }
+  const overlap = requests.some(r=> r.status!=='rejected' && !(end < r.start || start > r.end));
+  if(overlap){ errEl.textContent = 'This overlaps an existing request.'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  const type = document.getElementById('leaveType').value;
+  requests.push({ id: nextId++, type, start, end, days, len, status:'pending', synced:true });
+  closeSheetFn();
+  renderHome();
+  showToast('Leave submitted');
+});
+document.getElementById('cancelDelete').addEventListener('click', ()=>{
+  document.getElementById('confirmOverlay').classList.remove('open');
+  pendingDeleteId = null;
+});
+document.getElementById('confirmDelete').addEventListener('click', ()=>{
+  requests = requests.filter(r=>r.id !== pendingDeleteId);
+  document.getElementById('confirmOverlay').classList.remove('open');
+  pendingDeleteId = null;
+  renderHome();
+  showToast('Request deleted');
+});
+
+render();
+</script>
+</body>
+</html>

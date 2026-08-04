@@ -1,0 +1,952 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Approvals:
+    Properties:
+      Fill: =RGBA(245, 246, 251, 1)
+      LoadingSpinnerColor: =RGBA(0, 18, 107, 1)
+      OnVisible: |-
+        =Clear(colVacationsUpdates);
+        Set(varFilterEmployee, "");
+        Set(varFilterFrom, Blank());
+        Set(varFilterTo, Blank());
+        Set(varApprovalStatusFilter, "Pending");
+        Reset(txt_FilterEmployee);
+        Reset(DatePicker_FilterFrom);
+        Reset(DatePicker_FilterTo);
+        Select(btn_ReloadApprovals);
+    Children:
+      - appr_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            LayoutMinWidth: =0
+            LayoutMinHeight: =0
+            Fill: =RGBA(245, 246, 251, 1)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =0
+            Width: =Parent.Width
+            X: =0
+            Y: =0
+          Children:
+            - appr_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  LayoutMinWidth: =0
+                  LayoutMinHeight: =0
+                  Fill: =RGBA(0, 18, 107, 1)
+                  FillPortions: =0
+                  Height: =If(App.Width < 680, 186, 176)
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =0
+                  PaddingBottom: =14
+                  PaddingLeft: =If(App.Width < 680, 18, 24)
+                  PaddingRight: =If(App.Width < 680, 18, 24)
+                  PaddingTop: =If(App.Width < 680, 16, 18)
+                  Width: =Parent.Width
+                Children:
+                  - appr_brand_row:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        LayoutMinWidth: =0
+                        FillPortions: =0
+                        Height: =40
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        Width: =Parent.Width
+                      Children:
+                        - Logo_Dayaway_Appr_Wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =124
+                            Children:
+                              - Logo_Dayaway_Appr:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    BorderThickness: =0
+                                    Height: =32
+                                    Image: ='Subtitle (1)'
+                                    ImagePosition: =ImagePosition.Fit
+                                    Width: =116
+                                    X: =4
+                                    Y: =2
+                        - appr_brand_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              Height: =1
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =8
+                        - btn_ApproverTab_Appr:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              OnSelect: =Navigate(Approvals, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Approvals"
+                              Visible: =App.Width >= 680
+                              Width: =96
+                        - btn_HomeTab_Appr:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(255, 255, 255, 0.35)
+                              BorderThickness: =1
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(255, 255, 255, 0.08)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              OnSelect: =Navigate('Vacations Tracking', ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="← Home"
+                              Width: =88
+                  - Label_ApprTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        PaddingTop: =10
+                        Size: =If(App.Width < 680, 18, 20)
+                        Text: ="Leave approvals"
+                        Width: =Parent.Width
+                  - Label_ApprSub:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 0.7)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        Height: =18
+                        Size: =12
+                        Text: =Coalesce(User().FullName, varApproverName) & " · viewing team requests"
+                        Width: =Parent.Width
+                  - appr_metrics:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        LayoutMinWidth: =0
+                        FillPortions: =0
+                        Height: =64
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =0
+                        PaddingTop: =8
+                        Width: =Parent.Width
+                      Children:
+                        - metric_pending:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(255, 255, 255, 0.18)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 0.1)
+                              FillPortions: =1
+                              Height: =52
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingBottom: =6
+                              PaddingLeft: =12
+                              PaddingTop: =6
+                              RadiusBottomLeft: =11
+                              RadiusBottomRight: =11
+                              RadiusTopLeft: =11
+                              RadiusTopRight: =11
+                            Children:
+                              - Label_MetricPendingVal:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =16
+                                    Text: =Text(CountIf(colApprovalsSource, ApprovalStatus_1 = "Pending"))
+                                    Width: =Parent.Width
+                              - Label_MetricPendingCap:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 0.65)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    Height: =14
+                                    Size: =9
+                                    Text: ="PENDING REVIEW"
+                                    Width: =Parent.Width
+                        - metric_total:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(255, 255, 255, 0.18)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 0.1)
+                              FillPortions: =1
+                              Height: =52
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingBottom: =6
+                              PaddingLeft: =12
+                              PaddingTop: =6
+                              RadiusBottomLeft: =11
+                              RadiusBottomRight: =11
+                              RadiusTopLeft: =11
+                              RadiusTopRight: =11
+                            Children:
+                              - Label_MetricTotalVal:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =16
+                                    Text: |-
+                                      =Text(
+                                          CountRows(
+                                              Filter(
+                                                  colApprovalsSource,
+                                                  (
+                                                      varApprovalStatusFilter = "All" ||
+                                                      ApprovalStatus_1 = varApprovalStatusFilter
+                                                  ) &&
+                                                  (
+                                                      IsBlank(varFilterEmployee) ||
+                                                      varFilterEmployee in Lower(Coalesce(Employee_Name, "")) ||
+                                                      varFilterEmployee in Lower(Coalesce(Employee, ""))
+                                                  ) &&
+                                                  (
+                                                      IsBlank(varFilterFrom) ||
+                                                      IsBlank(varFilterTo) ||
+                                                      (StartDate <= varFilterTo && EndDate >= varFilterFrom)
+                                                  )
+                                              )
+                                          )
+                                      )
+                                    Width: =Parent.Width
+                              - Label_MetricTotalCap:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 0.65)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    Height: =14
+                                    Size: =9
+                                    Text: ="TOTAL IN VIEW"
+                                    Width: =Parent.Width
+            - appr_body:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  LayoutMinWidth: =0
+                  LayoutMinHeight: =0
+                  Fill: =RGBA(245, 246, 251, 1)
+                  FillPortions: =1
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =12
+                  PaddingBottom: =16
+                  PaddingLeft: =If(App.Width < 680, 16, 28)
+                  PaddingRight: =If(App.Width < 680, 16, 28)
+                  PaddingTop: =If(App.Width < 680, 14, 20)
+                  Width: =Parent.Width
+                Children:
+                  - appr_filters:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(226, 228, 240, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        LayoutMinWidth: =0
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Height: =If(App.Width < 680, 248, 124)
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =0
+                        PaddingBottom: =12
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =12
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Width: =Parent.Width
+                      Children:
+                        - appr_toolbar:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =If(App.Width < 680, 64, 30)
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =If(App.Width < 680, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+                              LayoutGap: =6
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =Parent.Width
+                            Children:
+                              - appr_status_btns:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =If(App.Width < 680, 0, 1)
+                                    Height: =28
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =6
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    Width: =If(App.Width < 680, Parent.Width, 260)
+                                  Children:
+                                    - btn_StatusPending:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =If(varApprovalStatusFilter = "Pending", RGBA(0, 18, 107, 1), RGBA(226, 228, 240, 1))
+                                          BorderThickness: =1
+                                          Color: =If(varApprovalStatusFilter = "Pending", RGBA(255, 255, 255, 1), RGBA(23, 26, 51, 1))
+                                          Fill: =If(varApprovalStatusFilter = "Pending", RGBA(0, 18, 107, 1), RGBA(251, 251, 254, 1))
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          OnSelect: =Set(varApprovalStatusFilter, "Pending")
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Size: =10
+                                          Text: ="Pending"
+                                          Width: =76
+                                    - btn_StatusRejected:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =If(varApprovalStatusFilter = "Rejected", RGBA(0, 18, 107, 1), RGBA(226, 228, 240, 1))
+                                          BorderThickness: =1
+                                          Color: =If(varApprovalStatusFilter = "Rejected", RGBA(255, 255, 255, 1), RGBA(23, 26, 51, 1))
+                                          Fill: =If(varApprovalStatusFilter = "Rejected", RGBA(0, 18, 107, 1), RGBA(251, 251, 254, 1))
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          OnSelect: =Set(varApprovalStatusFilter, "Rejected")
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Size: =10
+                                          Text: ="Rejected"
+                                          Width: =84
+                                    - btn_StatusAll:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =If(varApprovalStatusFilter = "All", RGBA(0, 18, 107, 1), RGBA(226, 228, 240, 1))
+                                          BorderThickness: =1
+                                          Color: =If(varApprovalStatusFilter = "All", RGBA(255, 255, 255, 1), RGBA(23, 26, 51, 1))
+                                          Fill: =If(varApprovalStatusFilter = "All", RGBA(0, 18, 107, 1), RGBA(251, 251, 254, 1))
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          OnSelect: =Set(varApprovalStatusFilter, "All")
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Size: =10
+                                          Text: ="All"
+                                          Width: =52
+                              - appr_filter_actions:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =If(App.Width < 680, 0, 0)
+                                    Height: =28
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =6
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    Width: =If(App.Width < 680, Parent.Width, 196)
+                                  Children:
+                                    - appr_actions_spacer:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =1
+                                          Height: =1
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          Width: =8
+                                          Visible: =App.Width < 680
+                                    - btn_ClearFilters:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(226, 228, 240, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(23, 26, 51, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          OnSelect: |-
+                                            =Set(varFilterEmployee, "");
+                                            Set(varFilterFrom, Blank());
+                                            Set(varFilterTo, Blank());
+                                            Reset(txt_FilterEmployee);
+                                            Reset(DatePicker_FilterFrom);
+                                            Reset(DatePicker_FilterTo);
+                                          RadiusBottomLeft: =7
+                                          RadiusBottomRight: =7
+                                          RadiusTopLeft: =7
+                                          RadiusTopRight: =7
+                                          Size: =10
+                                          Text: ="Clear"
+                                          Width: =58
+                                    - btn_ReloadApprovals:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(226, 228, 240, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(23, 26, 51, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          OnSelect: |-
+                                            =Refresh('Vacations Tracking (Days)');
+                                            If(
+                                                varIsAdmin,
+                                                ClearCollect(colApprovalsSource, 'Vacations Tracking (Days)'),
+                                                ClearCollect(
+                                                    colApprovalsSource,
+                                                    Filter('Vacations Tracking (Days)', ApproverID_1 = User().Email)
+                                                )
+                                            );
+                                          RadiusBottomLeft: =7
+                                          RadiusBottomRight: =7
+                                          RadiusTopLeft: =7
+                                          RadiusTopRight: =7
+                                          Size: =10
+                                          Text: ="Refresh"
+                                          Width: =68
+                                    - Button_SaveApprovals:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderThickness: =0
+                                          Color: =RGBA(255, 255, 255, 1)
+                                          DisplayMode: =If(CountRows(colVacationsUpdates) = 0 || varIsSaving, DisplayMode.Disabled, DisplayMode.Edit)
+                                          Fill: =RGBA(0, 18, 107, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          OnSelect: =Select(Button_SaveApprovals_Execute)
+                                          RadiusBottomLeft: =7
+                                          RadiusBottomRight: =7
+                                          RadiusTopLeft: =7
+                                          RadiusTopRight: =7
+                                          Size: =10
+                                          Text: ="Save"
+                                          Width: =56
+                        - appr_filter_fields:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              LayoutMinWidth: =0
+                              FillPortions: =0
+                              Height: =If(App.Width < 680, 150, 52)
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =If(App.Width < 680, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+                              LayoutGap: =8
+                              LayoutMinHeight: =0
+                              Width: =Parent.Width
+                            Children:
+                              - filter_name_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =If(App.Width < 680, 0, 2)
+                                    Height: =If(App.Width < 680, 52, 52)
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    Width: =If(App.Width < 680, Parent.Width - 2, 200)
+                                  Children:
+                                    - Label_FilterName:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =14
+                                          Size: =10
+                                          Text: ="Employee"
+                                          Width: =Parent.Width
+                                    - txt_FilterEmployee:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(226, 228, 240, 1)
+                                          Default: =""
+                                          Fill: =RGBA(251, 251, 254, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          Height: =34
+                                          HintText: ="Name or email"
+                                          OnChange: =Set(varFilterEmployee, Lower(Trim(Self.Text)))
+                                          Size: =12
+                                          Width: =Parent.Width
+                              - filter_from_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    Height: =52
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    Width: =If(App.Width < 680, Parent.Width - 2, 140)
+                                  Children:
+                                    - Label_FilterFrom:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =14
+                                          Size: =10
+                                          Text: ="From"
+                                          Width: =Parent.Width
+                                    - DatePicker_FilterFrom:
+                                        Control: Classic/DatePicker@2.6.0
+                                        Properties:
+                                          BorderColor: =RGBA(226, 228, 240, 1)
+                                          DefaultDate: =Blank()
+                                          Fill: =RGBA(251, 251, 254, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          Height: =34
+                                          IconBackground: =RGBA(0, 18, 107, 1)
+                                          OnChange: =Set(varFilterFrom, Self.SelectedDate)
+                                          Width: =Parent.Width
+                              - filter_to_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    Height: =52
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    Width: =If(App.Width < 680, Parent.Width - 2, 140)
+                                  Children:
+                                    - Label_FilterTo:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =14
+                                          Size: =10
+                                          Text: ="To"
+                                          Width: =Parent.Width
+                                    - DatePicker_FilterTo:
+                                        Control: Classic/DatePicker@2.6.0
+                                        Properties:
+                                          BorderColor: =RGBA(226, 228, 240, 1)
+                                          DefaultDate: =Blank()
+                                          Fill: =RGBA(251, 251, 254, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          Height: =34
+                                          IconBackground: =RGBA(0, 18, 107, 1)
+                                          OnChange: =Set(varFilterTo, Self.SelectedDate)
+                                          Width: =Parent.Width
+                  - Label_PendingHint:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(184, 121, 26, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =18
+                        Size: =11
+                        Text: =CountRows(colVacationsUpdates) & " unsaved change(s)"
+                        Visible: =CountRows(colVacationsUpdates) > 0
+                        Width: =Parent.Width
+                  - Gallery_Approvals:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Fill: =RGBA(0, 0, 0, 0)
+                        FillPortions: =1
+                        Height: =240
+                        Items: |-
+                          =Filter(
+                              colApprovalsSource,
+                              (
+                                  varApprovalStatusFilter = "All" ||
+                                  ApprovalStatus_1 = varApprovalStatusFilter
+                              ) &&
+                              (
+                                  IsBlank(varFilterEmployee) ||
+                                  varFilterEmployee in Lower(Coalesce(Employee_Name, "")) ||
+                                  varFilterEmployee in Lower(Coalesce(Employee, ""))
+                              ) &&
+                              (
+                                  IsBlank(varFilterFrom) ||
+                                  IsBlank(varFilterTo) ||
+                                  (StartDate <= varFilterTo && EndDate >= varFilterFrom)
+                              )
+                          )
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        TemplatePadding: =8
+                        TemplateSize: =208
+                        Width: =Parent.Width
+                        WrapCount: =1
+                      Children:
+                        - card_Appr:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =200
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =6
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingBottom: =12
+                              PaddingLeft: =14
+                              PaddingRight: =14
+                              PaddingTop: =12
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =Parent.TemplateWidth
+                            Children:
+                              - appr_top:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =48
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    Width: =Parent.Width
+                                  Children:
+                                    - appr_info:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =1
+                                          Height: =48
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - lbl_ApprName:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(23, 26, 51, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =22
+                                                Size: =13
+                                                Text: =ThisItem.Employee_Name
+                                                Width: =Parent.Width
+                                          - lbl_ApprMeta:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(23, 26, 51, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                Height: =20
+                                                Size: =12
+                                                Text: =ThisItem.Type_of_leave & " · " & Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d") & " · " & Text(ThisItem.Days) & "d"
+                                                Width: =Parent.Width
+                                    - dd_ApprStatus:
+                                        Control: Classic/DropDown@2.3.1
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.Center
+                                          BorderColor: =If(Self.Selected.Value = "Approved", RGBA(223, 243, 232, 1), Self.Selected.Value = "Rejected", RGBA(251, 226, 224, 1), RGBA(252, 239, 217, 1))
+                                          ChevronBackground: =RGBA(0, 18, 107, 1)
+                                          ChevronFill: =RGBA(255, 255, 255, 1)
+                                          Color: =If(Self.Selected.Value = "Approved", RGBA(20, 108, 67, 1), Self.Selected.Value = "Rejected", RGBA(179, 38, 30, 1), RGBA(184, 121, 26, 1))
+                                          Default: =ThisItem.ApprovalStatus_1
+                                          Fill: =If(Self.Selected.Value = "Approved", RGBA(223, 243, 232, 1), Self.Selected.Value = "Rejected", RGBA(251, 226, 224, 1), RGBA(252, 239, 217, 1))
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =36
+                                          Items: =["Pending", "Approved", "Rejected"]
+                                          OnChange: |-
+                                            =If(
+                                                !IsBlank(LookUp(colVacationsUpdates, ID = ThisItem.ID)),
+                                                UpdateIf(
+                                                    colVacationsUpdates,
+                                                    ID = ThisItem.ID,
+                                                    {
+                                                        ApprovalStatus_1: Self.Selected.Value,
+                                                        Type_of_leave: ThisItem.Type_of_leave,
+                                                        TypeofLeave: ThisItem.Type_of_leave,
+                                                        Employee: ThisItem.Employee,
+                                                        StartDate: ThisItem.StartDate,
+                                                        EndDate: ThisItem.EndDate,
+                                                        ApproverID_1: ThisItem.ApproverID_1,
+                                                        LOG_ID: ThisItem.LOG_ID,
+                                                        Approver_Comments: Coalesce(LookUp(colVacationsUpdates, ID = ThisItem.ID).Approver_Comments, ThisItem.Approver_Comments)
+                                                    }
+                                                ),
+                                                Collect(
+                                                    colVacationsUpdates,
+                                                    {
+                                                        ID: ThisItem.ID,
+                                                        ApprovalStatus_1: Self.Selected.Value,
+                                                        ApprovalStatus_2: ThisItem.ApprovalStatus_2,
+                                                        Type_of_leave: ThisItem.Type_of_leave,
+                                                        TypeofLeave: ThisItem.Type_of_leave,
+                                                        Employee: ThisItem.Employee,
+                                                        StartDate: ThisItem.StartDate,
+                                                        EndDate: ThisItem.EndDate,
+                                                        ApproverID_1: ThisItem.ApproverID_1,
+                                                        LOG_ID: ThisItem.LOG_ID,
+                                                        Approver_Comments: ThisItem.Approver_Comments
+                                                    }
+                                                )
+                                            )
+                                          Size: =11
+                                          Width: =140
+                              - Label_EmployeeCommentsCap:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(91, 97, 120, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =16
+                                    Size: =10
+                                    Text: ="Employee comments"
+                                    Width: =Parent.Width
+                              - lbl_EmployeeComments:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(23, 26, 51, 1)
+                                    Fill: =RGBA(245, 246, 251, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    Size: =11
+                                    Text: =If(IsBlank(Trim(Coalesce(ThisItem.Comments, ""))), "No comments from employee.", ThisItem.Comments)
+                                    VerticalAlign: =VerticalAlign.Top
+                                    Width: =Parent.Width
+                                    Wrap: =true
+                              - Label_ApprCommentsCap:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(91, 97, 120, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =16
+                                    Size: =10
+                                    Text: ="Approver comments"
+                                    Width: =Parent.Width
+                              - txt_ApprComments:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    BorderColor: =RGBA(226, 228, 240, 1)
+                                    Default: =ThisItem.Approver_Comments
+                                    Fill: =RGBA(251, 251, 254, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    HintText: ="Your reply to the employee"
+                                    OnChange: |-
+                                      =If(
+                                          !IsBlank(LookUp(colVacationsUpdates, ID = ThisItem.ID)),
+                                          UpdateIf(
+                                              colVacationsUpdates,
+                                              ID = ThisItem.ID,
+                                              { Approver_Comments: Self.Text }
+                                          ),
+                                          Collect(
+                                              colVacationsUpdates,
+                                              {
+                                                  ID: ThisItem.ID,
+                                                  ApprovalStatus_1: ThisItem.ApprovalStatus_1,
+                                                  ApprovalStatus_2: ThisItem.ApprovalStatus_2,
+                                                  Type_of_leave: ThisItem.Type_of_leave,
+                                                  TypeofLeave: ThisItem.Type_of_leave,
+                                                  Employee: ThisItem.Employee,
+                                                  StartDate: ThisItem.StartDate,
+                                                  EndDate: ThisItem.EndDate,
+                                                  ApproverID_1: ThisItem.ApproverID_1,
+                                                  LOG_ID: ThisItem.LOG_ID,
+                                                  Approver_Comments: Self.Text
+                                              }
+                                          )
+                                      )
+                                    Size: =11
+                                    Width: =Parent.Width
+      - Button_SaveApprovals_Execute:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =If(
+                  CountRows(colVacationsUpdates) = 0,
+                  Notify("No changes to save", NotificationType.Information),
+                  Set(varIsSaving, true);
+                  Patch(
+                      'Vacations Tracking (Days)',
+                      ShowColumns(
+                          colVacationsUpdates,
+                          ID,
+                          Type_of_leave,
+                          ApprovalStatus_1,
+                          ApprovalStatus_2,
+                          Approver_Comments
+                      )
+                  );
+                  ForAll(
+                      colVacationsUpdates As u,
+                      With(
+                          {
+                              hoursRows: Filter(
+                                  Filter(
+                                      'Hours Tracking (Hours)',
+                                      Employee = u.Employee &&
+                                      Date >= u.StartDate &&
+                                      Date <= u.EndDate
+                                  ),
+                                  StartsWith(LOG_ID, u.LOG_ID & "_") &&
+                                  App_Name = "Dayaway"
+                              )
+                          },
+                          If(
+                              CountRows(hoursRows) > 0,
+                              Patch(
+                                  'Hours Tracking (Hours)',
+                                  ForAll(
+                                      hoursRows As h,
+                                      {
+                                          ID: h.ID,
+                                          ApprovalStatus_1: u.ApprovalStatus_1,
+                                          Approver_Comments: u.Approver_Comments
+                                      }
+                                  )
+                              )
+                          );
+                          If(
+                              u.ApprovalStatus_1 = "Approved" || u.ApprovalStatus_1 = "Rejected",
+                              Office365Outlook.SendEmailV2(
+                                  u.Employee,
+                                  Text(u.TypeofLeave) & " Request " & Text(u.ApprovalStatus_1),
+                                  "Your " & Text(u.TypeofLeave) & " request has been " & Text(u.ApprovalStatus_1) & ".<br><br>" &
+                                  "<b>Type:</b> " & Text(u.TypeofLeave) & "<br>" &
+                                  "<b>Dates:</b> " & Text(u.StartDate, "dd-mmm-yyyy") & " to " & Text(u.EndDate, "dd-mmm-yyyy") & "<br>" &
+                                  "<b>Comments:</b> " & Text(u.Approver_Comments),
+                                  {
+                                      Cc: u.ApproverID_1,
+                                      IsHtml: true
+                                  }
+                              )
+                          )
+                      )
+                  );
+                  Clear(colVacationsUpdates);
+                  Notify("Approvals saved", NotificationType.Success);
+                  Select(btn_ReloadApprovals);
+                  Set(varIsSaving, false)
+              )
+            Visible: =false
+            Width: =1

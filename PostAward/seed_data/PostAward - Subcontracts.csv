@@ -1,0 +1,7 @@
+Title,subcontractnumber,packageidentifier,projectidentifier,ponumber,vendor,scope,bundle,contracttype,originalvalue,startdate,completiondate,responsibleca,backupca,currentlyactive,holdback,closeoutstatus,invoicedtodate
+207,207,61a093f7-d7d6-4562-a88d-bbeeac7bcd53,A02180,4500728205,Liftsafe,Liftsafe Engineering and Service Group,SE/Buildings,Consulting Agreement,17320.00,11/24/2025,11/24/2026,Lolu Oyewole-Eletu,,Yes,Applicable,In progress,6928.00
+95,95,815c7599-8f8c-4b93-a1d2-155abfbab158,A02180,4700146936,Metric Storage Systems,Racking & Shelving,SE/Buildings,Construction Subcontract,311896.00,06/07/2025,06/07/2026,Frank Gou,,Yes,Applicable,Close-out pending,421059.60
+139,139,2ce1fe3d-f7c0-464a-bc58-eb9989e3fb75,A02180,450068669,Accent,Roofing Inspector,SE/Buildings,Consulting Agreement,15000.00,03/13/2025,03/13/2026,Frank Gou,,Yes,Not applicable,In progress,8250.00
+124,124,eec40bdf-1731-4f26-8a8f-a773424c1aa4,A02180,4700138223,M&G Steel,Warehouse Tent Erection,SE/Buildings,Construction Subcontract,1180000.00,05/20/2025,05/20/2026,Frank Gou,,No,Not applicable,Closed,1180000.00
+294,294,4dbfbbd5-bb0b-495c-b8cb-7c0b56e6e34d,A02180,4700154895,KT Innovative Solutions,SAT Consultant,Training,Consulting Agreement,91000.00,06/08/2026,06/08/2027,Robin Bouchard,,Yes,Applicable,Holdback to process,63700.00
+261,261,9ff7aaf4-d224-400e-a743-75e1971bc915,A02180,4700153101,P. Little Eng,Pipe Crossing,CCW/Tunnel,Consulting Agreement,53535.00,05/15/2026,05/15/2027,Ernesto Martinez,,Yes,Applicable,In progress,13383.75

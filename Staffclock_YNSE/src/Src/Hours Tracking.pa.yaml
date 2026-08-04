@@ -16,7 +16,25 @@ Screens:
         ClearCollect(colCostCodes, CostCodes);
         Set(varSubmitAsEmail, User().Email);
         Set(varSubmitAsName, User().FullName);
-        Set(varApprover1Email, LookUp(colEmployeesAll, Email_Address = User().Email).'Approver 1 Email');
+        Set(
+            varApprovers,
+            LookUp(colEmployeesAll, Lower(Email_Address) = Lower(User().Email))
+        );
+        Set(varApprover1Email, varApprovers.'Approver 1 Email');
+        Set(SelectedProject, Trim(Coalesce(varApprovers.'Project Title', "")));
+        ClearCollect(
+            colPublic_Holidays,
+            AddColumns(
+                Filter(
+                    Public_Holidays,
+                    !IsBlank(SelectedProject) && SelectedProject in Projects
+                ),
+                CleanDate,
+                DateValue(Trim(Text(Date))),
+                CleanDateKey,
+                Text(DateValue(Trim(Text(Date))), "yyyy-mm-dd")
+            )
+        );
         If(
             IsBlank(varSelectedCostCode),
             Set(varSelectedCostCode, First(Sort(Distinct(colCostCodes, Network_Activity_Name), Value)).Value);
@@ -229,13 +247,16 @@ Screens:
                         - Label_CostCodeHint:
                             Control: Label@2.5.1
                             Properties:
+                              AlignInContainer: =AlignInContainer.Center
                               Color: =RGBA(106, 122, 127, 1)
                               FillPortions: =0
                               Font: =Font.'Open Sans'
-                              Height: =28
+                              Height: =40
+                              LayoutMinHeight: =40
                               Size: =11
                               Text: ="Default cost code"
-                              Width: =110
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =120
                         - Dropdown_CostCode:
                             Control: Classic/DropDown@2.3.1
                             Properties:
@@ -618,7 +639,15 @@ Screens:
                       Control: Rectangle@2.3.0
                       Properties:
                         BorderThickness: =0
-                        Fill: =If(Weekday(ThisItem.WorkDate, StartOfWeek.Monday) >= 6, RGBA(240, 240, 240, 1), RGBA(255, 255, 255, 1))
+                        Fill: |-
+                          =If(
+                              Weekday(ThisItem.WorkDate, StartOfWeek.Monday) >= 6 ||
+                              ThisItem.TaskCode = "Weekend" ||
+                              ThisItem.TaskCode = "Stat. Holiday" ||
+                              Text(ThisItem.WorkDate, "yyyy-mm-dd") in ForAll(colPublic_Holidays, CleanDateKey),
+                              RGBA(240, 240, 240, 1),
+                              RGBA(255, 255, 255, 1)
+                          )
                         Height: =Parent.TemplateHeight
                         Width: =Parent.TemplateWidth
                   - lbl_Day:
@@ -862,7 +891,11 @@ Screens:
                     ForAll(
                         Sequence(7, 0, 1),
                         With(
-                            { currentDate: DateAdd(varCurrentWeekStart, Value, "Days") },
+                            {
+                                currentDate: DateAdd(varCurrentWeekStart, Value, "Days"),
+                                isWeekend: Weekday(DateAdd(varCurrentWeekStart, Value, "Days"), StartOfWeek.Monday) >= 6,
+                                isHoliday: Text(DateAdd(varCurrentWeekStart, Value, "Days"), "yyyy-mm-dd") in ForAll(colPublic_Holidays, CleanDateKey)
+                            },
                             If(
                                 IsEmpty(Filter(colExistingHours, DateAdd(SrcDate, 0, "Days") = currentDate)),
                                 Collect(
@@ -872,18 +905,20 @@ Screens:
                                         WorkDate: currentDate,
                                         DayLabel: Text(currentDate, "ddd"),
                                         CostCode: If(
-                                            Weekday(currentDate, StartOfWeek.Monday) >= 6,
+                                            isWeekend || isHoliday,
                                             "",
                                             varSelectedCostCode
                                         ),
                                         CostCodeID: If(
-                                            Weekday(currentDate, StartOfWeek.Monday) >= 6,
+                                            isWeekend || isHoliday,
                                             "",
                                             varSelectedCostCodeID
                                         ),
                                         TaskCode: If(
-                                            Weekday(currentDate, StartOfWeek.Monday) >= 6,
+                                            isWeekend,
                                             "Weekend",
+                                            isHoliday,
+                                            "Stat. Holiday",
                                             "Work Day"
                                         ),
                                         Comments: "",

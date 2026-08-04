@@ -1,0 +1,11 @@
+{
+  "PackedStructureVersion": "0.1",
+  "LastPackedDateTimeUtc": "2026-07-29 19:31:50Z",
+  "PackingClient": {
+    "Name": "Pac CLI",
+    "Version": "2.8.1"
+  },
+  "LoadConfiguration": {
+    "LoadFromYaml": true
+  }
+}

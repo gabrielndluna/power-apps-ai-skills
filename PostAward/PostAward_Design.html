@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostAward — Change Order & Claims Tracker</title>
+<style>
+  :root{
+    --red:#C8102E;
+    --red-dark:#A50D26;
+    --red-tint:#FBEAEA;
+    --amber-tint:#FCF6E0;
+    --bg:#F3F3F3;
+    --card:#FFFFFF;
+    --field:#DCE0E2;
+    --field-bd:#C9CFD2;
+    --header-row:#EBEBEB;
+    --border:#E4E4E4;
+    --line:#EFEFEF;
+    --text:#1B1B1B;
+    --dim:#6C7176;
+    --green:#2E9E5B;
+    --green-bg:#E7F4EC;
+    --amber:#D69A00;
+    --amber-bg:#FBF1D6;
+    --blue:#2F6FB3;
+    --blue-bg:#E5EEF7;
+    --gray-dot:#9AA0A6;
+    --gray-bg:#ECEEEF;
+    --font:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1500px;margin:0 auto;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;}
+
+  /* ---------- Red top bar ---------- */
+  .topbar{background:var(--red);color:#fff;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;min-height:78px;}
+  .topbar .proj{display:flex;align-items:center;gap:14px;}
+  .back-btn{width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:background .15s;}
+  .back-btn:hover{background:rgba(255,255,255,.15);}
+  .back-btn svg{width:18px;height:18px;}
+  .proj-text .eyebrow{font-size:10.5px;letter-spacing:1.4px;font-weight:700;opacity:.92;}
+  .proj-text .name{display:flex;align-items:center;gap:10px;font-size:23px;font-weight:700;line-height:1.1;margin-top:2px;}
+  .proj-text .name .chev{font-size:15px;opacity:.9;}
+  .topbar .tools{display:flex;align-items:center;gap:14px;}
+  .tool-ico{width:40px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .tool-xls{background:#1D6F42;font-weight:700;font-size:11px;color:#fff;letter-spacing:.5px;}
+  .tool-gear{color:#fff;}
+  .tool-gear svg{width:26px;height:26px;}
+
+  /* ---------- Toolbar (filters + search) ---------- */
+  .toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 22px 12px;gap:18px;flex-wrap:wrap;}
+  .filters{display:flex;background:#fff;border-radius:10px;padding:5px;box-shadow:0 1px 2px rgba(0,0,0,.05);}
+  .filters button{border:none;background:transparent;padding:9px 20px;border-radius:7px;font-family:var(--font);font-size:13px;font-weight:600;color:#444;cursor:pointer;transition:all .12s;white-space:nowrap;}
+  .filters button .ct{font-weight:700;opacity:.6;margin-left:6px;font-size:11px;}
+  .filters button.active{background:var(--red);color:#fff;}
+  .filters button.active .ct{opacity:.85;}
+  .search-cluster{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .search{position:relative;}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:#9AA0A6;}
+  .search input{border:1px solid var(--field-bd);background:#fff;border-radius:9px;padding:10px 14px 10px 34px;font-family:var(--font);font-size:13px;width:185px;color:var(--text);}
+  .search input::placeholder{color:#9AA0A6;}
+  .search input:focus{outline:none;border-color:var(--red);}
+  .add-btn{background:var(--red);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-family:var(--font);font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;}
+  .add-btn:hover{background:var(--red-dark);}
+  .add-btn .plus{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;font-weight:400;}
+
+  /* ---------- Register table ---------- */
+  .reg-wrap{padding:0 22px 30px;}
+  .reg-head,.reg-row{display:grid;grid-template-columns:11% 14% 16% 12% 9.5% 9.5% 9.5% 9.5% 6% 3.5%;align-items:center;}
+  .reg-head{background:var(--header-row);border-radius:8px 8px 0 0;padding:14px 8px;}
+  .reg-head .col{font-size:11px;font-weight:700;letter-spacing:.6px;color:#7A7F84;text-transform:uppercase;padding:0 10px;}
+  .reg-head .col.num{text-align:right;}
+  .reg-body{background:#fff;border-radius:0 0 10px 10px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;}
+  .reg-row{padding:16px 8px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .1s;}
+  .reg-row:last-child{border-bottom:none;}
+  .reg-row:hover{background:#FAFBFC;}
+  .reg-row.over{background:var(--red-tint);}
+  .reg-row.over:hover{background:#F8E0E0;}
+  .reg-row .cell{padding:0 10px;font-size:13px;overflow:hidden;}
+  .reg-row .cell.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .sc-num{color:var(--red);font-weight:700;font-size:13.5px;}
+  .sc-po{color:#9097A8;font-size:11px;margin-top:3px;}
+  .vendor{font-weight:600;color:#23262B;}
+  .scope{color:#5A6066;font-size:12.5px;line-height:1.35;}
+  .bundle-tag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;color:#7A7F84;background:#F0F1F2;border-radius:4px;padding:2px 6px;letter-spacing:.4px;}
+  .ca{display:flex;align-items:center;gap:9px;}
+  .avatar{width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
+  .ca-name{font-size:12.5px;color:#33373C;font-weight:600;}
+  .money{font-weight:600;color:#23262B;}
+  .money.neg{color:var(--red);}
+  .money.muted{color:#9097A8;font-weight:500;}
+  .eac{font-weight:700;color:#000;}
+  .status-pill{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;padding:6px 11px;border-radius:20px;white-space:nowrap;}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .st-active{background:var(--green-bg);color:#1E7A43;}.st-active .dot{background:var(--green);}
+  .st-closed{background:var(--gray-bg);color:#6C7176;}.st-closed .dot{background:var(--gray-dot);}
+  .st-over{background:var(--red-tint);color:#B11329;}.st-over .dot{background:var(--red);}
+  .arrow{color:#C2C7CC;display:flex;justify-content:flex-end;}
+  .arrow svg{width:17px;height:17px;}
+  .flag-bar{font-size:11px;font-weight:700;padding:4px 18px;color:#B11329;background:#F8DDDD;display:flex;align-items:center;gap:7px;}
+  .flag-bar.amber{color:#9A7400;background:#F7EFCF;}
+
+  /* ---------- Detail view ---------- */
+  .detail{display:none;flex-direction:column;}
+  .detail.show{display:flex;}
+  .register-view.hide{display:none;}
+
+  .status-strip{display:flex;align-items:stretch;justify-content:space-between;padding:14px 22px 4px;gap:18px;flex-wrap:wrap;}
+  .cur-status{display:flex;align-items:center;gap:14px;}
+  .cur-status .ring{width:48px;height:48px;border-radius:50%;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;color:var(--green);flex:none;}
+  .cur-status .ring svg{width:24px;height:24px;}
+  .cur-status .eyebrow{font-size:10px;letter-spacing:1.2px;font-weight:700;color:#9097A8;}
+  .cur-status .big{font-size:20px;font-weight:700;margin-top:1px;}
+  .metric-cards{display:flex;gap:12px;flex-wrap:wrap;}
+  .mcard{background:#fff;border:1px solid var(--border);border-radius:10px;padding:11px 16px;display:flex;align-items:center;gap:12px;min-width:150px;}
+  .mcard .mi{width:34px;height:34px;border-radius:8px;background:#F4F5F6;display:flex;align-items:center;justify-content:center;color:#8A9099;flex:none;}
+  .mcard .mi svg{width:18px;height:18px;}
+  .mcard .ml{font-size:9.5px;letter-spacing:.7px;font-weight:700;color:#9097A8;}
+  .mcard .mv{font-size:15.5px;font-weight:700;margin-top:2px;}
+  .mcard.accent .mv{color:var(--red);}
+
+  .detail-body{display:grid;grid-template-columns:340px 1fr;gap:16px;padding:14px 22px 30px;align-items:start;}
+  @media(max-width:1100px){.detail-body{grid-template-columns:1fr;}}
+
+  .panel{background:#fff;border-radius:11px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden;}
+  .panel-head{background:var(--red);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700;letter-spacing:.3px;}
+  .panel-head .ph-ico{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;}
+  .panel-head .ph-ico svg{width:14px;height:14px;}
+  .panel-head .prereq{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.5px;}
+  .panel-head .chk{width:18px;height:18px;border-radius:4px;background:var(--green);display:flex;align-items:center;justify-content:center;}
+  .panel-body{padding:16px;}
+  .fld{margin-bottom:13px;}
+  .fld:last-child{margin-bottom:0;}
+  .fld label{display:block;font-size:12px;font-weight:600;color:#3C4147;margin-bottom:5px;}
+  .chip{background:var(--field);border:1px solid var(--field-bd);border-radius:7px;padding:9px 11px;font-size:12.5px;color:#23262B;min-height:36px;display:flex;align-items:center;}
+  .chip.sel{justify-content:space-between;}
+  .chip.sel .cv{color:#23262B;}
+  .chip .chev{color:#7A7F84;}
+  .fld-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  .subhead{background:var(--red);color:#fff;padding:11px 16px;display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;letter-spacing:.4px;margin-top:0;}
+  .subhead .ph-ico{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;}
+  .subhead .ph-ico svg{width:13px;height:13px;}
+
+  /* right side register */
+  .reg-panel{background:#fff;border-radius:11px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:0;overflow:hidden;}
+  .reg-panel-top{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);}
+  .reg-panel-top .title{font-size:14px;font-weight:700;}
+  .reg-panel-top .actions{display:flex;gap:10px;}
+  .btn-ghost{border:1px solid var(--red);color:var(--red);background:#fff;border-radius:7px;padding:8px 14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;}
+  .btn-ghost:hover{background:var(--red-tint);}
+  .btn-solid{border:none;background:var(--red);color:#fff;border-radius:7px;padding:8px 14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .btn-solid:hover{background:var(--red-dark);}
+
+  .co-head,.co-row{display:grid;grid-template-columns:9% 9% 26% 12% 12% 13% 13% 6%;align-items:center;}
+  .co-head{background:#F6F7F8;padding:11px 16px;}
+  .co-head .c{font-size:10px;font-weight:700;letter-spacing:.5px;color:#8A9099;text-transform:uppercase;}
+  .co-head .c.num{text-align:right;}
+  .co-row{padding:13px 16px;border-bottom:1px solid var(--line);}
+  .co-row:hover{background:#FAFBFC;}
+  .co-row .c{font-size:12px;padding-right:6px;}
+  .co-row .c.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
+  .co-ref{font-weight:700;color:#33373C;}
+  .co-desc{color:#5A6066;line-height:1.3;}
+  .type-tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;letter-spacing:.3px;}
+  .type-co{background:var(--blue-bg);color:#255D96;}
+  .type-claim{background:#F3E8F5;color:#8A3A9E;}
+  .reason-tag{display:inline-block;font-size:10.5px;font-weight:600;color:#5A6066;background:#F1F2F3;border-radius:5px;padding:3px 8px;}
+  .st-ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .st-ico svg{width:13px;height:13px;}
+  .ico-appr{background:var(--green-bg);color:var(--green);}
+  .ico-pend{background:var(--amber-bg);color:var(--amber);}
+  .ico-rej{background:var(--red-tint);color:var(--red);}
+  .ico-pot{background:var(--blue-bg);color:var(--blue);}
+
+  /* roll-up grids */
+  .rollups{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px 18px;}
+  @media(max-width:760px){.rollups{grid-template-columns:1fr;}}
+  .rollup{border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+  .rollup h4{font-size:11px;letter-spacing:.6px;font-weight:700;color:#7A7F84;text-transform:uppercase;background:#F6F7F8;padding:9px 13px;}
+  .rollup .rline{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-top:1px solid var(--line);font-size:12px;}
+  .rollup .rline .lab{display:flex;align-items:center;gap:8px;color:#4A4F55;}
+  .rollup .rline .val{font-weight:700;font-variant-numeric:tabular-nums;}
+  .rollup .rline .ct{font-size:10px;color:#9097A8;font-weight:700;margin-left:6px;}
+  .rollup .rline.tot{background:#FBFBFC;}
+  .rollup .rline.tot .lab{font-weight:700;color:#23262B;}
+
+  .invoice-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line);}
+  @media(max-width:760px){.invoice-strip{grid-template-columns:1fr 1fr;}}
+  .inv{padding:14px 18px;border-right:1px solid var(--line);}
+  .inv:last-child{border-right:none;}
+  .inv .il{font-size:10px;letter-spacing:.6px;font-weight:700;color:#9097A8;}
+  .inv .iv{font-size:16px;font-weight:700;margin-top:4px;}
+  .progress-track{height:7px;border-radius:4px;background:#ECEEEF;margin-top:9px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--green);border-radius:4px;}
+
+  .detail-footer{display:flex;justify-content:flex-end;gap:12px;padding:14px 22px 26px;}
+  .btn-cancel{border:1px solid var(--red);color:var(--red);background:#fff;border-radius:9px;padding:11px 26px;font-family:var(--font);font-size:13.5px;font-weight:700;cursor:pointer;}
+  .btn-save{border:none;background:var(--red);color:#fff;border-radius:9px;padding:11px 26px;font-family:var(--font);font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:9px;}
+  .btn-save:hover{background:var(--red-dark);}
+
+  /* toast / modal stub */
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:#23262B;color:#fff;padding:13px 22px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .empty{padding:60px 20px;text-align:center;color:#9097A8;font-size:13px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ REGISTER (LIST) VIEW ============ -->
+  <div class="register-view" id="registerView">
+    <div class="topbar">
+      <div class="proj">
+        <div class="proj-text">
+          <div class="eyebrow">CURRENT PROJECT</div>
+          <div class="name">Darlington New Nuclear Project (DNNP) <span class="chev">&#9662;</span></div>
+        </div>
+      </div>
+      <div class="tools">
+        <div class="tool-ico tool-xls" title="Export to Excel">XLS</div>
+        <div class="tool-ico tool-gear" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filters" id="filters">
+        <button class="active" data-f="all">All <span class="ct" id="ct-all"></span></button>
+        <button data-f="active">Active <span class="ct" id="ct-active"></span></button>
+        <button data-f="over">Over Budget <span class="ct" id="ct-over"></span></button>
+        <button data-f="closed">Closed-out <span class="ct" id="ct-closed"></span></button>
+      </div>
+      <div class="search-cluster">
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="searchCA" placeholder="Resp. CA"></div>
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="searchVendor" placeholder="Vendor"></div>
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="searchSub" placeholder="Subcontract #"></div>
+        <button class="add-btn" onclick="toast('New subcontract — opens the post-award intake form')"><span class="plus">+</span> Add Subcontract</button>
+      </div>
+    </div>
+
+    <div class="reg-wrap">
+      <div class="reg-head">
+        <div class="col">Subcontract</div>
+        <div class="col">Vendor</div>
+        <div class="col">Scope</div>
+        <div class="col">Resp. CA</div>
+        <div class="col num">Original</div>
+        <div class="col num">Change Orders</div>
+        <div class="col num">Current Value</div>
+        <div class="col num">EAC</div>
+        <div class="col">Status</div>
+        <div class="col"></div>
+      </div>
+      <div class="reg-body" id="regBody"></div>
+    </div>
+  </div>
+
+  <!-- ============ DETAIL VIEW ============ -->
+  <div class="detail" id="detailView">
+    <div class="topbar">
+      <div class="proj">
+        <div class="back-btn" onclick="showRegister()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="proj-text">
+          <div class="eyebrow">CURRENT PROJECT</div>
+          <div class="name">Darlington New Nuclear Project (DNNP) <span class="chev">&#9662;</span></div>
+        </div>
+      </div>
+      <div class="tools">
+        <div class="tool-ico tool-xls" title="Export to Excel">XLS</div>
+        <div class="tool-ico tool-gear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+      </div>
+    </div>
+
+    <div class="status-strip">
+      <div class="cur-status">
+        <div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div>
+          <div class="eyebrow">SUBCONTRACT STATUS</div>
+          <div class="big" id="d-status">Active</div>
+        </div>
+      </div>
+      <div class="metric-cards" id="d-metrics"></div>
+    </div>
+
+    <div class="detail-body">
+      <!-- LEFT: subcontract basics -->
+      <div>
+        <div class="panel">
+          <div class="panel-head">
+            <span class="ph-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>
+            SUBCONTRACT BASICS
+            <span class="prereq"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span> ACTIVE</span>
+          </div>
+          <div class="panel-body">
+            <div class="fld-row">
+              <div class="fld"><label>Subcontract&nbsp;#</label><div class="chip" id="d-sub"></div></div>
+              <div class="fld"><label>PO&nbsp;#</label><div class="chip" id="d-po"></div></div>
+            </div>
+            <div class="fld"><label>Vendor</label><div class="chip" id="d-vendor"></div></div>
+            <div class="fld"><label>Scope</label><div class="chip" id="d-scope"></div></div>
+            <div class="fld-row">
+              <div class="fld"><label>Bundle</label><div class="chip sel"><span class="cv" id="d-bundle"></span><span class="chev">&#9662;</span></div></div>
+              <div class="fld"><label>Contract Type</label><div class="chip sel"><span class="cv">Subcontract</span><span class="chev">&#9662;</span></div></div>
+            </div>
+            <div class="fld-row">
+              <div class="fld"><label>Start Date</label><div class="chip" id="d-start"></div></div>
+              <div class="fld"><label>Completion</label><div class="chip" id="d-end"></div></div>
+            </div>
+          </div>
+          <div class="subhead">
+            <span class="ph-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="18" cy="9" r="2.2"/></svg></span>
+            PEOPLE &amp; CLOSE-OUT
+          </div>
+          <div class="panel-body">
+            <div class="fld"><label>Responsible CA</label><div class="chip sel" id="d-ca"></div></div>
+            <div class="fld"><label>Backup CA</label><div class="chip sel"><span class="cv" id="d-backup">—</span><span class="chev">&#9662;</span></div></div>
+            <div class="fld-row">
+              <div class="fld"><label>Currently Active</label><div class="chip sel"><span class="cv" id="d-active"></span><span class="chev">&#9662;</span></div></div>
+              <div class="fld"><label>Holdback (HB)</label><div class="chip sel"><span class="cv">Applicable</span><span class="chev">&#9662;</span></div></div>
+            </div>
+            <div class="fld"><label>Close-out Status</label><div class="chip sel"><span class="cv" id="d-closeout">Only Close-out to be processed</span><span class="chev">&#9662;</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: change register -->
+      <div class="reg-panel">
+        <div class="reg-panel-top">
+          <div class="title">Change Register</div>
+          <div class="actions">
+            <button class="btn-ghost" onclick="toast('Recalculates contract value, future liability &amp; EAC from all line items')">Recalculate</button>
+            <button class="btn-solid" onclick="toast('Add change — choose Change Order, Claim, or Change Directive')"><span style="font-size:15px;line-height:1">+</span> Add Change</button>
+          </div>
+        </div>
+        <div class="co-head">
+          <div class="c">Ref&nbsp;#</div>
+          <div class="c">Date</div>
+          <div class="c">Description</div>
+          <div class="c">Type</div>
+          <div class="c">Reason</div>
+          <div class="c num">Value</div>
+          <div class="c">Status</div>
+          <div class="c num">Aecon&nbsp;Ref</div>
+        </div>
+        <div id="d-corows"></div>
+
+        <div class="rollups">
+          <div class="rollup">
+            <h4>Change Orders — by Status</h4>
+            <div class="rline"><span class="lab"><span class="st-ico ico-appr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>Approved <span class="ct" id="rs-appr-ct"></span></span><span class="val" id="rs-appr"></span></div>
+            <div class="rline"><span class="lab"><span class="st-ico ico-pend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="9"/></svg></span>Pending — Under Review <span class="ct" id="rs-pend-ct"></span></span><span class="val" id="rs-pend"></span></div>
+            <div class="rline"><span class="lab"><span class="st-ico ico-pot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="9"/></svg></span>Potential — Anticipated <span class="ct" id="rs-pot-ct"></span></span><span class="val" id="rs-pot"></span></div>
+            <div class="rline"><span class="lab"><span class="st-ico ico-rej"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg></span>Rejected <span class="ct" id="rs-rej-ct"></span></span><span class="val" id="rs-rej"></span></div>
+            <div class="rline tot"><span class="lab">Approved to date</span><span class="val" id="rs-tot"></span></div>
+          </div>
+          <div class="rollup">
+            <h4>Approved value — by Reason</h4>
+            <div class="rline"><span class="lab">Design Change</span><span class="val" id="rr-design"></span></div>
+            <div class="rline"><span class="lab">Scope Gap</span><span class="val" id="rr-scope"></span></div>
+            <div class="rline"><span class="lab">Variation</span><span class="val" id="rr-var"></span></div>
+            <div class="rline"><span class="lab">Acceleration</span><span class="val" id="rr-accel"></span></div>
+            <div class="rline tot"><span class="lab">Total approved</span><span class="val" id="rr-tot"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-footer">
+      <button class="btn-cancel" onclick="showRegister()">Cancel</button>
+      <button class="btn-save" onclick="toast('Changes saved to the subcontract register')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Save Changes</button>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- avatar palette ---------- */
+const palette={"Dhruv J.":"#3B6EA5","Isabelle B.":"#B14A8A","Mo Dehghan":"#2E9E5B","Mohamad Salih":"#C8102E","Thiago A.":"#D69A00","Teri B.":"#6C7176","Dean":"#7A5BA5"};
+function initials(n){return n.split(/\s+/).map(p=>p[0]).join("").slice(0,2).toUpperCase();}
+function avatarHTML(name){const c=palette[name]||"#6C7176";return `<span class="avatar" style="background:${c}">${initials(name)}</span>`;}
+const fmt=n=>{const neg=n<0;const v=Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:0});return (neg?"-$":"$")+v;};
+const fmtFull=n=>{const neg=n<0;const v=Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});return (neg?"-$":"$")+v;};
+
+/* ---------- data drawn from the DNNP workbook ---------- */
+const subs=[
+  {sub:"DNNP-A01760-23",po:"4700122956",vendor:"Mansteel Rebar Limited",scope:"Reinforcing Steel — Fab Shop & Warehouse",bundle:"BOP",ca:"Dhruv J.",active:"Yes",closeout:"Only Close-out to be processed",
+   orig:454852,start:"Mar 01, 2024",end:"Dec 31, 2025",invoiced:1783757.15,
+   changes:[
+     {ref:"SCO 01",date:"Apr 12, 2024",val:80218,type:"CO",status:"Approved",reason:"Design Change",aecon:"001",desc:"Rebars for Forebay & Outfall shafts"},
+     {ref:"SCO 02",date:"Jun 27, 2024",val:330500,type:"CO",status:"Approved",reason:"Design Change",aecon:"002",desc:"Rebars to Pre-Assembly Building"},
+     {ref:"SCO 03",date:"Aug 12, 2024",val:14720,type:"CO",status:"Approved",reason:"Design Change",aecon:"003",desc:"Rebars to Western Muck Bin structures"},
+     {ref:"SCO 04",date:"Aug 12, 2024",val:36000,type:"CO",status:"Approved",reason:"Design Change",aecon:"004",desc:"Rebars to Outfall Tower Crane foundation"},
+     {ref:"SCO 05",date:"Nov 01, 2024",val:57500,type:"CO",status:"Approved",reason:"Design Change",aecon:"005",desc:"Rebars for Reactor Building"},
+     {ref:"SCO 06",date:"Feb 21, 2025",val:81400,type:"CO",status:"Approved",reason:"Design Change",aecon:"006",desc:"Rebars for Reactor Building (R2)"},
+     {ref:"SCO 07",date:"Mar 20, 2025",val:7375.92,type:"CO",status:"Approved",reason:"Design Change",aecon:"007",desc:"Warehouse rebar design change"},
+     {ref:"SCO 08",date:"Mar 20, 2025",val:85700,type:"CO",status:"Approved",reason:"Design Change",aecon:"008",desc:"Pre-Assembly Building revision"},
+     {ref:"MR115203-AP",date:"Jun 13, 2025",val:77705,type:"CO",status:"Approved",reason:"Design Change",aecon:"009",desc:"Reactor Shaft Ring Beam R3"},
+     {ref:"Various",date:"Jun 23, 2025",val:807939.73,type:"CO",status:"Approved",reason:"Variation",aecon:"010",desc:"Additional scope — various locations"},
+     {ref:"Various",date:"Apr 20, 2026",val:161510.6,type:"CO",status:"Pending",reason:"Variation",aecon:"011",desc:"PAAB Security Building rebar"},
+     {ref:"Various",date:"Apr 20, 2026",val:480000,type:"CO",status:"Pending",reason:"Variation",aecon:"012",desc:"Miscellaneous additional work"}
+   ]},
+  {sub:"DNNP-A01760-31a",po:"4700120318",vendor:"Voyageur Services Ltd.",scope:"Site Services",bundle:"CI",ca:"Isabelle B.",active:"Yes",closeout:"HB applicable / to be processed",
+   orig:3719800,start:"Jan 29, 2024",end:"Dec 31, 2026",invoiced:12242968.02,
+   changes:[{ref:"Multiple",date:"2024–2025",val:8892590.19,type:"CO",status:"Approved",reason:"Variation",aecon:"Various",desc:"Approved site-services change orders (rolled)"}]},
+  {sub:"DNNP-A01760-35",po:"4300006363",vendor:"CSI",scope:"PCTL",bundle:"BOP",ca:"Isabelle B.",active:"Yes",closeout:"HB applicable / to be processed",
+   orig:19899738.66,start:"Jan 29, 2024",end:"Aug 31, 2026",invoiced:10651731.96,
+   changes:[{ref:"CO-01",date:"2024",val:136897.75,type:"CO",status:"Approved",reason:"Scope Gap",aecon:"001",desc:"PCTL scope adjustment"}]},
+  {sub:"DNNP-A01760-13",po:"4700134315",vendor:"Gillam Construction Group Ltd",scope:"Administration Building Construction",bundle:"BOP",ca:"Mohamad Salih",active:"Yes",closeout:"Substantial completion / close-out pending",
+   orig:38177467.59,start:"Dec 24, 2024",end:"Oct 31, 2026",invoiced:11434009.13,
+   changes:[
+     {ref:"CO-01",date:"2025",val:746994.9,type:"CO",status:"Approved",reason:"Design Change",aecon:"001",desc:"Admin building design changes (rolled)"},
+     {ref:"CO-02",date:"2025",val:249970.79,type:"CO",status:"Pending",reason:"Scope Gap",aecon:"002",desc:"Communications duct bank & microduct works"}
+   ]},
+  {sub:"DNNP-A01760-36",po:"4700140377",vendor:"FDDF Drilling and Blasting",scope:"Drill and Blast",bundle:"NI / BOP",ca:"Dhruv J.",active:"Yes",closeout:"In progress",
+   orig:13512829.14,start:"May 14, 2025",end:"Dec 01, 2026",invoiced:9051844.03,
+   changes:[
+     {ref:"CO group",date:"2025",val:4079948.43,type:"CO",status:"Approved",reason:"Variation",aecon:"Various",desc:"Approved drill & blast changes (rolled)"},
+     {ref:"CO pend",date:"2026",val:1635306.52,type:"CO",status:"Pending",reason:"Variation",aecon:"Various",desc:"Pending drill & blast changes (rolled)"},
+     {ref:"CL-01",date:"2026",val:4759.97,type:"Claim",status:"Potential",reason:"Acceleration",aecon:"—",desc:"Anticipated acceleration claim"}
+   ]},
+  {sub:"DNNP-A01760-08",po:"4700114780",vendor:"E.S. Fox Limited",scope:"SUE Investigation",bundle:"BOP",ca:"Isabelle B.",active:"No",closeout:"HB not applicable / only close-out",
+   orig:115586.1,start:"Sep 18, 2023",end:"Dec 31, 2025",invoiced:2167248.15,
+   changes:[{ref:"CO group",date:"2024–2025",val:2763372.79,type:"CO",status:"Approved",reason:"Scope Gap",aecon:"Various",desc:"Additional SUE investigation scope (rolled)"}]},
+  {sub:"DNNP-A01760-18",po:"4700123964",vendor:"PDI Solutions Inc",scope:"Overhead Crane for Fabrication Building",bundle:"BOP",ca:"Thiago A.",active:"Yes",closeout:"Substantial completion / close-out pending",
+   orig:1694705.93,start:"Jan 05, 2024",end:"Dec 30, 2025",invoiced:1570681.2,
+   changes:[
+     {ref:"—",date:"May 24, 2025",val:60945,type:"CO",status:"Approved",reason:"Design Change",aecon:"—",desc:"Supply & install overhead crane tie-backs"},
+     {ref:"—",date:"Aug 08, 2024",val:-253226.71,type:"CO",status:"Approved",reason:"Design Change",aecon:"—",desc:"Crane capacity change 50T → 20T (credit)"},
+     {ref:"—",date:"Jul 03, 2025",val:82768.09,type:"Claim",status:"Rejected",reason:"Acceleration",aecon:"—",desc:"Costs associated with site shutdown"},
+     {ref:"CO#03",date:"Nov 26, 2025",val:64723.79,type:"CO",status:"Approved",reason:"Design Change",aecon:"303",desc:"Crane adder + additional hours"}
+   ]},
+  {sub:"DNNP-A01760-15",po:"4700124493",vendor:"Norseman Structures Limited",scope:"Fabric Structure — Manufacture, Supply & Install",bundle:"BOP",ca:"Mo Dehghan",active:"Yes",closeout:"HB not applicable / only close-out",
+   orig:1735307,start:"Apr 29, 2024",end:"Jul 31, 2025",invoiced:2600227.14,
+   changes:[
+     {ref:"CO-01",date:"2024",val:109903,type:"CO",status:"Approved",reason:"Scope Gap",aecon:"001",desc:"Two fabric warehouse structures — added"},
+     {ref:"CO-02",date:"2025",val:-275199,type:"CO",status:"Pending",reason:"Variation",aecon:"002",desc:"Scope reduction (credit, pending)"}
+   ]},
+  {sub:"DNNP-A01760-14",po:"4700125620",vendor:"Canam",scope:"Pre-Engineered Building Envelopes",bundle:"BOP",ca:"Dhruv J.",active:"No",closeout:"Substantial completion / full HB to process",
+   orig:6394000,start:"Feb 05, 2024",end:"Dec 31, 2025",invoiced:3940605.98,
+   changes:[{ref:"CO group",date:"2024–2025",val:-2507039,type:"CO",status:"Approved",reason:"Variation",aecon:"Various",desc:"Net scope reduction (credit, rolled)"}]},
+  {sub:"DNNP-A01760-02",po:"4700110084",vendor:"Dean Construction Company",scope:"Consulting Agreement — Marine Works",bundle:"BOP",ca:"Dean",active:"No",closeout:"Closed",
+   orig:76325,start:"May 25, 2023",end:"Dec 30, 2026",invoiced:452808.06,
+   changes:[
+     {ref:"001",date:"Jun 15, 2023",val:78575.25,type:"CO",status:"Approved",reason:"Scope Gap",aecon:"001",desc:"CO-01 Phase 2 Marine Works — design assist"},
+     {ref:"002",date:"Dec 11, 2023",val:284750,type:"CO",status:"Approved",reason:"Scope Gap",aecon:"002",desc:"CO-02 Phase 3 Marine Works — construction"},
+     {ref:"003",date:"Sep 04, 2025",val:54395,type:"CO",status:"Approved",reason:"Scope Gap",aecon:"003",desc:"CO-03 Phase 3 off-shore geotech investigation"}
+   ]},
+  {sub:"DNNP-A01760-12",po:"4200017380",vendor:"HEM Innovative Solutions",scope:"Access Control Cameras",bundle:"BOP",ca:"Isabelle B.",active:"Yes",closeout:"In progress",
+   orig:91200,start:"Jan 01, 2025",end:"Dec 31, 2026",invoiced:389437.66,
+   changes:[
+     {ref:"CO group",date:"2025",val:370855.69,type:"CO",status:"Approved",reason:"Scope Gap",aecon:"Various",desc:"Additional access-control scope (rolled)"},
+     {ref:"CO pend",date:"2025",val:64200,type:"CO",status:"Pending",reason:"Scope Gap",aecon:"Various",desc:"Pending camera additions"}
+   ]}
+];
+
+/* ---------- derive roll-ups ---------- */
+function roll(s){
+  const r={appr:0,apprCt:0,pend:0,pendCt:0,pot:0,potCt:0,rej:0,rejCt:0,design:0,scope:0,var:0,accel:0};
+  s.changes.forEach(c=>{
+    if(c.status==="Approved"){r.appr+=c.val;r.apprCt++;
+      if(c.reason==="Design Change")r.design+=c.val;
+      else if(c.reason==="Scope Gap")r.scope+=c.val;
+      else if(c.reason==="Variation")r.var+=c.val;
+      else if(c.reason==="Acceleration")r.accel+=c.val;}
+    else if(c.status==="Pending"){r.pend+=c.val;r.pendCt++;}
+    else if(c.status==="Potential"){r.pot+=c.val;r.potCt++;}
+    else if(c.status==="Rejected"){r.rej+=c.val;r.rejCt++;}
+  });
+  s.apprCO=r.appr;
+  s.current=s.orig+r.appr;
+  s.futureLiab=r.pend+r.pot;
+  s.eac=s.current+s.futureLiab;
+  s.progress=s.current>0?s.invoiced/s.current:0;
+  s.over=s.invoiced>s.current; // exceeds current contract value
+  s.roll=r;
+  return s;
+}
+subs.forEach(roll);
+
+/* ---------- render register list ---------- */
+let curFilter="all";
+function statusPill(s){
+  if(s.active==="No"||s.closeout==="Closed") return `<span class="status-pill st-closed"><span class="dot"></span>${s.changes.length} chg · Closed</span>`;
+  if(s.over) return `<span class="status-pill st-over"><span class="dot"></span>${s.changes.length} chg · Over</span>`;
+  return `<span class="status-pill st-active"><span class="dot"></span>${s.changes.length} chg · Active</span>`;
+}
+function passFilter(s){
+  if(curFilter==="active") return !(s.active==="No"||s.closeout==="Closed");
+  if(curFilter==="over") return s.over;
+  if(curFilter==="closed") return s.active==="No"||s.closeout==="Closed";
+  return true;
+}
+function passSearch(s){
+  const ca=document.getElementById("searchCA").value.toLowerCase();
+  const v=document.getElementById("searchVendor").value.toLowerCase();
+  const n=document.getElementById("searchSub").value.toLowerCase();
+  return s.ca.toLowerCase().includes(ca)&&s.vendor.toLowerCase().includes(v)&&s.sub.toLowerCase().includes(n);
+}
+function renderRegister(){
+  const body=document.getElementById("regBody");
+  const list=subs.filter(s=>passFilter(s)&&passSearch(s));
+  if(!list.length){body.innerHTML='<div class="empty">No subcontracts match these filters.</div>';}
+  else body.innerHTML=list.map(s=>{
+    return `<div class="reg-row ${s.over?'over':''}" onclick="openDetail('${s.sub}')">
+      <div class="cell"><div class="sc-num">${s.sub}</div><div class="sc-po">PO ${s.po}</div></div>
+      <div class="cell"><div class="vendor">${s.vendor}</div></div>
+      <div class="cell"><div class="scope">${s.scope}</div><span class="bundle-tag">${s.bundle}</span></div>
+      <div class="cell"><div class="ca">${avatarHTML(s.ca)}<span class="ca-name">${s.ca}</span></div></div>
+      <div class="cell num"><span class="money muted">${fmt(s.orig)}</span></div>
+      <div class="cell num"><span class="money ${s.apprCO<0?'neg':''}">${s.apprCO?(s.apprCO>0?'+':'')+fmt(s.apprCO):'—'}</span></div>
+      <div class="cell num"><span class="money">${fmt(s.current)}</span></div>
+      <div class="cell num"><span class="eac">${fmt(s.eac)}</span></div>
+      <div class="cell">${statusPill(s)}</div>
+      <div class="cell arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>`;}).join("");
+
+  // counts
+  document.getElementById("ct-all").textContent=subs.length;
+  document.getElementById("ct-active").textContent=subs.filter(s=>!(s.active==="No"||s.closeout==="Closed")).length;
+  document.getElementById("ct-over").textContent=subs.filter(s=>s.over).length;
+  document.getElementById("ct-closed").textContent=subs.filter(s=>s.active==="No"||s.closeout==="Closed").length;
+}
+
+/* ---------- detail ---------- */
+function statusIco(st){
+  if(st==="Approved")return `<span class="st-ico ico-appr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>`;
+  if(st==="Pending")return `<span class="st-ico ico-pend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="9"/></svg></span>`;
+  if(st==="Potential")return `<span class="st-ico ico-pot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="9"/></svg></span>`;
+  return `<span class="st-ico ico-rej"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg></span>`;
+}
+function openDetail(subId){
+  const s=subs.find(x=>x.sub===subId);if(!s)return;
+  document.getElementById("d-sub").textContent=s.sub;
+  document.getElementById("d-po").textContent=s.po;
+  document.getElementById("d-vendor").textContent=s.vendor;
+  document.getElementById("d-scope").textContent=s.scope;
+  document.getElementById("d-bundle").textContent=s.bundle;
+  document.getElementById("d-start").textContent=s.start;
+  document.getElementById("d-end").textContent=s.end;
+  document.getElementById("d-ca").innerHTML=`<span class="cv" style="display:flex;align-items:center;gap:8px">${avatarHTML(s.ca)}${s.ca}</span><span class="chev">&#9662;</span>`;
+  document.getElementById("d-active").textContent=s.active;
+  document.getElementById("d-closeout").textContent=s.closeout;
+  document.getElementById("d-status").textContent = s.over?"Over Budget":(s.active==="No"?"Closed-out":"Active");
+
+  // metrics
+  document.getElementById("d-metrics").innerHTML=`
+    ${mcard("ORIGINAL CONTRACT",fmt(s.orig),"doc")}
+    ${mcard("CURRENT VALUE",fmt(s.current),"dollar")}
+    ${mcard("FUTURE LIABILITY",s.futureLiab?fmt(s.futureLiab):"$0","clock")}
+    ${mcard("EAC",fmt(s.eac),"flag",true)}
+    ${mcard("INVOICED TO DATE",fmt(s.invoiced),"receipt")}`;
+
+  // change rows
+  document.getElementById("d-corows").innerHTML=s.changes.map(c=>`
+    <div class="co-row">
+      <div class="c co-ref">${c.ref}</div>
+      <div class="c" style="color:#6C7176">${c.date}</div>
+      <div class="c co-desc">${c.desc}</div>
+      <div class="c"><span class="type-tag ${c.type==="Claim"?'type-claim':'type-co'}">${c.type==="Claim"?'Claim':'Change Order'}</span></div>
+      <div class="c"><span class="reason-tag">${c.reason}</span></div>
+      <div class="c num ${c.val<0?'':''}" style="${c.val<0?'color:#C8102E':''}">${fmtFull(c.val)}</div>
+      <div class="c">${statusIco(c.status)}</div>
+      <div class="c num" style="color:#6C7176">${c.aecon}</div>
+    </div>`).join("");
+
+  const r=s.roll;
+  set("rs-appr",fmtFull(r.appr));set("rs-appr-ct","("+r.apprCt+")");
+  set("rs-pend",fmtFull(r.pend));set("rs-pend-ct","("+r.pendCt+")");
+  set("rs-pot",fmtFull(r.pot));set("rs-pot-ct","("+r.potCt+")");
+  set("rs-rej",fmtFull(r.rej));set("rs-rej-ct","("+r.rejCt+")");
+  set("rs-tot",fmtFull(r.appr));
+  set("rr-design",fmtFull(r.design));set("rr-scope",fmtFull(r.scope));
+  set("rr-var",fmtFull(r.var));set("rr-accel",fmtFull(r.accel));
+  set("rr-tot",fmtFull(r.design+r.scope+r.var+r.accel));
+
+  document.getElementById("registerView").classList.add("hide");
+  document.getElementById("detailView").classList.add("show");
+  window.scrollTo(0,0);
+}
+function mcard(label,val,ico,accent){
+  const icons={doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+    dollar:'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    flag:'<path d="M4 22V4M4 4h13l-2 4 2 4H4"/>',
+    receipt:'<path d="M5 2v20l2-1.5L9 22l2-1.5L13 22l2-1.5L17 22l2-1.5V2l-2 1.5L15 2l-2 1.5L11 2 9 3.5 7 2z"/><path d="M8 8h8M8 12h8"/>'};
+  return `<div class="mcard ${accent?'accent':''}"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons[ico]}</svg></span><div><div class="ml">${label}</div><div class="mv">${val}</div></div></div>`;
+}
+function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function showRegister(){
+  document.getElementById("detailView").classList.remove("show");
+  document.getElementById("registerView").classList.remove("hide");
+  window.scrollTo(0,0);
+}
+
+/* ---------- events ---------- */
+document.getElementById("filters").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  document.querySelectorAll("#filters button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");curFilter=b.dataset.f;renderRegister();
+});
+["searchCA","searchVendor","searchSub"].forEach(id=>document.getElementById(id).addEventListener("input",renderRegister));
+
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2600);
+}
+
+renderRegister();
+</script>
+</body>
+</html>

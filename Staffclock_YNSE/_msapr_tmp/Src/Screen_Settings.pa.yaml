@@ -1,0 +1,561 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen_Settings:
+    Properties:
+      Fill: =RGBA(245, 245, 245, 1)
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |-
+        =Set(varSettingsGrantApprover, false);
+        Set(varSettingsGrantAdmin, false);
+        Set(varSettingsSelectedEmail, "");
+        Set(varSettingsSelectedName, "");
+        Set(varSettingsFilter, "");
+        Reset(Dropdown_SettingsEmployee);
+        Reset(txt_ActiveUsersFilter);
+        Reset(chk_ApproverOfAll);
+        Reset(chk_Admin);
+        Refresh('Hours Tracking (Active Users)');
+        Refresh('Hours Tracking (Permissions)');
+        ClearCollect(colActiveUsers, 'Hours Tracking (Active Users)');
+        ClearCollect(colPermissions, 'Hours Tracking (Permissions)');
+    Children:
+      - settings_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(245, 245, 245, 1)
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Vertical
+            Width: =Parent.Width
+          Children:
+            - settings_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =100
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =12
+                  PaddingBottom: =8
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =8
+                  Width: =Parent.Width
+                Children:
+                  - Crewclock_Logo_Settings:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =72
+                        Image: ='App Names'
+                        Width: =180
+                  - Logo_Cropped_Settings:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =64
+                        Image: ='Logo Cropped'
+                        Width: =160
+                  - settings_header_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Height: =1
+                        LayoutMinWidth: =20
+                  - btn_HomeTab_Settings:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =44
+                        OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
+                        Text: ="Home"
+                        Width: =96
+                  - btn_ApproverTab_Settings:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        Height: =44
+                        OnSelect: |-
+                          =If(
+                              varIsApprover,
+                              Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade),
+                              Notify("No timesheets for approval.", NotificationType.Error)
+                          )
+                        Text: ="Approver"
+                        Visible: =varIsApprover
+                        Width: =110
+                  - btn_SettingsGear_Settings:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =44
+                        Icon: =Icon.Settings
+                        OnSelect: |-
+                          =If(
+                              varIsAdmin,
+                              Navigate(Screen_Settings, ScreenTransition.Fade),
+                              Notify("Settings are for admins only", NotificationType.Error)
+                          )
+                        Tooltip: ="Settings"
+                        Visible: =varIsAdmin
+                        Width: =44
+            - settings_rule:
+                Control: Rectangle@2.3.0
+                Properties:
+                  Fill: =RGBA(0, 18, 107, 1)
+                  Height: =4
+                  Width: =Parent.Width
+            - settings_body:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Height: =400
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =16
+                  PaddingBottom: =24
+                  PaddingLeft: =32
+                  PaddingRight: =32
+                  PaddingTop: =20
+                  Width: =Parent.Width
+                Children:
+                  - settings_page_intro:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =36
+                        LayoutDirection: =LayoutDirection.Vertical
+                        Width: =Parent.Width
+                      Children:
+                        - Label_SettingsTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =32
+                              Size: =20
+                              Text: ="People access"
+                              Width: =Parent.Width
+                  - settings_add_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(200, 204, 210, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Height: =148
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        PaddingBottom: =16
+                        PaddingLeft: =20
+                        PaddingRight: =20
+                        PaddingTop: =14
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width
+                      Children:
+                        - Label_AddSection:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              Size: =14
+                              Text: ="Add person"
+                              Width: =Parent.Width
+                        - settings_search_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =40
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              Width: =Parent.Width
+                            Children:
+                              - Dropdown_SettingsEmployee:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    BorderColor: =RGBA(200, 204, 210, 1)
+                                    ChevronBackground: =RGBA(0, 18, 107, 1)
+                                    ChevronFill: =RGBA(255, 255, 255, 1)
+                                    DisplayFields: =["DisplayName"]
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    InputTextPlaceholder: ="Search by name or email"
+                                    Items: |-
+                                      =If(
+                                          !IsBlank(Trim(Self.SearchText)),
+                                          ShowColumns(
+                                              Office365Users.SearchUser(
+                                                  {
+                                                      searchTerm: Trim(Self.SearchText),
+                                                      top: 15
+                                                  }
+                                              ),
+                                              Id,
+                                              DisplayName,
+                                              Mail,
+                                              UserPrincipalName,
+                                              Department
+                                          )
+                                      )
+                                    LayoutMinWidth: =120
+                                    OnChange: |-
+                                      =Set(
+                                          varSettingsSelectedEmail,
+                                          Lower(Coalesce(Self.Selected.Mail, Self.Selected.UserPrincipalName))
+                                      );
+                                      Set(varSettingsSelectedName, Self.Selected.DisplayName);
+                                    SearchFields: =["DisplayName","Mail"]
+                                    SelectMultiple: =false
+                        - Label_SelectedHint:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Open Sans'
+                              Height: =20
+                              Size: =11
+                              Text: =varSettingsSelectedName & "  ·  " & varSettingsSelectedEmail
+                              Visible: =!IsBlank(varSettingsSelectedEmail)
+                              Width: =Parent.Width
+                        - settings_actions_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =40
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =16
+                              Width: =Parent.Width
+                            Children:
+                              - chk_ApproverOfAll:
+                                  Control: CheckBox@0.0.30
+                                  Properties:
+                                    BasePaletteColor: =RGBA(0, 18, 107, 1)
+                                    CheckboxSize: =20
+                                    Checked: =varSettingsGrantApprover || varSettingsGrantAdmin
+                                    Label: ="Approver of all"
+                                    OnCheck: =Set(varSettingsGrantApprover, true)
+                                    OnUncheck: |-
+                                      =If(
+                                          varSettingsGrantAdmin,
+                                          Notify("Admin includes Approver of all", NotificationType.Information),
+                                          Set(varSettingsGrantApprover, false)
+                                      )
+                              - chk_Admin:
+                                  Control: CheckBox@0.0.30
+                                  Properties:
+                                    BasePaletteColor: =RGBA(0, 18, 107, 1)
+                                    CheckboxSize: =20
+                                    Checked: =varSettingsGrantAdmin
+                                    Label: ="Admin"
+                                    OnCheck: |-
+                                      =Set(varSettingsGrantAdmin, true);
+                                      Set(varSettingsGrantApprover, true)
+                                    OnUncheck: =Set(varSettingsGrantAdmin, false)
+                                    Width: =100
+                              - settings_toggle_spacer:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Height: =1
+                                    LayoutMinWidth: =8
+                              - Button_AddUser:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderThickness: =0
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    DisplayMode: =If(varIsSavingSettings || IsBlank(varSettingsSelectedEmail), DisplayMode.Disabled, DisplayMode.Edit)
+                                    Fill: =RGBA(16, 124, 65, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    HoverFill: =ColorFade(RGBA(16, 124, 65, 1), -15%)
+                                    OnSelect: =Select(Button_AddUser_Execute)
+                                    Size: =12
+                                    Text: ="Add to app"
+                                    Width: =120
+                  - settings_review_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(200, 204, 210, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =240
+                        LayoutDirection: =LayoutDirection.Vertical
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width
+                      Children:
+                        - settings_list_header:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =52
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              PaddingLeft: =20
+                              PaddingRight: =16
+                              Width: =Parent.Width
+                            Children:
+                              - Label_ActiveUsersTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    Size: =14
+                                    Text: |-
+                                      ="People with access (" & CountRows(
+                                          Filter(
+                                              colActiveUsers,
+                                              IsBlank(varSettingsFilter) ||
+                                              varSettingsFilter in Lower(Coalesce(Name, "")) ||
+                                              varSettingsFilter in Lower(Coalesce(Title, ""))
+                                          )
+                                      ) & ")"
+                                    Width: =280
+                              - txt_ActiveUsersFilter:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    BorderColor: =RGBA(200, 204, 210, 1)
+                                    Default: =""
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    Height: =36
+                                    HintText: ="Filter by name or email"
+                                    OnChange: =Set(varSettingsFilter, Lower(Trim(Self.Text)))
+                                    Size: =12
+                                    Width: =280
+                              - btn_ReloadActiveUsers:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    BorderThickness: =1
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    HoverFill: =RGBA(235, 240, 250, 1)
+                                    OnSelect: |-
+                                      =Refresh('Hours Tracking (Active Users)');
+                                      Refresh('Hours Tracking (Permissions)');
+                                      ClearCollect(colActiveUsers, 'Hours Tracking (Active Users)');
+                                      ClearCollect(colPermissions, 'Hours Tracking (Permissions)');
+                                    Size: =12
+                                    Text: ="Refresh"
+                                    Width: =90
+                        - settings_col_headers:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(245, 247, 250, 1)
+                              FillPortions: =0
+                              Height: =32
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              PaddingLeft: =20
+                              PaddingRight: =20
+                              Width: =Parent.Width
+                            Children:
+                              - h_AU_Name:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    Size: =11
+                                    Text: ="Name"
+                                    Width: =320
+                              - h_AU_Email:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    Size: =11
+                                    Text: ="Email"
+                                    Width: =320
+                        - Gallery_ActiveUsers:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =200
+                              Items: |-
+                                =SortByColumns(
+                                    Filter(
+                                        colActiveUsers,
+                                        IsBlank(varSettingsFilter) ||
+                                        varSettingsFilter in Lower(Coalesce(Name, "")) ||
+                                        varSettingsFilter in Lower(Coalesce(Title, ""))
+                                    ),
+                                    "Name",
+                                    SortOrder.Ascending
+                                )
+                              TemplateSize: =48
+                              Width: =Parent.Width
+                            Children:
+                              - lbl_AU_Name:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Text: =Coalesce(ThisItem.Name, "-")
+                                    Width: =Parent.TemplateWidth / 2 - 28
+                                    X: =20
+                                    Y: =4
+                              - lbl_AU_Email:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(80, 80, 80, 1)
+                                    Font: =Font.'Open Sans'
+                                    Size: =12
+                                    Text: =ThisItem.Title
+                                    Width: =Parent.TemplateWidth / 2 - 28
+                                    X: =Parent.TemplateWidth / 2
+                                    Y: =4
+                              - row_AU_divider:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    Fill: =RGBA(235, 238, 242, 1)
+                                    Height: =1
+                                    Width: =Parent.TemplateWidth - 40
+                                    X: =20
+                                    Y: =47
+      - Button_AddUser_Execute:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =If(
+                  varIsSavingSettings,
+                  Notify("Please wait...", NotificationType.Warning),
+                  IsBlank(varSettingsSelectedEmail),
+                  Notify("Select a person first", NotificationType.Warning),
+                  Set(varIsSavingSettings, true);
+                  Set(
+                      varSettingsEntraId,
+                      Office365Users.UserProfileV2(varSettingsSelectedEmail).id
+                  );
+                  With(
+                      {
+                          existingAU: LookUp(
+                              colActiveUsers,
+                              Lower(Title) = varSettingsSelectedEmail
+                          )
+                      },
+                      If(
+                          !IsBlank(existingAU),
+                          If(
+                              IsBlank(existingAU.Entra_ID),
+                              Patch(
+                                  'Hours Tracking (Active Users)',
+                                  LookUp('Hours Tracking (Active Users)', ID = existingAU.ID),
+                                  {
+                                      Name: Coalesce(varSettingsSelectedName, existingAU.Name),
+                                      Entra_ID: varSettingsEntraId
+                                  }
+                              );
+                              Notify("User updated", NotificationType.Success),
+                              Notify("Already has access", NotificationType.Information)
+                          ),
+                          Patch(
+                              'Hours Tracking (Active Users)',
+                              Defaults('Hours Tracking (Active Users)'),
+                              {
+                                  Title: varSettingsSelectedEmail,
+                                  Name: varSettingsSelectedName,
+                                  Entra_ID: varSettingsEntraId
+                              }
+                          );
+                          Notify("Added to app", NotificationType.Success)
+                      )
+                  );
+                  If(
+                      varSettingsGrantAdmin || varSettingsGrantApprover,
+                      With(
+                          {
+                              existingPerm: LookUp(
+                                  colPermissions,
+                                  Lower(User_Email) = varSettingsSelectedEmail
+                              ),
+                              writeAdmin: varSettingsGrantAdmin,
+                              writeApprover: If(varSettingsGrantAdmin || varSettingsGrantApprover, 1, 0)
+                          },
+                          If(
+                              IsBlank(existingPerm),
+                              Patch(
+                                  'Hours Tracking (Permissions)',
+                                  Defaults('Hours Tracking (Permissions)'),
+                                  {
+                                      Title: varSettingsSelectedEmail,
+                                      User_Email: varSettingsSelectedEmail,
+                                      Approver: writeApprover,
+                                      IsAdmin: writeAdmin
+                                  }
+                              );
+                              Notify("Permissions saved", NotificationType.Success),
+                              Patch(
+                                  'Hours Tracking (Permissions)',
+                                  LookUp('Hours Tracking (Permissions)', ID = existingPerm.ID),
+                                  {
+                                      Approver: Max(Coalesce(existingPerm.Approver, 0), writeApprover),
+                                      IsAdmin: writeAdmin || Coalesce(existingPerm.IsAdmin, false)
+                                  }
+                              );
+                              Notify("Permissions updated", NotificationType.Success)
+                          )
+                      )
+                  );
+                  Set(varIsSavingSettings, false);
+                  Select(btn_ReloadActiveUsers)
+              )
+            Visible: =false
+            Width: =1
