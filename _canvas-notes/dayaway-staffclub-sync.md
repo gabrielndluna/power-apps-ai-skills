@@ -63,7 +63,7 @@ When loading a week with missing day rows, Staffclock defaults like weekends:
 | Project public holiday (Mon–Fri) | `Stat. Holiday` | Grey | blank |
 | Other weekday | `Work Day` | White | selected cost code |
 
-Holidays come from SharePoint `Public_Holidays` filtered by Approvers `Project Title` (`SelectedProject in Projects`). `Date` is a calendar text/date value — parse with `DateValue(Trim(Text(Date)))` (**do not** add +1; that shifts holidays by a day). Match with `CleanDateKey` (`yyyy-mm-dd`). Weekend wins if a holiday falls on Sat/Sun.
+Holidays come from SharePoint `Public_Holidays` (full list). Parse with `DateValue(Trim(Text(Date))) + 1` (SharePoint date offset) and match via `CleanDateKey` (`yyyy-mm-dd`). Weekend wins if a holiday falls on Sat/Sun.
 
 ## Connector requirement
 

@@ -1,0 +1,790 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Approvals:
+    Properties:
+      Fill: =RGBA(245, 246, 251, 1)
+      LoadingSpinnerColor: =RGBA(0, 18, 107, 1)
+      OnVisible: |-
+        =If(
+            !varDrillFromWeekly,
+            Set(
+                varApprovalWeekStart,
+                DateAdd(Today(), -(Weekday(Today(), StartOfWeek.Monday) - 1), "Days")
+            )
+        );
+        Set(varApprovalStatusFilter, "All");
+        Set(varDrillFromWeekly, false);
+        Clear(colHoursUpdates);
+        Select(Button_ReloadApprovalsWeek);
+    Children:
+      - appr_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(245, 246, 251, 1)
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Vertical
+            Width: =Parent.Width
+          Children:
+            - appr_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =128
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =14
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =18
+                  Width: =Parent.Width
+                Children:
+                  - appr_brand_row:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =40
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - Logo_Appr_Wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =124
+                            Children:
+                              - Logo_App_Appr:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    Height: =32
+                                    Image: ='App Names'
+                                    Width: =116
+                                    X: =4
+                                    Y: =2
+                        - Logo_Crop_Appr_Wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =124
+                            Children:
+                              - Logo_Crop_Appr:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    Height: =32
+                                    Image: ='Logo Cropped'
+                                    Width: =116
+                                    X: =4
+                                    Y: =2
+                        - appr_brand_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Height: =1
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =8
+                        - btn_HomeTab_Appr:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Home"
+                              Width: =84
+                        - btn_ApproverTab_Appr:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              OnSelect: =Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Approver"
+                              Width: =96
+                        - btn_SettingsGear_Appr:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              OnSelect: |-
+                                =If(
+                                    varIsAdmin,
+                                    Navigate(Screen_Settings, ScreenTransition.Fade),
+                                    Notify("Settings are for admins only", NotificationType.Error)
+                                )
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Settings"
+                              Visible: =varIsAdmin
+                              Width: =88
+                  - Label_ApprTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(23, 26, 51, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =38
+                        PaddingBottom: =2
+                        PaddingTop: =8
+                        Size: =20
+                        Text: ="Day approval"
+                        Width: =Parent.Width
+                  - Label_ApprSub:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(91, 97, 120, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =20
+                        Size: =12
+                        Text: ="Review and update daily hours for the selected week"
+                        Width: =Parent.Width
+            - appr_rule:
+                Control: Rectangle@2.3.0
+                Properties:
+                  Fill: =RGBA(226, 228, 240, 1)
+                  Height: =1
+                  Width: =Parent.Width
+            - appr_toolbar:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =128
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =8
+                  PaddingBottom: =10
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =10
+                  Width: =Parent.Width
+                Children:
+                  - appr_toolbar_nav:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =48
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        Width: =Parent.Width
+                      Children:
+                        - Button_BackWeekly:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(0, 0, 0, 0)
+                              Font: =Font.'Segoe UI'
+                              HoverFill: =RGBA(230, 234, 238, 1)
+                              OnSelect: =Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade)
+                              Size: =12
+                              Text: ="< Weekly list"
+                              Width: =120
+                        - Button_PrevWeek_Appr:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Font: =Font.'Segoe UI'
+                              OnSelect: |-
+                                =Set(varApprovalWeekStart, DateAdd(varApprovalWeekStart, -7, "Days"));
+                                Clear(colHoursUpdates);
+                                Select(Button_ReloadApprovalsWeek);
+                              Text: ="<"
+                              Width: =40
+                        - Label_CurrentWeek_Approver:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Open Sans'
+                              FontWeight: =FontWeight.Semibold
+                              Text: |-
+                                =Coalesce(varSelectedWeekEmployeeName, "All") & " | Week of " &
+                                Text(varApprovalWeekStart, "mmm d") & " - " &
+                                Text(DateAdd(varApprovalWeekStart, 6, "Days"), "mmm d, yyyy")
+                              Width: =420
+                        - Button_NextWeek_Appr:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Font: =Font.'Segoe UI'
+                              OnSelect: |-
+                                =Set(varApprovalWeekStart, DateAdd(varApprovalWeekStart, 7, "Days"));
+                                Clear(colHoursUpdates);
+                                Select(Button_ReloadApprovalsWeek);
+                              Text: =">"
+                              Visible: =varApprovalWeekStart < DateAdd(varThisWeekStart, 21, "Days")
+                              Width: =40
+                        - appr_nav_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Height: =1
+                              LayoutMinWidth: =10
+                        - Label_StatusHint:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Open Sans'
+                              Size: =11
+                              Text: ="Status"
+                              Width: =70
+                        - Dropdown_StatusFilter:
+                            Control: Classic/DropDown@2.3.1
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              ChevronBackground: =RGBA(0, 18, 107, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              Default: ="All"
+                              Font: =Font.'Segoe UI'
+                              Items: =["All", "Pending", "Reviewed"]
+                              Items.Value: =Value
+                              OnChange: =Set(varApprovalStatusFilter, Self.Selected.Value)
+                              Width: =120
+                  - appr_toolbar_actions:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(245, 247, 250, 1)
+                        FillPortions: =0
+                        Height: =52
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =52
+                        PaddingBottom: =6
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =6
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width
+                      Children:
+                        - appr_actions_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Height: =40
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =8
+                              Width: =8
+                        - Button_SaveApprovals:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              HoverFill: =RGBA(245, 247, 250, 1)
+                              LayoutMinHeight: =34
+                              OnSelect: |-
+                                =ForAll(
+                                    colHoursUpdates As UpdateRow,
+                                    Patch(
+                                        'Hours Tracking (Hours)',
+                                        LookUp('Hours Tracking (Hours)', ID = UpdateRow.ID),
+                                        {
+                                            ApprovalStatus_1: UpdateRow.ApprovalStatus_1,
+                                            Approver_Comments: UpdateRow.Approver_Comments
+                                        }
+                                    )
+                                );
+                                Notify("Changes saved", NotificationType.Success);
+                                Clear(colHoursUpdates);
+                                Refresh('Hours Tracking (Hours)');
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Save changes"
+                              Tooltip: ="Apply status and comment edits from this screen"
+                              Width: =140
+                        - Button_ApproveAllDaily:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              HoverFill: =ColorFade(RGBA(0, 18, 107, 1), -15%)
+                              LayoutMinHeight: =34
+                              OnSelect: |-
+                                =ClearCollect(
+                                    colApproveAll,
+                                    ForAll(
+                                        Filter(
+                                            colApprovalWeekHours,
+                                            (
+                                                ApprovalStatus_1 = "Pending" ||
+                                                ApprovalStatus_1 = "Rejected"
+                                            ) &&
+                                            (
+                                                IsBlank(varSelectedWeekEmployee) ||
+                                                Employee = varSelectedWeekEmployee
+                                            )
+                                        ) As TargetRow,
+                                        {
+                                            ID: TargetRow.ID,
+                                            ApprovalStatus_1: "Approved"
+                                        }
+                                    )
+                                );
+                                If(
+                                    CountRows(colApproveAll) = 0,
+                                    Notify("No rows to approve in this week", NotificationType.Information),
+                                    Patch('Hours Tracking (Hours)', colApproveAll);
+                                    Notify("Week approved", NotificationType.Success)
+                                );
+                                Clear(colHoursUpdates);
+                                Clear(colApproveAll);
+                                Select(Button_ReloadApprovalsWeek);
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Approve all"
+                              Tooltip: ="Approve every pending and rejected row in this week"
+                              Width: =180
+            - appr_col_headers:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(0, 18, 107, 1)
+                  FillPortions: =0
+                  Height: =40
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =4
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  Width: =Parent.Width
+                Children:
+                  - ah_Emp:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        Size: =12
+                        Text: ="Employee"
+                  - ah_Cost:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        Size: =12
+                        Text: ="Cost Code"
+                        Width: =140
+                  - ah_Date:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        Size: =12
+                        Text: ="Date"
+                        Width: =90
+                  - ah_Hours:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        Size: =12
+                        Text: ="Hours"
+                        Width: =80
+                  - ah_Task:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        Size: =12
+                        Text: ="Task"
+                        Width: =140
+                  - ah_Comments:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        LayoutMinWidth: =120
+                        Size: =12
+                        Text: ="Comments"
+                  - ah_Status:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        Size: =12
+                        Text: ="Status"
+                        Width: =110
+                  - ah_ApprComment:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        Size: =12
+                        Text: ="Approver Comment"
+                        Width: =220
+            - Gallery_Approvals:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =400
+                  Items: |-
+                    =Filter(
+                        colApprovalWeekHours,
+                        (
+                            IsBlank(varSelectedWeekEmployee) ||
+                            Employee = varSelectedWeekEmployee
+                        ) &&
+                        (
+                            varApprovalStatusFilter = "All" ||
+                            (
+                                varApprovalStatusFilter = "Pending" &&
+                                ApprovalStatus_1 = "Pending"
+                            ) ||
+                            (
+                                varApprovalStatusFilter = "Reviewed" &&
+                                (
+                                    ApprovalStatus_1 = "Approved" ||
+                                    ApprovalStatus_1 = "Rejected"
+                                )
+                            )
+                        )
+                    )
+                  TemplateSize: =52
+                  Width: =Parent.Width
+                Children:
+                  - row_fill_Appr:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        Fill: |-
+                          =If(
+                              Weekday(ThisItem.Date, StartOfWeek.Monday) >= 6 ||
+                              Coalesce(Text(ThisItem.Task), "") = "Weekend" ||
+                              Coalesce(Text(ThisItem.Task), "") = "Stat. Holiday" ||
+                              Text(ThisItem.Date, "yyyy-mm-dd") in ForAll(colPublic_Holidays, CleanDateKey),
+                              RGBA(240, 240, 240, 1),
+                              RGBA(255, 255, 255, 1)
+                          )
+                        Height: =Parent.TemplateHeight
+                        Width: =Parent.TemplateWidth
+                  - lbl_AEmp:
+                      Control: Label@2.5.1
+                      Properties:
+                        Font: =Font.'Open Sans'
+                        Size: =11
+                        Text: =ThisItem.Employee_Name
+                        X: =16
+                        Y: =6
+                  - lbl_ACost:
+                      Control: Label@2.5.1
+                      Properties:
+                        Font: =Font.'Open Sans'
+                        Size: =11
+                        Text: =ThisItem.Cost_code
+                        Width: =140
+                        X: =166
+                        Y: =6
+                  - lbl_ADate:
+                      Control: Label@2.5.1
+                      Properties:
+                        Font: =Font.'Open Sans'
+                        Size: =11
+                        Text: =Text(ThisItem.Date, "yyyy-mm-dd")
+                        Width: =90
+                        X: =306
+                        Y: =6
+                  - lbl_AHours:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Font: =Font.'Open Sans'
+                        Size: =11
+                        Text: |-
+                          =If(
+                              Mod(Round(Coalesce(ThisItem.Standard_time, 0), 2), 1) = 0,
+                              Text(Round(Coalesce(ThisItem.Standard_time, 0), 2), "0"),
+                              Text(Round(Coalesce(ThisItem.Standard_time, 0), 2), "0.##")
+                          )
+                        Width: =80
+                        X: =396
+                        Y: =6
+                  - lbl_ATask:
+                      Control: Label@2.5.1
+                      Properties:
+                        Font: =Font.'Open Sans'
+                        Size: =11
+                        Text: |-
+                          =With(
+                              {
+                                  rawTask: Coalesce(ThisItem.Task, ""),
+                                  rawComment: Coalesce(ThisItem.Comments, ""),
+                                  sepPos: Find(" | ", Coalesce(ThisItem.Comments, ""))
+                              },
+                              If(
+                                  !IsBlank(rawTask),
+                                  rawTask,
+                                  If(
+                                      IsBlank(rawComment),
+                                      "",
+                                      If(sepPos < 1, rawComment, Left(rawComment, sepPos - 1))
+                                  )
+                              )
+                          )
+                        Width: =140
+                        X: =484
+                        Y: =6
+                  - lbl_AComments:
+                      Control: Label@2.5.1
+                      Properties:
+                        Font: =Font.'Open Sans'
+                        Size: =11
+                        Text: |-
+                          =With(
+                              {
+                                  rawTask: Coalesce(ThisItem.Task, ""),
+                                  rawComment: Coalesce(ThisItem.Comments, ""),
+                                  sepPos: Find(" | ", Coalesce(ThisItem.Comments, ""))
+                              },
+                              If(
+                                  !IsBlank(rawTask),
+                                  rawComment,
+                                  If(sepPos < 1, "", Mid(rawComment, sepPos + 3))
+                              )
+                          )
+                        Width: =Parent.TemplateWidth - 990
+                        X: =632
+                        Y: =6
+                  - dd_AStatus:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        ChevronBackground: =RGBA(0, 18, 107, 1)
+                        ChevronFill: =RGBA(255, 255, 255, 1)
+                        Default: =ThisItem.ApprovalStatus_1
+                        Fill: =If(ThisItem.ApprovalStatus_1 = "Approved", RGBA(108, 212, 136, 1), ThisItem.ApprovalStatus_1 = "Rejected", RGBA(252, 124, 124, 1), ThisItem.ApprovalStatus_1 = "Pending", RGBA(252, 250, 124, 1), RGBA(255, 255, 255, 1))
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        Items: =["Pending", "Approved", "Rejected"]
+                        Items.Value: =Value
+                        OnChange: |-
+                          =If(
+                              IsBlank(LookUp(colHoursUpdates, ID = ThisItem.ID)),
+                              Collect(
+                                  colHoursUpdates,
+                                  {
+                                      ID: ThisItem.ID,
+                                      ApprovalStatus_1: Self.Selected.Value,
+                                      Approver_Comments: ThisItem.Approver_Comments
+                                  }
+                              ),
+                              UpdateIf(
+                                  colHoursUpdates,
+                                  ID = ThisItem.ID,
+                                  { ApprovalStatus_1: Self.Selected.Value }
+                              )
+                          )
+                        Size: =11
+                        Width: =110
+                        X: =Parent.TemplateWidth - 354
+                        Y: =8
+                  - txt_AApprComment:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Default: =ThisItem.Approver_Comments
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        OnChange: |-
+                          =If(
+                              IsBlank(LookUp(colHoursUpdates, ID = ThisItem.ID)),
+                              Collect(
+                                  colHoursUpdates,
+                                  {
+                                      ID: ThisItem.ID,
+                                      ApprovalStatus_1: ThisItem.ApprovalStatus_1,
+                                      Approver_Comments: Self.Text
+                                  }
+                              ),
+                              UpdateIf(
+                                  colHoursUpdates,
+                                  ID = ThisItem.ID,
+                                  { Approver_Comments: Self.Text }
+                              )
+                          )
+                        Size: =11
+                        Width: =220
+                        X: =Parent.TemplateWidth - 236
+                        Y: =8
+      - Button_ReloadApprovalsWeek:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =Refresh('Hours Tracking (Hours)');
+              Clear(colApprovalWeekHours);
+              If(
+                  varIsSuperAdmin,
+                  Collect(
+                      colApprovalWeekHours,
+                      Filter(
+                          'Hours Tracking (Hours)',
+                          ApprovalStatus_1 = "Pending" &&
+                          Date >= varApprovalWeekStart &&
+                          Date <= DateAdd(varApprovalWeekStart, 6, "Days")
+                      )
+                  );
+                  Collect(
+                      colApprovalWeekHours,
+                      Filter(
+                          'Hours Tracking (Hours)',
+                          ApprovalStatus_1 = "Approved" &&
+                          Date >= varApprovalWeekStart &&
+                          Date <= DateAdd(varApprovalWeekStart, 6, "Days")
+                      )
+                  );
+                  Collect(
+                      colApprovalWeekHours,
+                      Filter(
+                          'Hours Tracking (Hours)',
+                          ApprovalStatus_1 = "Rejected" &&
+                          Date >= varApprovalWeekStart &&
+                          Date <= DateAdd(varApprovalWeekStart, 6, "Days")
+                      )
+                  ),
+                  Collect(
+                      colApprovalWeekHours,
+                      Filter(
+                          'Hours Tracking (Hours)',
+                          ApproverID_1 = varMyEmail &&
+                          ApprovalStatus_1 = "Pending" &&
+                          Date >= varApprovalWeekStart &&
+                          Date <= DateAdd(varApprovalWeekStart, 6, "Days")
+                      )
+                  );
+                  Collect(
+                      colApprovalWeekHours,
+                      Filter(
+                          'Hours Tracking (Hours)',
+                          ApproverID_1 = varMyEmail &&
+                          ApprovalStatus_1 = "Approved" &&
+                          Date >= varApprovalWeekStart &&
+                          Date <= DateAdd(varApprovalWeekStart, 6, "Days")
+                      )
+                  );
+                  Collect(
+                      colApprovalWeekHours,
+                      Filter(
+                          'Hours Tracking (Hours)',
+                          ApproverID_1 = varMyEmail &&
+                          ApprovalStatus_1 = "Rejected" &&
+                          Date >= varApprovalWeekStart &&
+                          Date <= DateAdd(varApprovalWeekStart, 6, "Days")
+                      )
+                  )
+              );
+            Visible: =false
+            Width: =1

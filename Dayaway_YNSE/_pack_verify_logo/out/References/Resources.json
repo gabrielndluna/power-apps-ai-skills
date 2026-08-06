@@ -1,0 +1,40 @@
+{
+  "Resources": [
+    {
+      "Name": "SampleImage",
+      "Schema": "i",
+      "IsSampleData": true,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "/ctrllib/image/images/SampleImage.svg",
+      "Path": "/ctrllib/image/images/SampleImage.svg",
+      "Content": "Image",
+      "ResourceKind": "Uri",
+      "RootPath": "ms-appx:///ctrllib/image/images/SampleImage.svg"
+    },
+    {
+      "Name": "Subtitle (1)",
+      "Schema": "i",
+      "IsSampleData": false,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "409fd42f-1553-4c0e-9643-9b9f02ff0e43.png",
+      "Path": "Assets\\Images\\409fd42f-1553-4c0e-9643-9b9f02ff0e43.png",
+      "Content": "Image",
+      "ResourceKind": "LocalFile",
+      "RootPath": "https://dsprdil102eca.blob.core.windows.net/4a8c44f7-0033-458b-a110-943b3eb04a31-1/resource/NDA5ZmQ0MmYtMTU1My00YzBlLTk2NDMtOWI5ZjAyZmYwZTQz.png?skoid=58690ece-ec83-4ce2-9ce8-883d4d6a54ee&sktid=975f013f-7f24-47e8-a7d3-abc4752bf346&skt=2026-08-06T14%3A35%3A41Z&ske=2026-08-07T14%3A50%3A41Z&sks=b&skv=2023-01-03&sv=2023-01-03&spr=https&se=2026-08-07T14%3A50%3A41Z&sr=b&sp=r&sig=6XdIwOL2KbRPIEpb4NcEwQ1qIp8NV3aXiqiSQZyuK%2Fw%3D"
+    },
+    {
+      "Name": "Department Logo",
+      "Schema": "i",
+      "IsSampleData": false,
+      "IsWritable": false,
+      "Type": "ResourceInfo",
+      "FileName": "bf491d97-d6cc-41b5-b38d-3e10e3756f49.png",
+      "Path": "Assets\\Images\\bf491d97-d6cc-41b5-b38d-3e10e3756f49.png",
+      "Content": "Image",
+      "ResourceKind": "LocalFile",
+      "RootPath": "https://dsprdil102eca.blob.core.windows.net/4a8c44f7-0033-458b-a110-943b3eb04a31-1/resource/YmY0OTFkOTctZDZjYy00MWI1LWIzOGQtM2UxMGUzNzU2ZjQ5.png?skoid=58690ece-ec83-4ce2-9ce8-883d4d6a54ee&sktid=975f013f-7f24-47e8-a7d3-abc4752bf346&skt=2026-08-06T14%3A35%3A42Z&ske=2026-08-07T14%3A50%3A42Z&sks=b&skv=2023-01-03&sv=2023-01-03&spr=https&se=2026-08-07T14%3A50%3A42Z&sr=b&sp=r&sig=CHkTzbvE1X%2Fv0N0WCIX%2FSXiNKVWeaEW6JJeYyDIdn2A%3D"
+    }
+  ]
+}

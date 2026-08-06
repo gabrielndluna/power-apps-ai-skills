@@ -1,0 +1,348 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =Set(varIsSaving, false);
+
+      Set(
+          varCurrentWeekStart,
+          DateAdd(Today(), -(Weekday(Today(), StartOfWeek.Monday) - 1), "Days")
+      );
+      Set(varThisWeekStart, varCurrentWeekStart);
+      Set(varApprovalWeekStart, varCurrentWeekStart);
+      Set(varApprovalStatusFilter, "All");
+      Set(varAppStartDate, Date(2026, 6, 1));
+
+      ClearCollect(
+          colMissingWeeks,
+          {
+              WeekStart: Today(),
+              WeekEnd: Today(),
+              WeekLabel: ""
+          }
+      );
+      Clear(colMissingWeeks);
+
+      ClearCollect(
+          colMyHours,
+          {
+              ID: 0,
+              Employee: "",
+              Date: Today(),
+              ApprovalStatus_1: ""
+          }
+      );
+      Clear(colMyHours);
+
+      Set(varPendingApprovalWeeks, 0);
+
+      ClearCollect(
+          colPendingApprovalHours,
+          {
+              ID: 0,
+              Employee: "",
+              Employee_Name: "",
+              Date: Today(),
+              ApprovalStatus_1: "",
+              ApproverID_1: ""
+          }
+      );
+      Clear(colPendingApprovalHours);
+
+      ClearCollect(
+          colPermissions,
+          {
+              ID: 0,
+              User_Email: "",
+              Title: "",
+              Approver: 0,
+              IsAdmin: false
+          }
+      );
+      Clear(colPermissions);
+
+      ClearCollect(
+          colApprovalWeekHours,
+          {
+              ID: 0,
+              Employee: "",
+              Employee_Name: "",
+              Date: Today(),
+              Standard_time: 0,
+              ApprovalStatus_1: "",
+              Cost_code: "",
+              Task_code: "",
+              Comments: "",
+              Task: "",
+              ApproverID_1: "",
+              Approver_Comments: ""
+          }
+      );
+      Clear(colApprovalWeekHours);
+
+      ClearCollect(colCostCodes, CostCodes);
+      ClearCollect(colEmployeesAll, Approvers);
+      ClearCollect(colPermissions, 'Hours Tracking (Permissions)');
+
+      Set(varDrillFromWeekly, false);
+
+      ClearCollect(
+          colEmployees,
+          Filter(colEmployeesAll, Lower(Email_Address) = Lower(User().Email))
+      );
+
+      Set(
+          varApprovers,
+          LookUp(
+              colEmployeesAll,
+              Lower(Email_Address) = Lower(User().Email)
+          )
+      );
+
+      Set(varApprover1Email, varApprovers.'Approver 1 Email');
+      Set(varMyEmail, User().Email);
+      Set(varSubmitAsEmail, User().Email);
+      Set(varSubmitAsName, User().FullName);
+
+      Set(SelectedProject, Trim(Coalesce(varApprovers.'Project Title', "")));
+      Refresh(Public_Holidays);
+      ClearCollect(
+          colPublic_Holidays,
+          AddColumns(
+              Public_Holidays,
+              CleanDate,
+              DateValue(Trim(Text(Date))) + 1,
+              CleanDateKey,
+              Text(DateValue(Trim(Text(Date))) + 1, "yyyy-mm-dd")
+          )
+      );
+
+      Set(
+          varIsSuperAdmin,
+          !IsBlank(
+              LookUp(
+                  colPermissions,
+                  Lower(User_Email) = Lower(User().Email)
+              )
+          )
+      );
+      Set(
+          varIsAdmin,
+          !IsBlank(
+              LookUp(
+                  colPermissions,
+                  Lower(User_Email) = Lower(User().Email) &&
+                  IsAdmin = true
+              )
+          )
+      );
+      Set(
+          varIsApprover,
+          varIsSuperAdmin ||
+          !IsBlank(
+              LookUp(
+                  colEmployeesAll,
+                  Lower('Approver 1 Email') = Lower(User().Email)
+              )
+          )
+      );
+
+      Set(
+          varSelectedCostCode,
+          First(colCostCodes).Network_Activity_Name
+      );
+      Set(
+          varSelectedCostCodeID,
+          First(colCostCodes).Network_Activity
+      );
+      Set(
+          varSelectedTaskCode,
+          First(
+              Filter(
+                  colCostCodes,
+                  Network_Activity_Name = varSelectedCostCode &&
+                  !IsBlank(Task_Code)
+              )
+          ).Task_Code
+      );
+
+      ClearCollect(
+          colHoursUpdates,
+          {
+              ID: Blank(),
+              Cost_code: "",
+              Employee: "",
+              Date: Today(),
+              Standard_time: 0,
+              Comments: "",
+              ApproverID_1: Blank(),
+              ApprovalStatus_1: "",
+              Approver_Comments: ""
+          }
+      );
+      Clear(colHoursUpdates);
+
+      ClearCollect(
+          colWeeklySummaryDisplay,
+          {
+              Employee_Name: "",
+              Employee: "",
+              WeekStart: Today(),
+              WeekEnd: Today(),
+              TotalStandard: 0,
+              TotalDays: 0,
+              WeekStatus: ""
+          }
+      );
+      Clear(colWeeklySummaryDisplay);
+
+      ClearCollect(
+          colAllPendingHours,
+          {
+              ID: 0,
+              Employee: "",
+              Employee_Name: "",
+              Date: Today(),
+              Standard_time: 0,
+              ApprovalStatus_1: "",
+              Cost_code: "",
+              Comments: "",
+              ApproverID_1: ""
+          }
+      );
+      Clear(colAllPendingHours);
+
+      ClearCollect(
+          colRawHours,
+          {
+              ID: 0,
+              Employee: "",
+              Employee_Name: "",
+              Date: Today(),
+              Standard_time: 0,
+              ApprovalStatus_1: "",
+              Cost_code: "",
+              Comments: "",
+              ApproverID_1: ""
+          }
+      );
+      Clear(colRawHours);
+
+      ClearCollect(
+          colHoursGallery,
+          {
+              RowKey: "",
+              WorkDate: Today(),
+              DayLabel: "",
+              CostCode: "",
+              CostCodeID: "",
+              ActivityTaskCode: "",
+              EntryType: "",
+              Comments: "",
+              StandardHours: "",
+              IsSubmitted: false,
+              RecordID: 0,
+              ApprovalStatus: "",
+              IsDirty: false
+          }
+      );
+      Clear(colHoursGallery);
+
+      ClearCollect(
+          colExistingHours,
+          {
+              SrcID: 0,
+              SrcDate: Today(),
+              SrcCostCode: "",
+              SrcTaskCode: "",
+              SrcTask: "",
+              SrcComments: "",
+              SrcHours: 0,
+              SrcStatus: ""
+          }
+      );
+      Clear(colExistingHours);
+
+      ClearCollect(
+          colRowActionIds,
+          {
+              ID: 0
+          }
+      );
+      Clear(colRowActionIds);
+
+      Set(GUID_Var, GUID());
+
+      Set(
+          varFirstTimeUser,
+          IsEmpty(Filter('Hours Tracking (Active Users)', Title = User().Email))
+      );
+
+      Set(varResetGallery, false);
+      Set(varHasDuplicates, false);
+      Set(varShowAllWeeks, false);
+      Set(varShowPublicHolidays, false);
+      Set(varWeeklySortColumn, "WeekStart");
+      Set(varWeeklySortAscending, false);
+      Set(varSelectedWeekEmployee, "");
+      Set(varSelectedWeekEmployeeName, "");
+      Set(varWeeklyFilterFrom, Blank());
+      Set(varWeeklyFilterTo, Blank());
+      Set(varWeeklyLoadFrom, DateAdd(Today(), -56, "Days"));
+      Set(varWeeklyLoadTo, DateAdd(Today(), 21, "Days"));
+      Set(varWeeklyEmployeeEmail, "");
+      Set(varWeeklyEmployeeName, "");
+      Set(varShowApproveAllConfirm, false);
+      Set(varSettingsGrantApprover, false);
+      Set(varSettingsGrantAdmin, false);
+      Set(varSettingsSelectedEmail, "");
+      Set(varSettingsSelectedName, "");
+      Set(varSettingsEntraId, "");
+      Set(varSettingsFilter, "");
+      Set(varIsSavingSettings, false);
+
+      ClearCollect(
+          colActiveUsers,
+          {
+              ID: 0,
+              Title: "",
+              Name: "",
+              Entra_ID: ""
+          }
+      );
+      Clear(colActiveUsers);
+
+      Refresh('Hours Tracking (Hours)');
+      ClearCollect(
+          colPendingApprovalHours,
+          If(
+              varIsSuperAdmin,
+              Filter(
+                  'Hours Tracking (Hours)',
+                  ApprovalStatus_1 = "Pending"
+              ),
+              Filter(
+                  'Hours Tracking (Hours)',
+                  ApproverID_1 = User().Email &&
+                  ApprovalStatus_1 = "Pending"
+              )
+          )
+      );
+      Set(
+          varPendingApprovalWeeks,
+          CountRows(
+              Distinct(
+                  colPendingApprovalHours,
+                  Text(DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days"), "yyyy-mm-dd") & Employee_Name
+              )
+          )
+      );
+    StartScreen: =Screen_Home
+    Theme: =PowerAppsTheme

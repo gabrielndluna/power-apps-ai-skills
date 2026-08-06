@@ -1,0 +1,569 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen_Home:
+    Properties:
+      Fill: =RGBA(245, 246, 251, 1)
+      LoadingSpinnerColor: =RGBA(0, 18, 107, 1)
+      OnVisible: |-
+        =Set(varThisWeekStart, DateAdd(Today(), -(Weekday(Today(), StartOfWeek.Monday) - 1), "Days"));
+
+        Refresh('Hours Tracking (Hours)');
+
+        ClearCollect(
+            colPendingApprovalHours,
+            If(
+                varIsSuperAdmin,
+                Filter(
+                    'Hours Tracking (Hours)',
+                    ApprovalStatus_1 = "Pending"
+                ),
+                Filter(
+                    'Hours Tracking (Hours)',
+                    ApproverID_1 = User().Email &&
+                    ApprovalStatus_1 = "Pending"
+                )
+            )
+        );
+
+        Set(
+            varPendingApprovalWeeks,
+            CountRows(
+                Distinct(
+                    colPendingApprovalHours,
+                    Text(DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days"), "yyyy-mm-dd") & Employee_Name
+                )
+            )
+        );
+
+        ClearCollect(
+            colMyHours,
+            Filter(
+                'Hours Tracking (Hours)',
+                Lower(Employee) = Lower(User().Email) &&
+                Date >= varAppStartDate
+            )
+        );
+
+        ClearCollect(
+            colMissingWeeks,
+            ForAll(
+                Sequence(
+                    RoundDown(
+                        DateDiff(
+                            DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                            varThisWeekStart,
+                            "Days"
+                        ) / 7,
+                        0
+                    ) + 1,
+                    0,
+                    1
+                ),
+                With(
+                    {
+                        weekStart: DateAdd(
+                            DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                            Value * 7,
+                            "Days"
+                        )
+                    },
+                    If(
+                        weekStart <= varThisWeekStart &&
+                        CountRows(
+                            Distinct(
+                                Filter(
+                                    colMyHours,
+                                    Date >= weekStart &&
+                                    Date <= DateAdd(weekStart, 4, "Days") &&
+                                    (
+                                        ApprovalStatus_1 = "Pending" ||
+                                        ApprovalStatus_1 = "Approved"
+                                    )
+                                ),
+                                Text(Date, "yyyy-mm-dd")
+                            )
+                        ) < 5,
+                        {
+                            WeekStart: weekStart,
+                            WeekEnd: DateAdd(weekStart, 6, "Days"),
+                            WeekLabel: Text(weekStart, "mmm d") & " - " & Text(DateAdd(weekStart, 6, "Days"), "mmm d, yyyy")
+                        }
+                    )
+                )
+            )
+        );
+    Children:
+      - home_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(245, 246, 251, 1)
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Vertical
+            Width: =Parent.Width
+          Children:
+            - home_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =128
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =14
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =18
+                  Width: =Parent.Width
+                Children:
+                  - home_brand_row:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =40
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - Logo_Home_Wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =124
+                            Children:
+                              - Crewclock_Logo_Home:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    Height: =32
+                                    Image: ='App Names'
+                                    Width: =116
+                                    X: =4
+                                    Y: =2
+                        - Logo_Crop_Home_Wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =124
+                            Children:
+                              - Logo_Cropped_Home:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    Height: =32
+                                    Image: ='Logo Cropped'
+                                    Width: =116
+                                    X: =4
+                                    Y: =2
+                        - home_brand_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Height: =1
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =8
+                        - btn_HomeTab:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Home"
+                              Width: =84
+                        - btn_ApproverTab:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              OnSelect: |-
+                                =If(
+                                    varIsApprover,
+                                    Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade),
+                                    Notify("No timesheets for approval.", NotificationType.Error)
+                                )
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Approver"
+                              Visible: =varIsApprover
+                              Width: =96
+                        - btn_SettingsGear_Home:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              OnSelect: |-
+                                =If(
+                                    varIsAdmin,
+                                    Navigate(Screen_Settings, ScreenTransition.Fade),
+                                    Notify("Settings are for admins only", NotificationType.Error)
+                                )
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Settings"
+                              Visible: =varIsAdmin
+                              Width: =88
+                  - Label_Welcome:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(23, 26, 51, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =38
+                        PaddingBottom: =2
+                        PaddingTop: =8
+                        Size: =20
+                        Text: ="Hi, " & Coalesce(First(Split(User().FullName, " ")).Value, User().FullName)
+                        Width: =Parent.Width
+                  - Label_Supervisor:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(91, 97, 120, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =20
+                        Size: =12
+                        Text: ="Supervisor · " & Coalesce(varApprover1Email, "Not assigned")
+                        Width: =Parent.Width
+            - home_rule:
+                Control: Rectangle@2.3.0
+                Properties:
+                  Fill: =RGBA(226, 228, 240, 1)
+                  Height: =1
+                  Width: =Parent.Width
+            - home_body:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Height: =Parent.Height
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =16
+                  PaddingBottom: =24
+                  PaddingLeft: =32
+                  PaddingRight: =32
+                  PaddingTop: =8
+                  Width: =Parent.Width
+                Children:
+                  - Container_MyTimesheet:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(166, 166, 166, 1)
+                        BorderThickness: =2
+                        DropShadow: =DropShadow.Bold
+                        Fill: =RGBA(255, 255, 255, 1)
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =6
+                        PaddingBottom: =12
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =12
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - myts_title_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =48
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                            Children:
+                              - Icon_MyTs:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Height: =32
+                                    Icon: =Icon.CalendarBlank
+                                    Width: =32
+                              - Label_MyTimesheetTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    Size: =18
+                                    Text: ="My Timesheet"
+                        - myts_status_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =40
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                            Children:
+                              - Label_MissingStatus:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    Text: |-
+                                      =If(
+                                          CountRows(colMissingWeeks) = 0,
+                                          "All timesheets up to date",
+                                          Text(CountRows(colMissingWeeks)) & " week(s) not submitted"
+                                      )
+                              - btn_GoHours:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderThickness: =0
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Fill: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =34
+                                    OnSelect: =Navigate('Hours Tracking', ScreenTransition.Cover)
+                                    RadiusBottomLeft: =9
+                                    RadiusBottomRight: =9
+                                    RadiusTopLeft: =9
+                                    RadiusTopRight: =9
+                                    Size: =11
+                                    Text: ="Open"
+                                    Width: =80
+                        - pending_submissions_gallery:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =280
+                              Items: =SortByColumns(colMissingWeeks, "WeekStart", SortOrder.Descending)
+                              TemplateSize: =64
+                            Children:
+                              - Label_MissingWeekLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =24
+                                    OnSelect: =Select(Parent)
+                                    Size: =14
+                                    Text: =ThisItem.WeekLabel
+                                    Width: =Parent.TemplateWidth - 100
+                                    X: =12
+                                    Y: =8
+                              - Label_NotSubmitted:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 1)
+                                    Color: =RGBA(160, 96, 0, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =22
+                                    OnSelect: =Select(Parent)
+                                    Size: =12
+                                    Text: ="Not Submitted"
+                                    Width: =Parent.TemplateWidth - 100
+                                    X: =12
+                                    Y: =34
+                              - Icon_GoToWeek:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Height: =28
+                                    Icon: =Icon.NextArrow
+                                    OnSelect: |-
+                                      =Set(varCurrentWeekStart, ThisItem.WeekStart);
+                                      Set(varDrillFromWeekly, false);
+                                      Navigate('Hours Tracking', ScreenTransition.Cover);
+                                    Width: =28
+                                    X: =Parent.TemplateWidth - 44
+                                    Y: =18
+                  - Container_Approvals:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(166, 166, 166, 1)
+                        BorderThickness: =2
+                        DropShadow: =DropShadow.Bold
+                        Fill: =RGBA(255, 255, 255, 1)
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =6
+                        LayoutMaxHeight: =160
+                        PaddingBottom: =12
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =12
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Visible: =varIsApprover
+                      Children:
+                        - appr_title_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =48
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                            Children:
+                              - Icon_Appr:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    Height: =32
+                                    Icon: =Icon.CheckBadge
+                                    Width: =32
+                              - Label_ApprovalsTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    Color: =RGBA(0, 18, 107, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =36
+                                    Size: =18
+                                    Text: ="Approvals"
+                        - appr_status_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =48
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                            Children:
+                              - Label_PendingApprovals:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Open Sans'
+                                    Height: =32
+                                    Text: =Text(varPendingApprovalWeeks) & " timesheet week(s) waiting for approval"
+                              - btn_GoApprovals:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 18, 107, 1)
+                                    BorderThickness: =0
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Fill: =RGBA(0, 18, 107, 1)
+                                    Font: =Font.'Open Sans'
+                                    Height: =36
+                                    OnSelect: =Navigate(Screen_WeeklyApprovals, ScreenTransition.Cover)
+                                    Text: ="Review"
+                                    Width: =90
+            - home_help:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =44
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =8
+                  PaddingBottom: =8
+                  PaddingLeft: =32
+                  Width: =Parent.Width
+                Children:
+                  - Icon_Help:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Height: =24
+                        Icon: =Icon.Help
+                        OnSelect: |-
+                          =Launch(
+                              "mailto:staffclock@stconnect.ca" &
+                              "?subject=" & EncodeUrl("StaffClock Support Request") &
+                              "&body=" & EncodeUrl("Hi StaffClock team," & Char(10) & Char(10) & "I need help with...")
+                          )
+                        Width: =24
+                  - Label_Help:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =28
+                        OnSelect: |-
+                          =Launch(
+                              "mailto:staffclock@stconnect.ca" &
+                              "?subject=" & EncodeUrl("StaffClock Support Request") &
+                              "&body=" & EncodeUrl("Hi StaffClock team," & Char(10) & Char(10) & "I need help with...")
+                          )
+                        Text: ="Help"
+                        Width: =60

@@ -1,0 +1,1463 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Vacations Tracking:
+    Properties:
+      Fill: =RGBA(245, 246, 251, 1)
+      LoadingSpinnerColor: =RGBA(0, 18, 107, 1)
+      OnVisible: |-
+        =ClearCollect(
+            colMyRequests,
+            SortByColumns(
+                Filter('Vacations Tracking (Days)', Employee = User().Email),
+                "StartDate",
+                SortOrder.Descending
+            )
+        );
+        Set(varShowSubmitSheet, false);
+        Set(varShowDeleteConfirm, false);
+        Set(varShowRequestDetail, false);
+        Set(varLeaveTime, "Full Day");
+    Children:
+      - vt_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(245, 246, 251, 1)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            Width: =Parent.Width
+          Children:
+            - vt_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =If(App.Width < 680, 188, 178)
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =14
+                  PaddingLeft: =If(App.Width < 680, 18, 24)
+                  PaddingRight: =If(App.Width < 680, 18, 24)
+                  PaddingTop: =If(App.Width < 680, 18, 20)
+                  Width: =Parent.Width
+                Children:
+                  - vt_brand_row:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =40
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - Logo_Dayaway_Wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =124
+                            Children:
+                              - Logo_Dayaway:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    Height: =32
+                                    Image: ='Subtitle (1)'
+                                    Width: =116
+                                    X: =4
+                                    Y: =2
+                        - brand_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Height: =1
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =8
+                        - btn_ApproverTab_VT:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              OnSelect: =Navigate(Approvals, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Approvals"
+                              Visible: =varIsApprover && App.Width >= 680
+                              Width: =96
+                        - btn_NewRequest_Web:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =34
+                              OnSelect: |-
+                                =Reset(dd_LeaveType);
+                                Reset(txt_Comments);
+                                Set(varLeaveTime, "Full Day");
+                                Set(varShowSubmitSheet, true);
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="+ New request"
+                              Visible: =App.Width >= 680
+                              Width: =120
+                  - Label_WelcomeName:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(23, 26, 51, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =30
+                        PaddingTop: =10
+                        Size: =If(App.Width < 680, 18, 20)
+                        Text: ="Hi, " & Coalesce(First(Split(User().FullName, " ")).Value, User().FullName)
+                        Width: =Parent.Width
+                  - Label_GreetingSub:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(91, 97, 120, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =20
+                        Size: =12
+                        Text: =Coalesce(Selected_ProjectID, "") & " · " & Coalesce(SelectedProject, "")
+                        Width: =Parent.Width
+                  - vt_metrics:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =64
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingTop: =8
+                        Width: =Parent.Width
+                      Children:
+                        - metric_used:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Height: =52
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingBottom: =6
+                              PaddingLeft: =12
+                              PaddingRight: =10
+                              PaddingTop: =6
+                              RadiusBottomLeft: =11
+                              RadiusBottomRight: =11
+                              RadiusTopLeft: =11
+                              RadiusTopRight: =11
+                            Children:
+                              - Label_MetricUsedVal:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(23, 26, 51, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =16
+                                    Text: |-
+                                      =Text(
+                                          Sum(
+                                              Filter(
+                                                  colMyRequests,
+                                                  Year(StartDate) = Year(Today()) &&
+                                                  ApprovalStatus_1 <> "Rejected" &&
+                                                  Type_of_leave = "Vacation Paid"
+                                              ),
+                                              Days
+                                          )
+                                      )
+                                    Width: =Parent.Width
+                              - Label_MetricUsedCap:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(91, 97, 120, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =14
+                                    Size: =9
+                                    Text: ="USED / PENDING"
+                                    Width: =Parent.Width
+                        - metric_approver:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(245, 247, 250, 1)
+                              Height: =52
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingBottom: =6
+                              PaddingLeft: =12
+                              PaddingRight: =10
+                              PaddingTop: =6
+                              RadiusBottomLeft: =11
+                              RadiusBottomRight: =11
+                              RadiusTopLeft: =11
+                              RadiusTopRight: =11
+                              Visible: =App.Width >= 680
+                            Children:
+                              - Label_MetricApprVal:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(23, 26, 51, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Text: =Coalesce(First(Split(Coalesce(varApproverName, "-"), " ")).Value, "-")
+                                    Width: =Parent.Width
+                              - Label_MetricApprCap:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(91, 97, 120, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =14
+                                    Size: =9
+                                    Text: ="APPROVER"
+                                    Width: =Parent.Width
+            - vt_list_section:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(245, 246, 251, 1)
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =8
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =If(App.Width < 680, 110, 24)
+                  PaddingLeft: =If(App.Width < 680, 16, 28)
+                  PaddingRight: =If(App.Width < 680, 16, 28)
+                  PaddingTop: =If(App.Width < 680, 16, 22)
+                  Width: =Parent.Width
+                Children:
+                  - Label_MyRequests:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(91, 97, 120, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =22
+                        Size: =11
+                        Text: ="YOUR REQUESTS"
+                        Width: =Parent.Width
+                  - Label_EmptyRequests:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(91, 97, 120, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =90
+                        PaddingTop: =40
+                        Text: =If(App.Width < 680, "No leave requests yet. Tap the + button to submit time off.", "No leave requests yet. Use New request to submit time off.")
+                        Visible: =CountRows(colMyRequests) = 0
+                        Width: =Parent.Width
+                  - Gallery_MyRequests:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        Height: =200
+                        Items: =colMyRequests
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        TemplatePadding: =8
+                        TemplateSize: =108
+                        Visible: =CountRows(colMyRequests) > 0
+                        Width: =Parent.Width
+                      Children:
+                        - card_Req:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =100
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                              Width: =Parent.TemplateWidth
+                            Children:
+                              - status_bar:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    Fill: =If(Text(ThisItem.ApprovalStatus_1) = "Approved", RGBA(20, 108, 67, 1), Text(ThisItem.ApprovalStatus_1) = "Rejected", RGBA(179, 38, 30, 1), RGBA(184, 121, 26, 1))
+                                    OnSelect: |-
+                                      =Set(varDetailType, Coalesce(Text(ThisItem.Type_of_leave), ""));
+                                      Set(
+                                          varDetailDates,
+                                          If(
+                                              ThisItem.StartDate = ThisItem.EndDate,
+                                              Text(ThisItem.StartDate, "mmm d, yyyy") & If(Coalesce(Value(ThisItem.Days), 0) < 1, " · " & Coalesce(Text(ThisItem.Leave_Time), ""), ""),
+                                              Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d, yyyy")
+                                          )
+                                      );
+                                      Set(varDetailStatus, Coalesce(Text(ThisItem.ApprovalStatus_1), ""));
+                                      Set(varDetailDays, Coalesce(Value(ThisItem.Days), 0));
+                                      Set(varDetailComments, Coalesce(Text(ThisItem.Comments), ""));
+                                      Set(varDetailApproverComments, Coalesce(Text(ThisItem.Approver_Comments), ""));
+                                      Set(varShowRequestDetail, true);
+                                    Width: =4
+                              - req_main:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Height: =100
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =10
+                                    PaddingLeft: =12
+                                    PaddingRight: =8
+                                    PaddingTop: =10
+                                  Children:
+                                    - lbl_ReqType:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(23, 26, 51, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =22
+                                          OnSelect: |-
+                                            =Set(varDetailType, Coalesce(Text(ThisItem.Type_of_leave), ""));
+                                            Set(
+                                                varDetailDates,
+                                                If(
+                                                    ThisItem.StartDate = ThisItem.EndDate,
+                                                    Text(ThisItem.StartDate, "mmm d, yyyy") & If(Coalesce(Value(ThisItem.Days), 0) < 1, " · " & Coalesce(Text(ThisItem.Leave_Time), ""), ""),
+                                                    Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d, yyyy")
+                                                )
+                                            );
+                                            Set(varDetailStatus, Coalesce(Text(ThisItem.ApprovalStatus_1), ""));
+                                            Set(varDetailDays, Coalesce(Value(ThisItem.Days), 0));
+                                            Set(varDetailComments, Coalesce(Text(ThisItem.Comments), ""));
+                                            Set(varDetailApproverComments, Coalesce(Text(ThisItem.Approver_Comments), ""));
+                                            Set(varShowRequestDetail, true);
+                                          Size: =14
+                                          Text: =Text(ThisItem.Type_of_leave)
+                                          Width: =Parent.Width
+                                    - lbl_ReqDates:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =20
+                                          OnSelect: |-
+                                            =Set(varDetailType, Coalesce(Text(ThisItem.Type_of_leave), ""));
+                                            Set(
+                                                varDetailDates,
+                                                If(
+                                                    ThisItem.StartDate = ThisItem.EndDate,
+                                                    Text(ThisItem.StartDate, "mmm d, yyyy") & If(Coalesce(Value(ThisItem.Days), 0) < 1, " · " & Coalesce(Text(ThisItem.Leave_Time), ""), ""),
+                                                    Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d, yyyy")
+                                                )
+                                            );
+                                            Set(varDetailStatus, Coalesce(Text(ThisItem.ApprovalStatus_1), ""));
+                                            Set(varDetailDays, Coalesce(Value(ThisItem.Days), 0));
+                                            Set(varDetailComments, Coalesce(Text(ThisItem.Comments), ""));
+                                            Set(varDetailApproverComments, Coalesce(Text(ThisItem.Approver_Comments), ""));
+                                            Set(varShowRequestDetail, true);
+                                          Size: =12
+                                          Text: =If(ThisItem.StartDate = ThisItem.EndDate, Text(ThisItem.StartDate, "mmm d") & If(Coalesce(Value(ThisItem.Days), 0) < 1, " · " & Coalesce(Text(ThisItem.Leave_Time), ""), ""), Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d")) & " · " & Text(ThisItem.Days) & If(Coalesce(Value(ThisItem.Days), 0) = 1, " day", " days")
+                                          Width: =Parent.Width
+                                    - row_ReqComments:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =20
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =4
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          Visible: |-
+                                            =!IsBlank(Trim(Coalesce(Text(ThisItem.Comments), ""))) ||
+                                            !IsBlank(Trim(Coalesce(Text(ThisItem.Approver_Comments), "")))
+                                          Width: =Parent.Width
+                                        Children:
+                                          - icon_ReqComments:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                AlignInContainer: =AlignInContainer.Center
+                                                Color: =RGBA(0, 18, 107, 1)
+                                                Height: =16
+                                                Icon: =Icon.Message
+                                                OnSelect: |-
+                                                  =Set(varDetailType, Coalesce(Text(ThisItem.Type_of_leave), ""));
+                                                  Set(
+                                                      varDetailDates,
+                                                      If(
+                                                          ThisItem.StartDate = ThisItem.EndDate,
+                                                          Text(ThisItem.StartDate, "mmm d, yyyy") & If(Coalesce(Value(ThisItem.Days), 0) < 1, " · " & Coalesce(Text(ThisItem.Leave_Time), ""), ""),
+                                                          Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d, yyyy")
+                                                      )
+                                                  );
+                                                  Set(varDetailStatus, Coalesce(Text(ThisItem.ApprovalStatus_1), ""));
+                                                  Set(varDetailDays, Coalesce(Value(ThisItem.Days), 0));
+                                                  Set(varDetailComments, Coalesce(Text(ThisItem.Comments), ""));
+                                                  Set(varDetailApproverComments, Coalesce(Text(ThisItem.Approver_Comments), ""));
+                                                  Set(varShowRequestDetail, true);
+                                                Width: =16
+                                          - lbl_ReqComments:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                AlignInContainer: =AlignInContainer.Center
+                                                Color: =RGBA(0, 18, 107, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =20
+                                                LayoutMinWidth: =0
+                                                OnSelect: |-
+                                                  =Set(varDetailType, Coalesce(Text(ThisItem.Type_of_leave), ""));
+                                                  Set(
+                                                      varDetailDates,
+                                                      If(
+                                                          ThisItem.StartDate = ThisItem.EndDate,
+                                                          Text(ThisItem.StartDate, "mmm d, yyyy") & If(Coalesce(Value(ThisItem.Days), 0) < 1, " · " & Coalesce(Text(ThisItem.Leave_Time), ""), ""),
+                                                          Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d, yyyy")
+                                                      )
+                                                  );
+                                                  Set(varDetailStatus, Coalesce(Text(ThisItem.ApprovalStatus_1), ""));
+                                                  Set(varDetailDays, Coalesce(Value(ThisItem.Days), 0));
+                                                  Set(varDetailComments, Coalesce(Text(ThisItem.Comments), ""));
+                                                  Set(varDetailApproverComments, Coalesce(Text(ThisItem.Approver_Comments), ""));
+                                                  Set(varShowRequestDetail, true);
+                                                Size: =11
+                                                Text: ="Comments"
+                                                Width: =120
+                              - req_actions:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =100
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =6
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingRight: =8
+                                    Width: =If(ThisItem.ApprovalStatus_1 = "Pending" || ThisItem.ApprovalStatus_1 = "Rejected", 140, 96)
+                                  Children:
+                                    - pill_ReqStatus:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.Center
+                                          BorderThickness: =0
+                                          Color: =If(Text(ThisItem.ApprovalStatus_1) = "Approved", RGBA(20, 108, 67, 1), Text(ThisItem.ApprovalStatus_1) = "Rejected", RGBA(179, 38, 30, 1), RGBA(184, 121, 26, 1))
+                                          Fill: =If(Text(ThisItem.ApprovalStatus_1) = "Approved", RGBA(223, 243, 232, 1), Text(ThisItem.ApprovalStatus_1) = "Rejected", RGBA(251, 226, 224, 1), RGBA(252, 239, 217, 1))
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =24
+                                          OnSelect: |-
+                                            =Set(varDetailType, Coalesce(Text(ThisItem.Type_of_leave), ""));
+                                            Set(
+                                                varDetailDates,
+                                                If(
+                                                    ThisItem.StartDate = ThisItem.EndDate,
+                                                    Text(ThisItem.StartDate, "mmm d, yyyy") & If(Coalesce(Value(ThisItem.Days), 0) < 1, " · " & Coalesce(Text(ThisItem.Leave_Time), ""), ""),
+                                                    Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d, yyyy")
+                                                )
+                                            );
+                                            Set(varDetailStatus, Coalesce(Text(ThisItem.ApprovalStatus_1), ""));
+                                            Set(varDetailDays, Coalesce(Value(ThisItem.Days), 0));
+                                            Set(varDetailComments, Coalesce(Text(ThisItem.Comments), ""));
+                                            Set(varDetailApproverComments, Coalesce(Text(ThisItem.Approver_Comments), ""));
+                                            Set(varShowRequestDetail, true);
+                                          RadiusBottomLeft: =12
+                                          RadiusBottomRight: =12
+                                          RadiusTopLeft: =12
+                                          RadiusTopRight: =12
+                                          Size: =10
+                                          Text: =Upper(Text(ThisItem.ApprovalStatus_1))
+                                          Width: =88
+                                    - btn_ReqDelete:
+                                        Control: Classic/Icon@2.5.0
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.Center
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          Height: =26
+                                          Icon: =Icon.Trash
+                                          OnSelect: |-
+                                            =Set(varShowRequestDetail, false);
+                                            Set(varDeleteRequestID, ThisItem.ID);
+                                            Set(varDeleteRequestLog, ThisItem.LOG_ID);
+                                            Set(varDeleteStart, ThisItem.StartDate);
+                                            Set(varDeleteEnd, ThisItem.EndDate);
+                                            Set(varShowDeleteConfirm, true);
+                                          Visible: =ThisItem.ApprovalStatus_1 = "Pending" || ThisItem.ApprovalStatus_1 = "Rejected"
+                                          Width: =26
+            - vt_phone_footer:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(0, 10, 69, 1)
+                  FillPortions: =0
+                  Height: =90
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  Visible: =App.Width < 680
+                  Width: =Parent.Width
+                Children:
+                  - btn_PhoneFAB:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =56
+                        OnSelect: |-
+                          =Reset(dd_LeaveType);
+                          Reset(txt_Comments);
+                          Set(varLeaveTime, "Full Day");
+                          Set(varShowSubmitSheet, true);
+                        RadiusBottomLeft: =28
+                        RadiusBottomRight: =28
+                        RadiusTopLeft: =28
+                        RadiusTopRight: =28
+                        Size: =26
+                        Text: ="+"
+                        Width: =56
+                        X: =(Parent.Width - 56) / 2
+                        Y: =14
+      - Overlay_SubmitSheet:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(10, 12, 30, 0.42)
+            Height: =Parent.Height
+            LayoutAlignItems: =If(App.Width < 680, LayoutAlignItems.Stretch, LayoutAlignItems.Center)
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutJustifyContent: =If(App.Width < 680, LayoutJustifyContent.End, LayoutJustifyContent.Center)
+            Visible: =varShowSubmitSheet
+            Width: =Parent.Width
+          Children:
+            - submit_sheet_panel:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =If(App.Width < 680, Min(Parent.Height * 0.92, 680), Min(Parent.Height * 0.85, 580))
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =If(App.Width < 680, 24, 20)
+                  PaddingLeft: =If(App.Width < 680, 16, 20)
+                  PaddingRight: =If(App.Width < 680, 16, 20)
+                  PaddingTop: =18
+                  RadiusBottomLeft: =If(App.Width < 680, 0, 16)
+                  RadiusBottomRight: =If(App.Width < 680, 0, 16)
+                  RadiusTopLeft: =If(App.Width < 680, 20, 16)
+                  RadiusTopRight: =If(App.Width < 680, 20, 16)
+                  Width: =If(App.Width < 680, Parent.Width, Min(480, Parent.Width * 0.9))
+                Children:
+                  - submit_sheet_header:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =36
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - Label_SubmitTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(23, 26, 51, 1)
+                              FillPortions: =1
+                              Font: =Font.'Open Sans'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =32
+                              Size: =16
+                              Text: ="New leave request"
+                              Width: =200
+                        - btn_CloseSubmit:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(91, 97, 120, 1)
+                              Fill: =RGBA(240, 241, 248, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =30
+                              OnSelect: =Set(varShowSubmitSheet, false)
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =14
+                              Text: ="✕"
+                              Width: =30
+                  - submit_sheet_body:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        LayoutOverflowY: =LayoutOverflow.Scroll
+                        PaddingTop: =10
+                        Width: =Parent.Width
+                      Children:
+                        - submit_dates_row:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =If(App.Width < 680, 148, 70)
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =If(App.Width < 680, LayoutDirection.Vertical, LayoutDirection.Horizontal)
+                              LayoutGap: =If(App.Width < 680, 8, 10)
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =Parent.Width
+                            Children:
+                              - submit_start_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Height: =70
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    Width: =Parent.Width
+                                  Children:
+                                    - Label_Start:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =18
+                                          Size: =11
+                                          Text: ="Start date"
+                                          Width: =Parent.Width
+                                    - StartDatePicker_Date:
+                                        Control: Classic/DatePicker@2.6.0
+                                        Properties:
+                                          BorderColor: =RGBA(226, 228, 240, 1)
+                                          Fill: =RGBA(251, 251, 254, 1)
+                                          Font: =Font.'Segoe UI'
+                                          IconBackground: =RGBA(0, 18, 107, 1)
+                                          Width: =Parent.Width
+                              - submit_end_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Height: =70
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    Width: =Parent.Width
+                                  Children:
+                                    - Label_End:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =18
+                                          Size: =11
+                                          Text: ="End date"
+                                          Width: =Parent.Width
+                                    - EndDatePicker_Date:
+                                        Control: Classic/DatePicker@2.6.0
+                                        Properties:
+                                          BorderColor: =RGBA(226, 228, 240, 1)
+                                          Fill: =RGBA(251, 251, 254, 1)
+                                          Font: =Font.'Segoe UI'
+                                          IconBackground: =RGBA(0, 18, 107, 1)
+                                          Width: =Parent.Width
+                        - Label_LeaveType:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(91, 97, 120, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =18
+                              Size: =11
+                              Text: ="Leave type"
+                              Width: =Parent.Width
+                        - dd_LeaveType:
+                            Control: Classic/DropDown@2.3.1
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              ChevronBackground: =RGBA(0, 18, 107, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              Default: ="Vacation Paid"
+                              Fill: =RGBA(251, 251, 254, 1)
+                              Font: =Font.'Segoe UI'
+                              Items: =["Vacation Paid", "Vacation Unpaid", "Sick Leave Paid", "Sick Leave Unpaid", "Bereavement", "Jury Duty", "Personal Day", "Stat. Holiday"]
+                              Items.Value: =Value
+                              Size: =12
+                              Width: =Parent.Width
+                        - Label_LeaveTime:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(91, 97, 120, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =18
+                              Size: =11
+                              Text: ="Day length"
+                              Visible: =StartDatePicker_Date.SelectedDate = EndDatePicker_Date.SelectedDate
+                              Width: =Parent.Width
+                        - day_length_chips:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =46
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Visible: =StartDatePicker_Date.SelectedDate = EndDatePicker_Date.SelectedDate
+                              Width: =Parent.Width
+                            Children:
+                              - chip_FullDay:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varLeaveTime = "Full Day", RGBA(0, 18, 107, 1), RGBA(226, 228, 240, 1))
+                                    BorderThickness: =1
+                                    Color: =If(varLeaveTime = "Full Day", RGBA(255, 255, 255, 1), RGBA(91, 97, 120, 1))
+                                    Fill: =If(varLeaveTime = "Full Day", RGBA(0, 18, 107, 1), RGBA(255, 255, 255, 1))
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    OnSelect: =Set(varLeaveTime, "Full Day")
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Size: =11
+                                    Text: ="Full day"
+                                    Width: =100
+                              - chip_FirstHalf:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varLeaveTime = "First Half", RGBA(0, 18, 107, 1), RGBA(226, 228, 240, 1))
+                                    BorderThickness: =1
+                                    Color: =If(varLeaveTime = "First Half", RGBA(255, 255, 255, 1), RGBA(91, 97, 120, 1))
+                                    Fill: =If(varLeaveTime = "First Half", RGBA(0, 18, 107, 1), RGBA(255, 255, 255, 1))
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    OnSelect: =Set(varLeaveTime, "First Half")
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Size: =11
+                                    Text: ="First half"
+                                    Width: =100
+                              - chip_SecondHalf:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =If(varLeaveTime = "Second Half", RGBA(0, 18, 107, 1), RGBA(226, 228, 240, 1))
+                                    BorderThickness: =1
+                                    Color: =If(varLeaveTime = "Second Half", RGBA(255, 255, 255, 1), RGBA(91, 97, 120, 1))
+                                    Fill: =If(varLeaveTime = "Second Half", RGBA(0, 18, 107, 1), RGBA(255, 255, 255, 1))
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    OnSelect: =Set(varLeaveTime, "Second Half")
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Size: =11
+                                    Text: ="Second half"
+                                    Width: =100
+                        - Label_Comments:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(91, 97, 120, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =18
+                              Size: =11
+                              Text: ="Comments (optional)"
+                              Width: =Parent.Width
+                        - txt_Comments:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              Default: =""
+                              Fill: =RGBA(251, 251, 254, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =64
+                              HintText: ="Add a note for your approver…"
+                              Mode: =TextMode.MultiLine
+                              Size: =12
+                              Width: =Parent.Width
+                        - preview_box:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(238, 240, 251, 1)
+                              FillPortions: =0
+                              Height: =58
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingBottom: =6
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              PaddingTop: =6
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              Width: =Parent.Width
+                            Children:
+                              - preview_days_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Height: =44
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - Label_PreviewDaysNum:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(0, 18, 107, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =22
+                                          Size: =15
+                                          Text: =lbl_DaysCalc.Text
+                                          Width: =Parent.Width
+                                    - Label_PreviewDaysCap:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="working day(s)"
+                                          Width: =Parent.Width
+                              - preview_who_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Height: =44
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - Label_PreviewWhoCap:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Right
+                                          Color: =RGBA(91, 97, 120, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Approver"
+                                          Width: =Parent.Width
+                                    - Label_PreviewWhoName:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Right
+                                          Color: =RGBA(23, 26, 51, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =22
+                                          Size: =12
+                                          Text: =Coalesce(varApproverName, varApproverEmail, "Not assigned")
+                                          Width: =Parent.Width
+                        - submit_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Height: =8
+                              LayoutMinHeight: =4
+                              LayoutMinWidth: =0
+                        - Button_SubmitLeave:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              DisplayMode: =If(varIsSaving, DisplayMode.Disabled, DisplayMode.Edit)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =48
+                              HoverFill: =RGBA(0, 10, 69, 1)
+                              OnSelect: =Select(Button_SubmitLeave_Execute)
+                              Size: =14
+                              Text: ="Submit request"
+                              Width: =Parent.Width
+      - lbl_DaysCalc:
+          Control: Label@2.5.1
+          Properties:
+            Height: =1
+            Text: |-
+              =With(
+                  {
+                      varStart: StartDatePicker_Date.SelectedDate,
+                      varEnd: EndDatePicker_Date.SelectedDate,
+                      varDiff: DateDiff(StartDatePicker_Date.SelectedDate, EndDatePicker_Date.SelectedDate) + 1,
+                      varLeaveType: Coalesce(dd_LeaveType.Selected.Value, "")
+                  },
+                  If(
+                      Or(IsBlank(varStart), IsBlank(varEnd), varDiff <= 0, varDiff > 50000),
+                      0,
+                      If(
+                          StartDatePicker_Date.SelectedDate = EndDatePicker_Date.SelectedDate && varLeaveTime <> "Full Day",
+                          0.5,
+                          With(
+                              {
+                                  varDateRange: ForAll(Sequence(varDiff), varStart + Value - 1),
+                                  varHolidayDates: ForAll(colPublic_Holidays, CleanDateKey)
+                              },
+                              If(
+                                  varLeaveType = "Stat. Holiday",
+                                  CountIf(
+                                      varDateRange,
+                                      And(
+                                          Weekday(Value) in [2, 3, 4, 5, 6],
+                                          Text(Value, "yyyy-mm-dd") in varHolidayDates
+                                      )
+                                  ),
+                                  CountIf(
+                                      varDateRange,
+                                      And(
+                                          Weekday(Value) in [2, 3, 4, 5, 6],
+                                          Not(Text(Value, "yyyy-mm-dd") in varHolidayDates)
+                                      )
+                                  )
+                              )
+                          )
+                      )
+                  )
+              )
+            Visible: =false
+            Width: =1
+      - Button_SubmitLeave_Execute:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =If(
+                  varIsSaving,
+                  Notify("Please wait...", NotificationType.Warning),
+                  IsBlank(StartDatePicker_Date.SelectedDate) || IsBlank(EndDatePicker_Date.SelectedDate),
+                  Notify("Select start and end dates", NotificationType.Warning),
+                  EndDatePicker_Date.SelectedDate < StartDatePicker_Date.SelectedDate,
+                  Notify("End date must be on or after start date", NotificationType.Warning),
+                  Year(StartDatePicker_Date.SelectedDate) <> Year(EndDatePicker_Date.SelectedDate),
+                  Notify("Leave must be within a single year", NotificationType.Warning),
+                  Value(lbl_DaysCalc.Text) <= 0,
+                  Notify("No working days in this range", NotificationType.Warning),
+                  IsBlank(varApproverEmail),
+                  Notify("No approver assigned in Employees list", NotificationType.Error),
+                  IsBlank(dd_LeaveType.Selected.Value),
+                  Notify("Select a leave type", NotificationType.Warning),
+                  CountRows(
+                      Filter(
+                          colMyRequests,
+                          ApprovalStatus_1 <> "Rejected" &&
+                          StartDate <= EndDatePicker_Date.SelectedDate &&
+                          EndDate >= StartDatePicker_Date.SelectedDate
+                      )
+                  ) > 0,
+                  Notify("Overlaps an existing leave request", NotificationType.Error),
+                  Set(varIsSaving, true);
+                  Set(GUID_Var, GUID());
+                  With(
+                      {
+                          varStart: StartDatePicker_Date.SelectedDate,
+                          varEnd: EndDatePicker_Date.SelectedDate,
+                          varDiff: DateDiff(StartDatePicker_Date.SelectedDate, EndDatePicker_Date.SelectedDate) + 1
+                      },
+                      ClearCollect(
+                          colLeaveDates,
+                          ForAll(
+                              Filter(
+                                  ForAll(Sequence(varDiff), { LeaveDate: varStart + Value - 1 }),
+                                  Weekday(LeaveDate) in [2, 3, 4, 5, 6]
+                              ),
+                              { LeaveDate: LeaveDate }
+                          )
+                      )
+                  );
+                  ClearCollect(
+                      colHoursSync,
+                      Filter(
+                          'Hours Tracking (Hours)',
+                          Employee = User().Email &&
+                          Date >= StartDatePicker_Date.SelectedDate &&
+                          Date <= EndDatePicker_Date.SelectedDate
+                      )
+                  );
+                  If(
+                      CountRows(
+                          Filter(
+                              colHoursSync,
+                              Date in ForAll(colLeaveDates, LeaveDate) &&
+                              (Task = "Work Day" || Task = "Weekend" || IsBlank(Task)) &&
+                              Coalesce(Standard_time, 0) > 0
+                          )
+                      ) > 0,
+                      Set(varIsSaving, false);
+                      Notify("Staff Club already has worked hours on a day in this range. Clear those hours first.", NotificationType.Error),
+                      Patch(
+                          'Vacations Tracking (Days)',
+                          Defaults('Vacations Tracking (Days)'),
+                          {
+                              Title: GUID_Var,
+                              LOG_ID: GUID_Var,
+                              Employee: User().Email,
+                              Employee_Name: User().FullName,
+                              Project: Selected_ProjectID,
+                              StartDate: StartDatePicker_Date.SelectedDate,
+                              EndDate: EndDatePicker_Date.SelectedDate,
+                              Days: Value(lbl_DaysCalc.Text),
+                              Leave_Time: If(
+                                  StartDatePicker_Date.SelectedDate = EndDatePicker_Date.SelectedDate,
+                                  varLeaveTime,
+                                  "Full Day"
+                              ),
+                              Type_of_leave: dd_LeaveType.Selected.Value,
+                              Comments: txt_Comments.Text,
+                              App_Name: "Dayaway_HR_Vacations",
+                              ApproverID_1: varApproverEmail,
+                              ApprovalStatus_1: "Pending"
+                          }
+                      );
+                      ForAll(
+                          colLeaveDates As d,
+                          With(
+                              {
+                                  dayLog: GUID_Var & "_" & Text(d.LeaveDate, "yyyymmdd"),
+                                  dayTask: If(
+                                      Text(d.LeaveDate, "yyyy-mm-dd") in ForAll(colPublic_Holidays, CleanDateKey),
+                                      "Stat. Holiday",
+                                      dd_LeaveType.Selected.Value
+                                  )
+                              },
+                              Patch(
+                                  'Hours Tracking (Hours)',
+                                  Defaults('Hours Tracking (Hours)'),
+                                  {
+                                      Title: dayLog,
+                                      LOG_ID: dayLog,
+                                      Employee: User().Email,
+                                      Employee_Name: User().FullName,
+                                      Date: d.LeaveDate,
+                                      Task: dayTask,
+                                      Standard_time: 0,
+                                      Comments: txt_Comments.Text,
+                                      App_Name: "Dayaway",
+                                      ApproverID_1: varApproverEmail,
+                                      ApprovalStatus_1: "Pending"
+                                  }
+                              )
+                          )
+                      );
+                      Office365Outlook.SendEmailV2(
+                          varApproverEmail,
+                          dd_LeaveType.Selected.Value & " Request Submitted",
+                          "A new " & dd_LeaveType.Selected.Value & " request has been submitted by " & User().FullName &
+                          ". Please review in DayAway.<br><br>" &
+                          "<b>Type:</b> " & dd_LeaveType.Selected.Value & "<br>" &
+                          "<b>Dates:</b> " & Text(StartDatePicker_Date.SelectedDate, "dd-mmm-yyyy") &
+                          " to " & Text(EndDatePicker_Date.SelectedDate, "dd-mmm-yyyy") & "<br>" &
+                          "<b>Comments:</b> " & txt_Comments.Text,
+                          { IsHtml: true }
+                      );
+                      Notify("Leave submitted", NotificationType.Success);
+                      Reset(dd_LeaveType);
+                      Reset(txt_Comments);
+                      Set(varLeaveTime, "Full Day");
+                      Set(varShowSubmitSheet, false);
+                      ClearCollect(
+                          colMyRequests,
+                          SortByColumns(
+                              Filter('Vacations Tracking (Days)', Employee = User().Email),
+                              "StartDate",
+                              SortOrder.Descending
+                          )
+                      );
+                      Set(varIsSaving, false)
+                  )
+              )
+            Visible: =false
+            Width: =1
+      - Overlay_RequestDetail:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(10, 12, 30, 0.42)
+            Height: =Parent.Height
+            LayoutAlignItems: =If(App.Width < 680, LayoutAlignItems.Stretch, LayoutAlignItems.Center)
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutJustifyContent: =If(App.Width < 680, LayoutJustifyContent.End, LayoutJustifyContent.Center)
+            Visible: =varShowRequestDetail
+            Width: =Parent.Width
+          Children:
+            - detail_sheet_panel:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =If(App.Width < 680, Min(Parent.Height * 0.75, 480), 420)
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =20
+                  PaddingLeft: =If(App.Width < 680, 16, 20)
+                  PaddingRight: =If(App.Width < 680, 16, 20)
+                  PaddingTop: =18
+                  RadiusBottomLeft: =If(App.Width < 680, 0, 16)
+                  RadiusBottomRight: =If(App.Width < 680, 0, 16)
+                  RadiusTopLeft: =If(App.Width < 680, 20, 16)
+                  RadiusTopRight: =If(App.Width < 680, 20, 16)
+                  Width: =If(App.Width < 680, Parent.Width, Min(480, Parent.Width * 0.9))
+                Children:
+                  - detail_sheet_header:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =36
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - Label_DetailTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(23, 26, 51, 1)
+                              FillPortions: =1
+                              Font: =Font.'Open Sans'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =32
+                              Size: =16
+                              Text: ="Request details"
+                              Width: =200
+                        - btn_CloseDetail:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(91, 97, 120, 1)
+                              Fill: =RGBA(240, 241, 248, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =30
+                              OnSelect: =Set(varShowRequestDetail, false)
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =14
+                              Text: ="✕"
+                              Width: =30
+                  - Label_DetailType:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(23, 26, 51, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =15
+                        Text: =varDetailType
+                        Width: =Parent.Width
+                  - Label_DetailMeta:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(91, 97, 120, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =22
+                        Size: =12
+                        Text: =varDetailDates & " · " & Text(varDetailDays) & If(varDetailDays = 1, " day", " days") & " · " & Coalesce(varDetailStatus, "")
+                        Width: =Parent.Width
+                  - Label_DetailMyCommentsCap:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(91, 97, 120, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =18
+                        Size: =11
+                        Text: ="Your comments"
+                        Width: =Parent.Width
+                  - Label_DetailMyComments:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(226, 228, 240, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(23, 26, 51, 1)
+                        Fill: =RGBA(251, 251, 254, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =72
+                        Size: =12
+                        Text: =If(IsBlank(varDetailComments) || Len(Trim(varDetailComments)) = 0, "No comments submitted.", varDetailComments)
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =Parent.Width
+                  - Label_DetailApprCommentsCap:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(91, 97, 120, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =18
+                        Size: =11
+                        Text: ="Approver comments"
+                        Width: =Parent.Width
+                  - Label_DetailApprComments:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(226, 228, 240, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(23, 26, 51, 1)
+                        Fill: =RGBA(238, 240, 251, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =72
+                        Size: =12
+                        Text: =If(IsBlank(varDetailApproverComments) || Len(Trim(varDetailApproverComments)) = 0, "No approver comments yet.", varDetailApproverComments)
+                        VerticalAlign: =VerticalAlign.Top
+                        Width: =Parent.Width
+                  - btn_CloseDetailBottom:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        Fill: =RGBA(0, 18, 107, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =44
+                        OnSelect: =Set(varShowRequestDetail, false)
+                        Size: =13
+                        Text: ="Close"
+                        Width: =Parent.Width
+      - Overlay_DeleteConfirm:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(10, 12, 30, 0.42)
+            Height: =Parent.Height
+            Visible: =varShowDeleteConfirm
+            Width: =Parent.Width
+          Children:
+            - DeleteConfirm_Card:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =112
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =14
+                  PaddingBottom: =16
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =18
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  Width: =Min(Parent.Width * 0.9, 320)
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - Label_DeleteTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(23, 26, 51, 1)
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =14
+                        Text: ="Delete this request?"
+                        Width: =Parent.Width
+                  - delete_btn_row:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =42
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - btn_DeleteCancel:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =1
+                              Font: =Font.'Segoe UI'
+                              LayoutMinWidth: =0
+                              OnSelect: =Set(varShowDeleteConfirm, false)
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =12
+                              Text: ="Cancel"
+                              Width: =1
+                        - btn_DeleteConfirm:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(179, 38, 30, 1)
+                              FillPortions: =1
+                              Font: =Font.'Segoe UI'
+                              LayoutMinWidth: =0
+                              OnSelect: |-
+                                =Remove(
+                                    'Vacations Tracking (Days)',
+                                    LookUp('Vacations Tracking (Days)', ID = varDeleteRequestID)
+                                );
+                                ClearCollect(
+                                    colHoursSync,
+                                    Filter(
+                                        'Hours Tracking (Hours)',
+                                        Employee = User().Email &&
+                                        Date >= varDeleteStart &&
+                                        Date <= varDeleteEnd
+                                    )
+                                );
+                                ClearCollect(
+                                    colHoursSync,
+                                    Filter(
+                                        colHoursSync,
+                                        StartsWith(LOG_ID, varDeleteRequestLog & "_")
+                                    )
+                                );
+                                ForAll(
+                                    colHoursSync As h,
+                                    Remove(
+                                        'Hours Tracking (Hours)',
+                                        LookUp('Hours Tracking (Hours)', ID = h.ID)
+                                    )
+                                );
+                                Set(varShowDeleteConfirm, false);
+                                Notify("Request deleted", NotificationType.Success);
+                                ClearCollect(
+                                    colMyRequests,
+                                    SortByColumns(
+                                        Filter('Vacations Tracking (Days)', Employee = User().Email),
+                                        "StartDate",
+                                        SortOrder.Descending
+                                    )
+                                );
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =12
+                              Text: ="Delete"
+                              Width: =1
