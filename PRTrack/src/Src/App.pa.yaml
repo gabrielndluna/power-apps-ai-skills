@@ -1,0 +1,222 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =      Set(varCurrentUserEmail, User().Email);
+      Set(varCurrentUserName, User().FullName);
+      Set(varSelectedProject, { projectidentifier: "", projectname: "" });
+      Set(varPRFilter, "all");
+      Set(varDashTab, "approver");
+      Set(varDetailTab, "request");
+      Set(varLogSearch, "");
+      Set(varIsAdmin, false);
+      Set(varCurrentRole, "Viewer");
+      Set(varCreateNonce, 1);
+      Set(varExpandedLine, Blank());
+      Set(varExpandedPcLine, Blank());
+      Set(varPipeIndex, 0);
+      Set(varPipeAllPo, false);
+      Set(varPipeReturned, false);
+      Set(varSettingsSelectedEmail, "");
+      Set(varSettingsSelectedName, "");
+      Set(varShowLogDelete, false);
+      Set(varSkipGalleryNav, false);
+      Set(varDeletePR, Blank());
+      Set(varShowLineDelete, false);
+      Set(varDeleteLine, Blank());
+      Set(varShowAddSupplier, false);
+      Set(varSupplierDefault, "No Preference");
+
+      ClearCollect(
+          colUserPermissions,
+          Filter('PRTrack - Permissions', Title = varCurrentUserEmail)
+      );
+      If(
+          CountRows(colUserPermissions) = 0,
+          ClearCollect(
+              colUserPermissions,
+              Filter('PRTrack - Permissions', Title = Lower(varCurrentUserEmail))
+          )
+      );
+
+      Set(
+          varIsAdmin,
+          !IsBlank(LookUp(colUserPermissions, Admin = true))
+      );
+
+      ClearCollect(colPermittedProjects, { projectidentifier: "", projectname: "" });
+      Clear(colPermittedProjects);
+      ForAll(
+          colUserPermissions As perm,
+          If(
+              !IsBlank(perm.Project) && CountRows(Filter(colPermittedProjects, projectidentifier = perm.Project)) = 0,
+              Collect(
+                  colPermittedProjects,
+                  {
+                      projectidentifier: perm.Project,
+                      projectname: perm.Project
+                  }
+              )
+          )
+      );
+
+      If(
+          CountRows(colPermittedProjects) > 0,
+          Set(varSelectedProject, First(colPermittedProjects))
+      );
+
+      Set(
+          varCurrentRole,
+          Coalesce(
+              LookUp(colUserPermissions, Project = varSelectedProject.projectidentifier).Role.Value,
+              "Viewer"
+          )
+      );
+      Set(
+          varDashTab,
+          Switch(
+              varCurrentRole,
+              "Approver", "approver",
+              "Buyer", "buyer",
+              "requester"
+          )
+      );
+
+      ClearCollect(
+          colPermittedPRs,
+          {
+              Title: "",
+              projectidentifier: "",
+              prnumber: "",
+              reqtype: { Value: "" },
+              reqdate: Today(),
+              requester: "",
+              requesteremail: "",
+              phase: { Value: "" },
+              category: { Value: "" },
+              onsitedate: Today(),
+              deliveryloc: "",
+              priority: { Value: "" },
+              supplier: { Value: "" },
+              contact: "",
+              proceedapprover: "",
+              doaapprover: "",
+              comments: "",
+              prstatus: { Value: "" }
+          }
+      );
+      Set(varSelectedPR, First(colPermittedPRs));
+      Clear(colPermittedPRs);
+      ForAll(
+          colPermittedProjects As p,
+          Collect(
+              colPermittedPRs,
+              Filter(
+                  'PRTrack - Requisitions',
+                  projectidentifier = p.projectidentifier
+              )
+          )
+      );
+
+      ClearCollect(
+          colPermittedLines,
+          {
+              Title: "",
+              pridentifier: "",
+              linenumber: 0,
+              description: "",
+              uom: { Value: "" },
+              qty: 0,
+              notes: "",
+              buyer: "",
+              vendor: "",
+              podesc: "",
+              quoted: 0,
+              ponumber: "",
+              sourcing: { Value: "" },
+              leadtime: "",
+              expdelivery: Today(),
+              nwacode: "",
+              origbudget: 0,
+              rembudget: 0,
+              budgetstatus: { Value: "" },
+              pcnotes: "",
+              proceedstatus: { Value: "" },
+              proceedapprover: "",
+              proceedcomment: "",
+              stage: { Value: "" },
+              doaapprover: "",
+              doacomment: ""
+          }
+      );
+      Clear(colPermittedLines);
+      ForAll(
+          colPermittedProjects As p,
+          Collect(
+              colPermittedLines,
+              Filter(
+                  'PRTrack - LineItems',
+                  StartsWith(pridentifier, p.projectidentifier & "-")
+              )
+          )
+      );
+
+      ClearCollect(
+          colProjectPRs,
+          Filter(colPermittedPRs, projectidentifier = varSelectedProject.projectidentifier)
+      );
+      ClearCollect(
+          colProjectLines,
+          Filter(colPermittedLines, StartsWith(pridentifier, varSelectedProject.projectidentifier & "-"))
+      );
+      ClearCollect(
+          colProjectPermissions,
+          Filter('PRTrack - Permissions', Project = varSelectedProject.projectidentifier)
+      );
+      ClearCollect(
+          colApprovers,
+          Filter(colProjectPermissions, Role.Value = "Approver")
+      );
+      ClearCollect(
+          colBuyers,
+          Filter(colProjectPermissions, Role.Value = "Buyer")
+      );
+      ClearCollect(
+          colUserHits,
+          {
+              Id: "",
+              DisplayName: "",
+              Mail: "",
+              UserPrincipalName: "",
+              Department: ""
+          }
+      );
+      Clear(colUserHits);
+      ClearCollect(colSuppliers, { Value: "No Preference" });
+      Collect(
+          colSuppliers,
+          Filter(
+              Distinct(colPermittedPRs, supplier.Value),
+              !IsBlank(Value) && Value <> "No Preference" && Value <> "Suggested supplier"
+          )
+      );
+      ClearCollect(
+          colDraftLines,
+          {
+              lineid: GUID(),
+              lineno: 1,
+              description: "",
+              uom: "Each",
+              qty: 1,
+              notes: ""
+          }
+      );
+    StartScreen: =Dashboard
+    Theme: =PowerAppsTheme

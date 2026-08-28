@@ -8,6 +8,8 @@
 # ************************************************************************************************
 EditorState:
   ScreensOrder:
-    - Home
-    - Register
-    - Subcontract Detail
+    - Screen_Home
+    - Hours Tracking
+    - Screen_WeeklyApprovals
+    - Approvals
+    - Screen_Settings

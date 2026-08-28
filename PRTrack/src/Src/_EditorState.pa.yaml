@@ -8,6 +8,8 @@
 # ************************************************************************************************
 EditorState:
   ScreensOrder:
-    - Home
-    - Register
-    - Subcontract Detail
+    - Dashboard
+    - PR Log
+    - PR Detail
+    - New PR
+    - Settings

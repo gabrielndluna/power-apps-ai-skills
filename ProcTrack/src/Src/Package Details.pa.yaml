@@ -3813,6 +3813,133 @@ Screens:
                         Text: ="Cancel"
                         TextSize: =12
                         Width: =180
+                  - archive_package_button:
+                      Control: CanvasComponent
+                      ComponentName: ButtonInverted
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        ArrowVisible: =false
+                        Fill: |
+                          =Color.White
+                        Height: =60
+                        Icon: ="Text"
+                        IconVisible: =false
+                        LayoutMinHeight: =0
+                        OnPressAction: |-
+                          =IfError(
+                              Patch(
+                                  'ProcTrack - Packages',
+                                  LookUp(
+                                      'ProcTrack - Packages',
+                                      packageidentifier = First(colPackageDetails).packageidentifier
+                                  ),
+                                  {archived: true}
+                              );
+                              Patch(
+                                  colPackageDetails,
+                                  First(colPackageDetails),
+                                  {archived: true}
+                              );
+                              Patch(
+                                  colProjectPackages,
+                                  LookUp(
+                                      colProjectPackages,
+                                      packageidentifier = First(colPackageDetails).packageidentifier
+                                  ),
+                                  {archived: true}
+                              );
+                              If(
+                                  !IsBlank(
+                                      LookUp(
+                                          colPermittedPackages,
+                                          packageidentifier = First(colPackageDetails).packageidentifier
+                                      )
+                                  ),
+                                  Patch(
+                                      colPermittedPackages,
+                                      LookUp(
+                                          colPermittedPackages,
+                                          packageidentifier = First(colPackageDetails).packageidentifier
+                                      ),
+                                      {archived: true}
+                                  )
+                              );
+                              Notify("Package archived.", NotificationType.Success);
+                              Navigate('Welcome screen', ScreenTransition.Fade),
+                              Notify(
+                                  "Error archiving: " & FirstError.Message,
+                                  NotificationType.Error
+                              )
+                          )
+                        Text: ="Archive"
+                        TextSize: =12
+                        Visible: |-
+                          =varCanEditCurrentProject && First(colPackageDetails).archived <> true
+                        Width: =160
+                  - unarchive_package_button:
+                      Control: CanvasComponent
+                      ComponentName: ButtonMain
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Stretch
+                        ArrowVisible: =false
+                        Fill: |
+                          =Color.White
+                        Height: =60
+                        Icon: ="Text"
+                        IconVisible: =false
+                        LayoutMinHeight: =0
+                        OnPressAction: |-
+                          =IfError(
+                              Patch(
+                                  'ProcTrack - Packages',
+                                  LookUp(
+                                      'ProcTrack - Packages',
+                                      packageidentifier = First(colPackageDetails).packageidentifier
+                                  ),
+                                  {archived: false}
+                              );
+                              Patch(
+                                  colPackageDetails,
+                                  First(colPackageDetails),
+                                  {archived: false}
+                              );
+                              Patch(
+                                  colProjectPackages,
+                                  LookUp(
+                                      colProjectPackages,
+                                      packageidentifier = First(colPackageDetails).packageidentifier
+                                  ),
+                                  {archived: false}
+                              );
+                              If(
+                                  !IsBlank(
+                                      LookUp(
+                                          colPermittedPackages,
+                                          packageidentifier = First(colPackageDetails).packageidentifier
+                                      )
+                                  ),
+                                  Patch(
+                                      colPermittedPackages,
+                                      LookUp(
+                                          colPermittedPackages,
+                                          packageidentifier = First(colPackageDetails).packageidentifier
+                                      ),
+                                      {archived: false}
+                                  )
+                              );
+                              Notify("Package restored.", NotificationType.Success);
+                              Set(varPackageFilter, "all");
+                              Navigate('Welcome screen', ScreenTransition.Fade),
+                              Notify(
+                                  "Error restoring: " & FirstError.Message,
+                                  NotificationType.Error
+                              )
+                          )
+                        Text: ="Unarchive"
+                        TextSize: =12
+                        Visible: |-
+                          =varCanEditCurrentProject && First(colPackageDetails).archived = true
+                        Width: =180
                   - save_changes_button:
                       Control: CanvasComponent
                       ComponentName: ButtonMain

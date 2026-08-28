@@ -320,7 +320,12 @@ Screens:
                                     Height: =28
                                     Size: =16
                                     Text: |-
-                                      =CountRows(colPermittedPackages)
+                                      =CountRows(
+                                          Filter(
+                                              colPermittedPackages,
+                                              archived <> true
+                                          )
+                                      )
                                     Width: =Parent.Width
                               - dash_kpi_packages_label:
                                   Control: Label@2.5.1
@@ -404,7 +409,7 @@ Screens:
                                       =CountRows(
                                           Filter(
                                               colPermittedPackages,
-                                              !IsBlank(actualawarddate)
+                                              !IsBlank(actualawarddate) && archived <> true
                                           )
                                       )
                                     Width: =Parent.Width
@@ -490,6 +495,7 @@ Screens:
                                       =CountRows(
                                           Filter(
                                               colPermittedPackages,
+                                              archived <> true &&
                                               IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && (
                                                   revisedplannedawarddate < Today() ||
                                                   (
@@ -720,7 +726,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    projectidentifier = ThisItem.projectidentifier
+                                                    projectidentifier = ThisItem.projectidentifier && archived <> true
                                                 )
                                             )
                                           Width: =dash_metric_packages.Width - 12
@@ -773,7 +779,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    projectidentifier = ThisItem.projectidentifier && !IsBlank(actualawarddate)
+                                                    projectidentifier = ThisItem.projectidentifier && !IsBlank(actualawarddate) && archived <> true
                                                 )
                                             )
                                           Width: =dash_metric_awarded.Width - 12
@@ -840,7 +846,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    projectidentifier = ThisItem.projectidentifier && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate < Today()
+                                                    projectidentifier = ThisItem.projectidentifier && archived <> true && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate < Today()
                                                 )
                                             )
                                           Width: =dash_metric_delayed.Width - 12
@@ -893,7 +899,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    projectidentifier = ThisItem.projectidentifier && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate >= Today() && revisedplannedawarddate <= Today() + 30
+                                                    projectidentifier = ThisItem.projectidentifier && archived <> true && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate >= Today() && revisedplannedawarddate <= Today() + 30
                                                 )
                                             )
                                           Width: =dash_metric_risk.Width - 12

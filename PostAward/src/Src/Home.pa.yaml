@@ -1,0 +1,1259 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Home:
+    Properties:
+      Fill: =RGBA(245, 245, 245, 1)
+      LoadingSpinnerColor: =RGBA(214, 12, 48, 1)
+      OnVisible: |-
+        =Set(varShowSettings, false);
+        If(
+            IsBlank(varSelectedProject) && CountRows(colPermittedProjects) > 0,
+            Set(varSelectedProject, First(colPermittedProjects))
+        );
+        If(
+            !IsBlank(varSelectedProject),
+            Set(
+                varCanEditCurrentProject,
+                !IsBlank(
+                    LookUp(
+                        colUserPermissions,
+                        Project = varSelectedProject.projectidentifier && Edit_allowed = "yes"
+                    )
+                )
+            );
+            ClearCollect(
+                colProjectSubcontracts,
+                Filter(
+                    'PostAward - Subcontracts',
+                    projectidentifier = varSelectedProject.projectidentifier
+                )
+            );
+            ClearCollect(
+                colProjectChanges,
+                Filter(
+                    'PostAward - Changes',
+                    projectidentifier = varSelectedProject.projectidentifier
+                )
+            );
+            ClearCollect(
+                colProjectPackages,
+                Filter(
+                    colPermittedPackages,
+                    projectidentifier = varSelectedProject.projectidentifier
+                )
+            );
+            ClearCollect(
+                colRegisterView,
+                ForAll(
+                    colProjectSubcontracts As s,
+                    With(
+                        {
+                            approvedSum: Coalesce(
+                                Sum(
+                                    AddColumns(
+                                        Filter(
+                                            colProjectChanges,
+                                            subcontractid = s.packageidentifier && status.Value = "Approved"
+                                        ),
+                                        _amt,
+                                        Coalesce(finalvalue, value)
+                                    ),
+                                    _amt
+                                ),
+                                0
+                            ),
+                            pendingSum: Coalesce(
+                                Sum(
+                                    AddColumns(
+                                        Filter(
+                                            colProjectChanges,
+                                            subcontractid = s.packageidentifier && status.Value = "Pending"
+                                        ),
+                                        _amt,
+                                        Coalesce(finalvalue, value)
+                                    ),
+                                    _amt
+                                ),
+                                0
+                            ),
+                            potentialSum: Coalesce(
+                                Sum(
+                                    AddColumns(
+                                        Filter(
+                                            colProjectChanges,
+                                            subcontractid = s.packageidentifier && status.Value = "Potential"
+                                        ),
+                                        _amt,
+                                        Coalesce(finalvalue, value)
+                                    ),
+                                    _amt
+                                ),
+                                0
+                            )
+                        },
+                        {
+                            ID: s.ID,
+                            packageidentifier: s.packageidentifier,
+                            subcontractnumber: s.subcontractnumber,
+                            ponumber: s.ponumber,
+                            vendor: s.vendor,
+                            scope: s.scope,
+                            bundle: s.bundle,
+                            contracttype: s.contracttype,
+                            originalvalue: Coalesce(s.originalvalue, 0),
+                            invoicedtodate: Coalesce(s.invoicedtodate, 0),
+                            responsibleca: s.responsibleca,
+                            backupca: s.backupca,
+                            currentlyactive: s.currentlyactive,
+                            holdback: s.holdback,
+                            closeoutstatus: s.closeoutstatus,
+                            startdate: s.startdate,
+                            completiondate: s.completiondate,
+                            projectidentifier: s.projectidentifier,
+                            apprCO: approvedSum,
+                            currentValue: Coalesce(s.originalvalue, 0) + approvedSum,
+                            futureLiab: pendingSum + potentialSum,
+                            eac: Coalesce(s.originalvalue, 0) + approvedSum + pendingSum + potentialSum,
+                            isOver: Coalesce(s.invoicedtodate, 0) > (Coalesce(s.originalvalue, 0) + approvedSum),
+                            isClosed: s.closeoutstatus.Value = "Closed",
+                            changeCount: CountRows(
+                                Filter(colProjectChanges, subcontractid = s.packageidentifier)
+                            )
+                        }
+                    )
+                )
+            );
+            Set(varHomeSubCount, CountRows(colRegisterView));
+            Set(varHomeActive, CountRows(Filter(colRegisterView, !isClosed && !isOver)));
+            Set(varHomeOver, CountRows(Filter(colRegisterView, isOver && !isClosed)));
+            Set(varHomeClosed, CountRows(Filter(colRegisterView, isClosed)));
+            Set(varHomeOriginal, Coalesce(Sum(colRegisterView, originalvalue), 0));
+            Set(varHomeCurrent, Coalesce(Sum(colRegisterView, currentValue), 0));
+            Set(varHomeFuture, Coalesce(Sum(colRegisterView, futureLiab), 0));
+            Set(varHomeEac, Coalesce(Sum(colRegisterView, eac), 0));
+            Set(varHomePendingChg, CountRows(Filter(colProjectChanges, status.Value = "Pending")));
+            Set(varHomePotentialChg, CountRows(Filter(colProjectChanges, status.Value = "Potential")));
+            Set(
+                varHomePctComplete,
+                If(
+                    varHomeCurrent <= 0,
+                    0,
+                    Min(
+                        100,
+                        Round(
+                            Coalesce(Sum(colRegisterView, invoicedtodate), 0) / varHomeCurrent * 100,
+                            0
+                        )
+                    )
+                )
+            );
+            ClearCollect(
+                colHomeAttention,
+                Filter(colRegisterView, isOver && !isClosed)
+            );
+            ClearCollect(
+                colHomePendingChanges,
+                FirstN(
+                    Sort(
+                        Filter(colProjectChanges, status.Value = "Pending" || status.Value = "Potential"),
+                        changedate,
+                        SortOrder.Descending
+                    ),
+                    8
+                )
+            )
+        )
+    Children:
+      - home_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =RGBA(245, 245, 245, 1)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =12
+            PaddingBottom: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =12
+            Width: =Parent.Width
+          Children:
+            - home_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.Light
+                  Fill: =RGBA(214, 12, 48, 1)
+                  FillPortions: =0
+                  Height: =108
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  PaddingBottom: =10
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =10
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Width: =Parent.Width
+                Children:
+                  - home_header_top:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =44
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =44
+                      Children:
+                        - home_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 0.18)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =36
+                              LayoutMinWidth: =36
+                              RadiusBottomLeft: =18
+                              RadiusBottomRight: =18
+                              RadiusTopLeft: =18
+                              RadiusTopRight: =18
+                              Width: =36
+                            Children:
+                              - home_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Height: =20
+                                    Icon: =Icon.Home
+                                    Width: =20
+                                    X: =8
+                                    Y: =8
+                        - home_brand_col:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                            Children:
+                              - home_brand_title:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =24
+                                    Size: =18
+                                    Text: ="PostAward"
+                                    Width: =280
+                              - home_brand_sub:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 0.82)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
+                                    Size: =11
+                                    Text: ="Home — change order and claims tracker"
+                                    Width: =320
+                        - home_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                        - home_user_col:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.End
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =16
+                              LayoutMinWidth: =16
+                            Children:
+                              - home_user_l:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Right
+                                    Color: =RGBA(255, 255, 255, 0.7)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =14
+                                    Size: =10
+                                    Text: ="SIGNED IN AS"
+                                    Width: =200
+                              - home_user_n:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Right
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    Size: =13
+                                    Text: =User().FullName
+                                    Width: =200
+                        - home_xls_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =32
+                              LayoutMinHeight: =32
+                              LayoutMinWidth: =32
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =32
+                            Children:
+                              - home_xls_img:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Height: =22
+                                    Image: ='excel-icon-17'
+                                    OnSelect: =Launch(varSubcontractsListUrl)
+                                    Width: =22
+                                    X: =5
+                                    Y: =5
+                        - home_settings_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 0.18)
+                              FillPortions: =0
+                              Height: =32
+                              LayoutMinHeight: =32
+                              LayoutMinWidth: =32
+                              RadiusBottomLeft: =16
+                              RadiusBottomRight: =16
+                              RadiusTopLeft: =16
+                              RadiusTopRight: =16
+                              Width: =32
+                            Children:
+                              - home_settings_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Height: =18
+                                    Icon: =Icon.Settings
+                                    OnSelect: =Set(varShowSettings, true)
+                                    Width: =18
+                                    X: =7
+                                    Y: =7
+                  - home_header_bottom:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =32
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =32
+                      Children:
+                        - home_project_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =1
+                              Height: =32
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =32
+                              PaddingLeft: =12
+                              PaddingRight: =8
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                            Children:
+                              - home_project_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =32
+                                    Size: =11
+                                    Text: ="Project"
+                                    Width: =68
+                              - home_project_combo:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Center
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    ChevronBackground: =RGBA(255, 255, 255, 1)
+                                    ChevronFill: =RGBA(214, 12, 48, 1)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    DefaultSelectedItems: |-
+                                      =Filter(
+                                          AddColumns(colPermittedProjects, Display, projectname),
+                                          projectidentifier = varSelectedProject.projectidentifier
+                                      )
+                                    DisplayFields: =["Display"]
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =32
+                                    IsSearchable: =false
+                                    Items: =AddColumns(colPermittedProjects, Display, projectname)
+                                    OnChange: |-
+                                      =If(
+                                          !IsBlank(Self.Selected),
+                                          Set(varSelectedProject, Self.Selected);
+                                          Select(home_refresh_btn)
+                                      )
+                                    SearchFields: =["Display"]
+                                    SelectMultiple: =false
+                                    Size: =12
+                        - home_refresh_btn:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(214, 12, 48, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =32
+                              OnSelect: |-
+                                =If(
+                                    !IsBlank(varSelectedProject),
+                                    Set(
+                                        varCanEditCurrentProject,
+                                        !IsBlank(
+                                            LookUp(
+                                                colUserPermissions,
+                                                Project = varSelectedProject.projectidentifier && Edit_allowed = "yes"
+                                            )
+                                        )
+                                    );
+                                    ClearCollect(
+                                        colProjectSubcontracts,
+                                        Filter(
+                                            'PostAward - Subcontracts',
+                                            projectidentifier = varSelectedProject.projectidentifier
+                                        )
+                                    );
+                                    ClearCollect(
+                                        colProjectChanges,
+                                        Filter(
+                                            'PostAward - Changes',
+                                            projectidentifier = varSelectedProject.projectidentifier
+                                        )
+                                    );
+                                    ClearCollect(
+                                        colRegisterView,
+                                        ForAll(
+                                            colProjectSubcontracts As s,
+                                            With(
+                                                {
+                                                    approvedSum: Coalesce(Sum(AddColumns(Filter(colProjectChanges, subcontractid = s.packageidentifier && status.Value = "Approved"), _amt, Coalesce(finalvalue, value)), _amt), 0),
+                                                    pendingSum: Coalesce(Sum(AddColumns(Filter(colProjectChanges, subcontractid = s.packageidentifier && status.Value = "Pending"), _amt, Coalesce(finalvalue, value)), _amt), 0),
+                                                    potentialSum: Coalesce(Sum(AddColumns(Filter(colProjectChanges, subcontractid = s.packageidentifier && status.Value = "Potential"), _amt, Coalesce(finalvalue, value)), _amt), 0)
+                                                },
+                                                {
+                                                    ID: s.ID,
+                                                    packageidentifier: s.packageidentifier,
+                                                    subcontractnumber: s.subcontractnumber,
+                                                    ponumber: s.ponumber,
+                                                    vendor: s.vendor,
+                                                    scope: s.scope,
+                                                    bundle: s.bundle,
+                                                    contracttype: s.contracttype,
+                                                    originalvalue: Coalesce(s.originalvalue, 0),
+                                                    invoicedtodate: Coalesce(s.invoicedtodate, 0),
+                                                    responsibleca: s.responsibleca,
+                                                    backupca: s.backupca,
+                                                    currentlyactive: s.currentlyactive,
+                                                    holdback: s.holdback,
+                                                    closeoutstatus: s.closeoutstatus,
+                                                    startdate: s.startdate,
+                                                    completiondate: s.completiondate,
+                                                    projectidentifier: s.projectidentifier,
+                                                    apprCO: approvedSum,
+                                                    currentValue: Coalesce(s.originalvalue, 0) + approvedSum,
+                                                    futureLiab: pendingSum + potentialSum,
+                                                    eac: Coalesce(s.originalvalue, 0) + approvedSum + pendingSum + potentialSum,
+                                                    isOver: Coalesce(s.invoicedtodate, 0) > (Coalesce(s.originalvalue, 0) + approvedSum),
+                                                    isClosed: s.closeoutstatus.Value = "Closed",
+                                                    changeCount: CountRows(Filter(colProjectChanges, subcontractid = s.packageidentifier))
+                                                }
+                                            )
+                                        )
+                                    );
+                                    Set(varHomeSubCount, CountRows(colRegisterView));
+                                    Set(varHomeActive, CountRows(Filter(colRegisterView, !isClosed && !isOver)));
+                                    Set(varHomeOver, CountRows(Filter(colRegisterView, isOver && !isClosed)));
+                                    Set(varHomeClosed, CountRows(Filter(colRegisterView, isClosed)));
+                                    Set(varHomeOriginal, Coalesce(Sum(colRegisterView, originalvalue), 0));
+                                    Set(varHomeCurrent, Coalesce(Sum(colRegisterView, currentValue), 0));
+                                    Set(varHomeFuture, Coalesce(Sum(colRegisterView, futureLiab), 0));
+                                    Set(varHomeEac, Coalesce(Sum(colRegisterView, eac), 0));
+                                    Set(varHomePendingChg, CountRows(Filter(colProjectChanges, status.Value = "Pending")));
+                                    Set(varHomePotentialChg, CountRows(Filter(colProjectChanges, status.Value = "Potential")));
+                                    Set(varHomePctComplete, If(varHomeCurrent <= 0, 0, Min(100, Round(Coalesce(Sum(colRegisterView, invoicedtodate), 0) / varHomeCurrent * 100, 0))));
+                                    ClearCollect(colHomeAttention, Filter(colRegisterView, isOver && !isClosed));
+                                    ClearCollect(colHomePendingChanges, FirstN(Sort(Filter(colProjectChanges, status.Value = "Pending" || status.Value = "Potential"), changedate, SortOrder.Descending), 8));
+                                    Notify("Home metrics refreshed.", NotificationType.Success)
+                                )
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =11
+                              Text: ="Refresh"
+                              Width: =90
+            - home_actions:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =44
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =10
+                  LayoutMinHeight: =44
+                Children:
+                  - home_btn_register:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        Fill: =RGBA(214, 12, 48, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =40
+                        OnSelect: |-
+                          =Set(varRegisterFilter, "all");
+                          Navigate(Register, ScreenTransition.Fade)
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        Size: =12
+                        Text: ="Open Subcontract Register"
+                        Width: =220
+                  - home_btn_over:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(214, 12, 48, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(214, 12, 48, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =40
+                        OnSelect: |-
+                          =Set(varRegisterFilter, "over");
+                          Navigate(Register, ScreenTransition.Fade)
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        Size: =12
+                        Text: ="Over Budget (" & Coalesce(varHomeOver, 0) & ")"
+                        Width: =160
+                  - home_btn_add:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisplayMode: =If(varCanEditCurrentProject && !IsBlank(varSelectedProject), DisplayMode.Edit, DisplayMode.Disabled)
+                        Fill: =RGBA(35, 38, 43, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =40
+                        OnSelect: |-
+                          =Set(varPendingOpenAddSub, true);
+                          Navigate(Register, ScreenTransition.Fade)
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        Size: =12
+                        Text: ="+ Add Subcontract"
+                        Width: =160
+                  - home_actions_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                  - home_pct_chip:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Right
+                        Color: =RGBA(60, 65, 71, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        Size: =13
+                        Text: |-
+                          ="Invoiced vs current: " & Coalesce(varHomePctComplete, 0) & "%"
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =220
+            - home_kpi_counts:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =88
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =10
+                  LayoutMinHeight: =88
+                Children:
+                  - home_k_subs:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(228, 228, 228, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - home_k_subs_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =16
+                              Size: =10
+                              Text: ="SUBCONTRACTS"
+                        - home_k_subs_v:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(27, 27, 27, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =22
+                              Text: =Text(Coalesce(varHomeSubCount, 0))
+                  - home_k_active:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(228, 228, 228, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - home_k_active_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =16
+                              Size: =10
+                              Text: ="ACTIVE"
+                        - home_k_active_v:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(16, 124, 65, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =22
+                              Text: =Text(Coalesce(varHomeActive, 0))
+                  - home_k_over:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(228, 228, 228, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(251, 234, 234, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - home_k_over_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(177, 19, 41, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =16
+                              Size: =10
+                              Text: ="OVER BUDGET"
+                        - home_k_over_v:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(214, 12, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =22
+                              Text: =Text(Coalesce(varHomeOver, 0))
+                  - home_k_closed:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(228, 228, 228, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - home_k_closed_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =16
+                              Size: =10
+                              Text: ="CLOSED"
+                        - home_k_closed_v:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(108, 113, 118, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =22
+                              Text: =Text(Coalesce(varHomeClosed, 0))
+            - home_kpi_money:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =88
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =10
+                  LayoutMinHeight: =88
+                Children:
+                  - home_m_orig:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(228, 228, 228, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - home_m_orig_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =16
+                              Size: =10
+                              Text: ="ORIGINAL VALUE"
+                        - home_m_orig_v:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(27, 27, 27, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =16
+                              Text: =Text(Coalesce(varHomeOriginal, 0), "$#,##0")
+                  - home_m_cur:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(228, 228, 228, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - home_m_cur_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =16
+                              Size: =10
+                              Text: ="CURRENT VALUE"
+                        - home_m_cur_v:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(27, 27, 27, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =16
+                              Text: =Text(Coalesce(varHomeCurrent, 0), "$#,##0")
+                  - home_m_fut:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(228, 228, 228, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - home_m_fut_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =16
+                              Size: =10
+                              Text: ="FUTURE LIABILITY"
+                        - home_m_fut_v:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(27, 27, 27, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =16
+                              Text: =Text(Coalesce(varHomeFuture, 0), "$#,##0")
+                  - home_m_eac:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(228, 228, 228, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        PaddingBottom: =10
+                        PaddingLeft: =14
+                        PaddingRight: =14
+                        PaddingTop: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                      Children:
+                        - home_m_eac_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =16
+                              Size: =10
+                              Text: ="EAC"
+                        - home_m_eac_v:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(214, 12, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =16
+                              Text: =Text(Coalesce(varHomeEac, 0), "$#,##0")
+            - home_lists:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =1
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =12
+                  LayoutMinHeight: =200
+                Children:
+                  - home_attn_panel:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        RadiusBottomLeft: =11
+                        RadiusBottomRight: =11
+                        RadiusTopLeft: =11
+                        RadiusTopRight: =11
+                      Children:
+                        - home_attn_head:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(214, 12, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =34
+                              PaddingLeft: =12
+                              Size: =12
+                              Text: ="NEEDS ATTENTION — OVER BUDGET"
+                              VerticalAlign: =VerticalAlign.Middle
+                        - home_attn_empty:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =80
+                              Size: =12
+                              Text: ="No over-budget subcontracts for this project."
+                              VerticalAlign: =VerticalAlign.Middle
+                              Visible: =CountRows(colHomeAttention) = 0
+                        - home_attn_gal:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderThickness: =0
+                              FillPortions: =1
+                              Items: =colHomeAttention
+                              LayoutMinHeight: =80
+                              OnSelect: |-
+                                =Set(varSelectedSubcontract, ThisItem);
+                                Navigate('Subcontract Detail', ScreenTransition.Fade)
+                              TemplatePadding: =0
+                              TemplateSize: =52
+                              Visible: =CountRows(colHomeAttention) > 0
+                            Children:
+                              - home_attn_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(251, 234, 234, 1)
+                                    Height: =Parent.TemplateHeight
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    Width: =Parent.TemplateWidth
+                                  Children:
+                                    - home_attn_num:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(214, 12, 48, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =20
+                                          Size: =13
+                                          Text: =ThisItem.subcontractnumber
+                                          Width: =70
+                                    - home_attn_vendor:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(35, 38, 43, 1)
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =36
+                                          Size: =12
+                                          Text: =ThisItem.vendor & " — invoiced " & Text(ThisItem.invoicedtodate, "$#,##0") & " vs current " & Text(ThisItem.currentValue, "$#,##0")
+                                          Wrap: =true
+                  - home_pending_panel:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        RadiusBottomLeft: =11
+                        RadiusBottomRight: =11
+                        RadiusTopLeft: =11
+                        RadiusTopRight: =11
+                      Children:
+                        - home_pending_head:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(27, 27, 27, 1)
+                              Fill: =RGBA(246, 247, 248, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =34
+                              PaddingLeft: =12
+                              Size: =12
+                              Text: ="OPEN CHANGES — PENDING / POTENTIAL (" & (Coalesce(varHomePendingChg, 0) + Coalesce(varHomePotentialChg, 0)) & ")"
+                              VerticalAlign: =VerticalAlign.Middle
+                        - home_pending_empty:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =80
+                              Size: =12
+                              Text: ="No pending or potential changes."
+                              VerticalAlign: =VerticalAlign.Middle
+                              Visible: =CountRows(colHomePendingChanges) = 0
+                        - home_pending_gal:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderThickness: =0
+                              FillPortions: =1
+                              Items: =colHomePendingChanges
+                              LayoutMinHeight: =80
+                              OnSelect: |-
+                                =Set(
+                                    varSelectedSubcontract,
+                                    LookUp(colRegisterView, packageidentifier = ThisItem.subcontractid)
+                                );
+                                If(
+                                    !IsBlank(varSelectedSubcontract),
+                                    Navigate('Subcontract Detail', ScreenTransition.Fade)
+                                )
+                              TemplatePadding: =0
+                              TemplateSize: =48
+                              Visible: =CountRows(colHomePendingChanges) > 0
+                            Children:
+                              - home_pending_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =Parent.TemplateHeight
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    Width: =Parent.TemplateWidth
+                                  Children:
+                                    - home_pend_ref:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(51, 55, 60, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =20
+                                          Size: =12
+                                          Text: =ThisItem.refnumber
+                                          Width: =80
+                                    - home_pend_desc:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(90, 96, 102, 1)
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Size: =11
+                                          Text: =ThisItem.description
+                                          Wrap: =true
+                                    - home_pend_st:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          Color: =If(ThisItem.status.Value = "Pending", RGBA(214, 154, 0, 1), RGBA(47, 111, 179, 1))
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =20
+                                          Size: =11
+                                          Text: =ThisItem.status.Value
+                                          Width: =80
+                                    - home_pend_val:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Right
+                                          Color: =RGBA(35, 38, 43, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =20
+                                          Size: =12
+                                          Text: =Text(Coalesce(ThisItem.finalvalue, ThisItem.value), "$#,##0")
+                                          Width: =90
+      - home_overlay_settings:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(0, 0, 0, 0.45)
+            Height: =Parent.Height
+            Visible: =varShowSettings
+            Width: =Parent.Width
+          Children:
+            - home_settings_panel:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.Regular
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =300
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  PaddingBottom: =16
+                  PaddingLeft: =18
+                  PaddingRight: =18
+                  PaddingTop: =16
+                  RadiusBottomLeft: =12
+                  RadiusBottomRight: =12
+                  RadiusTopLeft: =12
+                  RadiusTopRight: =12
+                  Width: =420
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - home_set_title:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(27, 27, 27, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =28
+                        Size: =16
+                        Text: ="Settings"
+                  - home_set_user:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(60, 65, 71, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =40
+                        Size: =12
+                        Text: ="Signed in as " & User().FullName & " (" & User().Email & ")"
+                        Wrap: =true
+                  - home_set_edit:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(60, 65, 71, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =36
+                        Size: =12
+                        Text: |-
+                          ="Edit access for this project: " & If(varCanEditCurrentProject, "Yes", "No (view only)")
+                        Wrap: =true
+                  - home_set_help:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(108, 113, 118, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =90
+                        Size: =12
+                        Text: ="Permissions use ProcTrack - Permissions. Operational Owners listed on a subcontract get automatic view access to that project. XLS opens the SharePoint list for Excel export."
+                        Wrap: =true
+                  - home_set_close:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        Fill: =RGBA(214, 12, 48, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =40
+                        OnSelect: =Set(varShowSettings, false)
+                        RadiusBottomLeft: =9
+                        RadiusBottomRight: =9
+                        RadiusTopLeft: =9
+                        RadiusTopRight: =9
+                        Size: =12
+                        Text: ="Close"
+                        Width: =110

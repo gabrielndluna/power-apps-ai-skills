@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostAward — Interactive Design</title>
+<style>
+  :root {
+    --red: #D60C30;
+    --red-dark: #B01028;
+    --red-tint: #FBEAEA;
+    --bg: #F5F5F5;
+    --card: #FFFFFF;
+    --field: #DCE0E2;
+    --field-bd: #C9CFD2;
+    --header-row: #EBEBEB;
+    --chg-head: #F6F7F8;
+    --border: #E4E4E4;
+    --line: #EFEFEF;
+    --text: #1B1B1B;
+    --dim: #6C7176;
+    --muted: #9097A8;
+    --green: #2E9E5B;
+    --green-bg: #E7F4EC;
+    --green-pill: rgba(56,142,60,.12);
+    --green-text: #107C41;
+    --amber: #D69A00;
+    --amber-bg: #FBF1D6;
+    --blue: #2F6FB3;
+    --blue-bg: #E5EEF7;
+    --purple: #8A3A9E;
+    --purple-bg: #F3E8F5;
+    --gray-dot: #858585;
+    --gray-bg: rgba(133,133,133,.12);
+    --bar-track: #ECEEF0;
+    --font: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font);
+    background: #DDD;
+    color: var(--text);
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .frame {
+    max-width: 1440px;
+    margin: 16px auto 40px;
+    background: var(--bg);
+    min-height: calc(100vh - 56px);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.18);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .banner {
+    background: #23262B;
+    color: #fff;
+    padding: 10px 18px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .banner strong { color: #FFD166; }
+  .banner span { opacity: .85; }
+
+  .view { display: none; flex-direction: column; flex: 1; }
+  .view.show { display: flex; }
+
+  .header {
+    background: var(--red);
+    color: #fff;
+    margin: 12px 16px 0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+    padding: 10px 16px;
+  }
+  .header-reg { padding-bottom: 12px; }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+  }
+  .icon-well {
+    width: 36px; height: 36px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.18);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex: none; border: none; color: #fff;
+  }
+  .icon-well:hover { background: rgba(255,255,255,.28); }
+  .icon-well svg { width: 18px; height: 18px; }
+  .brand-col { flex: none; }
+  .brand-title { font-size: 18px; font-weight: 700; line-height: 1.2; }
+  .brand-sub { font-size: 11px; opacity: .82; margin-top: 2px; }
+  .spacer { flex: 1; }
+  .user-col { text-align: right; }
+  .user-col .eyebrow { font-size: 10px; font-weight: 700; opacity: .7; letter-spacing: .4px; }
+  .user-col .name { font-size: 13px; font-weight: 600; }
+  .tool-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .tool-btn:hover { background: rgba(255,255,255,.28); }
+  .tool-btn.svg svg { width: 20px; height: 20px; }
+  .tool-xls { background: #1D6F42; font-size: 10px; font-weight: 700; letter-spacing: .4px; }
+  .header-bottom { margin-top: 10px; }
+  .project-picker {
+    background: #fff; color: var(--text);
+    border-radius: 8px; padding: 8px 12px;
+    display: inline-flex; align-items: center; gap: 10px;
+    min-width: 320px; max-width: 480px;
+  }
+  .project-picker label { font-size: 11px; font-weight: 700; color: var(--dim); }
+  .project-picker select {
+    border: none; background: transparent; font: inherit; font-weight: 600;
+    flex: 1; outline: none; cursor: pointer;
+  }
+
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap; padding: 14px 16px 10px;
+  }
+  .filters {
+    display: flex; background: #fff; border-radius: 10px; padding: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.05); max-width: 520px;
+  }
+  .filters button {
+    border: none; background: transparent; padding: 8px 16px; border-radius: 6px;
+    font: inherit; font-size: 13px; font-weight: 600; color: #444; cursor: pointer;
+  }
+  .filters button .ct { font-size: 11px; opacity: .6; margin-left: 5px; }
+  .filters button.active { background: var(--red); color: #fff; }
+  .filters button.active .ct { opacity: .9; }
+  .search-cluster { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .search input {
+    border: 1px solid var(--field-bd); background: #fff; border-radius: 8px;
+    padding: 9px 12px; font: inherit; width: 150px;
+  }
+  .search input:focus { outline: none; border-color: var(--red); }
+  .btn-primary {
+    background: var(--red); color: #fff; border: none; border-radius: 9px;
+    padding: 10px 16px; font: inherit; font-weight: 700; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-outline {
+    background: #fff; color: var(--red); border: 1px solid var(--red);
+    border-radius: 9px; padding: 10px 16px; font: inherit; font-weight: 700; cursor: pointer;
+  }
+  .btn-outline:hover { background: var(--red-tint); }
+
+  .reg-wrap { padding: 0 16px 24px; flex: 1; }
+  .reg-table { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+  .reg-head, .reg-row {
+    display: grid;
+    grid-template-columns: 1.1fr 1.2fr 1.3fr 1fr .9fr .9fr .95fr .85fr 1.15fr 28px;
+    align-items: center; gap: 4px;
+  }
+  .reg-head {
+    background: var(--header-row); padding: 12px 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: .5px; color: #7A7F84; text-transform: uppercase;
+  }
+  .reg-head .col { padding: 0 6px; cursor: pointer; user-select: none; }
+  .reg-head .col.num, .reg-row .cell.num { text-align: right; }
+  .reg-head .col .sort { opacity: .5; }
+  .reg-row {
+    padding: 12px 10px; border-bottom: 1px solid var(--line); cursor: pointer;
+    transition: background .1s;
+  }
+  .reg-row:last-child { border-bottom: none; }
+  .reg-row:hover { background: #FAFBFC; }
+  .reg-row.over { background: #FBEAEA; }
+  .reg-row.over:hover { background: #F8E0E0; }
+  .reg-row .cell { padding: 0 6px; overflow: hidden; }
+  .sc-num { color: var(--red); font-weight: 700; }
+  .sc-po { color: var(--muted); font-size: 10px; margin-top: 2px; }
+  .vendor { font-weight: 600; }
+  .scope { color: #5A6066; font-size: 12px; line-height: 1.3; }
+  .bundle { font-size: 10px; font-weight: 700; color: #7A7F84; margin-top: 3px; }
+  .money { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .money.muted { color: var(--muted); font-weight: 500; }
+  .money.neg { color: var(--red); }
+  .eac { font-weight: 700; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 12px; white-space: nowrap;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .st-active { background: var(--green-pill); color: var(--green-text); }
+  .st-active .dot { background: #388E3C; }
+  .st-over { background: rgba(214,12,48,.12); color: #B11329; }
+  .st-over .dot { background: var(--red); }
+  .st-closed { background: var(--gray-bg); color: #6C7176; }
+  .st-closed .dot { background: var(--gray-dot); }
+  .chev { color: #C2C7CC; text-align: right; }
+  .empty { padding: 48px 20px; text-align: center; color: var(--muted); }
+
+  /* Detail status strip */
+  .status-strip {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; padding: 12px 16px 6px;
+  }
+  .status-left { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+  .cur-status .eyebrow, .pct-block .eyebrow {
+    font-size: 10px; letter-spacing: 1px; font-weight: 700; color: var(--muted);
+  }
+  .cur-status .big { font-size: 20px; font-weight: 700; margin-top: 2px; }
+  .cur-status .big.over { color: var(--red); }
+  .cur-status .big.closed { color: #6C7176; }
+  .cur-status .big.active { color: var(--green); }
+  .pct-block { min-width: 140px; }
+  .pct-block .pct-val { font-size: 15px; font-weight: 700; margin-top: 2px; }
+  .pct-track {
+    margin-top: 6px; height: 6px; width: 140px;
+    background: var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .pct-fill { height: 100%; background: var(--red); border-radius: 3px; min-width: 2px; transition: width .2s; }
+  .metric-cards { display: flex; gap: 10px; flex-wrap: wrap; }
+  .mcard {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; min-width: 118px;
+  }
+  .mcard .ml { font-size: 9.5px; letter-spacing: .6px; font-weight: 700; color: var(--muted); }
+  .mcard .mv { font-size: 15px; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .mcard.accent .mv { color: var(--red); }
+
+  .detail-body {
+    display: grid; grid-template-columns: 392px 1fr; gap: 12px;
+    padding: 8px 16px 16px; align-items: start; flex: 1;
+  }
+  @media (max-width: 1100px) { .detail-body { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: #fff; border-radius: 11px; box-shadow: 0 1px 3px rgba(0,0,0,.06); overflow: hidden;
+  }
+  .panel-head {
+    background: var(--red); color: #fff; padding: 8px 12px;
+    font-size: 11px; font-weight: 700; letter-spacing: .4px;
+  }
+  .panel-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .fld label { display: block; font-size: 10px; font-weight: 600; color: #3C4147; margin-bottom: 3px; }
+  .fld label .hint {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 14px; height: 14px; margin-left: 4px; border-radius: 50%;
+    background: var(--bar-track); color: var(--muted); font-size: 9px; font-weight: 700;
+    cursor: help; vertical-align: middle;
+  }
+  .chip {
+    background: var(--field); border: 1px solid var(--field-bd); border-radius: 7px;
+    padding: 8px 10px; font-size: 12px; min-height: 34px; display: flex; align-items: center;
+  }
+  .fld-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .fld input, .fld select, .fld textarea {
+    width: 100%; border: 1px solid var(--field-bd); border-radius: 7px;
+    padding: 7px 9px; font: inherit; background: #fff; min-height: 34px;
+  }
+  .fld textarea { min-height: 48px; resize: vertical; }
+  .fld input:focus, .fld select:focus, .fld textarea:focus { outline: none; border-color: var(--red); }
+  .toggle {
+    font-size: 10px; color: var(--red); font-weight: 700; cursor: pointer;
+    background: none; border: none; padding: 0; margin-left: 6px;
+  }
+
+  .reg-panel { display: flex; flex-direction: column; min-height: 520px; }
+  .reg-panel-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; gap: 10px;
+  }
+  .reg-panel-top .title { font-size: 14px; font-weight: 700; }
+  .co-head, .co-row {
+    display: grid;
+    grid-template-columns: 72px 110px 1fr 120px 120px 88px 88px 80px 36px;
+    align-items: center; gap: 0;
+  }
+  .co-head {
+    background: var(--chg-head); padding: 10px 14px;
+    font-size: 9px; font-weight: 700; letter-spacing: .4px; color: #8A9099; text-transform: uppercase;
+  }
+  .co-head .c.num, .co-row .c.num { text-align: right; }
+  .co-head .c.center, .co-row .c.center { text-align: center; }
+  .co-body { flex: 1; overflow: auto; max-height: 260px; }
+  .co-row {
+    padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer;
+  }
+  .co-row:hover { background: #FAFBFC; }
+  .co-ref { font-weight: 700; }
+  .co-desc { color: #5A6066; font-size: 11px; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .type-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 3px 7px; border-radius: 4px; text-align: center; width: 100%;
+  }
+  .type-co { background: var(--blue-bg); color: #255D96; }
+  .type-claim { background: var(--purple-bg); color: var(--purple); }
+  .st-appr { color: var(--green); font-weight: 700; font-size: 11px; }
+  .st-pend { color: var(--amber); font-weight: 700; font-size: 11px; }
+  .st-pot { color: var(--blue); font-weight: 700; font-size: 11px; }
+  .st-rej { color: var(--red); font-weight: 700; font-size: 11px; }
+  .st-can { color: var(--dim); font-weight: 700; font-size: 11px; }
+  .trash-btn {
+    background: none; border: none; color: var(--red); cursor: pointer;
+    width: 36px; display: flex; justify-content: center; align-items: center;
+  }
+  .trash-btn:hover { opacity: .7; }
+  .trash-btn svg { width: 16px; height: 16px; }
+
+  .rollups { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 14px; }
+  @media (max-width: 900px) { .rollups { grid-template-columns: 1fr; } }
+  .rollup { border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .rollup h4 {
+    font-size: 10px; letter-spacing: .5px; font-weight: 700; color: #7A7F84;
+    text-transform: uppercase; background: var(--chg-head); padding: 8px 12px;
+  }
+  .rollup .rline {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; border-top: 1px solid var(--line); font-size: 12px;
+  }
+  .rollup .rline .lab { color: #4A4F55; flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; }
+  .rollup .rline .ct { font-size: 10px; color: var(--muted); font-weight: 700; }
+  .rollup .rline .hbar {
+    width: 120px; height: 10px; background: var(--bar-track); border-radius: 2px;
+    overflow: hidden; flex: none;
+  }
+  .rollup .rline .hfill { height: 100%; border-radius: 2px; min-width: 0; }
+  .rollup .rline .hfill.zero { min-width: 0; width: 0 !important; }
+  .rollup .rline .val {
+    font-weight: 700; font-variant-numeric: tabular-nums; width: 90px;
+    text-align: right; flex: none; color: #4A4F55;
+  }
+  .hfill-appr { background: var(--green); }
+  .hfill-pend { background: var(--amber); }
+  .hfill-pot { background: var(--blue); }
+  .hfill-rej { background: var(--red); }
+  .hfill-reason { background: var(--red); }
+
+  .detail-footer {
+    display: flex; justify-content: flex-end; gap: 12px;
+    padding: 8px 16px 18px;
+  }
+
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 12px; box-shadow: 0 16px 48px rgba(0,0,0,.28);
+    width: 100%; max-width: 560px; padding: 16px; max-height: 90vh; overflow: auto;
+  }
+  .modal.wide { max-width: 620px; }
+  .modal h2 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+  .modal .help { font-size: 12px; color: var(--dim); line-height: 1.45; margin-top: 8px; }
+  .modal .meta { font-size: 12px; margin-bottom: 8px; }
+  .fld-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(16px);
+    background: #23262B; color: #fff; padding: 12px 20px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none;
+    transition: all .25s; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 1100px) {
+    .reg-head, .reg-row { grid-template-columns: 1fr 1fr 1fr; }
+    .reg-head .col:nth-child(n+4), .reg-row .cell:nth-child(n+4) { display: none; }
+    .co-head, .co-row { grid-template-columns: 70px 1fr 100px 80px 36px; }
+    .co-head .c:nth-child(2), .co-head .c:nth-child(5), .co-head .c:nth-child(6), .co-head .c:nth-child(8),
+    .co-row .c:nth-child(2), .co-row .c:nth-child(5), .co-row .c:nth-child(6), .co-row .c:nth-child(8) { display: none; }
+    .fld-row3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="banner">
+  <div><strong>PostAward</strong> interactive design — mirrors Detail feedback (status %, new fields, change modal, rollup bars). Closed-out = closeoutstatus Closed only.</div>
+  <span>Click a change row to edit. Filters, Add Subcontract / Add Change, trash, Save. Demo data only.</span>
+</div>
+
+<div class="frame">
+  <!-- REGISTER -->
+  <div class="view show" id="registerView">
+    <div class="header header-reg">
+      <div class="header-top">
+        <div class="icon-well" title="PostAward" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h14"/></svg>
+        </div>
+        <div class="brand-col">
+          <div class="brand-title">PostAward</div>
+          <div class="brand-sub">Change order and claims tracker</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="user-col">
+          <div class="eyebrow">SIGNED IN AS</div>
+          <div class="name">Alex Rivera</div>
+        </div>
+        <button class="tool-btn tool-xls" title="Open SharePoint / Excel" onclick="toast('Would open SharePoint list in Excel')">XLS</button>
+        <button class="tool-btn svg" title="Settings" onclick="openSettings()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+      <div class="header-bottom">
+        <div class="project-picker">
+          <label>Project</label>
+          <select id="projectSelect" onchange="toast('Would reload subcontracts for selected project')">
+            <option>Darlington New Nuclear Project (DNNP)</option>
+            <option>Sample Civil Works</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filters" id="filterTabs">
+        <button class="active" data-filter="all">All <span class="ct" id="ctAll">0</span></button>
+        <button data-filter="active">Active <span class="ct" id="ctActive">0</span></button>
+        <button data-filter="over">Over Budget <span class="ct" id="ctOver">0</span></button>
+        <button data-filter="closed">Closed <span class="ct" id="ctClosed">0</span></button>
+      </div>
+      <div class="search-cluster">
+        <div class="search"><input id="qCa" placeholder="Search CA" oninput="renderRegister()"></div>
+        <div class="search"><input id="qVendor" placeholder="Search vendor" oninput="renderRegister()"></div>
+        <div class="search"><input id="qSub" placeholder="Search subcontract" oninput="renderRegister()"></div>
+        <button class="btn-primary" onclick="openAddSub()">+ Add Subcontract</button>
+      </div>
+    </div>
+
+    <div class="reg-wrap">
+      <div class="reg-table">
+        <div class="reg-head" id="regHead"></div>
+        <div id="regBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="view" id="detailView">
+    <div class="header">
+      <div class="header-top">
+        <button class="icon-well" onclick="showRegister()" title="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="brand-col">
+          <div class="brand-title">PostAward</div>
+          <div class="brand-sub" id="detSubtitle">Project / Sub</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="user-col">
+          <div class="eyebrow">SIGNED IN AS</div>
+          <div class="name">Alex Rivera</div>
+        </div>
+        <button class="tool-btn tool-xls" title="Excel" onclick="toast('Would open SharePoint list in Excel')">XLS</button>
+      </div>
+    </div>
+
+    <div class="status-strip">
+      <div class="status-left">
+        <div class="cur-status">
+          <div class="eyebrow">SUBCONTRACT STATUS</div>
+          <div class="big" id="detStatus">Active</div>
+        </div>
+        <div class="pct-block">
+          <div class="eyebrow">% COMPLETE</div>
+          <div class="pct-val" id="detPct">0%</div>
+          <div class="pct-track"><div class="pct-fill" id="detPctBar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="metric-cards">
+        <div class="mcard"><div class="ml" id="mOriginalLabel">ORIGINAL (CAD)</div><div class="mv" id="mOriginal">$0</div></div>
+        <div class="mcard"><div class="ml">CURRENT VALUE</div><div class="mv" id="mCurrent">$0</div></div>
+        <div class="mcard"><div class="ml">FUTURE LIABILITY</div><div class="mv" id="mFuture">$0</div></div>
+        <div class="mcard accent"><div class="ml">EAC</div><div class="mv" id="mEac">$0</div></div>
+        <div class="mcard"><div class="ml">INVOICED TO DATE</div><div class="mv" id="mInv">$0</div></div>
+      </div>
+    </div>
+
+    <div class="detail-body">
+      <div class="left-col">
+        <div class="panel" style="margin-bottom:12px">
+          <div class="panel-head">SUBCONTRACT DETAILS</div>
+          <div class="panel-body">
+            <div class="fld-row">
+              <div class="fld"><label>Subcontract No.</label><div class="chip" id="dSubNo">-</div></div>
+              <div class="fld"><label>PO No.</label><div class="chip" id="dPo">-</div></div>
+            </div>
+            <div class="fld-row">
+              <div class="fld"><label>Vendor</label><div class="chip" id="dVendor">-</div></div>
+              <div class="fld"><label>Scope</label><div class="chip" id="dScope">-</div></div>
+            </div>
+            <div class="fld"><label>Bundle / Contract Type</label><div class="chip" id="dBundle">-</div></div>
+            <div class="fld-row">
+              <div class="fld"><label>Start Date</label><input type="date" id="dStart"></div>
+              <div class="fld"><label>Subcontract End Date</label><input type="date" id="dEnd"></div>
+            </div>
+            <div class="fld-row">
+              <div class="fld"><label>Revised End Date</label><input type="date" id="dRevisedEnd"></div>
+              <div class="fld"><label>SAP Vendor Number</label><input id="dSap" placeholder="e.g. 10001234"></div>
+            </div>
+            <div class="fld-row">
+              <div class="fld">
+                <label>Currency</label>
+                <select id="dCurrency" onchange="onCurrencyChange()">
+                  <option>CAD</option>
+                  <option>USD</option>
+                </select>
+              </div>
+              <div class="fld">
+                <label>Indigenous Contribution %</label>
+                <select id="dIndigenous">
+                  <option>0</option><option>5</option><option>10</option><option>15</option>
+                  <option>20</option><option>25</option><option>50</option><option>100</option>
+                </select>
+              </div>
+            </div>
+            <div class="fld">
+              <label>Work Type</label>
+              <select id="dWorkType">
+                <option>Boots on ground</option>
+                <option>Supply only</option>
+                <option>Consulting</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">PEOPLE &amp; CLOSE-OUT</div>
+          <div class="panel-body">
+            <div class="fld-row">
+              <div class="fld">
+                <label>Contract Admin <button class="toggle" type="button" onclick="toast('Would toggle directory vs free text')">Dir</button></label>
+                <input id="dCa" value="">
+              </div>
+              <div class="fld">
+                <label>Backup CA <button class="toggle" type="button" onclick="toast('Would toggle directory vs free text')">Dir</button></label>
+                <input id="dBackup" value="">
+              </div>
+            </div>
+            <div class="fld">
+              <label>Operational Owner <button class="toggle" type="button" onclick="toast('Would toggle directory vs free text')">Dir</button></label>
+              <input id="dOwner" value="">
+            </div>
+            <div class="fld-row">
+              <div class="fld">
+                <label>Currently Active</label>
+                <select id="dActive"><option>Yes</option><option>No</option></select>
+              </div>
+              <div class="fld">
+                <label>Holdback (HB)</label>
+                <select id="dHb"><option>Applicable</option><option>Not applicable</option></select>
+              </div>
+            </div>
+            <div class="fld">
+              <label>Close-out Status</label>
+              <select id="dClose" onchange="onCloseoutChange()">
+                <option>In progress</option>
+                <option>Close-out pending</option>
+                <option>Holdback to process</option>
+                <option>Closed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel reg-panel">
+        <div class="reg-panel-top">
+          <div class="title">Change Register</div>
+          <button class="btn-primary" onclick="openChangeModal()">+ Add Change</button>
+        </div>
+        <div class="co-head">
+          <div class="c">REF</div>
+          <div class="c">DATE</div>
+          <div class="c">DESCRIPTION</div>
+          <div class="c center">TYPE</div>
+          <div class="c">REASON</div>
+          <div class="c num">VALUE</div>
+          <div class="c center">STATUS</div>
+          <div class="c num">AECON REF</div>
+          <div class="c"></div>
+        </div>
+        <div class="co-body" id="chgBody"></div>
+        <div class="rollups">
+          <div class="rollup">
+            <h4>Change orders — by status</h4>
+            <div id="rollStatus"></div>
+          </div>
+          <div class="rollup">
+            <h4>Approved value — by reason</h4>
+            <div id="rollReason"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-footer">
+      <button class="btn-outline" onclick="showRegister()">Cancel</button>
+      <button class="btn-primary" onclick="saveDetail()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Subcontract -->
+<div class="overlay" id="overlayAddSub">
+  <div class="modal">
+    <h2>Add Subcontract</h2>
+    <div class="fld" style="margin-bottom:10px">
+      <label>Awarded package</label>
+      <select id="addPkg">
+        <option value="">Select awarded ProcTrack package…</option>
+        <option>312 — Acme Scaffolding</option>
+        <option>318 — Northern HVAC</option>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:10px">
+      <label>Contract Admin <button class="toggle" type="button">Type a name instead</button></label>
+      <input placeholder="Search directory…" id="addCa">
+    </div>
+    <div class="help">Only awarded ProcTrack packages not already in PostAward can be intaken. ProcTrack fields stay read-only after add.</div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeOverlay('overlayAddSub')">Cancel</button>
+      <button class="btn-primary" onclick="addSubDemo()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="overlay" id="overlaySettings">
+  <div class="modal" style="max-width:420px">
+    <h2>Settings</h2>
+    <div class="meta">Signed in as <strong>Alex Rivera</strong> (alex.rivera@aecon.com)</div>
+    <div class="meta">Edit access for this project: <strong style="color:var(--green)">Yes</strong></div>
+    <div class="help">
+      Permissions come from ProcTrack. XLS opens the SharePoint list for Excel export.
+      Package identity fields from ProcTrack are read-only in PostAward.
+      Closed-out status is driven only by closeoutstatus = Closed (not Currently Active = No).
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeOverlay('overlaySettings')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Change -->
+<div class="overlay" id="overlayChange">
+  <div class="modal wide">
+    <h2 id="chgTitle">Add Change</h2>
+    <div class="fld" style="margin-bottom:10px">
+      <label>Ref No. <span class="hint" title="Subcontractor Change notice number or Client Change number">?</span></label>
+      <input id="cRef">
+    </div>
+    <div class="fld-row3" style="margin-bottom:10px">
+      <div class="fld"><label>Change Date</label><input type="date" id="cDate"></div>
+      <div class="fld"><label>Date Received</label><input type="date" id="cReceived"></div>
+      <div class="fld"><label>Date Fully Executed</label><input type="date" id="cExecuted"></div>
+    </div>
+    <div class="fld" style="margin-bottom:10px"><label>Description</label><textarea id="cDesc"></textarea></div>
+    <div class="fld-row" style="margin-bottom:10px">
+      <div class="fld">
+        <label>Type</label>
+        <select id="cType"><option>Change Order</option><option>Claim</option><option>Change Directive</option></select>
+      </div>
+      <div class="fld">
+        <label>Reason</label>
+        <select id="cReason">
+          <option>Design Change</option>
+          <option>Scope Gap</option>
+          <option>Variation</option>
+          <option>Acceleration</option>
+          <option>New Scope</option>
+        </select>
+      </div>
+    </div>
+    <div class="fld-row" style="margin-bottom:10px">
+      <div class="fld"><label>Initial Value</label><input id="cInitial" value="0.00"></div>
+      <div class="fld"><label>Final Value</label><input id="cFinal" value="0.00"></div>
+    </div>
+    <div class="fld-row" style="margin-bottom:10px">
+      <div class="fld">
+        <label>Status</label>
+        <select id="cStatus">
+          <option>Pending</option>
+          <option>Approved</option>
+          <option>Potential</option>
+          <option>Rejected</option>
+          <option>Canceled</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Aecon Ref <span class="hint" title="Aecon Change order number">?</span></label>
+        <input id="cAecon" placeholder="SCO…">
+      </div>
+    </div>
+    <div class="help">Aecon Ref is saved with an SCO prefix (e.g. 001 → SCO001). KPIs and rollups use Final Value.</div>
+    <div class="modal-actions">
+      <button class="btn-outline" id="cDelete" style="margin-right:auto;display:none" onclick="deleteChangeFromModal()">Delete</button>
+      <button class="btn-outline" onclick="closeOverlay('overlayChange')">Cancel</button>
+      <button class="btn-primary" onclick="saveChange()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PROJECT = "Darlington New Nuclear Project (DNNP)";
+const money = n => "$" + Number(n || 0).toLocaleString("en-US", { maximumFractionDigits: 0 });
+const money2 = n => "$" + Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtDate = s => {
+  if (!s) return "—";
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+};
+const toInputDate = s => {
+  if (!s) return "";
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return "";
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+};
+const chgAmt = c => (c.finalvalue != null && c.finalvalue !== "" ? Number(c.finalvalue) : Number(c.value || 0));
+const prefixSco = raw => {
+  const cleaned = String(raw || "").trim().toUpperCase().replace(/SCO/g, "").replace(/\s+/g, "");
+  return cleaned ? "SCO" + cleaned : "";
+};
+
+let filter = "all";
+let sortCol = "subcontractnumber";
+let sortAsc = true;
+let selectedId = null;
+let editingChangeId = null;
+
+/* Sample changes: finalvalue drives money (mirrors Coalesce(finalvalue, value)) */
+const changes = [
+  { id: 1, sid: "207", ref: "SCO 01", date: "2025-12-24", received: "2025-12-20", executed: "2026-01-10", desc: "Additional design scope", type: "Change Order", reason: "Design Change", finalvalue: 2078.40, status: "Approved", aecon: "SCO001" },
+  { id: 2, sid: "207", ref: "SCO 02", date: "2026-01-23", received: "2026-01-20", executed: "2026-02-05", desc: "Field variation", type: "Change Order", reason: "Variation", finalvalue: 1385.60, status: "Approved", aecon: "SCO002" },
+  { id: 3, sid: "207", ref: "SCO 03", date: "2026-02-22", received: "2026-02-18", executed: "", desc: "Pending scope gap review", type: "Change Order", reason: "Scope Gap", finalvalue: 866.00, status: "Pending", aecon: "SCO003" },
+  { id: 4, sid: "207", ref: "CL-01", date: "2026-03-24", received: "2026-03-20", executed: "", desc: "Anticipated acceleration claim", type: "Claim", reason: "Acceleration", finalvalue: 519.60, status: "Potential", aecon: "SCO004" },
+  { id: 5, sid: "95", ref: "CO-01", date: "2025-07-07", received: "2025-07-01", executed: "2025-07-20", desc: "Approved design change", type: "Change Order", reason: "Design Change", finalvalue: 46784.40, status: "Approved", aecon: "SCO001" },
+  { id: 6, sid: "95", ref: "CO-02", date: "2025-08-06", received: "2025-08-01", executed: "", desc: "Pending variation", type: "Change Order", reason: "Variation", finalvalue: 31189.60, status: "Pending", aecon: "SCO002" },
+  { id: 7, sid: "95", ref: "CD-01", date: "2025-09-05", received: "2025-09-01", executed: "2025-09-15", desc: "Owner directed change", type: "Change Directive", reason: "Scope Gap", finalvalue: 12475.84, status: "Approved", aecon: "SCO003" },
+  { id: 8, sid: "139", ref: "CO-01", date: "2025-04-12", received: "2025-04-08", executed: "2025-04-25", desc: "Rolled approved changes", type: "Change Order", reason: "Variation", finalvalue: 3000.00, status: "Approved", aecon: "SCO001" },
+  { id: 9, sid: "139", ref: "CO-02", date: "2025-05-12", received: "2025-05-08", executed: "", desc: "Rejected credit claim", type: "Change Order", reason: "Design Change", finalvalue: -300.00, status: "Rejected", aecon: "SCO002" },
+  { id: 10, sid: "139", ref: "CL-01", date: "2025-06-11", received: "2025-06-05", executed: "", desc: "Pending acceleration claim", type: "Claim", reason: "Acceleration", finalvalue: 900.00, status: "Pending", aecon: "SCO003" },
+  { id: 11, sid: "124", ref: "CO-01", date: "2025-06-19", received: "2025-06-15", executed: "2025-07-01", desc: "Close-out scope adjustment", type: "Change Order", reason: "Scope Gap", finalvalue: 118000.00, status: "Approved", aecon: "SCO001" },
+  { id: 12, sid: "124", ref: "CO-02", date: "2025-07-19", received: "2025-07-15", executed: "2025-08-01", desc: "Credit on close-out", type: "Change Order", reason: "Variation", finalvalue: -59000.00, status: "Approved", aecon: "SCO002" },
+  { id: 13, sid: "294", ref: "SCO 01", date: "2026-07-08", received: "2026-07-05", executed: "2026-07-20", desc: "Design revision", type: "Change Order", reason: "Design Change", finalvalue: 6370.00, status: "Approved", aecon: "SCO001" },
+  { id: 14, sid: "294", ref: "SCO 02", date: "2026-08-07", received: "2026-08-03", executed: "", desc: "Potential variation", type: "Change Order", reason: "Variation", finalvalue: 8190.00, status: "Potential", aecon: "SCO002" },
+  { id: 15, sid: "294", ref: "SCO 03", date: "2026-09-06", received: "2026-09-01", executed: "", desc: "Under review", type: "Change Order", reason: "Scope Gap", finalvalue: 3640.00, status: "Pending", aecon: "SCO003" },
+  { id: 16, sid: "261", ref: "CO-01", date: "2026-06-14", received: "2026-06-10", executed: "2026-06-28", desc: "Minor design change", type: "Change Order", reason: "Design Change", finalvalue: 2676.75, status: "Approved", aecon: "SCO001" },
+  { id: 17, sid: "261", ref: "CO-02", date: "2026-07-14", received: "2026-07-10", executed: "2026-07-30", desc: "Site condition variation", type: "Change Order", reason: "Variation", finalvalue: 5888.85, status: "Approved", aecon: "SCO002" },
+  { id: 18, sid: "261", ref: "CL-01", date: "2026-08-13", received: "2026-08-08", executed: "", desc: "Rejected claim", type: "Claim", reason: "Acceleration", finalvalue: 4282.80, status: "Rejected", aecon: "SCO003" },
+  { id: 19, sid: "261", ref: "CO-03", date: "2026-09-12", received: "2026-09-08", executed: "", desc: "Pending gap", type: "Change Order", reason: "Scope Gap", finalvalue: 3212.10, status: "Pending", aecon: "SCO004" },
+  { id: 20, sid: "261", ref: "CO-04", date: "2026-09-20", received: "2026-09-18", executed: "", desc: "Canceled new scope request", type: "Change Order", reason: "New Scope", finalvalue: 1500.00, status: "Canceled", aecon: "SCO005" },
+  { id: 21, sid: "207", ref: "SCO 04", date: "2026-04-02", received: "2026-03-28", executed: "2026-04-15", desc: "Approved new scope package", type: "Change Order", reason: "New Scope", finalvalue: 1200.00, status: "Approved", aecon: "SCO006" }
+];
+
+const subs = [
+  { id: "207", number: "207", po: "4500728205", vendor: "Liftsafe", scope: "Liftsafe Engineering and Service Group", bundle: "SE/Buildings", contract: "Consulting Agreement", original: 17320, start: "2025-11-24", end: "2026-11-24", revisedEnd: "", sap: "10004521", currency: "CAD", indigenous: "0", workType: "Consulting", ca: "Lolu Oyewole-Eletu", backup: "", owner: "Alex Rivera", active: true, hb: "Applicable", closeout: "In progress", invoiced: 6928 },
+  { id: "95", number: "95", po: "4700146936", vendor: "Metric Storage Systems", scope: "Racking & Shelving", bundle: "SE/Buildings", contract: "Construction Subcontract", original: 311896, start: "2025-06-07", end: "2026-06-07", revisedEnd: "2026-08-15", sap: "10003812", currency: "CAD", indigenous: "5", workType: "Boots on ground", ca: "Frank Gou", backup: "Robin Bouchard", owner: "Frank Gou", active: true, hb: "Applicable", closeout: "Close-out pending", invoiced: 421059.60 },
+  { id: "139", number: "139", po: "450068669", vendor: "Accent", scope: "Roofing Inspector", bundle: "SE/Buildings", contract: "Consulting Agreement", original: 15000, start: "2025-03-13", end: "2026-03-13", revisedEnd: "", sap: "10002901", currency: "CAD", indigenous: "0", workType: "Consulting", ca: "Frank Gou", backup: "", owner: "", active: true, hb: "Not applicable", closeout: "In progress", invoiced: 8250 },
+  { id: "124", number: "124", po: "4700138223", vendor: "M&G Steel", scope: "Warehouse Tent Erection", bundle: "SE/Buildings", contract: "Construction Subcontract", original: 1180000, start: "2025-05-20", end: "2026-05-20", revisedEnd: "2026-05-20", sap: "10005110", currency: "CAD", indigenous: "10", workType: "Boots on ground", ca: "Frank Gou", backup: "", owner: "Alex Rivera", active: false, hb: "Not applicable", closeout: "Closed", invoiced: 1180000 },
+  { id: "294", number: "294", po: "4700154895", vendor: "KT Innovative Solutions", scope: "SAT Consultant", bundle: "Training", contract: "Consulting Agreement", original: 91000, start: "2026-06-08", end: "2027-06-08", revisedEnd: "", sap: "10006233", currency: "CAD", indigenous: "0", workType: "Consulting", ca: "Robin Bouchard", backup: "", owner: "Robin Bouchard", active: true, hb: "Applicable", closeout: "Holdback to process", invoiced: 63700 },
+  { id: "261", number: "261", po: "4700153101", vendor: "P. Little Eng", scope: "Pipe Crossing", bundle: "CCW/Tunnel", contract: "Consulting Agreement", original: 53535, start: "2026-05-15", end: "2027-05-15", revisedEnd: "2027-07-01", sap: "10007144", currency: "USD", indigenous: "15", workType: "Supply only", ca: "Ernesto Martinez", backup: "Frank Gou", owner: "Ernesto Martinez", active: true, hb: "Applicable", closeout: "In progress", invoiced: 13383.75 }
+];
+
+function chgsFor(sid) { return changes.filter(c => c.sid === sid); }
+function sumStatus(list, st) {
+  return list.filter(c => c.status === st).reduce((a, c) => a + chgAmt(c), 0);
+}
+function enrich(s) {
+  const list = chgsFor(s.id);
+  const appr = sumStatus(list, "Approved");
+  const pend = sumStatus(list, "Pending");
+  const pot = sumStatus(list, "Potential");
+  const rej = sumStatus(list, "Rejected");
+  const current = s.original + appr;
+  const future = pend + pot;
+  const eac = current + future;
+  /* Closed-out ONLY when closeoutstatus is Closed — not when Active=No */
+  const isClosed = s.closeout === "Closed";
+  const isOver = s.invoiced > current;
+  let status = "Active";
+  if (isClosed) status = "Closed";
+  else if (isOver) status = "Over";
+  const pct = Math.min(100, Math.round((s.invoiced || 0) / Math.max(current, 1) * 100));
+  return { ...s, list, appr, pend, pot, rej, current, future, eac, isClosed, isOver, status, pct, changeCount: list.length };
+}
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+}
+
+function openOverlay(id) { document.getElementById(id).classList.add("show"); }
+function closeOverlay(id) { document.getElementById(id).classList.remove("show"); }
+function openSettings() { openOverlay("overlaySettings"); }
+function openAddSub() { openOverlay("overlayAddSub"); }
+function addSubDemo() {
+  const pkg = document.getElementById("addPkg").value;
+  const ca = document.getElementById("addCa").value.trim();
+  if (!pkg) return toast("Select an awarded package.");
+  if (!ca) return toast("Contract Admin is required.");
+  closeOverlay("overlayAddSub");
+  toast("Subcontract added.");
+}
+
+document.getElementById("filterTabs").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-filter]");
+  if (!btn) return;
+  filter = btn.dataset.filter;
+  [...document.getElementById("filterTabs").children].forEach(b => b.classList.toggle("active", b === btn));
+  renderRegister();
+});
+
+const sortCols = [
+  ["subcontractnumber", "SUBCONTRACT", false],
+  ["vendor", "VENDOR", false],
+  ["scope", "SCOPE", false],
+  ["responsibleca", "CONTRACT ADMIN", false],
+  ["originalvalue", "ORIGINAL", true],
+  ["apprCO", "CHANGE ORDERS", true],
+  ["currentValue", "CURRENT VALUE", true],
+  ["eac", "EAC", true],
+  ["_statusOrder", "STATUS", false]
+];
+
+function renderHead() {
+  document.getElementById("regHead").innerHTML = sortCols.map(([key, label, num]) => {
+    const mark = sortCol === key ? (sortAsc ? " ^" : " v") : "";
+    return `<div class="col${num ? " num" : ""}" data-sort="${key}">${label}<span class="sort">${mark}</span></div>`;
+  }).join("") + `<div class="col"></div>`;
+  document.getElementById("regHead").onclick = e => {
+    const col = e.target.closest("[data-sort]");
+    if (!col) return;
+    const key = col.dataset.sort;
+    if (sortCol === key) sortAsc = !sortAsc;
+    else { sortCol = key; sortAsc = true; }
+    renderRegister();
+  };
+}
+
+function statusKey(s) { return s.isClosed ? 2 : s.isOver ? 1 : 0; }
+
+function renderRegister() {
+  renderHead();
+  const rows = subs.map(enrich);
+  document.getElementById("ctAll").textContent = `(${rows.length})`;
+  document.getElementById("ctActive").textContent = `(${rows.filter(r => !r.isClosed && !r.isOver).length})`;
+  document.getElementById("ctOver").textContent = `(${rows.filter(r => r.isOver && !r.isClosed).length})`;
+  document.getElementById("ctClosed").textContent = `(${rows.filter(r => r.isClosed).length})`;
+
+  const qCa = document.getElementById("qCa").value.trim().toLowerCase();
+  const qVendor = document.getElementById("qVendor").value.trim().toLowerCase();
+  const qSub = document.getElementById("qSub").value.trim().toLowerCase();
+
+  let view = rows.filter(r => {
+    if (filter === "active" && (r.isClosed || r.isOver)) return false;
+    if (filter === "over" && !(r.isOver && !r.isClosed)) return false;
+    if (filter === "closed" && !r.isClosed) return false;
+    if (qCa && !r.ca.toLowerCase().includes(qCa)) return false;
+    if (qVendor && !r.vendor.toLowerCase().includes(qVendor)) return false;
+    if (qSub && !(r.number.includes(qSub) || r.id.includes(qSub))) return false;
+    return true;
+  });
+
+  view.sort((a, b) => {
+    const map = {
+      subcontractnumber: x => Number(x.number),
+      vendor: x => x.vendor,
+      scope: x => x.scope,
+      responsibleca: x => x.ca,
+      originalvalue: x => x.original,
+      apprCO: x => x.appr,
+      currentValue: x => x.current,
+      eac: x => x.eac,
+      _statusOrder: x => statusKey(x)
+    };
+    const av = map[sortCol](a), bv = map[sortCol](b);
+    let cmp = av < bv ? -1 : av > bv ? 1 : 0;
+    return sortAsc ? cmp : -cmp;
+  });
+
+  const body = document.getElementById("regBody");
+  if (!view.length) {
+    body.innerHTML = `<div class="empty">No subcontracts match these filters.</div>`;
+    return;
+  }
+
+  body.innerHTML = view.map(r => {
+    const pillClass = r.status === "Closed" ? "st-closed" : r.status === "Over" ? "st-over" : "st-active";
+    const pillLabel = `${r.changeCount} chg - ${r.status === "Over" ? "Over" : r.status}`;
+    return `<div class="reg-row${r.isOver && !r.isClosed ? " over" : ""}" onclick="openDetail('${r.id}')">
+      <div class="cell"><div class="sc-num">${r.number}</div><div class="sc-po">PO ${r.po || "-"}</div></div>
+      <div class="cell"><div class="vendor">${r.vendor}</div></div>
+      <div class="cell"><div class="scope">${r.scope}</div><div class="bundle">${r.bundle}</div></div>
+      <div class="cell">${r.ca}</div>
+      <div class="cell num"><span class="money muted">${money(r.original)}</span></div>
+      <div class="cell num"><span class="money${r.appr < 0 ? " neg" : ""}">${r.appr === 0 ? "-" : (r.appr > 0 ? "+" : "") + money(r.appr)}</span></div>
+      <div class="cell num"><span class="money">${money(r.current)}</span></div>
+      <div class="cell num"><span class="eac">${money(r.eac)}</span></div>
+      <div class="cell"><span class="status-pill ${pillClass}"><span class="dot"></span>${pillLabel}</span></div>
+      <div class="cell chev">›</div>
+    </div>`;
+  }).join("");
+}
+
+function showRegister() {
+  document.getElementById("detailView").classList.remove("show");
+  document.getElementById("registerView").classList.add("show");
+  selectedId = null;
+  renderRegister();
+}
+
+function openDetail(id) {
+  selectedId = id;
+  document.getElementById("registerView").classList.remove("show");
+  document.getElementById("detailView").classList.add("show");
+  renderDetail();
+}
+
+function currentSub() { return enrich(subs.find(s => s.id === selectedId)); }
+
+function barWidth(absVal, maxAbs) {
+  if (!absVal) return 0;
+  return Math.max(4, Math.round(116 * Math.abs(absVal) / Math.max(maxAbs, 1)));
+}
+
+function renderDetail() {
+  const s = currentSub();
+  document.getElementById("detSubtitle").textContent = `${PROJECT} / ${s.number}`;
+
+  /* Match app: Over Budget takes priority, then Closed-out (closeout only), else Active */
+  const st = document.getElementById("detStatus");
+  if (s.isOver) {
+    st.textContent = "Over Budget";
+    st.className = "big over";
+  } else if (s.isClosed) {
+    st.textContent = "Closed-out";
+    st.className = "big closed";
+  } else {
+    st.textContent = "Active";
+    st.className = "big active";
+  }
+
+  document.getElementById("detPct").textContent = s.pct + "%";
+  document.getElementById("detPctBar").style.width = s.pct + "%";
+
+  document.getElementById("mOriginalLabel").textContent = `ORIGINAL (${s.currency || "CAD"})`;
+  document.getElementById("mOriginal").textContent = money(s.original);
+  document.getElementById("mCurrent").textContent = money(s.current);
+  document.getElementById("mFuture").textContent = money(s.future);
+  document.getElementById("mEac").textContent = money(s.eac);
+  document.getElementById("mInv").textContent = money(s.invoiced);
+
+  document.getElementById("dSubNo").textContent = s.number;
+  document.getElementById("dPo").textContent = s.po;
+  document.getElementById("dVendor").textContent = s.vendor;
+  document.getElementById("dScope").textContent = s.scope;
+  document.getElementById("dBundle").textContent = `${s.bundle} / ${s.contract}`;
+  document.getElementById("dStart").value = toInputDate(s.start);
+  document.getElementById("dEnd").value = toInputDate(s.end);
+  document.getElementById("dRevisedEnd").value = toInputDate(s.revisedEnd);
+  document.getElementById("dSap").value = s.sap || "";
+  document.getElementById("dCurrency").value = s.currency || "CAD";
+  document.getElementById("dIndigenous").value = String(s.indigenous ?? "0");
+  document.getElementById("dWorkType").value = s.workType || "Boots on ground";
+  document.getElementById("dCa").value = s.ca;
+  document.getElementById("dBackup").value = s.backup;
+  document.getElementById("dOwner").value = s.owner || "";
+  document.getElementById("dActive").value = s.active ? "Yes" : "No";
+  document.getElementById("dHb").value = s.hb;
+  document.getElementById("dClose").value = s.closeout;
+
+  const body = document.getElementById("chgBody");
+  if (!s.list.length) {
+    body.innerHTML = `<div class="empty">No changes yet. Use + Add Change.</div>`;
+  } else {
+    body.innerHTML = s.list.map(c => {
+      const amt = chgAmt(c);
+      const typeCls = c.type === "Claim" ? "type-claim" : "type-co";
+      const stCls = c.status === "Approved" ? "st-appr"
+        : c.status === "Pending" ? "st-pend"
+        : c.status === "Potential" ? "st-pot"
+        : c.status === "Canceled" ? "st-can"
+        : "st-rej";
+      return `<div class="co-row" onclick="openChangeModal(${c.id})" title="Click to edit">
+        <div class="c co-ref">${c.ref}</div>
+        <div class="c">${fmtDate(c.date)}</div>
+        <div class="c co-desc">${c.desc}</div>
+        <div class="c center"><span class="type-tag ${typeCls}">${c.type}</span></div>
+        <div class="c">${c.reason}</div>
+        <div class="c num money${amt < 0 ? " neg" : ""}">${money2(amt)}</div>
+        <div class="c center ${stCls}">${c.status}</div>
+        <div class="c num">${c.aecon || ""}</div>
+        <div class="c"><button class="trash-btn" title="Delete" onclick="event.stopPropagation(); deleteChange(${c.id})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button></div>
+      </div>`;
+    }).join("");
+  }
+
+  const counts = {
+    Approved: s.list.filter(c => c.status === "Approved").length,
+    Pending: s.list.filter(c => c.status === "Pending").length,
+    Potential: s.list.filter(c => c.status === "Potential").length,
+    Rejected: s.list.filter(c => c.status === "Rejected").length
+  };
+  const maxStatus = Math.max(Math.abs(s.appr), Math.abs(s.pend), Math.abs(s.pot), Math.abs(s.rej), 1);
+  const statusRows = [
+    ["Approved", counts.Approved, s.appr, "hfill-appr"],
+    ["Pending", counts.Pending, s.pend, "hfill-pend"],
+    ["Potential", counts.Potential, s.pot, "hfill-pot"],
+    ["Rejected", counts.Rejected, s.rej, "hfill-rej"]
+  ];
+  document.getElementById("rollStatus").innerHTML = statusRows.map(([lab, ct, val, cls]) => {
+    const w = barWidth(val, maxStatus);
+    return `<div class="rline">
+      <span class="lab">${lab} <span class="ct">(${ct})</span></span>
+      <span class="hbar"><span class="hfill ${cls}${w ? "" : " zero"}" style="width:${w}px"></span></span>
+      <span class="val">${money2(val)}</span>
+    </div>`;
+  }).join("");
+
+  const reasons = ["Design Change", "Scope Gap", "Variation", "Acceleration", "New Scope"];
+  const reasonSums = reasons.map(r =>
+    s.list.filter(c => c.status === "Approved" && c.reason === r).reduce((a, c) => a + chgAmt(c), 0)
+  );
+  const maxReason = Math.max(...reasonSums.map(Math.abs), 1);
+  document.getElementById("rollReason").innerHTML = reasons.map((r, i) => {
+    const w = barWidth(reasonSums[i], maxReason);
+    return `<div class="rline">
+      <span class="lab">${r}</span>
+      <span class="hbar"><span class="hfill hfill-reason${w ? "" : " zero"}" style="width:${w}px"></span></span>
+      <span class="val">${money2(reasonSums[i])}</span>
+    </div>`;
+  }).join("");
+}
+
+function onCurrencyChange() {
+  const sub = subs.find(s => s.id === selectedId);
+  if (!sub) return;
+  sub.currency = document.getElementById("dCurrency").value;
+  document.getElementById("mOriginalLabel").textContent = `ORIGINAL (${sub.currency})`;
+}
+
+function onCloseoutChange() {
+  const sub = subs.find(s => s.id === selectedId);
+  if (!sub) return;
+  sub.closeout = document.getElementById("dClose").value;
+  renderDetail();
+}
+
+function saveDetail() {
+  const sub = subs.find(s => s.id === selectedId);
+  if (!sub) return;
+  sub.start = document.getElementById("dStart").value;
+  sub.end = document.getElementById("dEnd").value;
+  sub.revisedEnd = document.getElementById("dRevisedEnd").value;
+  sub.sap = document.getElementById("dSap").value.trim();
+  sub.currency = document.getElementById("dCurrency").value;
+  sub.indigenous = document.getElementById("dIndigenous").value;
+  sub.workType = document.getElementById("dWorkType").value;
+  sub.ca = document.getElementById("dCa").value.trim();
+  sub.backup = document.getElementById("dBackup").value.trim();
+  sub.owner = document.getElementById("dOwner").value.trim();
+  sub.active = document.getElementById("dActive").value === "Yes";
+  sub.hb = document.getElementById("dHb").value;
+  sub.closeout = document.getElementById("dClose").value;
+  toast("Changes saved.");
+  showRegister();
+}
+
+function openChangeModal(id) {
+  editingChangeId = id || null;
+  const title = document.getElementById("chgTitle");
+  const del = document.getElementById("cDelete");
+  if (id) {
+    const c = changes.find(x => x.id === id);
+    title.textContent = "Edit Change";
+    del.style.display = "inline-block";
+    document.getElementById("cRef").value = c.ref;
+    document.getElementById("cDate").value = toInputDate(c.date);
+    document.getElementById("cReceived").value = toInputDate(c.received);
+    document.getElementById("cExecuted").value = toInputDate(c.executed);
+    document.getElementById("cDesc").value = c.desc;
+    document.getElementById("cType").value = c.type;
+    document.getElementById("cReason").value = c.reason;
+    const amt = chgAmt(c);
+    document.getElementById("cInitial").value = Number(c.initialvalue != null ? c.initialvalue : amt).toFixed(2);
+    document.getElementById("cFinal").value = Number(amt).toFixed(2);
+    document.getElementById("cStatus").value = c.status;
+    document.getElementById("cAecon").value = c.aecon || "";
+  } else {
+    title.textContent = "Add Change";
+    del.style.display = "none";
+    document.getElementById("cRef").value = "";
+    document.getElementById("cDate").value = toInputDate(new Date().toISOString().slice(0, 10));
+    document.getElementById("cReceived").value = "";
+    document.getElementById("cExecuted").value = "";
+    document.getElementById("cDesc").value = "";
+    document.getElementById("cType").value = "Change Order";
+    document.getElementById("cReason").value = "Design Change";
+    document.getElementById("cInitial").value = "0.00";
+    document.getElementById("cFinal").value = "0.00";
+    document.getElementById("cStatus").value = "Pending";
+    document.getElementById("cAecon").value = "";
+  }
+  openOverlay("overlayChange");
+}
+
+function saveChange() {
+  const ref = document.getElementById("cRef").value.trim();
+  if (!ref) return toast("Ref No. is required.");
+  const initial = Number(String(document.getElementById("cInitial").value).replace(/,/g, "")) || 0;
+  const final = Number(String(document.getElementById("cFinal").value).replace(/,/g, "")) || 0;
+  const payload = {
+    sid: selectedId,
+    ref,
+    date: document.getElementById("cDate").value,
+    received: document.getElementById("cReceived").value,
+    executed: document.getElementById("cExecuted").value,
+    desc: document.getElementById("cDesc").value,
+    type: document.getElementById("cType").value,
+    reason: document.getElementById("cReason").value,
+    initialvalue: initial,
+    finalvalue: final,
+    status: document.getElementById("cStatus").value,
+    aecon: prefixSco(document.getElementById("cAecon").value)
+  };
+  if (editingChangeId) {
+    const i = changes.findIndex(c => c.id === editingChangeId);
+    changes[i] = { ...changes[i], ...payload };
+  } else {
+    changes.push({ id: Date.now(), ...payload });
+  }
+  closeOverlay("overlayChange");
+  toast("Change saved.");
+  renderDetail();
+}
+
+function deleteChange(id) {
+  const i = changes.findIndex(c => c.id === id);
+  if (i >= 0) changes.splice(i, 1);
+  toast("Change deleted.");
+  renderDetail();
+}
+
+function deleteChangeFromModal() {
+  if (editingChangeId) deleteChange(editingChangeId);
+  closeOverlay("overlayChange");
+}
+
+document.querySelectorAll(".overlay").forEach(ov => {
+  ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("show"); });
+});
+
+renderRegister();
+</script>
+</body>
+</html>

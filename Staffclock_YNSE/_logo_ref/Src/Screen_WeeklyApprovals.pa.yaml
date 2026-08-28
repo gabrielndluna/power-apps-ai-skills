@@ -1,0 +1,1174 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Screen_WeeklyApprovals:
+    Properties:
+      Fill: =RGBA(245, 246, 251, 1)
+      LoadingSpinnerColor: =RGBA(0, 18, 107, 1)
+      OnVisible: |-
+        =Set(varShowApproveAllConfirm, false);
+        Set(varShowAllWeeks, false);
+        Set(varWeeklyEmployeeEmail, "");
+        Set(varWeeklyEmployeeName, "");
+        Reset(Dropdown_Employee_Weekly);
+
+        Select(btn_ReloadWeekly);
+    Children:
+      - weekly_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(245, 246, 251, 1)
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =0
+            Width: =Parent.Width
+          Children:
+            - weekly_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =128
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =0
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =14
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =18
+                  Width: =Parent.Width
+                Children:
+                  - weekly_brand_row:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =40
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - Logo_Weekly_Wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =124
+                            Children:
+                              - Logo_App_Weekly:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    BorderThickness: =0
+                                    Height: =32
+                                    Image: ='App Names'
+                                    ImagePosition: =ImagePosition.Fit
+                                    Width: =116
+                                    X: =4
+                                    Y: =2
+                        - Logo_Crop_Weekly_Wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Width: =124
+                            Children:
+                              - Logo_Crop_Weekly:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    BorderThickness: =0
+                                    Height: =32
+                                    Image: ='Logo Cropped'
+                                    ImagePosition: =ImagePosition.Fit
+                                    Width: =116
+                                    X: =4
+                                    Y: =2
+                        - weekly_brand_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              Height: =1
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Width: =8
+                        - btn_HomeTab_Weekly:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Home"
+                              Width: =84
+                        - btn_ApproverTab_Weekly:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              OnSelect: =Navigate(Screen_WeeklyApprovals, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Approver"
+                              Width: =96
+                        - btn_SettingsGear_Weekly:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(245, 247, 250, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              OnSelect: |-
+                                =If(
+                                    varIsAdmin,
+                                    Navigate(Screen_Settings, ScreenTransition.Fade),
+                                    Notify("Settings are for admins only", NotificationType.Error)
+                                )
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Settings"
+                              Visible: =varIsAdmin
+                              Width: =88
+                  - Label_WeeklyTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(23, 26, 51, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =38
+                        PaddingBottom: =2
+                        PaddingTop: =8
+                        Size: =20
+                        Text: ="Weekly approvals"
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =Parent.Width
+                  - Label_WeeklySub:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(91, 97, 120, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        Height: =20
+                        Size: =12
+                        Text: ="Review submitted weeks and open a day for edits"
+                        Width: =Parent.Width
+            - weekly_rule:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderThickness: =0
+                  Fill: =RGBA(226, 228, 240, 1)
+                  FillPortions: =0
+                  Height: =1
+                  Width: =Parent.Width
+            - weekly_toolbar:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =128
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =8
+                  PaddingBottom: =10
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =10
+                  Width: =Parent.Width
+                Children:
+                  - weekly_toolbar_nav:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =48
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =48
+                        Width: =Parent.Width
+                      Children:
+                        - weekly_nav_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              Height: =40
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =8
+                              Width: =8
+                        - Label_EmployeeHint:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(106, 122, 127, 1)
+                              FillPortions: =0
+                              Font: =Font.'Open Sans'
+                              Height: =40
+                              LayoutMinHeight: =40
+                              Size: =11
+                              Text: ="Employee"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =90
+                        - Dropdown_Employee_Weekly:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              ChevronBackground: =RGBA(0, 18, 107, 1)
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              DisplayFields: =["DisplayName"]
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =40
+                              InputTextPlaceholder: ="Search employee"
+                              IsSearchable: =true
+                              Items: |-
+                                =If(
+                                    !IsBlank(Trim(Self.SearchText)),
+                                    ShowColumns(
+                                        Office365Users.SearchUser(
+                                            {
+                                                searchTerm: Trim(Self.SearchText),
+                                                top: 15
+                                            }
+                                        ),
+                                        Id,
+                                        DisplayName,
+                                        Mail,
+                                        UserPrincipalName,
+                                        Department
+                                    )
+                                )
+                              LayoutMinHeight: =40
+                              OnChange: |-
+                                =Set(
+                                    varWeeklyEmployeeEmail,
+                                    Lower(Coalesce(Self.Selected.Mail, Self.Selected.UserPrincipalName))
+                                );
+                                Set(varWeeklyEmployeeName, Self.Selected.DisplayName);
+                                Select(btn_ReloadWeekly);
+                              SearchFields: =["DisplayName", "Mail"]
+                              SelectMultiple: =false
+                              Width: =320
+                  - weekly_toolbar_actions:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(245, 247, 250, 1)
+                        FillPortions: =0
+                        Height: =52
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =52
+                        PaddingBottom: =6
+                        PaddingLeft: =12
+                        PaddingRight: =12
+                        PaddingTop: =6
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width
+                      Children:
+                        - btn_TogglePending:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              BorderThickness: =2
+                              Color: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              HoverFill: =RGBA(235, 240, 250, 1)
+                              LayoutMinHeight: =40
+                              OnSelect: =Set(varShowAllWeeks, !varShowAllWeeks)
+                              Size: =12
+                              Text: =If(varShowAllWeeks, "Show pending only", "Show all requests")
+                              Width: =170
+                        - Label_WeeklyFrom:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(106, 122, 127, 1)
+                              FillPortions: =0
+                              Font: =Font.'Open Sans'
+                              Height: =40
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =56
+                              Size: =12
+                              Text: ="From"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =56
+                        - DatePicker_WeeklyFrom:
+                            Control: Classic/DatePicker@2.6.0
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              DefaultDate: =Blank()
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Format: ="m/d/yyyy"
+                              Height: =40
+                              IconBackground: =RGBA(0, 18, 107, 1)
+                              IconFill: =RGBA(255, 255, 255, 1)
+                              IsEditable: =true
+                              Language: ="en-US"
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =160
+                              OnChange: |-
+                                =Set(varWeeklyFilterFrom, Self.SelectedDate);
+                                Select(btn_ReloadWeekly);
+                              PaddingLeft: =6
+                              Size: =12
+                              Width: =160
+                        - Label_WeeklyTo:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(106, 122, 127, 1)
+                              FillPortions: =0
+                              Font: =Font.'Open Sans'
+                              Height: =40
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =32
+                              Size: =12
+                              Text: ="To"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =32
+                        - DatePicker_WeeklyTo:
+                            Control: Classic/DatePicker@2.6.0
+                            Properties:
+                              BorderColor: =RGBA(200, 204, 210, 1)
+                              DefaultDate: =Blank()
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Format: ="m/d/yyyy"
+                              Height: =40
+                              IconBackground: =RGBA(0, 18, 107, 1)
+                              IconFill: =RGBA(255, 255, 255, 1)
+                              IsEditable: =true
+                              Language: ="en-US"
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =160
+                              OnChange: |-
+                                =Set(varWeeklyFilterTo, Self.SelectedDate);
+                                Select(btn_ReloadWeekly);
+                              PaddingLeft: =6
+                              Size: =12
+                              Width: =160
+                        - btn_ReloadWeekly:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              BorderThickness: =0
+                              Color: =RGBA(106, 122, 127, 1)
+                              Fill: =RGBA(0, 0, 0, 0)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =40
+                              HoverColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(230, 234, 238, 1)
+                              LayoutMinHeight: =40
+                              OnSelect: |-
+                                =Refresh('Hours Tracking (Hours)');
+                                Set(
+                                    varWeeklyLoadFrom,
+                                    If(
+                                        !IsBlank(DatePicker_WeeklyFrom.SelectedDate) && !IsBlank(DatePicker_WeeklyTo.SelectedDate),
+                                        DateAdd(DatePicker_WeeklyFrom.SelectedDate, -6, "Days"),
+                                        If(
+                                            !IsBlank(varWeeklyEmployeeEmail),
+                                            varAppStartDate,
+                                            DateAdd(Today(), -56, "Days")
+                                        )
+                                    )
+                                );
+                                Set(
+                                    varWeeklyLoadTo,
+                                    If(
+                                        !IsBlank(DatePicker_WeeklyFrom.SelectedDate) && !IsBlank(DatePicker_WeeklyTo.SelectedDate),
+                                        DateAdd(DatePicker_WeeklyTo.SelectedDate, 6, "Days"),
+                                        DateAdd(Today(), 21, "Days")
+                                    )
+                                );
+                                Clear(colRawHours);
+                                If(
+                                    !IsBlank(varWeeklyEmployeeEmail),
+                                    If(
+                                        varIsSuperAdmin,
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                Employee = varWeeklyEmployeeEmail &&
+                                                ApprovalStatus_1 = "Pending" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        );
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                Employee = varWeeklyEmployeeEmail &&
+                                                ApprovalStatus_1 = "Approved" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        );
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                Employee = varWeeklyEmployeeEmail &&
+                                                ApprovalStatus_1 = "Rejected" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        ),
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                Employee = varWeeklyEmployeeEmail &&
+                                                ApproverID_1 = User().Email &&
+                                                ApprovalStatus_1 = "Pending" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        );
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                Employee = varWeeklyEmployeeEmail &&
+                                                ApproverID_1 = User().Email &&
+                                                ApprovalStatus_1 = "Approved" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        );
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                Employee = varWeeklyEmployeeEmail &&
+                                                ApproverID_1 = User().Email &&
+                                                ApprovalStatus_1 = "Rejected" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        )
+                                    ),
+                                    If(
+                                        varIsSuperAdmin,
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                ApprovalStatus_1 = "Pending" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        );
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                ApprovalStatus_1 = "Approved" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        );
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                ApprovalStatus_1 = "Rejected" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        ),
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                ApproverID_1 = User().Email &&
+                                                ApprovalStatus_1 = "Pending" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        );
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                ApproverID_1 = User().Email &&
+                                                ApprovalStatus_1 = "Approved" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        );
+                                        Collect(
+                                            colRawHours,
+                                            Filter(
+                                                'Hours Tracking (Hours)',
+                                                ApproverID_1 = User().Email &&
+                                                ApprovalStatus_1 = "Rejected" &&
+                                                Date >= varWeeklyLoadFrom &&
+                                                Date <= varWeeklyLoadTo
+                                            )
+                                        )
+                                    )
+                                );
+                                ClearCollect(
+                                    colAllPendingHours,
+                                    ForAll(
+                                        colRawHours,
+                                        {
+                                            ID: ThisRecord.ID,
+                                            Employee: ThisRecord.Employee,
+                                            Employee_Name: ThisRecord.Employee_Name,
+                                            Date: ThisRecord.Date,
+                                            Standard_time: ThisRecord.Standard_time,
+                                            ApprovalStatus_1: ThisRecord.ApprovalStatus_1,
+                                            Cost_code: ThisRecord.Cost_code,
+                                            Comments: ThisRecord.Comments,
+                                            ApproverID_1: ThisRecord.ApproverID_1
+                                        }
+                                    )
+                                );
+                                ClearCollect(
+                                    colWeeklySummary,
+                                    GroupBy(
+                                        AddColumns(
+                                            colAllPendingHours,
+                                            WeekStart,
+                                            DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days")
+                                        ),
+                                        Employee_Name,
+                                        Employee,
+                                        WeekStart,
+                                        WeekRecords
+                                    )
+                                );
+                                ClearCollect(
+                                    colWeeklySummaryDisplay,
+                                    AddColumns(
+                                        colWeeklySummary,
+                                        WeekEnd,
+                                        DateAdd(WeekStart, 6, "Days"),
+                                        TotalStandard,
+                                        Sum(WeekRecords, Standard_time),
+                                        TotalDays,
+                                        CountRows(WeekRecords),
+                                        WeekStatus,
+                                        If(
+                                            CountIf(WeekRecords, ApprovalStatus_1 = "Rejected") = CountRows(WeekRecords),
+                                            "Rejected",
+                                            If(
+                                                CountIf(WeekRecords, ApprovalStatus_1 = "Approved") = CountRows(WeekRecords),
+                                                "Approved",
+                                                If(
+                                                    CountIf(WeekRecords, ApprovalStatus_1 = "Pending") > 0,
+                                                    "Pending",
+                                                    "Mixed"
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                              Size: =12
+                              Text: ="Refresh"
+                              Tooltip: ="Reload approval weeks"
+                              Width: =90
+                        - weekly_actions_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              Height: =40
+                              LayoutMinHeight: =40
+                              LayoutMinWidth: =8
+                              Width: =8
+                        - Button_ApproveAllWeeks:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              HoverFill: =ColorFade(RGBA(0, 18, 107, 1), -15%)
+                              LayoutMinHeight: =34
+                              OnSelect: |-
+                                =If(
+                                    IsBlank(DatePicker_WeeklyFrom.SelectedDate) || IsBlank(DatePicker_WeeklyTo.SelectedDate),
+                                    Set(varShowApproveAllConfirm, true),
+                                    Select(Button_ApproveAllWeeks_Execute)
+                                );
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Approve all pending"
+                              Tooltip: ="Approve every pending timesheet for this filter"
+                              Width: =180
+            - weekly_col_headers:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(0, 18, 107, 1)
+                  FillPortions: =0
+                  Height: =40
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =4
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  Width: =Parent.Width
+                Children:
+                  - wh_Emp:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "Employee_Name",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "Employee_Name");
+                              Set(varWeeklySortAscending, true)
+                          )
+                        Size: =12
+                        Text: ="Employee" & If(varWeeklySortColumn = "Employee_Name", If(varWeeklySortAscending, " ↑", " ↓"), "")
+                        Width: =250
+                  - wh_Week:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "WeekStart",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "WeekStart");
+                              Set(varWeeklySortAscending, false)
+                          )
+                        Size: =12
+                        Text: ="Week" & If(varWeeklySortColumn = "WeekStart", If(varWeeklySortAscending, " ↑", " ↓"), "")
+                        Width: =250
+                  - wh_Hours:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "TotalStandard",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "TotalStandard");
+                              Set(varWeeklySortAscending, false)
+                          )
+                        Size: =12
+                        Text: ="Hours" & If(varWeeklySortColumn = "TotalStandard", If(varWeeklySortAscending, " ↑", " ↓"), "")
+                        Width: =88
+                  - wh_Days:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "TotalDays",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "TotalDays");
+                              Set(varWeeklySortAscending, false)
+                          )
+                        Size: =12
+                        Text: ="Days" & If(varWeeklySortColumn = "TotalDays", If(varWeeklySortAscending, " ↑", " ↓"), "")
+                        Width: =69
+                  - wh_InfoSpacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        Height: =1
+                        LayoutMinWidth: =16
+                        Width: =16
+                  - wh_Status:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        OnSelect: |-
+                          =If(
+                              varWeeklySortColumn = "WeekStatus",
+                              Set(varWeeklySortAscending, !varWeeklySortAscending),
+                              Set(varWeeklySortColumn, "WeekStatus");
+                              Set(varWeeklySortAscending, true)
+                          )
+                        Size: =12
+                        Text: ="Status" & If(varWeeklySortColumn = "WeekStatus", If(varWeeklySortAscending, " ↑", " ↓"), "")
+                        Width: =110
+                  - wh_ActionsSpacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =1
+                        LayoutMinWidth: =16
+                        Width: =280
+            - Gallery_WeeklySummary:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =1
+                  Height: =400
+                  Items: |-
+                    =SortByColumns(
+                        Filter(
+                            colWeeklySummaryDisplay,
+                            (
+                                varShowAllWeeks ||
+                                WeekStatus = "Pending" ||
+                                WeekStatus = "Rejected"
+                            ) &&
+                            (
+                                IsBlank(varWeeklyEmployeeEmail) ||
+                                Lower(Employee) = varWeeklyEmployeeEmail
+                            ) &&
+                            (
+                                IsBlank(DatePicker_WeeklyFrom.SelectedDate) ||
+                                IsBlank(DatePicker_WeeklyTo.SelectedDate) ||
+                                (WeekStart <= DatePicker_WeeklyTo.SelectedDate && WeekEnd >= DatePicker_WeeklyFrom.SelectedDate)
+                            )
+                        ),
+                        varWeeklySortColumn,
+                        If(varWeeklySortAscending, SortOrder.Ascending, SortOrder.Descending)
+                    )
+                  TemplateSize: =56
+                  Width: =Parent.Width
+                Children:
+                  - lbl_EmpName:
+                      Control: Label@2.5.1
+                      Properties:
+                        Font: =Font.'Open Sans'
+                        Height: =40
+                        Size: =12
+                        Text: =ThisItem.Employee_Name
+                        Width: =250
+                        X: =16
+                        Y: =8
+                  - lbl_WeekRange:
+                      Control: Label@2.5.1
+                      Properties:
+                        Font: =Font.'Open Sans'
+                        Height: =40
+                        Size: =12
+                        Text: =Text(ThisItem.WeekStart, "mmm d") & " - " & Text(ThisItem.WeekEnd, "mmm d, yyyy")
+                        Width: =250
+                        X: =270
+                        Y: =8
+                  - lbl_TotalStd:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Font: =Font.'Open Sans'
+                        Height: =40
+                        Size: =12
+                        Text: |-
+                          =If(
+                              Mod(Round(Coalesce(ThisItem.TotalStandard, 0), 2), 1) = 0,
+                              Text(Round(Coalesce(ThisItem.TotalStandard, 0), 2), "0"),
+                              Text(Round(Coalesce(ThisItem.TotalStandard, 0), 2), "0.##")
+                          )
+                        Width: =88
+                        X: =524
+                        Y: =8
+                  - lbl_TotalDays:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Font: =Font.'Open Sans'
+                        Height: =40
+                        Size: =12
+                        Text: =Text(ThisItem.TotalDays)
+                        Width: =69
+                        X: =616
+                        Y: =8
+                  - lbl_WeekStatus:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Fill: =If(ThisItem.WeekStatus = "Approved", RGBA(108, 212, 136, 1), ThisItem.WeekStatus = "Rejected", RGBA(252, 124, 124, 1), ThisItem.WeekStatus = "Pending", RGBA(252, 250, 124, 1), RGBA(230, 230, 230, 1))
+                        Font: =Font.'Open Sans'
+                        Height: =36
+                        Size: =11
+                        Text: =ThisItem.WeekStatus
+                        Width: =110
+                        X: =Parent.TemplateWidth - 422
+                        Y: =10
+                  - btn_RowApprove:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        Fill: =RGBA(16, 124, 65, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        OnSelect: |-
+                          =Clear(colRowActionIds);
+                          If(
+                              varIsSuperAdmin,
+                              Collect(
+                                  colRowActionIds,
+                                  Filter(
+                                      'Hours Tracking (Hours)',
+                                      Employee = ThisItem.Employee &&
+                                      Date >= ThisItem.WeekStart &&
+                                      Date <= ThisItem.WeekEnd
+                                  )
+                              ),
+                              Collect(
+                                  colRowActionIds,
+                                  Filter(
+                                      'Hours Tracking (Hours)',
+                                      Employee = ThisItem.Employee &&
+                                      ApproverID_1 = User().Email &&
+                                      Date >= ThisItem.WeekStart &&
+                                      Date <= ThisItem.WeekEnd
+                                  )
+                              )
+                          );
+                          ClearCollect(
+                              colRowActionIds,
+                              ForAll(
+                                  Filter(colRowActionIds, ApprovalStatus_1 <> "Draft") As TargetRow,
+                                  {
+                                      ID: TargetRow.ID,
+                                      ApprovalStatus_1: "Approved"
+                                  }
+                              )
+                          );
+                          Patch('Hours Tracking (Hours)', colRowActionIds);
+                          Clear(colRowActionIds);
+                          Notify("Week approved", NotificationType.Success);
+                          Select(btn_ReloadWeekly);
+                        Size: =11
+                        Text: ="Approve"
+                        Visible: =ThisItem.WeekStatus = "Pending" || ThisItem.WeekStatus = "Mixed" || ThisItem.WeekStatus = "Rejected"
+                        Width: =80
+                        X: =Parent.TemplateWidth - 296
+                        Y: =12
+                  - btn_RowReject:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        Fill: =RGBA(214, 12, 48, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        OnSelect: |-
+                          =Clear(colRowActionIds);
+                          If(
+                              varIsSuperAdmin,
+                              Collect(
+                                  colRowActionIds,
+                                  Filter(
+                                      'Hours Tracking (Hours)',
+                                      Employee = ThisItem.Employee &&
+                                      Date >= ThisItem.WeekStart &&
+                                      Date <= ThisItem.WeekEnd
+                                  )
+                              ),
+                              Collect(
+                                  colRowActionIds,
+                                  Filter(
+                                      'Hours Tracking (Hours)',
+                                      Employee = ThisItem.Employee &&
+                                      ApproverID_1 = User().Email &&
+                                      Date >= ThisItem.WeekStart &&
+                                      Date <= ThisItem.WeekEnd
+                                  )
+                              )
+                          );
+                          ClearCollect(
+                              colRowActionIds,
+                              ForAll(
+                                  Filter(colRowActionIds, ApprovalStatus_1 <> "Draft") As TargetRow,
+                                  {
+                                      ID: TargetRow.ID,
+                                      ApprovalStatus_1: "Rejected"
+                                  }
+                              )
+                          );
+                          Patch('Hours Tracking (Hours)', colRowActionIds);
+                          Clear(colRowActionIds);
+                          Notify("Week rejected", NotificationType.Warning);
+                          Select(btn_ReloadWeekly);
+                        Size: =11
+                        Text: ="Reject"
+                        Visible: =ThisItem.WeekStatus = "Pending" || ThisItem.WeekStatus = "Mixed" || ThisItem.WeekStatus = "Approved" || ThisItem.WeekStatus = "Rejected"
+                        Width: =80
+                        X: =Parent.TemplateWidth - 204
+                        Y: =12
+                  - btn_DrillDaily:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(0, 18, 107, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =32
+                        OnSelect: |-
+                          =Set(varSelectedWeekEmployee, ThisItem.Employee);
+                          Set(varSelectedWeekEmployeeName, ThisItem.Employee_Name);
+                          Set(varApprovalWeekStart, ThisItem.WeekStart);
+                          Set(varDrillFromWeekly, true);
+                          Navigate(Approvals, ScreenTransition.Cover);
+                        Size: =11
+                        Text: ="Details"
+                        Width: =80
+                        X: =Parent.TemplateWidth - 116
+                        Y: =12
+      - Button_ApproveAllWeeks_Execute:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+              =ClearCollect(
+                  colApproveAllWeeks,
+                  ForAll(
+                      Filter(
+                          colAllPendingHours,
+                          ApprovalStatus_1 = "Pending" &&
+                          (
+                              IsBlank(varWeeklyEmployeeEmail) ||
+                              Lower(Employee) = varWeeklyEmployeeEmail
+                          ) &&
+                          (
+                              IsBlank(DatePicker_WeeklyFrom.SelectedDate) ||
+                              IsBlank(DatePicker_WeeklyTo.SelectedDate) ||
+                              (
+                                  DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days") <= DatePicker_WeeklyTo.SelectedDate &&
+                                  DateAdd(DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days"), 6, "Days") >= DatePicker_WeeklyFrom.SelectedDate
+                              )
+                          )
+                      ) As TargetRow,
+                      {
+                          ID: TargetRow.ID,
+                          ApprovalStatus_1: "Approved"
+                      }
+                  )
+              );
+              If(
+                  CountRows(colApproveAllWeeks) = 0,
+                  Notify("No pending timesheets in this filter", NotificationType.Information),
+                  Patch('Hours Tracking (Hours)', colApproveAllWeeks);
+                  Notify("All pending timesheets approved", NotificationType.Success)
+              );
+              Clear(colApproveAllWeeks);
+              Select(btn_ReloadWeekly);
+            Visible: =false
+            Width: =1
+      - Dialog_ApproveAllConfirm:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(0, 0, 0, 0.45)
+            Height: =Parent.Height
+            Visible: =varShowApproveAllConfirm
+            Width: =Parent.Width
+            X: =0
+            Y: =0
+          Children:
+            - Dialog_ApproveAllCard:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.Bold
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =240
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =12
+                  PaddingBottom: =20
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =20
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Width: =480
+                  X: =(Parent.Width - 480) / 2
+                  Y: =(Parent.Height - 240) / 2
+                Children:
+                  - Label_ApproveAllTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(0, 18, 107, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        Size: =18
+                        Text: ="Approve all pending?"
+                        Width: =Parent.Width
+                  - Label_ApproveAllMessage:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(50, 49, 48, 1)
+                        FillPortions: =1
+                        Font: =Font.'Open Sans'
+                        Height: =100
+                        Size: =13
+                        Text: ="You have not set a From and To date range. This will approve every pending entry matching the current employee filter. Do you want to continue?"
+                        Width: =Parent.Width
+                  - Dialog_ApproveAllButtons:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =44
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                        Width: =Parent.Width
+                      Children:
+                        - Dialog_ApproveAllSpacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              Height: =1
+                              LayoutMinWidth: =8
+                              Width: =8
+                        - btn_ApproveAllCancel:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              BorderThickness: =2
+                              Color: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =40
+                              OnSelect: =Set(varShowApproveAllConfirm, false)
+                              Size: =12
+                              Text: ="Cancel"
+                              Width: =100
+                        - btn_ApproveAllConfirm:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(16, 124, 65, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =40
+                              HoverFill: =ColorFade(RGBA(16, 124, 65, 1), -15%)
+                              OnSelect: |-
+                                =Set(varShowApproveAllConfirm, false);
+                                Select(Button_ApproveAllWeeks_Execute);
+                              Size: =12
+                              Text: ="Approve all"
+                              Width: =120

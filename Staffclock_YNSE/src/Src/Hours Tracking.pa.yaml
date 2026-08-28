@@ -526,6 +526,18 @@ Screens:
                                     ) > 0,
                                     Notify("Work Day entries must have a cost code", NotificationType.Error),
                                     Set(varIsSaving, true);
+                                    UpdateIf(
+                                        colHoursGallery,
+                                        !IsBlank(TaskCode) &&
+                                        TaskCode <> "Work Day" &&
+                                        TaskCode <> "Weekend" &&
+                                        ApprovalStatus <> "Approved" &&
+                                        (IsBlank(StandardHours) || StandardHours = ""),
+                                        {
+                                            StandardHours: "0",
+                                            IsDirty: true
+                                        }
+                                    );
                                     ClearCollect(
                                         HoursDraftNew,
                                         Filter(
@@ -535,31 +547,42 @@ Screens:
                                                 (TaskCode <> "Work Day" && TaskCode <> "Weekend" && !IsBlank(TaskCode))
                                             ) &&
                                             RecordID = 0 &&
-                                            IsDirty = true &&
+                                            (
+                                                IsDirty = true ||
+                                                (
+                                                    TaskCode <> "Work Day" &&
+                                                    TaskCode <> "Weekend" &&
+                                                    !IsBlank(TaskCode)
+                                                )
+                                            ) &&
                                             ApprovalStatus <> "Approved"
                                         )
                                     );
-                                    ForAll(
-                                        HoursDraftNew,
-                                        With(
-                                            { logID: Text(GUID()) },
-                                            Patch(
-                                                'Hours Tracking (Hours)',
-                                                Defaults('Hours Tracking (Hours)'),
-                                                {
-                                                    Title: logID,
-                                                    LOG_ID: logID,
-                                                    Employee_Name: varSubmitAsName,
-                                                    Employee: varSubmitAsEmail,
-                                                    Cost_code: CostCode,
-                                                    Date: WorkDate,
-                                                    Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), 0),
-                                                    Task: Coalesce(TaskCode, "Work Day"),
-                                                    Comments: Comments,
-                                                    App_Name: "Staffclock",
-                                                    ApproverID_1: varApprover1Email,
-                                                    ApprovalStatus_1: "Draft"
-                                                }
+                                    Clear(colHoursPatchWait);
+                                    Collect(
+                                        colHoursPatchWait,
+                                        ForAll(
+                                            HoursDraftNew,
+                                            With(
+                                                { logID: Text(GUID()) },
+                                                Patch(
+                                                    'Hours Tracking (Hours)',
+                                                    Defaults('Hours Tracking (Hours)'),
+                                                    {
+                                                        Title: logID,
+                                                        LOG_ID: logID,
+                                                        Employee_Name: varSubmitAsName,
+                                                        Employee: varSubmitAsEmail,
+                                                        Cost_code: CostCode,
+                                                        Date: WorkDate,
+                                                        Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), Value("0")),
+                                                        Task: Coalesce(TaskCode, "Work Day"),
+                                                        Comments: Comments,
+                                                        App_Name: "Staffclock",
+                                                        ApproverID_1: varApprover1Email,
+                                                        ApprovalStatus_1: "Draft"
+                                                    }
+                                                )
                                             )
                                         )
                                     );
@@ -576,18 +599,21 @@ Screens:
                                             IsDirty = true
                                         )
                                     );
-                                    ForAll(
-                                        HoursDraftUpdate,
-                                        Patch(
-                                            'Hours Tracking (Hours)',
-                                            LookUp('Hours Tracking (Hours)', ID = RecordID),
-                                            {
-                                                Cost_code: CostCode,
-                                                Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), 0),
-                                                Task: Coalesce(TaskCode, "Work Day"),
-                                                Comments: Comments,
-                                                ApprovalStatus_1: If(ApprovalStatus = "Draft", "Draft", ApprovalStatus)
-                                            }
+                                    Collect(
+                                        colHoursPatchWait,
+                                        ForAll(
+                                            HoursDraftUpdate,
+                                            Patch(
+                                                'Hours Tracking (Hours)',
+                                                LookUp('Hours Tracking (Hours)', ID = RecordID),
+                                                {
+                                                    Cost_code: CostCode,
+                                                    Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), Value("0")),
+                                                    Task: Coalesce(TaskCode, "Work Day"),
+                                                    Comments: Comments,
+                                                    ApprovalStatus_1: If(ApprovalStatus = "Draft", "Draft", ApprovalStatus)
+                                                }
+                                            )
                                         )
                                     );
                                     If(
@@ -749,7 +775,7 @@ Screens:
                   Fill: =RGBA(255, 255, 255, 1)
                   FillPortions: =1
                   Height: =400
-                  Items: =SortByColumns(colHoursGallery, "WorkDate", SortOrder.Ascending)
+                  Items: =SortByColumns(Filter(colHoursGallery, varHoursFormStamp >= 0), "WorkDate", SortOrder.Ascending)
                   TemplateSize: =52
                   Width: =Parent.Width
                 Children:
@@ -831,9 +857,15 @@ Screens:
                               RowKey = ThisItem.RowKey,
                               {
                                   TaskCode: Self.Selected.Value,
+                                  StandardHours: If(
+                                      Self.Selected.Value = "Work Day" || Self.Selected.Value = "Weekend",
+                                      ThisItem.StandardHours,
+                                      "0"
+                                  ),
                                   IsDirty: true
                               }
-                          )
+                          );
+                          Set(varHoursFormStamp, varHoursFormStamp + 1)
                         Size: =11
                         Width: =160
                         X: =422
@@ -842,7 +874,7 @@ Screens:
                       Control: Classic/TextInput@2.3.2
                       Properties:
                         BorderColor: =RGBA(0, 18, 107, 1)
-                        Default: =ThisItem.StandardHours
+                        Default: =Coalesce(LookUp(colHoursGallery, RowKey = ThisItem.RowKey).StandardHours, "") & If(varHoursFormStamp >= 0, "")
                         DisplayMode: =If(ThisItem.ApprovalStatus = "Approved", DisplayMode.View, DisplayMode.Edit)
                         Font: =Font.'Open Sans'
                         Height: =36
@@ -956,6 +988,7 @@ Screens:
                             {
                                 SrcID: ID,
                                 SrcDate: Date,
+                                SrcDateKey: Text(DateAdd(Date, 0, "Days"), "yyyy-mm-dd"),
                                 SrcCostCode: Cost_code,
                                 SrcTask: Task,
                                 SrcComments: Comments,
@@ -1011,11 +1044,12 @@ Screens:
                         With(
                             {
                                 currentDate: DateAdd(varCurrentWeekStart, Value, "Days"),
+                                currentDateKey: Text(DateAdd(varCurrentWeekStart, Value, "Days"), "yyyy-mm-dd"),
                                 isWeekend: Weekday(DateAdd(varCurrentWeekStart, Value, "Days"), StartOfWeek.Monday) >= 6,
                                 isHoliday: Text(DateAdd(varCurrentWeekStart, Value, "Days"), "yyyy-mm-dd") in ForAll(colPublic_Holidays, CleanDateKey)
                             },
                             If(
-                                IsEmpty(Filter(colExistingHours, DateAdd(SrcDate, 0, "Days") = currentDate)),
+                                IsEmpty(Filter(colExistingHours, SrcDateKey = currentDateKey)),
                                 Collect(
                                     colHoursGallery,
                                     {
@@ -1040,7 +1074,11 @@ Screens:
                                             "Work Day"
                                         ),
                                         Comments: "",
-                                        StandardHours: "",
+                                        StandardHours: If(
+                                            isHoliday && !isWeekend,
+                                            "0",
+                                            ""
+                                        ),
                                         IsSubmitted: false,
                                         RecordID: 0,
                                         ApprovalStatus: "",
@@ -1050,6 +1088,8 @@ Screens:
                             )
                         )
                     );
+                    Set(varHoursFormStamp, varHoursFormStamp + 1);
+                    Reset(Gallery_Hours);
                   Text: ="Load"
                   Visible: =false
                   Width: =1
@@ -1079,6 +1119,17 @@ Screens:
                         ) > 0,
                         Notify("Work Day entries must have a cost code", NotificationType.Error),
                         Set(varIsSaving, true);
+                        UpdateIf(
+                            colHoursGallery,
+                            !IsBlank(TaskCode) &&
+                            TaskCode <> "Work Day" &&
+                            TaskCode <> "Weekend" &&
+                            ApprovalStatus <> "Approved" &&
+                            (IsBlank(StandardHours) || StandardHours = ""),
+                            {
+                                StandardHours: "0"
+                            }
+                        );
                         ClearCollect(
                             HoursNewCollection,
                             Filter(
@@ -1091,27 +1142,31 @@ Screens:
                                 ApprovalStatus <> "Approved"
                             )
                         );
-                        ForAll(
-                            HoursNewCollection,
-                            With(
-                                { logID: Text(GUID()) },
-                                Patch(
-                                    'Hours Tracking (Hours)',
-                                    Defaults('Hours Tracking (Hours)'),
-                                    {
-                                        Title: logID,
-                                        LOG_ID: logID,
-                                        Employee_Name: varSubmitAsName,
-                                        Employee: varSubmitAsEmail,
-                                        Cost_code: CostCode,
-                                        Date: WorkDate,
-                                        Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), 0),
-                                        Task: Coalesce(TaskCode, "Work Day"),
-                                        Comments: Comments,
-                                        App_Name: "Staffclock",
-                                        ApproverID_1: varApprover1Email,
-                                        ApprovalStatus_1: If(IsBlank(varApprover1Email), "Approved", "Pending")
-                                    }
+                        Clear(colHoursPatchWait);
+                        Collect(
+                            colHoursPatchWait,
+                            ForAll(
+                                HoursNewCollection,
+                                With(
+                                    { logID: Text(GUID()) },
+                                    Patch(
+                                        'Hours Tracking (Hours)',
+                                        Defaults('Hours Tracking (Hours)'),
+                                        {
+                                            Title: logID,
+                                            LOG_ID: logID,
+                                            Employee_Name: varSubmitAsName,
+                                            Employee: varSubmitAsEmail,
+                                            Cost_code: CostCode,
+                                            Date: WorkDate,
+                                            Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), Value("0")),
+                                            Task: Coalesce(TaskCode, "Work Day"),
+                                            Comments: Comments,
+                                            App_Name: "Staffclock",
+                                            ApproverID_1: varApprover1Email,
+                                            ApprovalStatus_1: If(IsBlank(varApprover1Email), "Approved", "Pending")
+                                        }
+                                    )
                                 )
                             )
                         );
@@ -1127,18 +1182,21 @@ Screens:
                                 ApprovalStatus <> "Approved"
                             )
                         );
-                        ForAll(
-                            HoursDraftCollection,
-                            Patch(
-                                'Hours Tracking (Hours)',
-                                LookUp('Hours Tracking (Hours)', ID = RecordID),
-                                {
-                                    Cost_code: CostCode,
-                                    Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), 0),
-                                    Task: Coalesce(TaskCode, "Work Day"),
-                                    Comments: Comments,
-                                    ApprovalStatus_1: If(IsBlank(varApprover1Email), "Approved", "Pending")
-                                }
+                        Collect(
+                            colHoursPatchWait,
+                            ForAll(
+                                HoursDraftCollection,
+                                Patch(
+                                    'Hours Tracking (Hours)',
+                                    LookUp('Hours Tracking (Hours)', ID = RecordID),
+                                    {
+                                        Cost_code: CostCode,
+                                            Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), Value("0")),
+                                        Task: Coalesce(TaskCode, "Work Day"),
+                                        Comments: Comments,
+                                        ApprovalStatus_1: If(IsBlank(varApprover1Email), "Approved", "Pending")
+                                    }
+                                )
                             )
                         );
                         If(

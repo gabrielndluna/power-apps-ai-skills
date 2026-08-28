@@ -42,32 +42,6 @@ Screens:
             )
         );
         If(
-            IsBlank(varSelectedTaskCode) ||
-            IsEmpty(
-                Filter(
-                    colCostCodes,
-                    Network_Activity_Name = varSelectedCostCode &&
-                    Task_Code = varSelectedTaskCode
-                )
-            ),
-            Set(
-                varSelectedTaskCode,
-                First(
-                    Sort(
-                        Distinct(
-                            Filter(
-                                colCostCodes,
-                                Network_Activity_Name = varSelectedCostCode &&
-                                !IsBlank(Task_Code)
-                            ),
-                            Task_Code
-                        ),
-                        Value
-                    )
-                ).Value
-            )
-        );
-        If(
             IsBlank(varCurrentWeekStart),
             Set(
                 varCurrentWeekStart,
@@ -84,6 +58,7 @@ Screens:
             Fill: =RGBA(245, 246, 251, 1)
             Height: =Parent.Height
             LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =0
             Width: =Parent.Width
           Children:
             - hours_header:
@@ -95,6 +70,7 @@ Screens:
                   FillPortions: =0
                   Height: =128
                   LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =0
                   LayoutMinHeight: =0
                   LayoutMinWidth: =0
                   PaddingBottom: =14
@@ -121,6 +97,7 @@ Screens:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
                             Properties:
+                              BorderThickness: =0
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
@@ -136,8 +113,10 @@ Screens:
                               - Logo_App_Hours:
                                   Control: Image@2.2.3
                                   Properties:
+                                    BorderThickness: =0
                                     Height: =32
                                     Image: ='App Names'
+                                    ImagePosition: =ImagePosition.Fit
                                     Width: =116
                                     X: =4
                                     Y: =2
@@ -145,6 +124,7 @@ Screens:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
                             Properties:
+                              BorderThickness: =0
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
@@ -160,8 +140,10 @@ Screens:
                               - Logo_Crop_Hours:
                                   Control: Image@2.2.3
                                   Properties:
+                                    BorderThickness: =0
                                     Height: =32
                                     Image: ='Logo Cropped'
+                                    ImagePosition: =ImagePosition.Fit
                                     Width: =116
                                     X: =4
                                     Y: =2
@@ -170,6 +152,7 @@ Screens:
                             Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
+                              FillPortions: =1
                               Height: =1
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
@@ -181,7 +164,9 @@ Screens:
                               BorderThickness: =1
                               Color: =RGBA(23, 26, 51, 1)
                               Fill: =RGBA(245, 247, 250, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
                               Height: =34
                               OnSelect: =Navigate(Screen_Home, ScreenTransition.Fade)
                               RadiusBottomLeft: =9
@@ -198,7 +183,9 @@ Screens:
                               BorderThickness: =1
                               Color: =RGBA(23, 26, 51, 1)
                               Fill: =RGBA(245, 247, 250, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
                               Height: =34
                               OnSelect: |-
                                 =If(
@@ -221,7 +208,9 @@ Screens:
                               BorderThickness: =1
                               Color: =RGBA(23, 26, 51, 1)
                               Fill: =RGBA(245, 247, 250, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
                               Height: =34
                               OnSelect: |-
                                 =If(
@@ -241,6 +230,7 @@ Screens:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(23, 26, 51, 1)
+                        FillPortions: =0
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =38
@@ -248,11 +238,13 @@ Screens:
                         PaddingTop: =8
                         Size: =20
                         Text: ="Hours tracking"
+                        VerticalAlign: =VerticalAlign.Middle
                         Width: =Parent.Width
                   - Label_HoursSub:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(91, 97, 120, 1)
+                        FillPortions: =0
                         Font: =Font.'Segoe UI'
                         Height: =20
                         Size: =12
@@ -261,7 +253,9 @@ Screens:
             - hours_rule:
                 Control: Rectangle@2.3.0
                 Properties:
+                  BorderThickness: =0
                   Fill: =RGBA(226, 228, 240, 1)
+                  FillPortions: =0
                   Height: =1
                   Width: =Parent.Width
             - hours_toolbar:
@@ -300,7 +294,9 @@ Screens:
                               BorderThickness: =1
                               Color: =RGBA(0, 18, 107, 1)
                               Fill: =RGBA(245, 247, 250, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              Height: =40
                               OnSelect: |-
                                 =Set(varCurrentWeekStart, DateAdd(varCurrentWeekStart, -7, "Days"));
                                 Select(Button_LoadWeek);
@@ -312,8 +308,10 @@ Screens:
                               Align: =Align.Center
                               BorderColor: =RGBA(0, 18, 107, 1)
                               Color: =RGBA(0, 18, 107, 1)
+                              FillPortions: =0
                               Font: =Font.'Open Sans'
                               FontWeight: =FontWeight.Semibold
+                              Height: =40
                               Size: =14
                               Text: ="Week of " & Text(varCurrentWeekStart, "mmm d") & " - " & Text(DateAdd(varCurrentWeekStart, 6, "Days"), "mmm d, yyyy")
                               Width: =340
@@ -324,7 +322,9 @@ Screens:
                               BorderThickness: =1
                               Color: =RGBA(0, 18, 107, 1)
                               Fill: =RGBA(245, 247, 250, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              Height: =40
                               OnSelect: |-
                                 =Set(varCurrentWeekStart, DateAdd(varCurrentWeekStart, 7, "Days"));
                                 Select(Button_LoadWeek);
@@ -336,6 +336,7 @@ Screens:
                             Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
+                              FillPortions: =1
                               Height: =1
                               LayoutMinWidth: =10
                         - Label_CostCodeHint:
@@ -343,10 +344,14 @@ Screens:
                             Properties:
                               AlignInContainer: =AlignInContainer.Center
                               Color: =RGBA(106, 122, 127, 1)
+                              FillPortions: =0
                               Font: =Font.'Open Sans'
+                              Height: =40
+                              LayoutMinHeight: =40
                               Size: =11
                               Text: ="Default cost code"
-                              Width: =110
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =120
                         - Dropdown_CostCode:
                             Control: Classic/DropDown@2.3.1
                             Properties:
@@ -354,164 +359,16 @@ Screens:
                               ChevronBackground: =RGBA(0, 18, 107, 1)
                               ChevronFill: =RGBA(255, 255, 255, 1)
                               Default: =varSelectedCostCode
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              Height: =40
                               Items: =Sort(Distinct(colCostCodes, Network_Activity_Name), Value)
                               Items.Value: =Value
                               OnChange: |-
                                 =Set(varSelectedCostCode, Self.Selected.Value);
                                 Set(varSelectedCostCodeID, LookUp(colCostCodes, Network_Activity_Name = Self.Selected.Value).Network_Activity);
-                                Set(
-                                    varSelectedTaskCode,
-                                    First(
-                                        Sort(
-                                            Distinct(
-                                                Filter(
-                                                    colCostCodes,
-                                                    Network_Activity_Name = Self.Selected.Value &&
-                                                    !IsBlank(Task_Code)
-                                                ),
-                                                Task_Code
-                                            ),
-                                            Value
-                                        )
-                                    ).Value
-                                );
-                                ClearCollect(
-                                    colHoursGallery,
-                                    ForAll(
-                                        colHoursGallery As Row,
-                                        {
-                                            RowKey: Text(GUID()),
-                                            WorkDate: Row.WorkDate,
-                                            DayLabel: Row.DayLabel,
-                                            CostCode: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                varSelectedCostCode,
-                                                Row.CostCode
-                                            ),
-                                            CostCodeID: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                varSelectedCostCodeID,
-                                                Row.CostCodeID
-                                            ),
-                                            ActivityTaskCode: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                varSelectedTaskCode,
-                                                Row.ActivityTaskCode
-                                            ),
-                                            EntryType: Row.EntryType,
-                                            Comments: Row.Comments,
-                                            StandardHours: Row.StandardHours,
-                                            IsSubmitted: Row.IsSubmitted,
-                                            RecordID: Row.RecordID,
-                                            ApprovalStatus: Row.ApprovalStatus,
-                                            IsDirty: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                true,
-                                                Row.IsDirty
-                                            )
-                                        }
-                                    )
-                                );
-                              Width: =170
-                        - Label_TaskCodeHint:
-                            Control: Label@2.5.1
-                            Properties:
-                              AlignInContainer: =AlignInContainer.Center
-                              Color: =RGBA(106, 122, 127, 1)
-                              Font: =Font.'Open Sans'
-                              Size: =11
-                              Text: ="Default task code"
-                              Width: =110
-                        - Dropdown_TaskCode:
-                            Control: Classic/DropDown@2.3.1
-                            Properties:
-                              BorderColor: =RGBA(200, 204, 210, 1)
-                              ChevronBackground: =RGBA(0, 18, 107, 1)
-                              ChevronFill: =RGBA(255, 255, 255, 1)
-                              Default: =varSelectedTaskCode
-                              Font: =Font.'Segoe UI'
-                              Items: |-
-                                =Sort(
-                                    Distinct(
-                                        Filter(
-                                            colCostCodes,
-                                            Network_Activity_Name = varSelectedCostCode &&
-                                            !IsBlank(Task_Code)
-                                        ),
-                                        Task_Code
-                                    ),
-                                    Value
-                                )
-                              Items.Value: =Value
-                              OnChange: |-
-                                =Set(varSelectedTaskCode, Self.Selected.Value);
-                                ClearCollect(
-                                    colHoursGallery,
-                                    ForAll(
-                                        colHoursGallery As Row,
-                                        {
-                                            RowKey: Text(GUID()),
-                                            WorkDate: Row.WorkDate,
-                                            DayLabel: Row.DayLabel,
-                                            CostCode: Row.CostCode,
-                                            CostCodeID: Row.CostCodeID,
-                                            ActivityTaskCode: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                Self.Selected.Value,
-                                                Row.ActivityTaskCode
-                                            ),
-                                            EntryType: Row.EntryType,
-                                            Comments: Row.Comments,
-                                            StandardHours: Row.StandardHours,
-                                            IsSubmitted: Row.IsSubmitted,
-                                            RecordID: Row.RecordID,
-                                            ApprovalStatus: Row.ApprovalStatus,
-                                            IsDirty: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                true,
-                                                Row.IsDirty
-                                            )
-                                        }
-                                    )
-                                );
-                              Width: =150
+                                Select(Button_LoadWeek);
+                              Width: =280
                   - hours_toolbar_actions:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
@@ -560,15 +417,18 @@ Screens:
                                   Properties:
                                     Align: =Align.Right
                                     Color: =RGBA(106, 122, 127, 1)
+                                    FillPortions: =0
                                     Font: =Font.'Open Sans'
                                     Height: =28
                                     LayoutMinHeight: =28
                                     Size: =10
                                     Text: ="Total"
+                                    VerticalAlign: =VerticalAlign.Middle
                                     Width: =48
                               - Label_TotalHours:
                                   Control: Label@2.5.1
                                   Properties:
+                                    Align: =Align.Left
                                     Color: =If(Sum(colHoursGallery, Value(StandardHours)) > 40, RGBA(214, 12, 48, 1), RGBA(0, 18, 107, 1))
                                     FillPortions: =1
                                     Font: =Font.'Open Sans'
@@ -582,6 +442,7 @@ Screens:
                                           Text(Round(Coalesce(Sum(colHoursGallery, Value(StandardHours)), 0), 2), "0"),
                                           Text(Round(Coalesce(Sum(colHoursGallery, Value(StandardHours)), 0), 2), "0.##")
                                       ) & " hrs"
+                                    VerticalAlign: =VerticalAlign.Middle
                                     Width: =90
                         - Button_PublicHolidays:
                             Control: Classic/Button@2.2.0
@@ -590,7 +451,11 @@ Screens:
                               BorderThickness: =1
                               Color: =RGBA(0, 18, 107, 1)
                               Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              LayoutMinHeight: =40
                               OnSelect: =Set(varShowPublicHolidays, true)
                               Size: =11
                               Text: ="Public holidays"
@@ -600,6 +465,7 @@ Screens:
                             Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
+                              FillPortions: =1
                               Height: =40
                               LayoutMinHeight: =40
                               LayoutMinWidth: =8
@@ -611,9 +477,12 @@ Screens:
                               BorderThickness: =0
                               Color: =RGBA(106, 122, 127, 1)
                               Fill: =RGBA(0, 0, 0, 0)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              Height: =40
                               HoverColor: =RGBA(0, 18, 107, 1)
                               HoverFill: =RGBA(230, 234, 238, 1)
+                              LayoutMinHeight: =40
                               OnSelect: |-
                                 =Notify("Week regenerated. Unsaved changes cleared.", NotificationType.Warning);
                                 Select(Button_LoadWeek);
@@ -629,7 +498,9 @@ Screens:
                               Color: =RGBA(23, 26, 51, 1)
                               DisplayMode: =If(varIsSaving, DisplayMode.Disabled, DisplayMode.Edit)
                               Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
                               Height: =34
                               HoverFill: =RGBA(245, 247, 250, 1)
                               LayoutMinHeight: =34
@@ -640,8 +511,8 @@ Screens:
                                     CountIf(
                                         colHoursGallery,
                                         Or(
-                                            And(Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)), !IsBlank(StandardHours)),
-                                            And(EntryType <> "Work Day", EntryType <> "Weekend", !IsBlank(EntryType))
+                                            And(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), !IsBlank(StandardHours)),
+                                            And(TaskCode <> "Work Day", TaskCode <> "Weekend", !IsBlank(TaskCode))
                                         ) &&
                                         ApprovalStatus <> "Approved"
                                     ) = 0,
@@ -649,28 +520,19 @@ Screens:
                                     CountIf(
                                         colHoursGallery,
                                         !IsBlank(StandardHours) &&
-                                        (EntryType = "Work Day" || IsBlank(EntryType)) &&
+                                        (TaskCode = "Work Day" || IsBlank(TaskCode)) &&
                                         IsBlank(CostCode) &&
                                         ApprovalStatus <> "Approved"
                                     ) > 0,
                                     Notify("Work Day entries must have a cost code", NotificationType.Error),
-                                    CountIf(
-                                        colHoursGallery,
-                                        !IsBlank(StandardHours) &&
-                                        (EntryType = "Work Day" || IsBlank(EntryType)) &&
-                                        !IsBlank(CostCode) &&
-                                        IsBlank(ActivityTaskCode) &&
-                                        ApprovalStatus <> "Approved"
-                                    ) > 0,
-                                    Notify("Work Day entries must have a task code", NotificationType.Error),
                                     Set(varIsSaving, true);
                                     ClearCollect(
                                         HoursDraftNew,
                                         Filter(
                                             colHoursGallery,
                                             (
-                                                (Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)) && !IsBlank(StandardHours)) ||
-                                                (EntryType <> "Work Day" && EntryType <> "Weekend" && !IsBlank(EntryType))
+                                                (Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)) && !IsBlank(StandardHours)) ||
+                                                (TaskCode <> "Work Day" && TaskCode <> "Weekend" && !IsBlank(TaskCode))
                                             ) &&
                                             RecordID = 0 &&
                                             IsDirty = true &&
@@ -690,10 +552,9 @@ Screens:
                                                     Employee_Name: varSubmitAsName,
                                                     Employee: varSubmitAsEmail,
                                                     Cost_code: CostCode,
-                                                    Task_code: ActivityTaskCode,
                                                     Date: WorkDate,
-                                                    Standard_time: If(Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)), Value(Coalesce(StandardHours, "0")), 0),
-                                                    Task: Coalesce(EntryType, "Work Day"),
+                                                    Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), 0),
+                                                    Task: Coalesce(TaskCode, "Work Day"),
                                                     Comments: Comments,
                                                     App_Name: "Staffclock",
                                                     ApproverID_1: varApprover1Email,
@@ -707,8 +568,8 @@ Screens:
                                         Filter(
                                             colHoursGallery,
                                             (
-                                                (Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)) && !IsBlank(StandardHours)) ||
-                                                (EntryType <> "Work Day" && EntryType <> "Weekend" && !IsBlank(EntryType))
+                                                (Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)) && !IsBlank(StandardHours)) ||
+                                                (TaskCode <> "Work Day" && TaskCode <> "Weekend" && !IsBlank(TaskCode))
                                             ) &&
                                             RecordID <> 0 &&
                                             ApprovalStatus <> "Approved" &&
@@ -722,9 +583,8 @@ Screens:
                                             LookUp('Hours Tracking (Hours)', ID = RecordID),
                                             {
                                                 Cost_code: CostCode,
-                                                Task_code: ActivityTaskCode,
-                                                Standard_time: If(Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)), Value(Coalesce(StandardHours, "0")), 0),
-                                                Task: Coalesce(EntryType, "Work Day"),
+                                                Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), 0),
+                                                Task: Coalesce(TaskCode, "Work Day"),
                                                 Comments: Comments,
                                                 ApprovalStatus_1: If(ApprovalStatus = "Draft", "Draft", ApprovalStatus)
                                             }
@@ -764,7 +624,9 @@ Screens:
                               Color: =RGBA(255, 255, 255, 1)
                               DisplayMode: =If(varIsSaving, DisplayMode.Disabled, DisplayMode.Edit)
                               Fill: =RGBA(0, 18, 107, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
                               Height: =34
                               HoverFill: =ColorFade(RGBA(0, 18, 107, 1), -15%)
                               LayoutMinHeight: =34
@@ -796,6 +658,7 @@ Screens:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
@@ -806,6 +669,7 @@ Screens:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
@@ -816,42 +680,35 @@ Screens:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
                         Size: =12
                         Text: ="Cost Code"
-                        Width: =200
-                  - h_TaskCode:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(255, 255, 255, 1)
-                        Font: =Font.'Open Sans'
-                        FontWeight: =FontWeight.Semibold
-                        Height: =32
-                        Size: =12
-                        Text: ="Task Code"
-                        Width: =180
+                        Width: =220
                   - h_Task:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
                         Size: =12
-                        Text: ="Type"
-                        Width: =130
+                        Text: ="Task"
+                        Width: =160
                   - h_Hours:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
                         Size: =12
                         Text: ="Hours"
-                        Width: =70
+                        Width: =80
                   - h_Comments:
                       Control: Label@2.5.1
                       Properties:
@@ -866,6 +723,7 @@ Screens:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
@@ -876,6 +734,7 @@ Screens:
                       Control: Label@2.5.1
                       Properties:
                         Color: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
                         Font: =Font.'Open Sans'
                         FontWeight: =FontWeight.Semibold
                         Height: =32
@@ -888,6 +747,7 @@ Screens:
                 Properties:
                   BorderColor: =RGBA(0, 18, 107, 1)
                   Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =1
                   Height: =400
                   Items: =SortByColumns(colHoursGallery, "WorkDate", SortOrder.Ascending)
                   TemplateSize: =52
@@ -896,11 +756,12 @@ Screens:
                   - row_fill:
                       Control: Rectangle@2.3.0
                       Properties:
+                        BorderThickness: =0
                         Fill: |-
                           =If(
                               Weekday(ThisItem.WorkDate, StartOfWeek.Monday) >= 6 ||
-                              ThisItem.EntryType = "Weekend" ||
-                              ThisItem.EntryType = "Stat. Holiday" ||
+                              ThisItem.TaskCode = "Weekend" ||
+                              ThisItem.TaskCode = "Stat. Holiday" ||
                               Text(ThisItem.WorkDate, "yyyy-mm-dd") in ForAll(colPublic_Holidays, CleanDateKey),
                               RGBA(240, 240, 240, 1),
                               RGBA(255, 255, 255, 1)
@@ -911,6 +772,7 @@ Screens:
                       Control: Label@2.5.1
                       Properties:
                         Font: =Font.'Open Sans'
+                        Height: =40
                         Size: =12
                         Text: =ThisItem.DayLabel
                         Width: =70
@@ -920,6 +782,7 @@ Screens:
                       Control: Label@2.5.1
                       Properties:
                         Font: =Font.'Open Sans'
+                        Height: =40
                         Size: =12
                         Text: =Text(ThisItem.WorkDate, "yyyy-mm-dd")
                         Width: =110
@@ -932,7 +795,7 @@ Screens:
                         ChevronBackground: =RGBA(0, 18, 107, 1)
                         ChevronFill: =RGBA(255, 255, 255, 1)
                         Default: =ThisItem.CostCode
-                        DisplayMode: =If(ThisItem.ApprovalStatus = "Approved", DisplayMode.View, Or(ThisItem.EntryType = "Work Day", ThisItem.EntryType = "Weekend", IsBlank(ThisItem.EntryType)), DisplayMode.Edit, DisplayMode.View)
+                        DisplayMode: =If(ThisItem.ApprovalStatus = "Approved", DisplayMode.View, Or(ThisItem.TaskCode = "Work Day", ThisItem.TaskCode = "Weekend", IsBlank(ThisItem.TaskCode)), DisplayMode.Edit, DisplayMode.View)
                         Font: =Font.'Open Sans'
                         Height: =36
                         Items: =Sort(Distinct(colCostCodes, Network_Activity_Name), Value)
@@ -944,61 +807,12 @@ Screens:
                               {
                                   CostCode: Self.Selected.Value,
                                   CostCodeID: LookUp(colCostCodes, Network_Activity_Name = Self.Selected.Value).Network_Activity,
-                                  ActivityTaskCode: First(
-                                      Sort(
-                                          Distinct(
-                                              Filter(
-                                                  colCostCodes,
-                                                  Network_Activity_Name = Self.Selected.Value &&
-                                                  !IsBlank(Task_Code)
-                                              ),
-                                              Task_Code
-                                          ),
-                                          Value
-                                      )
-                                  ).Value,
                                   IsDirty: true
                               }
                           )
                         Size: =11
-                        Width: =200
+                        Width: =220
                         X: =196
-                        Y: =8
-                  - dd_ActivityTaskCode:
-                      Control: Classic/DropDown@2.3.1
-                      Properties:
-                        BorderColor: =RGBA(0, 18, 107, 1)
-                        ChevronBackground: =RGBA(0, 18, 107, 1)
-                        ChevronFill: =RGBA(255, 255, 255, 1)
-                        Default: =ThisItem.ActivityTaskCode
-                        DisplayMode: =If(ThisItem.ApprovalStatus = "Approved", DisplayMode.View, Or(ThisItem.EntryType = "Work Day", ThisItem.EntryType = "Weekend", IsBlank(ThisItem.EntryType)), DisplayMode.Edit, DisplayMode.View)
-                        Font: =Font.'Open Sans'
-                        Height: =36
-                        Items: |-
-                          =Sort(
-                              Distinct(
-                                  Filter(
-                                      colCostCodes,
-                                      Network_Activity_Name = ThisItem.CostCode &&
-                                      !IsBlank(Task_Code)
-                                  ),
-                                  Task_Code
-                              ),
-                              Value
-                          )
-                        Items.Value: =Value
-                        OnChange: |-
-                          =UpdateIf(
-                              colHoursGallery,
-                              RowKey = ThisItem.RowKey,
-                              {
-                                  ActivityTaskCode: Self.Selected.Value,
-                                  IsDirty: true
-                              }
-                          )
-                        Size: =11
-                        Width: =180
-                        X: =402
                         Y: =8
                   - dd_Task:
                       Control: Classic/DropDown@2.3.1
@@ -1006,24 +820,23 @@ Screens:
                         BorderColor: =RGBA(0, 18, 107, 1)
                         ChevronBackground: =RGBA(0, 18, 107, 1)
                         ChevronFill: =RGBA(255, 255, 255, 1)
-                        Default: =ThisItem.EntryType
+                        Default: =ThisItem.TaskCode
                         DisplayMode: =If(ThisItem.ApprovalStatus = "Approved", DisplayMode.View, DisplayMode.Edit)
                         Font: =Font.'Open Sans'
                         Height: =36
                         Items: =["Work Day", "Weekend", "Stat. Holiday", "Vacation Paid", "Vacation Unpaid", "Sick Leave Paid", "Sick Leave Unpaid", "Bereavement", "Jury Duty", "Personal Day"]
-                        Items.Value: =Value
                         OnChange: |-
                           =UpdateIf(
                               colHoursGallery,
                               RowKey = ThisItem.RowKey,
                               {
-                                  EntryType: Self.Selected.Value,
+                                  TaskCode: Self.Selected.Value,
                                   IsDirty: true
                               }
                           )
                         Size: =11
-                        Width: =130
-                        X: =588
+                        Width: =160
+                        X: =422
                         Y: =8
                   - txt_Hours:
                       Control: Classic/TextInput@2.3.2
@@ -1043,8 +856,8 @@ Screens:
                               }
                           )
                         Size: =12
-                        Width: =70
-                        X: =724
+                        Width: =80
+                        X: =588
                         Y: =8
                   - txt_Comments:
                       Control: Classic/TextInput@2.3.2
@@ -1064,8 +877,8 @@ Screens:
                               }
                           )
                         Size: =11
-                        Width: =Parent.TemplateWidth - 1026
-                        X: =800
+                        Width: =Parent.TemplateWidth - 900
+                        X: =674
                         Y: =8
                   - lbl_Status:
                       Control: Label@2.5.1
@@ -1094,8 +907,7 @@ Screens:
                                   DayLabel: ThisItem.DayLabel,
                                   CostCode: varSelectedCostCode,
                                   CostCodeID: varSelectedCostCodeID,
-                                  ActivityTaskCode: varSelectedTaskCode,
-                                  EntryType: "Work Day",
+                                  TaskCode: "Work Day",
                                   Comments: "",
                                   StandardHours: "",
                                   IsSubmitted: false,
@@ -1145,7 +957,6 @@ Screens:
                                 SrcID: ID,
                                 SrcDate: Date,
                                 SrcCostCode: Cost_code,
-                                SrcTaskCode: Task_code,
                                 SrcTask: Task,
                                 SrcComments: Comments,
                                 SrcHours: Standard_time,
@@ -1164,21 +975,7 @@ Screens:
                                 DayLabel: Text(DateAdd(ExistingRow.SrcDate, 0, "Days"), "ddd"),
                                 CostCode: ExistingRow.SrcCostCode,
                                 CostCodeID: LookUp(colCostCodes, Network_Activity_Name = ExistingRow.SrcCostCode).Network_Activity,
-                                ActivityTaskCode: If(
-                                    !IsBlank(ExistingRow.SrcTaskCode),
-                                    ExistingRow.SrcTaskCode,
-                                    If(
-                                        Or(
-                                            IsBlank(ExistingRow.SrcTask),
-                                            ExistingRow.SrcTask = "Work Day",
-                                            ExistingRow.SrcTask = "Weekend",
-                                            ExistingRow.SrcTask = "Stat. Holiday"
-                                        ),
-                                        varSelectedTaskCode,
-                                        ""
-                                    )
-                                ),
-                                EntryType: If(
+                                TaskCode: If(
                                     !IsBlank(ExistingRow.SrcTask),
                                     ExistingRow.SrcTask,
                                     If(
@@ -1225,10 +1022,17 @@ Screens:
                                         RowKey: Text(GUID()),
                                         WorkDate: currentDate,
                                         DayLabel: Text(currentDate, "ddd"),
-                                        CostCode: varSelectedCostCode,
-                                        CostCodeID: varSelectedCostCodeID,
-                                        ActivityTaskCode: varSelectedTaskCode,
-                                        EntryType: If(
+                                        CostCode: If(
+                                            isWeekend || isHoliday,
+                                            "",
+                                            varSelectedCostCode
+                                        ),
+                                        CostCodeID: If(
+                                            isWeekend || isHoliday,
+                                            "",
+                                            varSelectedCostCodeID
+                                        ),
+                                        TaskCode: If(
                                             isWeekend,
                                             "Weekend",
                                             isHoliday,
@@ -1236,11 +1040,7 @@ Screens:
                                             "Work Day"
                                         ),
                                         Comments: "",
-                                        StandardHours: If(
-                                            isHoliday && !isWeekend,
-                                            "0",
-                                            ""
-                                        ),
+                                        StandardHours: "",
                                         IsSubmitted: false,
                                         RecordID: 0,
                                         ApprovalStatus: "",
@@ -1264,8 +1064,8 @@ Screens:
                         CountIf(
                             colHoursGallery,
                             Or(
-                                And(Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)), !IsBlank(StandardHours)),
-                                And(EntryType <> "Work Day", EntryType <> "Weekend", !IsBlank(EntryType))
+                                And(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), !IsBlank(StandardHours)),
+                                And(TaskCode <> "Work Day", TaskCode <> "Weekend", !IsBlank(TaskCode))
                             ) &&
                             ApprovalStatus <> "Approved"
                         ) = 0,
@@ -1273,28 +1073,19 @@ Screens:
                         CountIf(
                             colHoursGallery,
                             !IsBlank(StandardHours) &&
-                            (EntryType = "Work Day" || IsBlank(EntryType)) &&
+                            (TaskCode = "Work Day" || IsBlank(TaskCode)) &&
                             IsBlank(CostCode) &&
                             ApprovalStatus <> "Approved"
                         ) > 0,
                         Notify("Work Day entries must have a cost code", NotificationType.Error),
-                        CountIf(
-                            colHoursGallery,
-                            !IsBlank(StandardHours) &&
-                            (EntryType = "Work Day" || IsBlank(EntryType)) &&
-                            !IsBlank(CostCode) &&
-                            IsBlank(ActivityTaskCode) &&
-                            ApprovalStatus <> "Approved"
-                        ) > 0,
-                        Notify("Work Day entries must have a task code", NotificationType.Error),
                         Set(varIsSaving, true);
                         ClearCollect(
                             HoursNewCollection,
                             Filter(
                                 colHoursGallery,
                                 (
-                                    (Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)) && !IsBlank(StandardHours)) ||
-                                    (EntryType <> "Work Day" && EntryType <> "Weekend" && !IsBlank(EntryType))
+                                    (Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)) && !IsBlank(StandardHours)) ||
+                                    (TaskCode <> "Work Day" && TaskCode <> "Weekend" && !IsBlank(TaskCode))
                                 ) &&
                                 RecordID = 0 &&
                                 ApprovalStatus <> "Approved"
@@ -1313,10 +1104,9 @@ Screens:
                                         Employee_Name: varSubmitAsName,
                                         Employee: varSubmitAsEmail,
                                         Cost_code: CostCode,
-                                        Task_code: ActivityTaskCode,
                                         Date: WorkDate,
-                                        Standard_time: If(Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)), Value(Coalesce(StandardHours, "0")), 0),
-                                        Task: Coalesce(EntryType, "Work Day"),
+                                        Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), 0),
+                                        Task: Coalesce(TaskCode, "Work Day"),
                                         Comments: Comments,
                                         App_Name: "Staffclock",
                                         ApproverID_1: varApprover1Email,
@@ -1330,8 +1120,8 @@ Screens:
                             Filter(
                                 colHoursGallery,
                                 (
-                                    (Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)) && !IsBlank(StandardHours)) ||
-                                    (EntryType <> "Work Day" && EntryType <> "Weekend" && !IsBlank(EntryType))
+                                    (Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)) && !IsBlank(StandardHours)) ||
+                                    (TaskCode <> "Work Day" && TaskCode <> "Weekend" && !IsBlank(TaskCode))
                                 ) &&
                                 RecordID <> 0 &&
                                 ApprovalStatus <> "Approved"
@@ -1344,9 +1134,8 @@ Screens:
                                 LookUp('Hours Tracking (Hours)', ID = RecordID),
                                 {
                                     Cost_code: CostCode,
-                                    Task_code: ActivityTaskCode,
-                                    Standard_time: If(Or(EntryType = "Work Day", EntryType = "Weekend", IsBlank(EntryType)), Value(Coalesce(StandardHours, "0")), 0),
-                                    Task: Coalesce(EntryType, "Work Day"),
+                                    Standard_time: If(Or(TaskCode = "Work Day", TaskCode = "Weekend", IsBlank(TaskCode)), Value(Coalesce(StandardHours, "0")), 0),
+                                    Task: Coalesce(TaskCode, "Work Day"),
                                     Comments: Comments,
                                     ApprovalStatus_1: If(IsBlank(varApprover1Email), "Approved", "Pending")
                                 }
@@ -1388,6 +1177,8 @@ Screens:
                   LayoutMinWidth: =0
                   Visible: =varShowPublicHolidays
                   Width: =Parent.Width
+                  X: =0
+                  Y: =0
                 Children:
                   - holidays_sheet_panel:
                       Control: GroupContainer@1.5.0
@@ -1443,6 +1234,7 @@ Screens:
                                     BorderThickness: =0
                                     Color: =RGBA(91, 97, 120, 1)
                                     Fill: =RGBA(240, 241, 248, 1)
+                                    FillPortions: =0
                                     Font: =Font.'Segoe UI'
                                     Height: =30
                                     OnSelect: =Set(varShowPublicHolidays, false)
@@ -1457,6 +1249,7 @@ Screens:
                             Control: Label@2.5.1
                             Properties:
                               Color: =RGBA(91, 97, 120, 1)
+                              FillPortions: =0
                               Font: =Font.'Segoe UI'
                               Height: =22
                               Size: =12
@@ -1469,12 +1262,14 @@ Screens:
                             Properties:
                               BorderColor: =RGBA(226, 228, 240, 1)
                               Fill: =RGBA(251, 251, 254, 1)
+                              FillPortions: =1
                               Height: =360
                               Items: =SortByColumns(colPublic_Holidays, "CleanDateKey", SortOrder.Ascending)
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
                               TemplateSize: =44
                               Width: =Parent.Width
+                              WrapCount: =1
                             Children:
                               - lbl_HolDate:
                                   Control: Label@2.5.1

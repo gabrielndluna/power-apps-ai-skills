@@ -1,0 +1,1229 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  'New PR':
+    Properties:
+      Fill: =RGBA(234, 236, 240, 1)
+      LoadingSpinnerColor: =RGBA(176, 51, 63, 1)
+      OnVisible: |-
+        =If(
+            CountRows(colDraftLines) = 0,
+            ClearCollect(
+                colDraftLines,
+                {
+                    lineid: GUID(),
+                    lineno: 1,
+                    description: "",
+                    uom: "Each",
+                    qty: 1,
+                    notes: ""
+                }
+            )
+        );
+        Set(varSupplierDefault, "No Preference");
+        Set(varShowAddSupplier, false);
+        Reset(np_supplier)
+    Children:
+      - np_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =0
+            LayoutMinHeight: =0
+            LayoutMinWidth: =0
+            Width: =Parent.Width
+          Children:
+            - np_head:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =72
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =12
+                  LayoutMinHeight: =72
+                  LayoutMinWidth: =0
+                  PaddingLeft: =18
+                  PaddingRight: =18
+                Children:
+                  - np_back:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        Color: =RGBA(22, 39, 63, 1)
+                        FillPortions: =0
+                        Height: =40
+                        Icon: =Icon.BackArrow
+                        OnSelect: =Navigate('PR Log', ScreenTransition.Fade)
+                        Width: =40
+                  - np_head_text:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =180
+                      Children:
+                        - np_title:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(22, 39, 63, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              Size: =18
+                              Text: ="New PR"
+                              Wrap: =false
+                        - np_sub:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(114, 122, 138, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =18
+                              Size: =12
+                              Text: =Coalesce(varSelectedProject.projectidentifier, "")
+                              Wrap: =false
+                  - np_cancel:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(232, 234, 239, 1)
+                        Color: =RGBA(28, 35, 51, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =40
+                        OnSelect: =Navigate('PR Log', ScreenTransition.Fade)
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Size: =13
+                        Text: ="Cancel"
+                        Width: =100
+                  - np_submit:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        Fill: =RGBA(176, 51, 63, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =40
+                        OnSelect: |-
+                          =If(
+                              CountRows(Filter(colDraftLines, !IsBlank(Trim(description)))) = 0,
+                              Notify("Add at least one line item with a description.", NotificationType.Error),
+                              With(
+                                  {
+                                      nextNum: CountRows(Filter(colPermittedPRs, projectidentifier = varSelectedProject.projectidentifier)) + 1,
+                                      proceedWho: Coalesce(np_proceed.Selected.displayname, User().FullName),
+                                      doaWho: Coalesce(np_doa.Selected.displayname, User().FullName)
+                                  },
+                                  With(
+                                      {
+                                          prNum: "PR-" & Text(nextNum, "000"),
+                                          prId: varSelectedProject.projectidentifier & "-PR-" & Text(nextNum, "000")
+                                      },
+                                      Patch(
+                                          'PRTrack - Requisitions',
+                                          Defaults('PRTrack - Requisitions'),
+                                          {
+                                              Title: prId,
+                                              projectidentifier: varSelectedProject.projectidentifier,
+                                              prnumber: prNum,
+                                              reqtype: { Value: np_reqtype.Selected.Value },
+                                              reqdate: np_reqdate.SelectedDate,
+                                              requester: Coalesce(np_requester.Text, varCurrentUserName),
+                                              requesteremail: varCurrentUserEmail,
+                                              phase: { Value: np_phase.Selected.Value },
+                                              category: { Value: np_category.Selected.Value },
+                                              onsitedate: np_onsite.SelectedDate,
+                                              deliveryloc: np_delivery.Text,
+                                              priority: { Value: np_priority.Selected.Value },
+                                              supplier: { Value: Coalesce(np_supplier.Selected.Value, varSupplierDefault, "No Preference") },
+                                              contact: Coalesce(np_contact.Text, varCurrentUserEmail),
+                                              proceedapprover: proceedWho,
+                                              doaapprover: doaWho,
+                                              comments: np_comments.Text,
+                                              prstatus: { Value: "Submitted" }
+                                          }
+                                      );
+                                      ForAll(
+                                          Filter(colDraftLines, !IsBlank(Trim(description))) As ln,
+                                          Patch(
+                                              'PRTrack - LineItems',
+                                              Defaults('PRTrack - LineItems'),
+                                              {
+                                                  Title: prId & "-L" & Text(Coalesce(ln.lineno, 1)),
+                                                  pridentifier: prId,
+                                                  linenumber: Coalesce(ln.lineno, 1),
+                                                  description: ln.description,
+                                                  uom: { Value: ln.uom },
+                                                  qty: ln.qty,
+                                                  notes: ln.notes,
+                                                  buyer: "Unassigned",
+                                                  proceedstatus: { Value: "Pending" },
+                                                  proceedapprover: proceedWho,
+                                                  doaapprover: doaWho,
+                                                  stage: { Value: "Pending proceed" }
+                                              }
+                                          )
+                                      );
+                                      Collect(
+                                          colPermittedPRs,
+                                          LookUp('PRTrack - Requisitions', Title = prId)
+                                      );
+                                      Collect(
+                                          colPermittedLines,
+                                          Filter('PRTrack - LineItems', pridentifier = prId)
+                                      );
+                                      ClearCollect(colProjectPRs, Filter(colPermittedPRs, projectidentifier = varSelectedProject.projectidentifier));
+                                      ClearCollect(colProjectLines, Filter(colPermittedLines, StartsWith(pridentifier, varSelectedProject.projectidentifier & "-")));
+                                      Set(varSelectedPR, LookUp(colPermittedPRs, Title = prId));
+                                      Notify("PR submitted - waiting on approval to proceed.", NotificationType.Success);
+                                      Navigate('PR Detail', ScreenTransition.Fade)
+                                  )
+                              )
+                          )
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Size: =13
+                        Text: ="Submit PR"
+                        Width: =130
+            - np_body:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =1
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =14
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                  PaddingBottom: =20
+                  PaddingLeft: =46
+                  PaddingRight: =46
+                  PaddingTop: =18
+                Children:
+                  - np_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Height: =620
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =620
+                        LayoutMinWidth: =0
+                        PaddingBottom: =16
+                        PaddingLeft: =16
+                        PaddingRight: =16
+                        PaddingTop: =14
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                      Children:
+                        - np_card_title:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(22, 39, 63, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              Size: =14
+                              Text: ="Request Details"
+                        - np_f_comments:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =92
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =2
+                              PaddingBottom: =4
+                              PaddingLeft: =4
+                              PaddingRight: =4
+                              PaddingTop: =4
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - np_l_comments:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(114, 122, 138, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =16
+                                    Size: =11
+                                    Text: ="PR Description"
+                              - np_comments:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    BorderColor: =RGBA(232, 234, 239, 1)
+                                    BorderThickness: =1
+                                    Color: =RGBA(22, 39, 63, 1)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                    HoverFill: =RGBA(255, 255, 255, 1)
+                                    PressedBorderColor: =RGBA(176, 51, 63, 1)
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Default: =""
+                                    Font: =Font.'Segoe UI'
+                                    Height: =64
+                                    HintText: ="Name or summary of this purchase"
+                                    Mode: =TextMode.MultiLine
+                                    Size: =12
+                                    Width: =Parent.Width - 8
+                        - np_row1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =64
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - np_f_reqtype:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_reqtype:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Request Type"
+                                    - np_reqtype:
+                                        Control: Classic/DropDown@2.3.1
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          ChevronBackground: =RGBA(255, 255, 255, 1)
+                                          ChevronFill: =RGBA(176, 51, 63, 1)
+                                          AllowEmptySelection: =false
+                                          Default: ="Material"
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Items: =["Material", "Service"]
+                                          Size: =12
+                              - np_f_reqdate:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_reqdate:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Request Date"
+                                    - np_reqdate:
+                                        Control: Classic/DatePicker@2.6.0
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          IconBackground: =RGBA(255, 255, 255, 1)
+                                          IconFill: =RGBA(176, 51, 63, 1)
+                                          DefaultDate: =Today()
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Size: =12
+                        - np_row2:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =64
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - np_f_requester:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_requester:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Requester Name"
+                                    - np_requester:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          PressedBorderColor: =RGBA(176, 51, 63, 1)
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Default: =varCurrentUserName
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Size: =12
+                              - np_f_contact:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_contact:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Contact / Email"
+                                    - np_contact:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          PressedBorderColor: =RGBA(176, 51, 63, 1)
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Default: =varCurrentUserEmail
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Size: =12
+                        - np_row3:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =64
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - np_f_phase:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_phase:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Phase / Stage"
+                                    - np_phase:
+                                        Control: Classic/DropDown@2.3.1
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          ChevronBackground: =RGBA(255, 255, 255, 1)
+                                          ChevronFill: =RGBA(176, 51, 63, 1)
+                                          AllowEmptySelection: =false
+                                          Default: ="ADA Phase"
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Items: =["ADA Phase", "PAA Phase"]
+                                          Size: =12
+                              - np_f_category:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_category:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Category"
+                                    - np_category:
+                                        Control: Classic/DropDown@2.3.1
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          ChevronBackground: =RGBA(255, 255, 255, 1)
+                                          ChevronFill: =RGBA(176, 51, 63, 1)
+                                          AllowEmptySelection: =false
+                                          Default: ="Engineering/Subconsultant"
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Items: =["Engineering/Subconsultant", "General Expenses", "Construction"]
+                                          Size: =12
+                        - np_row4:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =64
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - np_f_onsite:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_onsite:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="On-Site Date"
+                                    - np_onsite:
+                                        Control: Classic/DatePicker@2.6.0
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          IconBackground: =RGBA(255, 255, 255, 1)
+                                          IconFill: =RGBA(176, 51, 63, 1)
+                                          DefaultDate: =Today()
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Size: =12
+                              - np_f_delivery:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_delivery:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Delivery Location"
+                                    - np_delivery:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          PressedBorderColor: =RGBA(176, 51, 63, 1)
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Default: =""
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          HintText: ="e.g. 100 King Street"
+                                          Size: =12
+                        - np_row5:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =64
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - np_f_priority:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_priority:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Priority"
+                                    - np_priority:
+                                        Control: Classic/DropDown@2.3.1
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          ChevronBackground: =RGBA(255, 255, 255, 1)
+                                          ChevronFill: =RGBA(176, 51, 63, 1)
+                                          AllowEmptySelection: =false
+                                          Default: ="Routine"
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Items: =["Routine", "Urgent", "Critical - Project Impact"]
+                                          Size: =12
+                              - np_f_supplier:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_supplier:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Suggested Supplier"
+                                    - np_supplier_row:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =40
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - np_supplier:
+                                              Control: Classic/DropDown@2.3.1
+                                              Properties:
+                                                AllowEmptySelection: =false
+                                                BorderColor: =RGBA(232, 234, 239, 1)
+                                                BorderThickness: =1
+                                                ChevronBackground: =RGBA(255, 255, 255, 1)
+                                                ChevronFill: =RGBA(176, 51, 63, 1)
+                                                Color: =RGBA(22, 39, 63, 1)
+                                                Default: =varSupplierDefault
+                                                Fill: =RGBA(255, 255, 255, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                Height: =36
+                                                HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                                HoverFill: =RGBA(255, 255, 255, 1)
+                                                Items: =SortByColumns(colSuppliers, "Value", SortOrder.Ascending)
+                                                Items.Value: =Value
+                                                Size: =12
+                                          - np_btn_add_supplier:
+                                              Control: Classic/Button@2.2.0
+                                              Properties:
+                                                BorderColor: =RGBA(176, 51, 63, 1)
+                                                BorderThickness: =1
+                                                Color: =RGBA(176, 51, 63, 1)
+                                                Fill: =RGBA(248, 235, 237, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =36
+                                                OnSelect: |-
+                                                  =Reset(np_add_supplier_input);
+                                                  Set(varShowAddSupplier, true)
+                                                RadiusBottomLeft: =8
+                                                RadiusBottomRight: =8
+                                                RadiusTopLeft: =8
+                                                RadiusTopRight: =8
+                                                Size: =10
+                                                Text: ="Add More Suppliers"
+                                                Width: =148
+                        - np_row6:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =64
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - np_f_proceed:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_proceed:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="Proceed Approver"
+                                    - np_proceed:
+                                        Control: Classic/DropDown@2.3.1
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          ChevronBackground: =RGBA(255, 255, 255, 1)
+                                          ChevronFill: =RGBA(176, 51, 63, 1)
+                                          AllowEmptySelection: =false
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Items: =colApprovers
+                                          Items.Value: =displayname
+                              - np_f_doa:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                  Children:
+                                    - np_l_doa:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(114, 122, 138, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          Size: =11
+                                          Text: ="DOA Approver"
+                                    - np_doa:
+                                        Control: Classic/DropDown@2.3.1
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          ChevronBackground: =RGBA(255, 255, 255, 1)
+                                          ChevronFill: =RGBA(176, 51, 63, 1)
+                                          AllowEmptySelection: =false
+                                          Font: =Font.'Segoe UI'
+                                          Height: =36
+                                          Items: =colApprovers
+                                          Items.Value: =displayname
+                  - np_lines_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Height: =70 + CountRows(colDraftLines) * 44
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =12
+                        PaddingLeft: =16
+                        PaddingRight: =16
+                        PaddingTop: =14
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                      Children:
+                        - np_lines_head:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =36
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =36
+                              LayoutMinWidth: =0
+                              PaddingBottom: =2
+                              PaddingRight: =4
+                              PaddingTop: =2
+                            Children:
+                              - np_lines_title:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(22, 39, 63, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    Size: =14
+                                    Text: ="Line Items"
+                              - np_add_line_wrap:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =32
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    PaddingTop: =2
+                                    Width: =108
+                                  Children:
+                                    - np_add_line:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(176, 51, 63, 1)
+                                          BorderThickness: =2
+                                          Color: =RGBA(176, 51, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          OnSelect: |-
+                                            =Collect(
+                                                colDraftLines,
+                                                {
+                                                    lineid: GUID(),
+                                                    lineno: CountRows(colDraftLines) + 1,
+                                                    description: "",
+                                                    uom: "Each",
+                                                    qty: 1,
+                                                    notes: ""
+                                                }
+                                            )
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Size: =11
+                                          Text: ="+ Add Line"
+                                          Width: =100
+                        - np_lines_gallery:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderThickness: =0
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =CountRows(colDraftLines) * 44
+                              Items: =colDraftLines
+                              LayoutMinHeight: =0
+                              ShowScrollbar: =false
+                              TemplatePadding: =0
+                              TemplateSize: =44
+                              Width: =Parent.Width
+                            Children:
+                              - np_line_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =Parent.TemplateHeight
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    Width: =Parent.TemplateWidth
+                                  Children:
+                                    - np_line_desc:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          PressedBorderColor: =RGBA(176, 51, 63, 1)
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Default: =ThisItem.description
+                                          FillPortions: =2
+                                          Font: =Font.'Segoe UI'
+                                          Height: =28
+                                          HintText: ="Item description"
+                                          OnChange: |-
+                                            =Patch(colDraftLines, ThisItem, { description: Self.Text })
+                                          Size: =12
+                                          Width: =1
+                                    - np_line_uom:
+                                        Control: Classic/DropDown@2.3.1
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          ChevronBackground: =RGBA(255, 255, 255, 1)
+                                          ChevronFill: =RGBA(176, 51, 63, 1)
+                                          AllowEmptySelection: =false
+                                          Default: =ThisItem.uom
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          Height: =28
+                                          Items: =["Each", "m", "m2", "m3", "kg", "ton", "lump sum", "hour", "day", "set", "lot"]
+                                          OnChange: |-
+                                            =Patch(colDraftLines, ThisItem, { uom: Self.Selected.Value })
+                                          Size: =12
+                                          Width: =120
+                                    - np_line_qty:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          PressedBorderColor: =RGBA(176, 51, 63, 1)
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Default: =Text(ThisItem.qty)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          Format: =TextFormat.Number
+                                          Height: =28
+                                          OnChange: |-
+                                            =Patch(colDraftLines, ThisItem, { qty: Value(Self.Text) })
+                                          Size: =12
+                                          Width: =80
+                                    - np_line_notes:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(232, 234, 239, 1)
+                                          BorderThickness: =1
+                                          Color: =RGBA(22, 39, 63, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
+                                          HoverFill: =RGBA(255, 255, 255, 1)
+                                          PressedBorderColor: =RGBA(176, 51, 63, 1)
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Default: =ThisItem.notes
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          Height: =28
+                                          HintText: ="Notes"
+                                          OnChange: |-
+                                            =Patch(colDraftLines, ThisItem, { notes: Self.Text })
+                                          Size: =12
+                                          Width: =1
+                                    - np_line_del:
+                                        Control: Classic/Icon@2.5.0
+                                        Properties:
+                                          Color: =RGBA(154, 161, 174, 1)
+                                          FillPortions: =0
+                                          Height: =28
+                                          Icon: =Icon.Trash
+                                          OnSelect: =Remove(colDraftLines, ThisItem)
+                                          Width: =28
+      - np_add_supplier_overlay:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(10, 12, 30, 0.42)
+            Height: =Parent.Height
+            LayoutMinHeight: =0
+            LayoutMinWidth: =0
+            Visible: =varShowAddSupplier
+            Width: =Parent.Width
+            X: =0
+            Y: =0
+          Children:
+            - np_add_supplier_card:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =188
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =16
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =18
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  Width: =Min(Parent.Width * 0.9, 400)
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - np_add_supplier_title:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Left
+                        Color: =RGBA(22, 39, 63, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =14
+                        Text: ="Add More Suppliers"
+                  - np_add_supplier_input:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =RGBA(232, 234, 239, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(22, 39, 63, 1)
+                        Default: =""
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =36
+                        HintText: ="Supplier name"
+                        HoverBorderColor: =RGBA(176, 51, 63, 1)
+                        HoverFill: =RGBA(255, 255, 255, 1)
+                        PressedBorderColor: =RGBA(176, 51, 63, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                  - np_add_supplier_btns:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =42
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - np_add_supplier_cancel:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(232, 234, 239, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(22, 39, 63, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =1
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              OnSelect: =Set(varShowAddSupplier, false)
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =12
+                              Text: ="Cancel"
+                              Width: =1
+                        - np_add_supplier_save:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(176, 51, 63, 1)
+                              FillPortions: =1
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              OnSelect: |-
+                                =If(
+                                    IsBlank(Trim(np_add_supplier_input.Text)),
+                                    Notify("Enter a supplier name.", NotificationType.Warning),
+                                    !IsBlank(LookUp(colSuppliers, Lower(Value) = Lower(Trim(np_add_supplier_input.Text)))),
+                                    Notify("That supplier is already in the list.", NotificationType.Information);
+                                    Set(varSupplierDefault, LookUp(colSuppliers, Lower(Value) = Lower(Trim(np_add_supplier_input.Text))).Value);
+                                    Set(varShowAddSupplier, false);
+                                    Reset(np_supplier),
+                                    Collect(colSuppliers, { Value: Trim(np_add_supplier_input.Text) });
+                                    Set(varSupplierDefault, Trim(np_add_supplier_input.Text));
+                                    Set(varShowAddSupplier, false);
+                                    Reset(np_supplier);
+                                    Notify("Supplier added. Select it from the list, then submit the PR.", NotificationType.Success)
+                                )
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =12
+                              Text: ="Add"
+                              Width: =1

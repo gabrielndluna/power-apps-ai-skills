@@ -46,56 +46,50 @@ Screens:
             colMyHours,
             Filter(
                 'Hours Tracking (Hours)',
-                Employee = User().Email &&
-                Date >= varAppStartDate
-            )
-        );
-        Collect(
-            colMyHours,
-            Filter(
-                'Hours Tracking (Hours)',
-                Employee = Lower(User().Email) &&
+                Lower(Employee) = Lower(User().Email) &&
                 Date >= varAppStartDate
             )
         );
 
-        Clear(colMissingWeeks);
-        ForAll(
-            Sequence(
-                RoundDown(
-                    DateDiff(
-                        DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                        varThisWeekStart,
-                        "Days"
-                    ) / 7,
-                    0
-                ) + 1,
-                0,
-                1
-            ),
-            With(
-                {
-                    weekStart: DateAdd(
-                        DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                        Value * 7,
-                        "Days"
-                    )
-                },
-                If(
-                    weekStart <= varThisWeekStart &&
-                    CountRows(
-                        Filter(
-                            colMyHours,
-                            Date >= weekStart &&
-                            Date <= DateAdd(weekStart, 6, "Days") &&
-                            (
-                                Text(ApprovalStatus_1) = "Pending" ||
-                                Text(ApprovalStatus_1) = "Approved"
-                            )
+        ClearCollect(
+            colMissingWeeks,
+            ForAll(
+                Sequence(
+                    RoundDown(
+                        DateDiff(
+                            DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                            varThisWeekStart,
+                            "Days"
+                        ) / 7,
+                        0
+                    ) + 1,
+                    0,
+                    1
+                ),
+                With(
+                    {
+                        weekStart: DateAdd(
+                            DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                            Value * 7,
+                            "Days"
                         )
-                    ) = 0,
-                    Collect(
-                        colMissingWeeks,
+                    },
+                    If(
+                        weekStart <= varThisWeekStart &&
+                        CountRows(
+                            Distinct(
+                                Filter(
+                                    colMyHours,
+                                    Date >= weekStart &&
+                                    Date <= DateAdd(weekStart, 4, "Days") &&
+                                    (
+                                        ApprovalStatus_1 = "Pending" ||
+                                        ApprovalStatus_1 = "Approved"
+                                    )
+                                ),
+                                Text(Date, "yyyy-mm-dd")
+                            )
+                        ) < 5,
                         {
                             WeekStart: weekStart,
                             WeekEnd: DateAdd(weekStart, 6, "Days"),

@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PRTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#b0333f;
+    --red-dark:#902934;
+    --red-soft:#f8ebed;
+    --cyan:#26a9d4;
+    --cyan-deep:#1b87b0;
+    --cyan-soft:#e6f4fb;
+    --navy:#163453;
+    --navy-2:#0f2542;
+    --ink:#16273f;
+    --sidebar:#163453;
+    --sidebar-2:#0f2542;
+    --bg:#f5f6f8;
+    --canvas:#eaecf0;
+    --surface:#ffffff;
+    --line:#e8eaef;
+    --line-2:#f0f1f4;
+    --text:#1c2333;
+    --muted:#727a8a;
+    --muted-2:#9aa1ae;
+
+    --green:#0f9d58;  --green-bg:#e7f6ee;
+    --amber:#b7791f;  --amber-bg:#fdf3e2;
+    --rose:#d1344a;   --rose-bg:#fdeaed;
+    --violet:#6d47c9; --violet-bg:#efeafb;
+    --slate:#5b6472;  --slate-bg:#eef0f3;
+
+    --r-lg:16px; --r-md:12px; --r-sm:9px;
+    --sh-sm:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.04);
+    --sh-md:0 4px 12px rgba(16,24,40,.07),0 2px 4px rgba(16,24,40,.04);
+    --sh-lg:0 18px 44px rgba(16,24,40,.16);
+    --disp:"Space Grotesk",system-ui,sans-serif;
+    --body:"Inter",system-ui,-apple-system,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--body);
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #eceef2 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 10%, #eef0f3 0%, transparent 55%),
+      #e9ebef;
+    -webkit-font-smoothing:antialiased;
+    display:grid;
+    place-items:center;
+    padding:22px;
+  }
+  input,select,textarea,button{font-family:inherit}
+
+  /* ---------- App window ---------- */
+  .app{
+    width:min(1320px,100%);
+    height:min(880px,calc(100vh - 44px));
+    background:var(--canvas);
+    border-radius:20px;
+    box-shadow:var(--sh-lg);
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:248px 1fr;
+    position:relative;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    background:#ffffff;
+    color:var(--text);
+    border-right:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    padding:20px 14px;
+    gap:6px;
+  }
+  .brand{display:flex;align-items:center;gap:11px;padding:6px 8px 16px}
+  .brand-mark{
+    width:42px;height:42px;flex-shrink:0;
+    display:grid;place-items:center;
+  }
+  .brand-mark img{width:100%;height:100%;object-fit:contain;display:block}
+  .brand-name{font-family:var(--disp);font-weight:700;font-size:18px;color:var(--ink);letter-spacing:-.01em;line-height:1}
+  .brand-sub{font-size:11px;color:var(--muted-2);margin-top:3px;letter-spacing:.02em}
+
+  .nav-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted-2);padding:12px 10px 6px;font-weight:600}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;
+    padding:10px 11px;border-radius:10px;
+    color:var(--muted);font-size:14px;font-weight:500;
+    cursor:pointer;border:none;background:none;width:100%;text-align:left;
+    transition:background .16s,color .16s;
+  }
+  .nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.9}
+  .nav-item:hover{background:var(--bg);color:var(--text)}
+  .nav-item.active{background:var(--red-soft);color:var(--red)}
+  .nav-item.active svg{opacity:1;color:var(--red)}
+  .nav-count{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:600;
+    background:var(--line-2);padding:1px 7px;border-radius:20px;color:var(--muted)}
+  .nav-item.active .nav-count{background:#fff;color:var(--red)}
+
+  .side-spacer{flex:1}
+  .side-new{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--red);color:#fff;border:none;border-radius:10px;
+    padding:11px;font-size:14px;font-weight:600;cursor:pointer;width:100%;
+    margin-top:12px;
+    box-shadow:0 6px 16px rgba(176,51,63,.4);transition:background .16s,transform .1s;
+  }
+  .side-new:hover{background:var(--red-dark)}
+  .side-new:active{transform:translateY(1px)}
+  .side-new svg{width:17px;height:17px}
+
+  .side-user{
+    display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 8px;
+    border-top:1px solid var(--line);
+  }
+  .avatar{
+    width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,#3b4557,#232c3c);color:#fff;
+    display:grid;place-items:center;font-weight:600;font-size:13px;
+    font-family:var(--disp);
+  }
+  .side-user .u-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.2}
+  .side-user .u-role{font-size:11px;color:var(--muted-2)}
+
+  /* ---------- Main ---------- */
+  .main{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--canvas)}
+  .topbar{
+    height:64px;flex-shrink:0;
+    background:rgba(255,255,255,.45);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:14px;padding:0 22px;
+  }
+  .proj-switch{
+    display:flex;align-items:center;gap:9px;
+    background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:7px 10px 7px 12px;box-shadow:var(--sh-sm);cursor:pointer;
+    transition:border-color .15s;
+  }
+  .proj-switch:focus-within{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+  .proj-dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);flex-shrink:0}
+  .proj-switch .plabel{font-size:10px;color:var(--muted-2);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  .proj-switch select{border:none;background:none;font-size:13.5px;font-weight:600;color:var(--text);outline:none;cursor:pointer;max-width:280px}
+
+  .topsearch{
+    flex:1;max-width:380px;position:relative;display:flex;align-items:center;
+  }
+  .topsearch svg{position:absolute;left:12px;width:16px;height:16px;color:var(--muted-2)}
+  .topsearch input{
+    width:100%;height:40px;border:1px solid var(--line);border-radius:10px;
+    background:var(--surface);padding:0 12px 0 36px;font-size:13.5px;box-shadow:var(--sh-sm);
+    transition:border-color .15s,box-shadow .15s;
+  }
+  .topsearch input:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+  .top-spacer{flex:1}
+  .icon-ghost{
+    width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
+    background:var(--surface);color:var(--muted);display:grid;place-items:center;
+    cursor:pointer;box-shadow:var(--sh-sm);transition:color .15s,border-color .15s;
+  }
+  .icon-ghost:hover{color:var(--red);border-color:#dcdfe6}
+  .icon-ghost svg{width:18px;height:18px}
+
+  .content{flex:1;min-height:0;overflow:auto;padding:26px;scroll-behavior:smooth}
+  .view{display:none;animation:fade .28s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .page-head{display:flex;align-items:flex-end;gap:14px;margin-bottom:20px}
+  .page-title{font-family:var(--disp);font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+  .page-sub{font-size:13.5px;color:var(--muted);margin-top:3px}
+
+  /* ---------- KPI ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+  .kpi{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:13px 15px;box-shadow:var(--sh-sm);position:relative;overflow:hidden;
+  }
+  .kpi-ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;margin-bottom:9px}
+  .kpi-ico svg{width:16px;height:16px}
+  .kpi-ico.red{background:var(--red-soft);color:var(--red)}
+  .kpi-ico.amber{background:var(--amber-bg);color:var(--amber)}
+  .kpi-ico.green{background:var(--green-bg);color:var(--green)}
+  .kpi-ico.slate{background:var(--slate-bg);color:var(--slate)}
+  .kpi-ico.cyan{background:var(--cyan-soft);color:var(--cyan-deep)}
+  .kpi-val{font-family:var(--disp);font-size:22px;font-weight:700;line-height:1;letter-spacing:-.02em;color:var(--ink)}
+  .kpi-val.mono{font-family:var(--mono);font-size:19px;font-weight:600}
+  .kpi-lab{font-size:11.5px;color:var(--muted);margin-top:4px}
+
+  .sec-title{font-family:var(--disp);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 12px;letter-spacing:-.01em}
+  .sec-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .link-btn{background:none;border:none;color:var(--red);font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+  .link-btn svg{width:15px;height:15px}
+
+  /* ---------- Project cards ---------- */
+  .proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:28px}
+  .proj-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:18px;box-shadow:var(--sh-sm);cursor:pointer;
+    transition:transform .16s,box-shadow .16s,border-color .16s;
+  }
+  .proj-card:hover{transform:translateY(-3px);box-shadow:var(--sh-md);border-color:#dfe2e8}
+  .proj-card .pc-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:16px}
+  .pc-badge{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;
+    font-family:var(--disp);font-weight:700;font-size:15px;color:#fff;
+    background:linear-gradient(135deg,#2b3547,#161d2b)}
+  .pc-name{font-weight:600;font-size:15px;line-height:1.25;color:var(--ink)}
+  .pc-id{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:3px}
+  .pc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-2);border-radius:9px;overflow:hidden}
+  .pc-stat{background:var(--surface);padding:10px 6px;text-align:center}
+  .pc-stat b{display:block;font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink)}
+  .pc-stat span{font-size:10px;color:var(--muted-2);letter-spacing:.02em}
+
+  /* ---------- Table ---------- */
+  .table-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-sm);overflow:hidden}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .chip{
+    height:32px;padding:0 13px;border-radius:8px;border:1px solid var(--line);
+    background:var(--surface);font-size:12.5px;font-weight:500;color:var(--muted);
+    cursor:pointer;transition:.14s;display:inline-flex;align-items:center;gap:6px;
+  }
+  .chip:hover{border-color:#d4d8e0;color:var(--text)}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip .c-num{font-family:var(--mono);font-size:11px;opacity:.7}
+
+  .tbl{width:100%;border-collapse:collapse}
+  .tbl thead th{
+    text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--muted-2);padding:12px 16px;background:#fafbfc;border-bottom:1px solid var(--line);
+  }
+  .tbl thead th.num,.tbl td.num{text-align:right}
+  .tbl tbody tr{border-bottom:1px solid var(--line-2);cursor:pointer;transition:background .12s}
+  .tbl tbody tr:last-child{border-bottom:none}
+  .tbl tbody tr:hover{background:#fafbfd}
+  .tbl td{padding:14px 16px;font-size:13.5px;vertical-align:middle}
+  .pr-code{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--red);white-space:nowrap}
+  .tbl td:first-child{white-space:nowrap}
+  .cell-strong{font-weight:600;color:var(--ink)}
+  .cell-mut{color:var(--muted);font-size:12.5px}
+  .cell-money{font-family:var(--mono);font-weight:500;color:var(--ink)}
+  .chev{color:var(--muted-2)}
+  .empty{padding:56px 20px;text-align:center;color:var(--muted)}
+  .empty svg{width:38px;height:38px;color:var(--muted-2);margin-bottom:10px}
+
+  /* ---------- Pills ---------- */
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:3px 9px 3px 8px;border-radius:20px;white-space:nowrap}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.9}
+  .pill.draft{background:var(--slate-bg);color:var(--slate)}
+  .pill.submitted{background:var(--amber-bg);color:var(--amber)}
+  .pill.approved{background:var(--green-bg);color:var(--green)}
+  .pill.rejected{background:var(--rose-bg);color:var(--rose)}
+  .pill.onhold{background:var(--violet-bg);color:var(--violet)}
+  .pill.cancelled{background:var(--slate-bg);color:var(--muted-2)}
+  .prio{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500}
+  .prio i{width:7px;height:7px;border-radius:2px;display:inline-block}
+  .prio.routine i{background:var(--slate)} .prio.routine{color:var(--muted)}
+  .prio.urgent i{background:var(--amber)} .prio.urgent{color:var(--amber)}
+  .prio.critical i{background:var(--rose)} .prio.critical{color:var(--rose)}
+
+  /* ---------- Detail ---------- */
+  .detail-head{
+    display:flex;align-items:center;gap:14px;margin-bottom:20px;
+  }
+  .back-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+    display:grid;place-items:center;cursor:pointer;color:var(--text);box-shadow:var(--sh-sm);transition:.15s}
+  .back-btn:hover{border-color:#d4d8e0;color:var(--red)}
+  .back-btn svg{width:18px;height:18px}
+  .detail-id{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+  .detail-meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .detail-actions{margin-left:auto;display:flex;gap:10px}
+
+  .btn{height:40px;padding:0 18px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;transition:.15s}
+  .btn svg{width:16px;height:16px}
+  .btn-primary{background:var(--red);color:#fff;box-shadow:0 4px 12px rgba(214,12,48,.28)}
+  .btn-primary:hover{background:var(--red-dark)}
+  .btn-outline{background:var(--surface);color:var(--text);border-color:var(--line);box-shadow:var(--sh-sm)}
+  .btn-outline:hover{border-color:#d4d8e0}
+
+  .metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .metric{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:11px 14px;box-shadow:var(--sh-sm)}
+  .metric .ml{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-2);font-weight:600;margin-bottom:8px}
+  .metric .mv{font-size:15px;font-weight:600;color:var(--ink)}
+
+  .detail-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:14px;align-items:start}
+  .stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-sm);overflow:hidden;min-width:0}
+  .card-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line-2)}
+  .card-head .ch-ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;flex-shrink:0}
+  .card-head .ch-ico svg{width:15px;height:15px}
+  .ch-ico.red{background:var(--red-soft);color:var(--red)}
+  .ch-ico.slate{background:var(--slate-bg);color:var(--slate)}
+  .ch-ico.green{background:var(--green-bg);color:var(--green)}
+  .ch-ico.cyan{background:var(--cyan-soft);color:var(--cyan-deep)}
+  .card-head h3{font-family:var(--disp);font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-.005em}
+  .role-tag{margin-left:auto;font-size:10.5px;font-weight:600;color:var(--muted-2);text-transform:uppercase;letter-spacing:.05em;
+    background:var(--line-2);padding:3px 9px;border-radius:6px}
+  .card-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field.full{grid-column:1/-1}
+  .field label{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.01em}
+  .field input,.field select,.field textarea{
+    height:40px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-size:13.5px;
+    background:var(--surface);color:var(--text);transition:border-color .15s,box-shadow .15s;
+  }
+  .field textarea{height:70px;padding:9px 11px;resize:vertical;line-height:1.5}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+  .field input.mono{font-family:var(--mono);font-size:13px}
+  .prefix-field{display:flex;align-items:center;gap:2px;height:40px;border:1px solid var(--line);border-radius:9px;padding:0 3px 0 11px;background:var(--surface);transition:border-color .15s,box-shadow .15s}
+  .prefix-field:focus-within{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+  .prefix-field .pf-prefix{font-family:var(--mono);font-size:13px;color:var(--muted-2);white-space:nowrap}
+  .prefix-field input{border:none;box-shadow:none!important;height:38px;flex:1;min-width:0;font-family:var(--mono);font-size:13px;padding:0 6px}
+  .prefix-field input:focus{border:none}
+
+  /* Line items */
+  .lines-scroll{overflow:auto}
+  .lines{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+  .lines th{text-align:left;padding:9px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-2);font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+  .lines td{padding:6px 8px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+  .lines tr:last-child td{border-bottom:none}
+  .lines .rownum{font-family:var(--mono);color:var(--muted-2);font-size:11px;width:26px}
+  .lines input,.lines select{width:100%;height:34px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:12.5px;background:var(--surface);transition:border-color .15s}
+  .lines input:focus,.lines select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 2px var(--red-soft)}
+  .lines input[type=number]{text-align:right;font-family:var(--mono)}
+  .line-del{width:30px;height:30px;border:none;background:none;color:var(--muted-2);border-radius:7px;cursor:pointer;display:grid;place-items:center;transition:.14s}
+  .line-del:hover{background:var(--rose-bg);color:var(--rose)}
+  .line-del svg{width:15px;height:15px}
+  .add-line{display:inline-flex;align-items:center;gap:6px;background:none;border:1px dashed var(--line);color:var(--muted);
+    border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:600;cursor:pointer;margin:10px;transition:.15s}
+  .add-line:hover{border-color:var(--red);color:var(--red)}
+  .add-line svg{width:15px;height:15px}
+
+  /* Create */
+  .form-card{max-width:none}
+  .create-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .banner{display:flex;gap:10px;align-items:flex-start;background:#eef4ff;border:1px solid #d5e2fb;color:#2c4a7c;
+    border-radius:10px;padding:12px 14px;font-size:12.5px;margin-bottom:18px;line-height:1.5}
+  .banner svg{width:17px;height:17px;flex-shrink:0;margin-top:1px}
+
+  /* toast */
+  .toast{position:fixed;top:22px;right:22px;display:flex;align-items:center;gap:9px;
+    background:var(--ink);color:#fff;padding:12px 16px;border-radius:11px;font-size:13.5px;font-weight:500;
+    box-shadow:var(--sh-lg);z-index:200;opacity:0;transform:translateY(-10px);transition:.28s;pointer-events:none}
+  .toast.show{opacity:1;transform:none}
+  .toast svg{width:17px;height:17px;color:#4ade80}
+  .toast.error svg{color:#fb7185}
+
+  @media(max-width:1080px){
+    .kpis,.metric-row,.create-grid{grid-template-columns:repeat(2,1fr)}
+    .detail-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:820px){
+    body{padding:0}
+    .app{height:100vh;border-radius:0;grid-template-columns:1fr}
+    .sidebar{position:fixed;left:-260px;top:0;bottom:0;width:248px;z-index:120;transition:left .25s;box-shadow:var(--sh-lg)}
+    .app.nav-open .sidebar{left:0}
+    .menu-btn{display:grid!important}
+    .frow,.create-grid{grid-template-columns:1fr}
+    .kpis{grid-template-columns:1fr 1fr}
+    .scrim{display:none;position:fixed;inset:0;background:rgba(9,13,20,.4);z-index:110}
+    .app.nav-open .scrim{display:block}
+  }
+  .menu-btn{display:none}
+  .scrim{display:none}
+
+  /* ---------- Dashboard approve button ---------- */
+  .aq-approve{height:34px;padding:0 14px;border-radius:8px;border:none;background:var(--green);color:#fff;
+    font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;transition:.15s}
+  .aq-approve:hover{filter:brightness(1.06)}
+  .aq-approve svg{width:14px;height:14px}
+  .aq-empty{display:flex;align-items:center;gap:10px;padding:16px;color:var(--muted);font-size:13px}
+  .aq-empty svg{width:18px;height:18px;color:var(--green)}
+
+  /* ---------- Status tint on the approval-status metric ---------- */
+  .metric.tint-submitted{background:var(--amber-bg);border-color:#f0dcae}
+  .metric.tint-approved{background:var(--green-bg);border-color:#bfe6ce}
+  .metric.tint-rejected{background:var(--rose-bg);border-color:#f2c4cc}
+  .metric.tint-onhold{background:var(--violet-bg);border-color:#ddd2f4}
+  .metric.tint-draft{background:var(--slate-bg);border-color:#dee2e8}
+  .metric.tint-cancelled{background:var(--slate-bg);border-color:#dee2e8}
+
+  /* ---------- Approval action bar ---------- */
+  .approval-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--slate);
+    border-radius:var(--r-md);box-shadow:var(--sh-sm);padding:12px 16px;margin-bottom:16px}
+  .approval-bar.tint-submitted{background:var(--amber-bg);border-color:#f0dcae;border-left-color:var(--amber)}
+  .approval-bar.tint-approved{background:var(--green-bg);border-color:#bfe6ce;border-left-color:var(--green)}
+  .approval-bar.tint-rejected{background:var(--rose-bg);border-color:#f2c4cc;border-left-color:var(--rose)}
+  .approval-bar.tint-onhold{background:var(--violet-bg);border-color:#ddd2f4;border-left-color:var(--violet)}
+  .approval-bar.tint-draft{background:var(--slate-bg);border-left-color:var(--slate)}
+  .approval-bar.tint-cancelled{background:var(--slate-bg);border-left-color:var(--muted-2)}
+  .ab-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .ab-label{font-family:var(--disp);font-size:13px;font-weight:600;color:var(--ink)}
+  .ab-approver{display:flex;align-items:center;gap:7px}
+  .ab-approver label{font-size:11px;font-weight:600;color:var(--muted)}
+  .ab-approver select{height:34px;border:1px solid var(--line);border-radius:8px;padding:0 9px;font-size:13px;background:var(--surface)}
+  .ab-approver select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+  .ab-actions{margin-left:auto;display:flex;gap:8px}
+  .btn-approve{background:var(--green);color:#fff;height:36px}
+  .btn-approve:hover{filter:brightness(1.06)}
+  .btn-hold{background:var(--surface);color:var(--violet);border-color:#ddd2f4;height:36px}
+  .btn-hold:hover{background:var(--violet-bg)}
+  .btn-reject{background:var(--surface);color:var(--rose);border-color:#f2c4cc;height:36px}
+  .btn-reject:hover{background:var(--rose-bg)}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex;align-items:stretch;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow:hidden}
+  .tab{position:relative;background:none;border:none;padding:11px 14px 12px;font-size:13.5px;font-weight:600;
+    color:var(--muted);cursor:pointer;white-space:nowrap;transition:color .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--red)}
+  .tab.active::after{content:"";position:absolute;left:8px;right:8px;bottom:0;height:2.5px;background:var(--red);border-radius:2px 2px 0 0}
+  .tab-num{font-family:var(--mono);font-size:11px;font-weight:600;background:var(--line-2);color:var(--muted);padding:1px 6px;border-radius:20px;margin-left:3px}
+  .tab.active .tab-num{background:var(--red-soft);color:var(--red)}
+  .tab-num.alert{background:var(--amber-bg);color:var(--amber)}
+  .tab-panel{display:none;animation:fade .2s ease}
+  .tab-panel.active{display:block}
+
+  /* ---------- Settings ---------- */
+  .settings-hint{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .add-user-card{margin-bottom:16px}
+  .au-grid{display:grid;grid-template-columns:1.2fr 1.4fr .8fr;gap:14px}
+  .au-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+  .users-tbl td{vertical-align:middle}
+  .u-cell{display:flex;flex-direction:column}
+  .u-cell b{font-weight:600;color:var(--ink);font-size:13.5px}
+  .u-cell span{font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .switch{position:relative;display:inline-block;width:40px;height:22px;cursor:pointer;flex-shrink:0}
+  .switch input{opacity:0;width:0;height:0}
+  .switch .sl{position:absolute;inset:0;background:#cfd4dc;border-radius:20px;transition:.2s}
+  .switch .sl::before{content:"";position:absolute;height:16px;width:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .switch input:checked + .sl{background:var(--green)}
+  .switch input:checked + .sl::before{transform:translateX(18px)}
+  .access-sel{height:34px;border:1px solid var(--line);border-radius:8px;padding:0 8px;font-size:12.5px;background:var(--surface);min-width:124px}
+  .access-sel:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+  .access-sel.none{color:var(--muted-2)}
+  .u-remove{width:32px;height:32px;border:none;background:none;color:var(--muted-2);border-radius:7px;cursor:pointer;display:grid;place-items:center;transition:.14s}
+  .u-remove:hover{background:var(--rose-bg);color:var(--rose)}
+  .u-remove svg{width:15px;height:15px}
+  .admin-badge{font-size:10.5px;font-weight:600;color:var(--cyan-deep);background:var(--cyan-soft);padding:2px 7px;border-radius:6px;margin-left:7px}
+
+  /* ---------- Log actions ---------- */
+  .log-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .log-search{max-width:220px;flex:none;width:220px}
+
+  /* ===== RFQ / attachments / role-tab additions ===== */
+  .rfq-card{border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);margin-bottom:12px;overflow:hidden}
+  .rfq-head{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background .12s}
+  .rfq-head:hover{background:#fafbfd}
+  .rfq-caret{width:16px;height:16px;color:var(--muted-2);transition:transform .18s;flex-shrink:0}
+  .rfq-card.open .rfq-caret{transform:rotate(90deg)}
+  .rfq-name{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--ink);white-space:nowrap}
+  .rfq-supplier{font-weight:600;font-size:13.5px;color:var(--ink)}
+  .rfq-meta{font-size:12px;color:var(--muted);margin-top:1px}
+  .rfq-head .rfq-mid{min-width:0;flex:1}
+  .rfq-amt{font-family:var(--mono);font-size:13px;color:var(--ink);white-space:nowrap}
+  .rfq-body{display:none;border-top:1px solid var(--line-2);padding:14px;flex-direction:column;gap:14px}
+  .rfq-card.open .rfq-body{display:flex}
+  .rfq-section-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-2);margin-bottom:8px}
+  .buyer-pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--cyan-soft);color:var(--cyan-deep);white-space:nowrap}
+  .buyer-pill.unassigned{background:var(--amber-bg);color:var(--amber)}
+  .stage-pill{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:600;padding:3px 6px 3px 7px;border-radius:20px;white-space:nowrap;width:100%;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}
+  .stage-pill::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+  .stage-draft{background:var(--slate-bg);color:var(--slate)}
+  .stage-pending_proceed{background:var(--amber-bg);color:var(--amber)}
+  .stage-sourcing{background:var(--cyan-soft);color:var(--cyan-deep)}
+  .stage-pending_approval{background:var(--amber-bg);color:var(--amber)}
+  .stage-approved{background:var(--green-bg);color:var(--green)}
+  .stage-rejected{background:var(--rose-bg);color:var(--rose)}
+  .stage-on_hold{background:var(--violet-bg);color:var(--violet)}
+
+  .rfq-approvals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .appr-box{border:1px solid var(--line);border-radius:9px;padding:11px 12px;background:#fbfcfd}
+  .appr-box .ab-t{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .appr-box .ab-name{font-size:12px;font-weight:700;color:var(--ink)}
+  .appr-box .ab-who{font-size:11.5px;color:var(--muted)}
+  .appr-actions2{display:flex;gap:6px;flex-wrap:wrap}
+  .mini{height:30px;padding:0 10px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;display:inline-flex;align-items:center;gap:5px}
+  .mini svg{width:13px;height:13px}
+  .mini-approve{background:var(--green);color:#fff}
+  .mini-approve:hover{filter:brightness(1.06)}
+  .mini-reject{background:var(--surface);color:var(--rose);border-color:#f2c4cc}
+  .mini-reject:hover{background:var(--rose-bg)}
+  .mini-hold{background:var(--surface);color:var(--violet);border-color:#ddd2f4}
+  .mini-hold:hover{background:var(--violet-bg)}
+  .mini-ghost{background:var(--surface);color:var(--text);border-color:var(--line)}
+  .mini-ghost:hover{border-color:#d4d8e0}
+  .appr-comment{width:100%;margin-top:8px;border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:12.5px;font-family:inherit;resize:vertical;min-height:34px}
+  .appr-comment:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 2px var(--red-soft)}
+  .appr-done{font-size:12px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:6px}
+  .appr-done svg{width:14px;height:14px}
+  .appr-rej{color:var(--rose)}
+  .line-rfq-move{height:30px;border:1px solid var(--line);border-radius:6px;font-size:11.5px;padding:0 4px;background:var(--surface)}
+
+  .add-rfq{display:inline-flex;align-items:center;gap:6px;background:none;border:1px dashed var(--line);color:var(--muted);
+    border-radius:8px;padding:9px 13px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s}
+  .add-rfq:hover{border-color:var(--red);color:var(--red)}
+  .add-rfq svg{width:15px;height:15px}
+
+  /* PR approval gate note */
+  .gate-note{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .gate-note svg{width:14px;height:14px;color:var(--amber)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;filter:grayscale(.3)}
+
+  /* Attachments — compact */
+  .attach-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:28px}
+  .attach-k{font-size:11px;font-weight:600;color:var(--muted);margin-right:2px;white-space:nowrap}
+  .attach-add{height:28px;padding:0 9px;border:1px dashed var(--line);border-radius:7px;background:var(--surface);
+    font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:.14s}
+  .attach-add svg{width:13px;height:13px}
+  .attach-add:hover,.attach-add.drag{border-color:var(--red);color:var(--red);background:var(--red-soft)}
+  .file-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .file-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:3px 4px 3px 8px;font-size:12px}
+  .file-chip svg.fi{width:12px;height:12px;color:var(--muted)}
+  .file-chip .fx{width:18px;height:18px;border:none;background:none;color:var(--muted-2);border-radius:5px;cursor:pointer;display:grid;place-items:center}
+  .file-chip .fx:hover{background:var(--rose-bg);color:var(--rose)}
+  .file-chip .fx svg{width:11px;height:11px}
+
+  /* Viewing-as + dash tabs pending col */
+  .viewas{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .viewas label{font-size:12px;color:var(--muted);font-weight:600}
+  .viewas select{height:34px;border:1px solid var(--line);border-radius:8px;padding:0 9px;font-size:13px;background:var(--surface)}
+  .viewas select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+  .pool-summary{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line-2);flex-wrap:wrap}
+  .pool-stat{font-size:12px;color:var(--muted)}
+  .pool-stat b{font-family:var(--mono);color:var(--ink);font-weight:600}
+
+  /* per-line compact attachments */
+  .li-attach{display:flex;flex-direction:column;gap:8px}
+
+  /* ---------- Process timeline ---------- */
+  .pipeline{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-sm);padding:14px 14px 12px;margin-bottom:16px}
+  .pipeline-track{display:flex;align-items:flex-start;gap:0;overflow-x:auto}
+  .tl-step{flex:1;min-width:108px;text-align:center;position:relative}
+  .tl-step:not(:last-child)::after{content:"";position:absolute;top:13px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:var(--line);z-index:0}
+  .tl-step.done:not(:last-child)::after,.tl-step.current:not(:last-child)::after{background:var(--green)}
+  .tl-step.current:not(:last-child)::after{background:linear-gradient(90deg,var(--red) 0%,var(--line) 100%)}
+  .tl-dot{width:26px;height:26px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:600;position:relative;z-index:1;border:2px solid var(--line);background:var(--surface);color:var(--muted-2)}
+  .tl-step.done .tl-dot{background:var(--green);border-color:var(--green);color:#fff}
+  .tl-step.current .tl-dot{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 0 4px var(--red-soft)}
+  .tl-step.returned .tl-dot{background:var(--amber);border-color:var(--amber);color:#fff;box-shadow:0 0 0 4px var(--amber-bg)}
+  .tl-lab{font-size:11px;font-weight:600;color:var(--muted);line-height:1.3;padding:0 6px}
+  .tl-step.current .tl-lab{color:var(--red)}
+  .tl-step.done .tl-lab{color:var(--ink)}
+  .tl-step.returned .tl-lab{color:var(--amber)}
+
+  /* Tabs + Approve all */
+  .tabs-bar{display:flex;align-items:flex-end;gap:12px;margin-bottom:16px;border-bottom:1px solid var(--line);overflow:hidden}
+  .tabs-bar .tabs{flex:1;min-width:0;margin-bottom:0;border-bottom:none;overflow:hidden}
+  .tabs-bar .btn-approve{margin-bottom:8px;flex-shrink:0;height:34px;padding:0 14px;font-size:12.5px}
+
+  /* Fillable fields on compressed line cards */
+  .rfq-head{align-items:flex-end;gap:8px;flex-wrap:nowrap}
+  .rfq-head .rfq-caret{margin-bottom:9px;flex-shrink:0}
+  .rfq-inline{display:grid;gap:6px;flex:1;min-width:0;align-items:end}
+  .rfq-inline.line-cols{grid-template-columns:minmax(128px,1.6fr) 96px minmax(108px,1.1fr) 76px 88px 126px}
+  .rfq-inline.pc-cols{grid-template-columns:minmax(128px,1.4fr) 108px 108px 108px minmax(120px,1fr)}
+  .ih-field{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .ih-field .ih-lab{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-2);white-space:nowrap}
+  .ih-field input,.ih-field select{height:32px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:12px;background:var(--surface);color:var(--text);width:100%}
+  .ih-field input:focus,.ih-field select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 2px var(--red-soft)}
+  .ih-field input.mono{font-family:var(--mono);font-size:12px}
+  .rfq-right{display:grid;grid-template-columns:100px 118px 26px;gap:6px;align-items:center;flex:0 0 256px;width:256px;margin-left:2px}
+  .rfq-right.no-del{grid-template-columns:100px 118px;flex:0 0 224px;width:224px}
+  .rfq-act{min-width:0}
+  .rfq-act:empty{visibility:hidden}
+  .li-approve,.btn-proc{width:100%;height:28px;padding:0 8px;border-radius:7px;border:none;font-size:11.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
+  .li-approve{background:var(--green);color:#fff}
+  .li-approve:hover{filter:brightness(1.06)}
+  .li-approve:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.3)}
+  .li-approve svg{width:12px;height:12px}
+  .btn-proc{background:var(--cyan-deep);color:#fff}
+  .btn-proc:hover{filter:brightness(1.06)}
+  .line-del{width:26px;height:26px;flex-shrink:0}
+
+  .stage-project_control{background:var(--cyan-soft);color:var(--cyan-deep)}
+  .stage-po_created{background:var(--green-bg);color:var(--green)}
+</style>
+
+<body>
+<div id="toast" class="toast" role="status">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<div class="app" id="app">
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAACECAYAAACppHhQAABMAklEQVR42u29d5hdZ3Uu/q71fXufMk2jaslFtizZQrLcJFuyLFsGm2LTYmBkSIGbG2JChxAgAcL4mEtCfgESLgnFJLn0GA3kUozxBRss4yLZHstN4yYLF7mpa2ZO2/v71rp/fPucOSON2qiZ+/N+nv1oNOW0vfYq73rXuwhH7yAAumTJvIlbKhOu4Kjt/Chn2hROSQwxCMSASssfECj8WfPvoQCBAM6+L0oAFAQolBSkpAAxCEIa/kIRfg6oqmp4OIZwy6tjIiUwi9Lw0OB644d+8vi6+27GS8eoC3jUDOeUc889qSLt33bSvsz5CMoKIAXUIpiD7uPlNv6fGcXuT7G3px/5rwJK2YlgjUoavlYFq8JqpdbO1X94fO1vrwq/SfqS8Ryl53zN7NnxwxNOvH67tr/Cp+wjikjVQNRDswtLrdeneb0o/FwZAIOhADyEJHtwgoCzr8OFD0ZBwUWNcSgkPGPDlzWNi2CVISAVJKY7rqNTd75jXf9t30ZvL6NUkpeM54gevQyU5LSzzlq0yU26o8bdLKpkGESqUAhAAlIGwex2mYMZeAACgDOjyowLjBCtsrelAoJkb5OgZPbwmjQzWN3luQhGLTwRHHuf0ypPsdV7Tpz89Pk33LC+vg/39v/8wUf6CXt6BggA8sVJJ7DJWQUTM5HCQSiFsoOSQEigSHc5PRQengieGJ4UjgWOCJ6MCtgLiVekXinxwqn3LOqNwLMf4/EapwORB5G0nAqCQNU3DJJSMCVqp1arx3a8lPEA9qg9sYktEQPqs3DUSDxs04MISfiZjnaWihxUAeI6QApSBeDJGDIQC1IBwSOBhVMb8hYIlN0B+QkigImgqiARgAycGmB4+CXLOZrGo8wkpOGuB4HUNEOPZsYTgoLuEh0IRjQk0+pB6pUE1JHH/RG7+63aCSwqCrKIeHjI69Lhsj+OWTRVpgOJ1Ao0QyADIGHAGrLM+pLpHEXjgWbJCikIDEhWbJMAcCH1VWpJy2hUpSSUpcXegMGI1A13U+VHa1bf+hMG9C2AWb/4vLcP+u4zyUQgFbDGe345NIblUMNkFaxKLAArkysKvWQ6RyHnGRUWsopJG1euidwoiGQPuWionjwRHCII5chTLNvqZunmuv2XC5Ytm6wAHjzjnLnPlQtfHfSFU1LE6pEjGmUZu76WXU40IaGQbitlBqZq7Uue56iHrUbprNAACDYtyLSUzmP9sQ/eCgyCh8BCweI8+7xIBIDaCl2Tt5QLxikpk0CpFTU6MMcRUABSTyAlVVM2LxnP0TQeokZQGk8E0FCqkwDkobAQjVkpT6Yjzep5nxqFsoKIRBV0CJCJ/bCZ3l7uGRjY6xP1AUDfPAVKe0I4XzKevcZL7w/i6TkzBN80JCWbAYfh8M6rUa9GBcIKVT4yoFapJH3jxL5eMp4DvI/1QP2BAlCDESw54EIBDHQjxiMiql6p+Sx6EJ6HRqq/vRzz5s2LqdC9tK3QMYWIWAiGTJRnoohV2IeHqtaq9R3l4R3Px3742YGBgacyw/m9AxyPmvEI7Qbg7Pd1JBUwCKQAq4FoSEzUeKnVRpJZMRyaoZKFx8PmenoM0Od3JuZsG+duHKwa4wnwMCAyIGVYAkQVAg9oBHCXq3HbzhMXTFzTxtV/XHdf/82/bx7oqFVbJKLj9VdEdRDVQptCCRACE2cN9HBEhYKFJVKi7AIeupe+px/UxBcrkjfbnZHBlHTIsQ6mRoYSkp1VkuE6yXCNpJxEWkWXLeukSVU7+bIyTbh+3pnnvQUoCXp7+SXjOcR56K4hhDTgQwILAoHTFOS1LfOmlFYHSX0SExikBNbxWQ+phA47ETiLXN77MQ2IWLxClcmQJVBEShE8R1COSTmCcMzgCEwEUk+sNYncTl8sDGv7lxYsWnoqSr8/BnTUXqRQ4DyMJ5J4xBDKwyOEJcM16shV6m15f/MfnnrqCwDUVTfcmzPpb/I58R4eyn68UbLR5c/qQ97jS9ZUSUWJM9wqUIWyHhkJJOvuNwp/gpIAVtn6OudnDKb8zpB0v+R59mUBB/GqGR4UsBtWgVHKR+5HO54a+Oi7vvvdScVicfrAE+V2U37uQwVr7jZsKLTrxxmlCK30HUXnnlNIgYXAQGEAIggRHFNo5jLBMcNx4AsRfMCpVCkRo54Lb126dOmMlgT6pYR5zMPsTxaxx3wpK9YNFBE7sdg0HL1Bu866uLM7NaxecwTeqjnPO6UzDpGMk3Fje639NQ8M7uG3OIpgLRQjTCNtAT1VJaDUpICG96BKAFt2XlCn+LjNleo8AM+ip4fR1+dfMp6xPmgd6SYR0YF1u7PWKVTgycCRAUXFdorb2kPDVCGkWV/VI9U0K7XNOF8sZ54iQM2uWBxt7j0B+WsrFidWDADvlUSJiLLsBnukoYEYWTomopY9zHEvler7ynlERFVCa4IO1ENT4P5l3JssK1FVgRUDqIFwQJ9BQo5Dwhv58RgPtQCS4YpXKpUxTb29Ld9e9ZpRQlpxpRF8W5qG1PBMoS8TMcGAwBzlX6q29h21smaT4kALIZ/lEoEuwWA1MGrJSkQASDgU6KSWWCJYn4N1eYzCCw8cymxe9j2lPEniiQTg7NcbPGilQHRtbbJCM/9JDGYKsIN3kHoyeHAwQi+jp8c0rb63l7Pqjf6f8Txp6upgBgOkEFVQVqUoPAkIDKNmzIqeW3nvoKbx6ajbYSQUBkorgYjHhAfCBW6xkexxqUl5BUQZockhks/lxky+c/m4AylDMwiLlBtzG5mvZChR8zEDHUUhCqgSMROS+nAVQNYAG0dhiJKO+ttSSXdxFnKkjYcO4Dbd69HXN08BwLnkd+SpCo1zZA1UQdp8bxywv13ep475qnZFjkc7UyVq8itoD5+bjopQkv1+lotoqJqgEAvYSN2jxenTB8f6TOJc3K4uzPM0X9voK7v7p6nh/bIxcEkVSXloaJwRRAjA/HOWnpci95rhcvVUYdb2fPGJPLkb55Zv/m3fAJJDiWLvK2w1fLXuz9mL/QG3SgIozZ11y0B3zlzXZi2rS6HwXtR7VfUQ8STidZcTY57eQ0eflJ2A8yqtp4x5QrwnceGxvHgV9SrwIvCi5A3YRyS2iIovcPLFvr4+j97e3XpRLnGBHkuMsVtVOsp6NPwyiBQiXm0UY/LkGdMBJSzs3r9QE0KULF26dMacc17Vt7nevmqrb/t0PTflilo85a1bZcJfb0nafnVf4ZU3nHHGOWeGz7/HHAnPE0qi2bM7O2s1O8is2AmgI2PSDQ0FC+7qIqRpvfRcqbK/jqyvD37x4uT9gmE1hBX1gBODlAJ6TGPTNRohZo9tTpKR0Z2WMjs8Lu/B87RMAY5KZgWGFLEhaH3omZyWP3Hv3Xf+AgCNNXZjTFSAMlSQEfhHOESqrY8/YlgiPst7WJ0SnI3eANB30I+0aRyBvrF7ttbTY9DX5+fMmf+yFyrF71e4/cwqCPDwBh5hCk7hNObUxS8vgG6Yc9ri//7Yg33XN/72YIyH9ho/p08vvufYWZ+ZYaPXcc3nxJCmBIoVgDoIOY1E1XhLlbZi+VFf+7fv3XnblxUZmLofMVoBOmfZxRdvH6rMqiYJm6yFCCJlr9T0jS2XSnjXx+ExfelIhewBDxhqAD2j+2oyghm0DKiGEMrw6MgX67686eZHHnnkiTFdSnYhzr7wD774VDn6cJqIJ3JGYKBkQvdfBdLMeRosyWalCCYDEBBp4tup8r+KUv3G/HT1vSHUjHqezIiWG2CVO/nkBWdXc1P6fNQ1qy7GKRtDKmSQwqiHJ4Zji1TZRxDTSUODRez4s0fuvfOHB2tAYxrPyp4es6Kvz39g2Ss/dnZq/iFfHUJMBqQKZwHrPEAOjhwiIeRTi7LN4eH2CPfZZPnK3/72lp6eHtO37xf2e0ZD2EO+kF2E05a+9l+fr+Xfk6TiDYvxDaQZAqMCIc54RRpghKYRNYYZARAhIoJ11XoO6d2x9TfF7K+f2n9r/6pWzgmAs84578Ittdy3y9w9U0BeiY1q6PgZDe0YAeCZoWTAAongOc+Dw52m/KcD/XcclAHtNWzFgqk5L1B1vi6psQ4wiQFE1MXQGgM1AI4AThKd6KyZmC/ObMHN9gu67enp4VG/u2nTuMvKK4eH6Zr+/hQAFi5cGPW3t++fcU6dusff6wHQ19en+0o0B4crbWLyWX7NaJLWlEcF0t0+gMwHcwZ/psLiqCPnWc6vaXo+Ofex2sJXrj0thx9SUv751K7ClmcH5eKtLv5qhXMTHVTAZMIYU0j0PTEUBkIMRgKrKQiGBSyD0t4uZL47f+EFE9b19f3beA1oTONZ0dcnAHDT9o1ftm1TzpnRUVwsLq3mKDIFsqbTpdbVKpyTGCkHAYEIJIZU1aUHmoxp3yGE4a8BcO7y5cc9sm1bub+/f/uheMz9rZpTtqFnrknwOBnRtpn7KO0y0hzK+BGsgbPuvzCg6gXqlJVNPj/k6bxqNT0vJttbHqThmsP0qhbIkxFWYRIZaZ80IEkKYTebo4XCQ8iwIJKdjnIc0VfnL1pWX9fX953xGBDvreRe+9BDT36usuW1txf4vP6O3IV3tefOXzO5+JahiR3PW2OhQhrmrQwAUiugdHjoqCCkWX5j//KspX/Xkxbu/GjXsbf9xctf/QYA6D1CFAeF9WHMzAQP0AAyiSEwWUMvzKVp9nXr2eiF6cj7YWI2KqJOIDVnZNhFndsTM6MiMTmQqoJHC0KMjChR9kzNpg4FQ2YCW7ZSdXk7WM//y8sWnPvGYDgH9jntq9oiDAwMXzswsLbxjQ8vvfAP05pO51TFCDggqYAnhfU4uG75eDORgBvKeQsXzj5e+C9PHC7n6pGZ7ij6KIDrri4dGZqnGiIYC0kVgjCq02jhUXbh0ELED41+yUBDbVaR4YPPLrsqiAwpiIgMHEw28RYenCmgYaNn3FqaItTgP2WhkRUqHgbMolaGeUKnKn/ztLPOeeWDa0t3HwgOxPu+oUFfX7gwAoD3nrn0nQsS/khnkoDFEcELS6pAmjUOAbsXvsvhOgZ6eggA5nRNmh6xsSLOR0kqudR349zZ7UcsI1cmmAgwUXbRMq9CmSFRQ4Sh4QWCB9IwOtQMZWgVl6GGEUkWepigTICSgQepa2IqDc+i2fMhy70ayLYSBUYCKUAOysIpW18zHRPK6Pzn5fPmtWeQAB0K40Fvby+9q78//YMLLjh3XmS/MLFSIw9BORYd7rBMbTGxpiB4+IAKH7XqqYtsrojYaOqJRdiq2A7tjo5Yv84yq/dQYmgGFI7yNRkdQzIjaoQ0JZMpeHBLyKFdQlDmS0jAwa/tPkzUUAoZNf6qI01a4sbgYmZcHiSpqTnvE9N5/vb26W8CoD09PXwojIcAYOLsczvPSPkrxzjtTMiLUVbYNn68vXjHjkkT7o+thVVSxwoUckc8cPVk/0ZQG3sBW1UxDmMMER+eY15oubBQLiPutMQfylDkbHxaAXDo6IEbFzGb0SfOvm5J5Bq5NGVDjtKYam0ohbS2q1q9V0CwOEOuFKOHHr0aKBg5cmAQhn2kVSq8LrSQVh582NLeXiqVSrKiO/eBOQktNLW690wgW+RnyK7+x83PX/5CLX1ITA6kUBhCXGyrHS3PY4RZrUeNHRIjUAaOgBYKoXR1+LANd5FRNVAlUmmchkgo024hggCiRBwMqsEqJAKHdnAzzDEAm3XpW+HlEXiRm7TWBkOheSpa5nGxS9LMId0VwHiPiEAiQrW0ftzKQHjYr9DFe01CSyW59KxzFp0k/i8LSU09eWXL/EheN1xb3f4n5QcffCFlWPVeyHt4FWU5emELkTAYiMSCNAKpgaTpEaq0QKTIwYNEvGUwqyiTCmfD1Qz1TKpMZAiiSs55FvGRqloGTMNDkQE4ENBYtelAqZnbjCTa3BC5ajAUW4btNfNmowGDRk7kwQR4NSAl5NQjUuG+noOvtugqqJZmz8mdFRc/f7yTbtHEszFmUyFXfcT496wdWLseAG2tlZ9LreWoYLmsjGcqQ1sOBBs5pBfQwzRDQxj3I7QfGdNZBNjYaj6fVhDl8AwhGrZRvhoVIrVRTF49XK3GLkk6U6LpjjhnuMOkdQ9xDs7XlUJCwwxL4usQUiQmCF3R3iqafXYnW6mMI3ClgKDMUCWNCBpHdlNfXxMo0nEZT09PD1Mf+XdMWvq2kz0vL1Zr3hNjWyFP6wxf/Z3frvo/vcuX29KqVW5DvfLNrrj9Fe2xPeFpdT+7Zcf22wBQXwY0HsmDtUm/ahSqaB8+Ek4H6Af8ok73ft28OUebnn8ylxvcPn/+5uSYY15DX/7yDfXW6HrS5BknH3/xa47fMlg5t2boAlKzUHzb1HLFGedSWKg3AQ0mZYfQcdPduzpNy9F9tCmxS9AbyaOUCCKCmD2pJD/ODGC/+NNjGQ+t7OuTmQsWdJ9E8V9PSFOw85q2Fe1jKj/72m9v+bz29jKVSh4Afn7PPf33zZt3wQmFQvft6H8Kj2Td4KNw+FG1SjAekcKRgg7k7huuu2sUhDBAAG7Aknf/1SXDi8+/qBrnpM3JlsLm59Ynv/nlg+t/0XeTAn/fDXRNufgPX8Nt8Tu8MxdX6hL7OgBSHzqrDanWTH6m+e5Cch6arfsyIB3TAFW9jwxMHrV7Jw0924dAeZBxhS3t7SUqleR9HZPefXwqp8LVvYut2UCybY3WPkGAu6qh+9aI9QMD2zYC2452s5OIlJQypbGskG07kmhlL2NggNDXp1i5krBihXR95HNvfuzS1383mXdqzkFhUg8zuBPxsovL0z7w149FLzx/y3FPP/kr/cR7froa+MGCV19+NiXugyYfXVaR4mSXijpNlFiZhINyqzb4aQf6MbdeGgbgxbI3OSkP56jysdsfeWToQEBCO1aSvHz58hNPqpoPdJUrChaUC3l6Sv2/rrr77gczryMtL0cBUC9ApReFXMju7vmIHa0cn4CVqM4/87VDJ8/L5XcOJ3mrxjFBOtu5PKGrTWfOPJNFzqxsHfxAdOaSDXOe+N2/H/vFz3zjgfX3vmPusotPMd5cXTGFK8QbIlfxIDUqDbS6xdNkcsFjeh+SXRCLrNOlqgRlq9VqUYf+fP19d//qQFmGoyqR+RlSuyi1l0+v0zQWI8LWbFS/ca2vfk0BotKY44xaGuEXHLWDSTTkBy7A8HBSTZKjJRxAANAJ3VFMneREDMOYCMyxJ8271OcrQ97Uq36oM9atp58664VXvuqzj3/u3+8572++8pFpt960YcMdfW/Nmx3vaC+YZzjqMAryzArSBAZVKPnAEcpuYd3F6WujZNeGJ258z6hVh3Yalglc+/CG++++NjASD4ye2mo8dEVfn5++cGFxsugf5cVDYbSWy+OFfPSD29eufTajXr5oVRycqAgQlDGUoCJSjqpH5/X2hXpT1t7+a920mTXKsXiIcEyuUGDf1m58ocOQjU1evBTrNfGR8y+cPe+4Zy+/4vMbv3njb89407vOf+K2n347hw0v72qX/2MMjKqKCVx8cKYzTa0xYA9W3DCeBrjcRnWaYIY++tja274+XkoGt1ZYCmB5FF3Y7vyZTqtCkbPPkrywulz/GgC6qvTiHqJ2BOdhQBoj5AdE6o+S+OSKFQJVKn75M79se/Cu7+S2V6itkvCkFza5KQOPPTex/4HfTdn41CazY5twvs2kbImdGvZV3d4d+y3nnb9k49v/4menfOKf37PhllseKzzw7be08dB/RobYecBxXo0Ceanv4m1aSfeUYUMePhO4MiDkdJis3/nZgf41XwR6GeOsjJs5z8qVK4WIcJzk/niqh2F1aRpF/ALw3dVrV6/fNdd5cVpPiP8sCubAiB4qHzXxSQURrQfqS/7ije+Sd3/2v6KuyV287anf6a9XPfTE+luHj+t5+8T8zDnzk4XnXfnC2We/OYlijRNPOQOTou5rp57cXe2Y8K/nxVy446oPfEE33/BHs5dc+uAQ5T5brauCKeTOqi2Oh0ZhPASFkINSBKjxlsm0s/uPx/vv+FTwOKVxpxu2mS4QybnnnnvSZMGrcvUETtVuYVPf4NOVATR88R9RnlTLXklcoEWR1c7OPY6WH7HsfTWoiq9+8seNby4H2uctedWx3Pftp1cDvwTwq+P+9QdfHLro0g+JYSEBW2XDLnXpMVN5ePqJl/UC/0SqCqK/O3XxZSTO/I9ESJiiYKUUSvmQStMo4kf4p0E6E4jIUEtPbtw3FwPAyixRPjcuXnqM6BQS5yJbpC3W3vbj9tw9CkXpRex11mWNyefq9R1DUK1HBrXIaIWoPrh6YPCoy030fpp7VXnZsmVTTv3KD7+48Rf33/dY6Yt3Pnnt6rsWfvxfPgzAmPde8TedD9yzSoptnCpSVfUuF6OYOs4/t+nWEiDLr7rZoLeXH1lz/Wc7c5XPxobYKYSo6eiyWTPNkpvgVEhNOFnIq0e1Lm+aNWvWVJQOTo2DAaAni3ldzr+6wzukEC3DYrPgJ1i1yvX1rHhRiw2VsqnIe8rlh7fY/NrBQpfZkivQVqafA3CfDkzCoxW+CFddpWuIomff/cnvbXz9Gz/89Ly5szaeOrv7yXMXLth0Wc8XX3X1f3zySaBW/M1vrpq8YUM9LrZFSbFo8iayuYfX9ld/+M9fARFWXXWRR6mk6O3lhXfe1Fvkyg2RZaOivmEwTZenI8pCpBZhGtezaCqIOo+3nSe/vgVSGNdhetHLL8cqXb548Ylnii11pmkbmM3zhB23o/7JDc8/s2XewACtevFPOdCWZ5+ttE2Z9n92Gtz1rLpvXv/Mhm8PDg66VatWHcXApQwipb/7ynu3XPDq91Yjciatw3oPpImvtrUBnhfO37n5uv6VX7vzzM7Oe/I7hqXwwvOPTll9278f870vfPKOu+9+HqrU3CG1ahUNgGT2/GN+m9b5srqaKaoijeHmkaH4YLtKYfEdIUQtUMRxpO3TJ0TXbl51swdK4/I+dqBngNAHzNRo0QSHqZHzPsnHZgfkwRvXrnmMAJQOv+EcKpFkvn7tHU8CeHI3VOzgRB3GmxsQ2IgCfOLMBVf49glaSIbZWRtYWeqs+JrUphzTWZy9ZBl++V/rfkN0PYDrd3ucUcvHIOh5i+nv63vqtPMu+kjK/L9rCRvK4EIln4GGPHrxHAAiwwJF3ekFUb79bIBWZ+DgAb8/XpnlCyfY/EUTPRAn8AlZDMbxHQCcHG6XH8ZlGxSVgzkbj7GrJcoheHzNyOHjN0AmiVTUEiGSTKCKGcwWiA1ckRlEeuXdd0e9qgxV6lkZqEFjfv59fYKeHvPgHTf/vItr38oxMZRUMgk7goKFRrUkRAFPoESdrylFiLr+sNFaGJfn4VJJsHx5vqOuC1kEYo0pK2M7650AsGIfauYH7XH6+nzvPMQ/1ZdN31ouMxHp/o5f1Im0IRJFRMr1uhKRuigyAGCa6HIBPvZMRJprEZVSzbW8txqISGsA8shD4jCXqhrTpEk0vGZN6YUxGkT79ljimYhk9raN9xR18bIKkEZB2Yy8qLApcmH776rVx9euAYBrfvYzj0WLBAD69j5OoNn0KOLKplKOplyWaNd0JRYFmDNkefQaBgo652rIQVBO5Q3Llp35mVsHBrZh+XKLVReNLop6kekjlsb0vFYBnFutTjconJrCQYhNhWjrI5Q8AADzshd4mEKVzjln+X/7HrddOVypzEraUkMEHVYAMAcmzaFQ5AVQ0ZQtKxHigiirNrR8iAGMZmi0Nn1GwsLwCPcKxscktdzwSWd2/7LdVr/wwN13P3JABnTVVUGb8H9/9wvtXcdeYBafd1bFKsgAxlozeeMmdN59x9W3/vj7/VlecyBVraC3lx8olTbOOn3J1yNqK3nEGkj10lAZRoMDrU0aB7HCSiLxzEE38Q3o6/v38HC75IallkvV8xaTgYmjxT7eufxVr1tYrf9k4nAFeVPg+2Jd/ekpz11EN6yv62HpkocG3KmLLvrgDun455qPAgmcEUQem1sppHmJd103il1eFDd3FHskHCJMTgBPHo4ERg1ojJW32Mebs96ARUGmigKGH+3O1V5935o1T+BAtG6yZHfJGUuOrV358b+pHjvzlWLNpKhe/93Eu275xq2f+6trst/BOD5rBqDz588/bgdPuaPCk45NYZWQEuBBGZTXGPxr4O0kqhFAbVHyRMGW/8pVhn5nTEN3L8wMtEWxTuy022666aYNuzyfNEHCSeA5BQXnlBNAYh/bp3HD+nrYFXPIt/gSUJJ558w7Zig1n0i9UQJ74jBeHRiUWW+KaFfMFK33UeOTDuTyDJhXgs1etRGFjwBihnEEVd4DPXc0uYEa+3hUIHAQo+phHHjiKTmpfBTAe9HbC+xvu4ZIoUqriZ7Bey9/3zKgO7/4wsl2zS1P3QDUR1VSB3QP9nLP/PnUt24Kryu9/OnjTzvvF4B7J1Esos4wSXPVwkiPCwARGEoCxqDLn1gV+0PmoiMlkoZEpKoOeoMXduq2Exdd8mAs1R/Z2qPfGhjYPNwwIAsArl6dlAeD1MPDwBNtAoC+nhWMvkM8xpex1Ix2npaITk6hYBbTvO046xDvraug2eXmsMiWMz0mTx4ggpEcjKQA10HCYERh4gmA42xFk2ZyLmhdsLWrMTVoZSkx2DoHrassf8fymflvlUq1AwpfmQH1AlRi2o41t2wHMXrFc+nAQlWrNxu1JCWXwy9rcH+WpgnbjPCsmfiVZkYTxuIVOjJnqnW1AKxt1BUh7SaoN4CTKQVTfHmqeHkUv+xtsxac8O4ND/Q/ACDorHGaHme9QoioHhmUzahS99DaTvZvW7FrorE5ViIIgVo1WfY9MOPDpIHY5pJj31A7pQRCVXjrkRBAnIfxBkZ9mJdqWbVE5CE0slZ7zKxsdP+YDHP7476zMD6fS1qiTLint5ehQuMynDDOoxe+8b8tWHjVl9/xsvd/dsWS4+ZNtOx+HZE8kbNMVsLGjbESR6JR9Wh4NBINp1cmUQNRQ6rGGE0EvqI5P8xd5zvu+NEZZ5xxbAhbPT2m66nNx9uygxjiQQJ2OHkoy/YPX5nVogDfHGjbzxRZicASTjEGqQqYWNmpKMXkDSglIUJOyBu16lhZyXOGxisyQYGMn7DP5w0wEYHgVeGcP3hMqlQaXzoQPA7P+af/6H1iwdIP1yZMbPeeMXTCgp88/dE3XH7S0tevSVM6yXlWzwTe7wYENdHFJp1XfdZYNSZFhESRqmmfkyf9KIAP8QmV5zo7TTTNeEEK4ho0HVbZFPpm8/QwGg9TYxT3QDYaKQC1AWPjNGsDGhERYvamEOU5T0p51NDGKee4ahynVDckI9K1Fq3Tmfv1xJlapgqQy0VHp8+3cqUBkU678m8ve+HMC/9228yZ7S4X+1pXXuqnn/bGV7/z6rNdUv2lkiCkj7wXXqWOuHltnWtlKFkQ2zBCqA5GPTjssjd1jbTs4j8469RTZ/CEzckEStPOsEeciMjWXI4rh/tz8B5AywK1A9FiJgAOipQFoFRjTXmCTfykYnJTd7TjQ/nhZy9sH3xy6RQefvckGlzZhcpwLMQGIpQZQZNCpTyKA7Pn56SMO2zIHymOUK9yj6rpUTVYudKgp0cBUNvZy/44nnasFmtVFxsyefFIJk/AM3PnzM498ej9kaawHhw50r3Xby0aiTpiPNDG3lcCK8NAYNUhUsekoJTi46T7hMU8KUk6fVJtdyRgYsQw5U3ODWYdx8Matsbl1kjBSGHIIJW8MoQ6dPuD06LyZetXX38JBh+7hWK5jApTezSpPPDI2l9fMS2qXDKBKmtzkjKp06BT46HkMsm3/emcZHo6dIT4QaqEEkkfke8j8lixwsNa6enpYSvotmBi51mYwMSKYhHVfG7u9C1PPUVEm5UJB6aNTtmmxBFAQ2DhKYJDDKEo+1mq3lgzlMrxtj2OCyalyJPAgMHCQw9s3z6MI9PTGl+7CCkIJJEpct4Pr++sP/uG/gce/d2suYtOG+KO36S5ji4vOaiU3zf3tEWv7O+/ddXcuXNf66Jjfu7YnJWAhEh4hP+yzyRrVxzxML/FkBCf/hcfezUtOOcibusuVh9/dN3Wz7zn+319fcOzJ5/y+eRls843x0wvGBUFKySOgPbOk+8ANk8k2iRspmRrd2ivsXjUzrzwhVHJhIdbdtxDM8Q6VZd62rJ9a5EnxIV2AxM1ZO1T+J2DGBg+3H5ZmUkzJfcDbYkKLERTKmC7dpjhv7//0Ud/h95eNnHnf0/NpK66zyVOOKlpPqpz4XKglx9++OHnclr9VCT1xKgQCytpY0PNnl+AUNgmSAp4dhlH5vB6nJWq5oT/+Z2/e+bt777+d6+49K/Xn7/sA9vf/LavT7vmVysvuODy6eu/+tlftt13579ZZYJhbSTF9bbiMf8JxFZsBQqIyj48Ko/cFC1whcKEMeWWzTxGfQZc5GHgYcgLd+TybRGxBaBeFQ6SYgAv6m0rChVmJau1p3J+43XIpG0ddK5QXZWqRjkxnqFKZn5Dc2ZS+zO/yRl9mMlkMGKLBteL4o0F+saH3tvbs3PJK/6mMvUYUvKOXc3XC8ZtOf+iS4cvf8cXAGDqjf/5VfP801s0ilkzcY3EmAl9gMnH8VZmxh4A9f2rDUZFbc0KkwYCpgBD2QBgJeIMRXO7sopehEcj2Y2MPn35/Ru2NOKJcxJKcnikEEqhVK1Wi/OACCBdvXpjTdU/SEHDRsPeUY8XyUAIAdBegN3i89+OScdoIa1LRMZaMibvxdRMIoMzT3rtJZe8bU7/ddc9oqg+muQiOIZGBMCY/DOAtexqnIWZcb8S7Kob3YLuEyAixJISi8/0gElBRgUv4vGaUNJHUI1gwXJVa8TmiCAxoDkQ5cFkIarRlJnNulydl4qqttxhL6J7hUifA/Id06adyOIBMIkIEgJSGEQebPL5dj322JNBpLGhOjhsTSQCcqRuFiBeNCCRdCgtm9DAHVUBEVGGMR6W1UOJKWt7vJi3zBEgaqBqkaYybfHs2R2NjDa2BqAYRDmwMlgF+XycDj8JDyiuXIjIxrlTgogSgghbttTkRRK2aDtQ37Zl+9PkCZwtsbBCIFFNYisVTYeef2r9Y1CFq0keKdDYDlUQrXUDTkE5Ej1k90Tz9qKRCVVmVh5O6+UU4oSVVAWkWsBxxx12RVNWHd+uagWQyTgKaGa5fcJpze9K8pjCq6oXuLq36qQYxxv7M/Hr22Xxy1JPZ4e/baxCNkdMQGyf76yvj/sAbx+49/tmeJCSXEypIV9n8pVCpG3W8oQnHupb95sfbzjvVW+am+bb53rvAAF5BSSpbX8T4D24W5VgaA+d5fG8uFaxDQKsZead9UqlDnUwBqIehtDePm1amx4xR6ItukSNHRHASOq16ylQqpKwl5Q68gkm/nWDNhJp9ceRDFJEaZTjJCqgylobvq5x4+x0cW+qcTsUoqQUnLvsvQrXUMwryeGv1LNBwRM+96Hvd95241emPr+VC46MMca01RMz8cZf/PTEz37ybwDolsve+D43/fhuW08kYK2C2uDghlcALvXaxqCmBN1u66GanVJtvvcgIqVoWX2X/S21yPsGnWcDhnpYWxWpK0epeIJVBTF1ndlR6LwV2NIiXnDok94M623kHQ010L0VCE1WHCcQWK67gpYJrz914cu/tsw//alb711940nzF783j/Y/tUzMyc7vPTpw13de9aolEx/ZbHorknuTE1IhZjS5LbLHhSbNLJaC8Rgxh9uAFETUT5TqB6943wXv7P1FPGvOAirmKN7+/IbNpff/5DqgOv8jV7/12XMvfKdYqE2E1ACoJzDl4UdPnTFj0lbVaWgmIrr3urVVLLNFJpNbqitRwEDCbDwxImKIicXujDDIxGVOdII4hfPa3ulMWGZ3IJyVcaLFDSdDNGLboZ5qkUlp8lGyD8IHMTU1KVW8qPOFK6s688K5Z534zcmxvxGRX2eMiepm2rbT2i76wGNb7ZVliuanyqpksqwuGCxlMrZKfkzvTk3zzoS3yZJzbXRYDShbXYd/K10H4LqRWM+44Kzzpz9+3iV/76cdm4vTuqhhFiHo4E6gsmlddeKCUwjRFKd1gHk3Wx8xlIAMKDE8Bc9D0KB/SAyhBrYT5MaN+mBIMKRSlSkTik/b4SnFIezEMEMRGQsoWZseiQ2APnszpjlTPRplaGgW7yLlqAQSA0MC4RooJqq5SFKN5ibef244TSASDQPMrFR0vgOJWDiwaGCDZc/tmy5bd+/0jJEuZqsdlY5MgqRCPStXMtAD9ADr+vrMwIoVqb/gknP12ONPNJWqGMMML1rPFYi2b3uh+4Z/v2fTpNP+RMsCMEQg3EhyG1YUmiuSke04023WpsBYK5YTqKyNNQcEqAixgJA+Q+mOVfbBNN5R1foWAp+qXsQSRW3WTAeAgcNIfhcShTLgEXZsqgeNujc06z/tgv9mdAyCg5KDVwvmiJ1ARFUrkjdeqJ00mKUqhDkCACYjUAQeTwhXwZBol3J9NDkkU1DPNJAxzpbceMynb8WKEbC2t1cBKG9+4jHatG2HTJzWJVp3RkjVmshu2/zb+1bdt+O4C+ZfknoHkCgzQ5qUDBqdRzY9b0a90EaYCr0+hg+Sc80lBKys3kdai7pi+s4D/Q9sZNxwQ30wTTaQsTBefIGJJproNGCEuHVYIpaQio6Epwarr7GPs/E1a2C2jZweRGn4mRCsAqwCA2VDbCJlLQi0oKIWXi0LE+pMqIPVw0DAqqGUB4PJg+HA6ptQPGvDM8kIvRVhTRTkIFXzVKln5UrTszLrlO9vLVQqCXqVb/3e/xrIr119VbxjB9VzRVvrbIuKLzyPKQP3fm3mOecc49PkfLCCQAwvo4oRUFgi1ziRjegYVTUqkpmaUFhcHkbAgsf23idq2UVdpt7fhsF/AkCBhmpzT6TOI0ZNbZoiSmnG4TKaBsEscdXtqjkNdYKGVkoLqYcUsMJoKECMDiJhHzlrBBIG4JvUSmgQ3NdsnWyYwpCQ8GVVBMAjVAzy2eaZEe6LZJMHDVHssK1YwKpija+cPjmtrR5/+0FGjdQQASL7x2EukUCVNhB96RT1Zb/wvPfnCvk23H3HNwY+86Gbpi+59H2CeJJqKszEkjlKzXa2UrPkbjyVV/KqRoktWfIhnYTTkE5wSCooIgdrKihS/QczJ9iP/PrX/VuaxoM42lpNHfIMKoqgXf3xAOith3CV0Yj1hLl4N7z1gXx8zDM1748jtk7B7BshQjlcNhqZO9KWzm9zAkAtqAmZN+D4sIbak4bmngTS+8jOWG0BCJDREGT0ItUWvT9PDI8Y8OJzEaJcxDdec11/Bb29jAMRf8g4x0tPPXVG+a3vf1W9vX165bkXHmj/4sd/OUCUYH/50EQKIjxaes+/9QDXAoj7gG09PT3m1qfKr3apCyiaYCRnVAE3bhZlMCsIDlBPeWMphmxOqtUn48jk86RFNradCAUVraaJey5n8VCOK//56Nrbf/q7llhuAeAZX1t3PMRNVJi8ExRSfzxOP70o999fxqEfvVH09vKDpdILC5ZM+xScXFOuS+wDVwbEIT0DhWXS2G3MpiW15hZVzcaWGYSdVQYZ0Zsy++eGhtZYsxgmUDOoZU12Q+mfPOA98pa4M3L3FpMtf5c1YnGAhqNnfeaf//SZRct7qzNmzMxxHu1bhtA956wbLvnOv/zZjXf87Nn99kABk+E+4uFM8pXvfvXFCxPueIX3AgZxWGUVbjRuMgHC2ib1ogwgx/W0A5VPT8rTtTvX/uY5ezqibnNKId8+vV2BfB2o1R9f9cLqjajuil4A2ejNI849eraaQcNmoopHXuzMJcXi9NXA+sOC9ZTChuMHVtO3Tl/0im35OPeRWt0dB6IIUAnNBILQSGkzWgS29RNWQjOwAEJMDNFYgg/y3OTIh01TI/hGNsDWbP01U2FVbTo6o4qIpZpj95sJlHx2dX//c2hoYO/P0RtC1Snv+8Sl25Zd9o2dJ80yNV/1NlFUpndi5zGveM10767puf2nb+oD0gPwQCEVfksPg8hXlrz2z1JnimDvIdYY5bCa0mTJsfqRTTvCkjexaTfJtx/tv+kfmo95PxLg0TLw6JZd3gSjZ4B2HfqzBKB/+/bn39Y+5UE1fGHinO8UnnQ688LVwPr5PT3U0Nc75CAPQPff/eufEfCz0044oZsm2IiHx2bqSVGoOe7ZUHUfCgX5CPAoQfE9K9RFhKQ40nsoZJrMzKxllMeCQdD4ucgI1bS9FlWDzOzoO2+/APTPGFGApp21/INy3CyDpOrEGlsuAqaeqvN1v/nkOZdOeutfLgfRr3p6Vpq+ees0u8n23rXt7SWUSn7KopcvTV3xj0mcKjM3KqyROS3NgE4FVJXYGEu12gROvg70MpbfzFi1yo/2Ls1Z47AecwwTsD8Iy2iT4SWvuLsaxRcqvO+CMRNdej6AH/QcRhJ8I4RpqSQPPPXUdjz1YiaCNJUkDuzzUMXNgKGO7km1sAeQlUISXiNDFp7izgkUHTvrVAA3YmUPQCukmUx/WhilMRloBAAzZ87MJ/ljPuuqKCoSgVpWZKu5s92lYdU4hVaMqhgiZi3fWSyuuhe4WbGK/C7vS1tmjffcn2x88YSktwwzw6qxcCkmCi3FbOToINWj9i+EjSIKH8zJu6Oph+qxx6ndJ0KvABxVd2yEJSJSacjeeoam1uqwr9D2nU8/nbUnsPB1b5u78A/fu2CharFRYe32uD09jFJJ9Lgz35c4c5FKXQgRoynqlA3wZTmfNocchWJOKTbup6tWwSEId43LQfCKTMjgvnT4rqrKs7Ewe4jGaTL3DRMWzQOA3sNP0dBDcAKALFq06Pi3LDznnW8587wenYd4NDx90I9/wO+rp6+PFcCUgXu/OWHLJkS2aC3Uk4qPlHw+VzATNzx9X3TXDat6gPjuL33/Xzd++KrVv3vH+2/beu3qVQs/9LnXNqZNW8IVo6/Pz7ngVedWXeGTSc0pmEkly20yUJMhzRZQVgEok5Jx1R0dFj8N1e+8g9IkFAVo7dq1z261fJvLsZIru4lxe9tJWnwVMCLu/SI+CIAuWLCg+6K48KNXm45vvNK2r3xP8YJPA+OR2T+EyMSKFR6q9MA/fOynXatu+ljXxueqbciZNs2bqT5vZ665Z6Dz5z+6ctV99+148B++8sHyay59184TT+gaPmlGx3OLFy/asvzyay/7808uBZGGRbu9jNLVcs7FF08acpO+UU3NBLCq+KwDoY2dpQ22QCgVLPnAG1OiCPW+e9fc8hh6D0zxfcyw1Zfp0j1v9Bc7Y0MRiIpJiinA67BwYZRpFr5oDag3iIvjZZMmzTuxrotm7Kz4Y8pVPTbK/QGWLCnQfi4fO2zHVVcRjNV1H/+Tf4x/+LVLuq//8dUzbrzuPwo/vfav27/4t5et7vunO0+/+M1nlc9c9vFaIS+xq0ubqNrqzrQya1b74ClL3gsAN+MiBq6W2bM190x98jdqae509omoKmuLg6XdatOg+i0gE5EOFjT5eoAbDu5tWQBohK4BX/3VTMk/12kK0+EqMtXmllyZ61pGwM09PT3cdzhAw0NwzM96cMfZ3KQJKvDk4C2RVU8ol/PAKJziCB9h/iqr7Q19+bO3A7i99Tfm/dmHz33hTX/09drsOZMwnIghw1G2zaYeWzxVTxkAr/rMJW451D7W/dr/Wa7lLgfEs7VGvGvu1RoR0R3ZByjEgKoQw3S1F297+Ldr+oEDXxcwpvEAkEyke+O551543Yk29+fWJa6bfDzRJ1cA+M3KefP0xR67LIwVa2goCu/MQ6kLwM6jZjcBHDztyvcu2vbqt3zqFJOfcOz2besKSW1d28Znn6MJXRPTY6Yv23zCzDdXZ57UkSuXlWHYq0qdWU2xLSqu6X/S9P/qiwBktvjchvMu/3LVt/+5d/AGifG7Dro0iAPQsHEps18FMcRpuerPedmZSy976N6+68e7NmBX42nKxz0HvXZQzX/vdmSVnHYU7FsuWbz4S1QqPdwLcOnFTI4HwEIwQoAHIiFbMMYeFePp7WUwy7zzLzlh6yVvXTm0eNlJO+Chlpfbeh25ag1qItTb2uDrCXKVigSlGfUuXzDF4Rom3PXrn039wbc/tuq6bz181tKlMzbTcddUXeG1aVITIjYqSdaWYYwBwGftmNCWYCJiqFZSTBbkvjPn9EV//lhf338dcJtlrFK9r69PCMDNnN6xLU93SlRkdjl3gosmnYbclQD0qt7eF7frEWGjBKtBNNJAlYw5Otny/KsIqii/7oo36+zTT+rYOZjmyoNiKsMeKlItxFpnEjs85ONq4iGs9UKOKF80M9YNPH3ij7//odP+5OLLV133rYfnvOK1F7xgTrqh4tpfmzjnDRNDXFZ+cwue0Krb2aqnm2E9quRhpcpdE4e4+zsLFl7wjmA4vXxQxgNAf9DTYzauXl3dYN03d8QWqsQdtUSP8/6KRYvmH49SSXsPTpL2sB4eQMKKNNtdLiQ6dLReTE+IGPmTTj4r7up0VpRixxQ7MDlRk4oQqYIjQ8V208E5M/XhR7Z0/fSH/3PqX1154R2ffteXnv5wTzz7NW//+HA65bqdO90CVy97VjEq2qTHSnPpxO6IgmaXKhAnJWvWGU41kooWittd9O+nnXXenwIl6QmqtOM2HqzIOt631Ks/2mbxOx+JEan7GcrTF3P3B2kP3qcX4N5gvUc1LSIiNQrYbHaawdTu/dF6TeF5B4d3Ggvr2ZoknydXaCNqazdUaDexFkznth2Yse7+h6Zd/78/edxHPrDo0Q+99YOrHlnzxOl/8Ceve+Lewk07hnKfG9pW6WTyAk2NSgpoAsCBOAMBmxpDPOpUpkxW10PIQJhBksLAMZGRIW03W13bV+csOO9toRg6MA9kd0vxQuK8deMFl3xlWr7wj7ETKta8zCvk333FuUt/QqXSb3t7e7mxiyLbWCijpTOP/hTduKQhD0ULoydbE7liBQAlvvW9Xyu0dZ0hxx67yBWMtKc63LZj+5M2qW6In9u+Prr/nls+8vXeX68AfM97lrefdsKbV5TreNvzz7s31pKI4AeFI8mEcxRQl4GADJJ9mu4o/yDa0FskiDKzMVLzyCnk63MXnr/l4f7Srw4kBxqT860Aps6b1/bBjhm3n1JPFsTVmtN83t6Tw+2f4eQSffWr69TStDt/4fknTDDovnN4++ObBwaGj/QlWxn6c/6vLr70zWfsrP8wVxn0bK15Kp9/9P9Ldix7/t57Nx8dow5POQ+I+c1vn+uj2E94ct3mO+64Y1Prb5188R+cF1Pxj8XTpYNld1KlrvCi4DDowaGf4UctMqYWmdrdaNWjJuJ0t8sdHiLTB1HxzGI6uPLQ1O2Pn9e/YcNOHMRqbL2qt5c3l0rDj5zb9ZkJxlw7LQKrr/iTpbD0PcIfo1Kp9PWFC6N39fenV5x33sULiL9b9DxlbueUX/9g3ry3bhwY2HY0LpbLVmOTNigvdCRDFp982jmL24rthZwOb9z06KObnty5cwgAz1/Z4/tWfPv+SUAHL77wuGlnXDi/Y0LXXDbF853o6dUyzd/plOuJg3eJRobFMLOqcnAX2lRQGyGj0Ji2OnrPKO2uQ9xIozVQUAUwXuBrFL+sOmXmFdiw4ZqDWY2NUqmkWWj6r2MWL/t5F0Wvj6plP6mcyBmFwt/88ZLz73nX6tt+1gtwjaMr5tZrx9jh1LdNmPjKV02d/vL/GBj40cqeHl5xhEFF0/LpHMEErCFQgG+bts9vl7alkpotcuKindNSX1YYvv0fBvnYs19jhLl9C3LdnrW4s2IhIvDeQ7xCVL0xRDZi9gpDoCzghIs80tqiBvTYGCZp6QDvCqRnKzcUuxhQY4hRYAAIGKJWndg3Arhmfzf/7SlBarA//Tojn37emK1MOU5AOiWR3BkuuubiRYvOKgFSpFwbUqsE6wFoweTbj1qeY0kbFFKmIzmBTigBkoJ3DKc5rfr2ySk6T07iyaenUfdptbRtXtkXTh12hWMrFS06D63VUqknda/ihNmpMWIIwqquQWtripg30+FRQubaEPLCyEwn7Ud2ErINATXldAlEIkSJx9TlwaHsVztnj9l1qVQS6e3l62+//d7HGVcPxQWqGkMeKiemcsxyW/ju6aeffhJZQ4mxVGUmB0ekyVGruCQw4ZsyIFAcCZxH0ftpBgAnbkgYJDAOjkRERQQiSkJCYr1IRKwAE7FlNpEhIiYBBcKfDxMNmVBJ0JqUXSXGw+XWVtb1nkQ5s99pUHG11fMwRG1zStRzBGErFx0ACLzX0oxKJdXeXv6abvjGU5H9rcnlWLQOqldlXlXmvT3q/NlMwqLYJTCqVFCPpLytcLSMJ/WingFPgIcgNXRE0XBSnygJxCg5q6wsrKwsxAwynFHPSTJiOmdMYOEInoL+n2oMQhTI/WqyEaFGqBo9PdvaPd9z/GjFf0ZIvY2ch1SgqsrMiBgbSo2JwP3IV/dV1+tVAGj1xuo9tvruZyM8a6KIfaRIpKbHOz+/bdvwHHKAESZygEvk6JXpKqLKsAJAFY6cL1ePgOxtcziyMX/f2iOgplptIz/JVLNHyWgrMYAYSjE0W9rSmAwxamAaOQ27ICFMIbzxOLtFrAKogyMDQ4QiVRGjem0AOPdvs+M+f6lUKumn5/XEP7vttnXr1X98az4PIcuxI5jUiU9TTYLAEKyaIzGnvNvRoNeWRStwKjnPGnt4QHUw2eKOWLnFGfSb+QrWkTx1ZKRnVJgd0cpEGIchSgCuw3MdjuthM3FofmpQ/hMBRJQVogzVaFyRNlimhVDkI/Ymru+4ruhvvh5hjZUctPE0oITSQF8CAF9ds+q76yB/ORznUkYEUmI1IE9hspJ15CHXbdp0xHKfxlqn9dWhp7azq0ghZ6vFvBmKzEasXz905FQHScdK1Bv/FxpD72/UxQgTsmGvRhD79ETiiTxEKIKaSD1bKJOQADGEDuR2bemCKUHIemIY64Yew9BT7+vvP4DpjT2V6i1PpUuXLp1xKsdzpFolYww9p5UHT4o6Huu2fh4chFXZZhNRcpSw5VIDPF2z5rGXLV72uZ0GV5Thtz6h/D8auBWOxHZmEQQqqEB4DIwOIxMNnnb/HsSA2EC9U1IjFsoGypYB8pWdsSY3A8nPCIUrKpp/ZR3iBbyfi8kytQ9tKPB4MQqTk+q2vOz80w1PPPFkY5XVeNsTWa+ql0soyRtOX3TW2Zr/wZTUzgERSBwsM4q1qqgoiJhZAmYgCjLWanuh3QHA/KlTj6gZNW7qr6+59bOYMuVL2Ly5imys90it9WZiJSIw7f8qrlYDEga8ijIxWfUmTzXkULsPSbWvGPv/Wrd2zUMAsHzhwp88g66+QdiL6gLfTJL2A+0mYkCdGBIuYnCow1Tf8fB9/bcFbk/pgHC5MY1nfra0dlZX1x+dXMectsGdSQQYIQ8fCnLyFMmIgKGACJKIWo2K/oCve+t65gMZ9WlV8Zg3TzEwQL2b5tHVq64e/nRvL9988812VasR7+9jtzxuQ+yhL4TGvVpEPsrpMBSSKU1oJpHUwGGarQQN5HRtyDkoQRGWylojlPeVelsu+lUsle92xw9cf/vtW0dmxpYvN6tWrdpy+umnX4Eoum5I8+fUlX0QHsqmYhvzjMQjiqjNkl/FkOV2JOUJtvbHD9x9x3XjJYXtNWxVoOsHCcjHJjaSLRghwMJC2WauWWA9QfMRP29JN1bTxwBg3f5dqHA7HEIkutSCU+EQENdGz7rt3a23FYuVHXWGa6pqUQurT1qMKQCA2pROCgIWRoTbdPihabb85/fcufq25gcYLm4w3lWrHNDL999f2rRwYfQW8ITvON92oVf2RNY0cxoSQCVc4mz0GJR4Em8iqW9qyyV/8sDdt//yYNiEe4MkdfrChcXL48KnplP8CisAIGyNMQCTKCBMIvCwgCmLDq5Pa//5/btuvwb7N65CAHT2bORyEy58bcXTTBPlJhqiNqgkBLaOWst+yuQDA4Mla+mLkiiH+1ihoqrsZaQSUFINM5LMVkkZHFYIhs3RPFLvZAQZBsDCYAnfN+Kd0+T5pL7zxscfum/dmAlldgHOuvD1//hUxf5VksJHgPEwYVdilggLcTZLn+36AkOIQyPCJ77NqOnm8qcH+m/6DBr8ml1GfHc15IULF07fRpP/q+xzS2reOOXIhO1lPmtrWLCQsqi31lv227d2Yvitjz1w942HjIY6Vnb1XH9/5SvAJ7BwYYRZVQLmA0NDLQa3Pvwz7VjCt1YlB3CnEwBdsuQVxz5fp2sq0nZZnSJ4T2AK61VJ0dQr3bMdjoi4N7yzpyATR6pgJqhItlFHwXAty7MxancwtbR/gmZQ0LRhMWGFg23bOfecyVc/fNdNX9xTReJcWkULqLe/VbNCYY2hRBLU1T0H9DI23UzBy+zRxwp6ekx/X99zZy09682m1v09ssWLKp6gCh+cHoFEYVRMzM7mtfZU3gy//eF77151sIazz7CFhn5UP6XaDwADe/i19SAAn27h+ezL2125ENEqb66pof2yegrvAKjxIDh4aKa7w/t4oN3lL5XSprkJ0CLXiP1SRA/yWyMym0QmaIhx3EXqvzDv3GVPDdx56w/H+vBVNW3IuaApiUd7TO+1BQTyImATIfGcACXB1P2YlcsIXGtvLz177uzZb+TuEz4VsbwrkajTa+A2W/LIcc3lbK2v21R716y5+7FDYTj7YzxK2K9VeND9rmp6CSjJ6nTRaYPiLqnDizERkXiGuiwXCO7ck9lLc6/165GfmV2VoDBCSfDEY0btkaZjAxHKRrdJoRSmdrzCVQQ2JvOe3uXLf1wKH/4uHohSJmqa7b5uoRBWmiAzkRcgrdfHSLawVw8E8J3r1w8C6z92ztLl369I/MpKtXY8UczFyGwuxrVb7rz9lt804aRDlGPa/Xeuh+bo6Rmgvj4g19k1ze80UWJigkItBSWq4DFsllj6vRhM63UY+b+0bPPFLtwX2i2qjvxcMiNjlSytbWgRW4gaeCIWMJymxw7ghTzCivZRFlJPkmEftgju2XI084nNXkVjmzOgWoeXZDwzZpm19tJdt5fuBXDvmH4AtP/SMIfQeA49LmPy7cYaUlUlytYnjWK6yV79IUDwRDAqMOqay749++Z67VA0GwBRWORMGtYeMsEHzfiR3J5amo9qWswxCIoaUggiEBfzmzDFjg3XS2rAcLBZS0Exoi8aODmcaRumiLMpD58hzxFUKkhrg8l4O3tBxaOXe3oGqC+rdnsGsq9LJDjEEO5RMx7DHGVMkkw0ksb0JGPbDmUBNVAYwpoFoworJJ6IPJEaFSFVjpggCkrDFkwiqHo0lAt3D4o0apuAUtAgBoQUFgBxrl4fMxlzPq0G3WwzQoNoMfamKKCGfVYB7/FBS5FA6gVD5UoFBxa3dgtjrXJKh3PJ8NEdo6EsrTjAyCgEKHlE4mAEUETiiIiNMzEnTK5KhgOsYFSJqc7MZSJ1DUPLqqkDF8DgveySGRoq7xTxY+wiaLVGA0WUlXcOngQCVVGPiOGmT+2sZbnhi3pt1VH1PLt/sLS/vjmolWcyaaIkxMptWh4qIrkhF+HXO4Y3Pd5enHRiNaULveofkehaz9GUOuLjiaKMChzoDB77ULMdRf+kvSKJTmoVbvbKWwXxdLcUhbL97pIJ+RphIu+eOaENTwXRyNKL3niOmufRFn3AAzU1o+GSO7Aaw9xpao9Msjsu3bD21yusL99VbJ9xSVK3J3f4wWvaZHvPsbT57QWJfmvJQFRFmolqJuS931P4wU36PcyCkajLxEr3cIuMLF8huOD5wtSnWpDmDW2pPze4E78nB+P38GBVqLCAmHI0+ES32/Tmdf2rb5szb+G5O5K2Xw9T28eqpuvjwzzpZuK2SXfd99C6Wnlws4HPIJZsklJ3z3EOyodGJKo+I3uNdqphx0YjMWeQ2qx1YAEljTilvJEfr964sRp0c/CS59ljwnwQfyuwEDIUUyK52o6r7rvvrnVAL9fj7ncN267OMmxS8ZRWUeQE+c+fM3fuJIfyZsoKDoKChZqbe+nAXOYeD+ccVLMFnCPY96jEPPS3rEKtirdCyi423sa68/4pujPTzXnxh6yjG7ZYxz3f4JkFrGTTytPTuHoDAF64sGTK1drLhCJVJQOmyHmSmrZ1lLtnfSrKd85KlAFKKZI6WBiOYgjrLnjS+I+cyTGrIS9GnRoSOFKkgT1DYYusaB1MjohAbIljrtlO2flgtx36o1vDcCJ+H7zO0U2YlccfLNQB6lHMx89373hwBwBpbz9najGh6WUZJlCenBIcCwOqW6v6IbETXKJ5KAszuSYcwBp2UQjt932kZreJjJAx5yNf9Vrx1uRMIF25DOMxYYOVCqwlqK9BJK1EVp9iqfxwmh/+lzX3PvgCXiSj2r9H1dZ43KWGvMdL5RePIQkJatEaQswq8EhANgbEgsDkfAqFtaAYIoE4ruzDegE1B3y9xkiYPQBEzq2d0FZ9pUamXZQ9QZRVWNVk+s8iqoZUUz9c375xVjz89I1rN+x8ciQKyO/TdbBHzwAOIuchA2KC95XuM45BEUB5ePjpoeFk+laN22YoOQSFx0jJG7TZZF0u9oPbqvWlKbwyHHHWVBKy2X6KPVy3kYVcSiACFGYPs2Dr16+vA/jN/r6PDQAyYQH9fTOc31vPIxRo5go+2cw462S8sPaB/v4NQzPmn7itRizQSCx5IvG+QGLz6eDftrd1TKnUsVRExIDNyN5M2t+bnhqStH5vsi29vYz92VMWyF2KI0SRfcl4slTSqBATpE75ju3S9kEAfwYoOvMX3uD9juXwHUwuRmTrNodttz764K0/OWPZ6z4hBnASVkMSjez0OqTH77Ex/N4Yj3IgAzabvTqa/7Lbhr9RIc9BFVyHEWj7n846/YInNtxPn3m4H5+bMffMXKEQ/TejVDBUuYHd5i8vWHDCBKda9hTmPByZrJmaZguWeOT5aXd4r8lDlgyreek4usbjvQfIhLWPRCChbO1RuJx7Dh4BKxEFlIgTKqAMc/WsMy86raDVr9odD3+pMCH/CxFpG645GvIT/rGQm7IjZ6JNpACxISEDFgergCNCWMlFY+/HbtnHFYXVTDT4kt0c7bBlINLQ1ZMWVQtFNnqw57RaA9Qm2QKyGmL1ZFcM+/jNhQmLNw06TerwlBCfAFtE4gGz08EpA8SMTJkmoL4NpSTdo5cj+GzlGUjVizlaIpkvGU92UcJWWqjPih1SSNZPDKsN916rEXzAccFQYqpp5NnmjZNkuqYpPIflkIxYGEqkLuyQJIWqC1tgRilN6B6MNfDuhUzgRBPQdvR0Dl8yHgBwLkmgrIZzkGymRxWt8ii7hatmtYUwccAqIJIGldN4kCbMMFqAcYCFg3CNPWfrETXMmTVsRprtiRbV9FEN8RGOqIQlqCD4NJpE6UumcxTaE33ZlpXq8NbH2dccq2vQtoI3kEanmRrawdk5El0o21gHakjFCgw8LDyBlRRMDEMWIJOtwlZiKAUej2kYK5nmYBw3TlCGOkvm2bLnUhWSVCPyGxcvLlTwIt7FceQSjyN+rAIAOrstv22orXNJStEclRbKJklYsUHArr0vItbAipBsZV1gGQtxRu0iZSVleAW8CrEqrJJGSkqqxMqZtkRgHhoFuLGYuxm/FKLITsoUDonUdNmUJprkY9d+/+YHenp6zMDAgPz/2XiOpkaxnrFkybHDvut/1RwuEVhKvcIYhnjJNrW0/jpnnglN+mHg/lJTGRTNotpnoSn0lKhFSo2am4wJ2jKYM4qSmknTEcI6AlKBRX17d17//sE7f/X5cRGRXjKeQ29AC6dPL6YnzHnNjqH6ZFF1xhjAewRV/LBdVkglMvGJsY0mOy8JWTaemkvSxwaHm6DxCDJDDdMI8zFoQElhraJXznpQlP0cAqhzXr1/dmION91zz639L2U6I8f/BZXAbcQZ70XAAAAAAElFTkSuQmCC" alt="Integrated Operational Controls" /></div>
+      <div>
+        <div class="brand-name">PRTrack</div>
+        <div class="brand-sub">IOC · Requisitions</div>
+      </div>
+    </div>
+
+    <button class="nav-item active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" data-view="log">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      PR Log
+      <span class="nav-count" id="nav-log-count">7</span>
+    </button>
+    <button class="nav-item" data-view="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </button>
+
+    <button class="side-new" data-view="create">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New PR
+    </button>
+
+    <div class="side-spacer"></div>
+
+    <div class="side-user">
+      <div class="avatar">MA</div>
+      <div>
+        <div class="u-name">Mamon Abuhantash</div>
+        <div class="u-role">Procurement Mgr · HaLRT</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="topbar">
+      <button class="icon-ghost menu-btn" id="menu-btn" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="proj-switch">
+        <span class="proj-dot"></span>
+        <div>
+          <div class="plabel">Project</div>
+          <select id="proj-switch"></select>
+        </div>
+      </div>
+      <div class="top-spacer"></div>
+    </div>
+
+    <div class="content" id="content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section id="view-dashboard" class="view active">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Good morning, Mamon</div>
+          </div>
+          <div class="viewas">
+            <label>Viewing as</label>
+            <select id="viewas-select">
+              <option value="approver">Approver</option>
+              <option value="buyer">Buyer / Procurement</option>
+              <option value="requester">Requester</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <div class="kpi-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+            <div class="kpi-val" id="kpi-projects">2</div>
+            <div class="kpi-lab">Active projects</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-ico cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="kpi-val" id="kpi-total">7</div>
+            <div class="kpi-lab">Total requisitions</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="kpi-val" id="kpi-pending">3</div>
+            <div class="kpi-lab">RFQs awaiting approval</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div class="kpi-val mono" id="kpi-value">$228K</div>
+            <div class="kpi-lab">Open PR value</div>
+          </div>
+        </div>
+
+        <div class="tabs dash-tabs" id="dash-tabs">
+          <button class="tab active" data-dtab="approver">Pending your approval <span class="tab-num alert" id="dt-appr-num">0</span></button>
+          <button class="tab" data-dtab="buyer">Procurement pool</button>
+          <button class="tab" data-dtab="requester">My requests</button>
+          <button class="link-btn" data-view="log" style="margin-left:auto;align-self:center">View all
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="table-card" id="dash-panel"></div>
+      </section>
+
+      <!-- ===== PR LOG ===== -->
+      <section id="view-log" class="view">
+        <div class="page-head">
+          <div>
+            <div class="page-title">PR Log</div>
+          </div>
+          <div class="log-actions">
+            <div class="topsearch log-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="log-search" type="search" placeholder="Search PRs…" />
+            </div>
+            <button class="icon-ghost" id="export-btn" title="Export to Excel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+            <button class="btn btn-primary" data-view="create">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New PR
+            </button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="filters" id="filters">
+            <button class="chip active" data-filter="all">All</button>
+            <button class="chip" data-filter="draft">Draft</button>
+            <button class="chip" data-filter="submitted">Submitted</button>
+            <button class="chip" data-filter="in_procurement">In procurement</button>
+            <button class="chip" data-filter="approved">Approved</button>
+            <button class="chip" data-filter="rejected">Rejected</button>
+            <button class="chip" data-filter="onhold">On Hold</button>
+          </div>
+          <table class="tbl">
+            <thead><tr>
+              <th>PR #</th><th>Description</th><th>Requester</th><th>RFQs</th>
+              <th class="num">Est. total</th><th>Pending with</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody id="log-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== DETAIL ===== -->
+      <section id="view-detail" class="view">
+        <div class="detail-head">
+          <button class="back-btn" data-view="log" title="Back to log">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </button>
+          <div>
+            <div class="detail-id" id="d-id">HaLRT · PR-001</div>
+            <div class="detail-meta" id="d-meta">Requested by Mamon Abuhantash</div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn btn-outline" data-view="log">Cancel</button>
+            <button class="btn btn-primary" id="save-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save changes
+            </button>
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <div class="metric" id="m-status-card"><div class="ml">PR status</div><div class="mv" id="m-status">In procurement</div></div>
+          <div class="metric"><div class="ml">Category</div><div class="mv" id="m-category">Construction</div></div>
+          <div class="metric"><div class="ml">Lines approved</div><div class="mv" id="m-rfqs">1 / 2</div></div>
+          <div class="metric"><div class="ml">Est. total</div><div class="mv" id="m-total">$0</div></div>
+        </div>
+
+        <div class="pipeline" id="pr-pipeline"></div>
+
+        <div class="tabs-bar">
+          <div class="tabs" id="detail-tabs">
+            <button class="tab active" data-tab="request">Request details</button>
+            <button class="tab" data-tab="lines">Line items <span class="tab-num" id="tab-line-num">1</span></button>
+            <button class="tab" data-tab="pc">Project control</button>
+          </div>
+          <button class="btn btn-approve" id="approve-all-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Approve all</button>
+        </div>
+
+        <div class="tab-panels">
+          <!-- Request details (shared for the whole PR) -->
+          <div class="tab-panel active" data-panel="request">
+            <div class="card"><div class="card-body">
+              <div class="frow">
+                <div class="field">
+                  <label>PR number</label>
+                  <div class="prefix-field"><span class="pf-prefix" id="pr-prefix">HaLRT –</span><input type="text" id="f-prnum" /></div>
+                </div>
+                <div class="field"><label>Request type</label><select id="f-reqtype"><option>Material</option><option>Service</option></select></div>
+              </div>
+              <div class="frow">
+                <div class="field"><label>Request date</label><input type="date" id="f-reqdate" /></div>
+                <div class="field"><label>Requester name</label><input type="text" id="f-requester" /></div>
+              </div>
+              <div class="frow">
+                <div class="field"><label>Phase / stage</label><select id="f-phase"><option>ADA Phase</option><option>PAA Phase</option></select></div>
+                <div class="field"><label>Category</label><select id="f-category"><option>Engineering/Subconsultant</option><option>General Expenses</option><option>Construction</option></select></div>
+              </div>
+              <div class="frow">
+                <div class="field"><label>Required on-site date</label><input type="date" id="f-onsite" /></div>
+                <div class="field"><label>Delivery location</label><input type="text" id="f-deliveryloc" /></div>
+              </div>
+              <div class="frow">
+                <div class="field"><label>Priority</label><select id="f-priority"><option>Routine</option><option>Urgent</option><option>Critical - Project Impact</option></select></div>
+                <div class="field"><label>Suggested supplier</label><select id="f-supplier"><option>No Preference</option><option>Suggested supplier</option></select></div>
+              </div>
+              <div class="frow">
+                <div class="field"><label>Contact / email</label><input type="email" id="f-contact" /></div>
+                <div class="field"><label>DOA approver</label><select id="f-prapprover"><option>Aaron Hoag</option><option>William Schreiber</option><option>Jeff Peroff</option></select></div>
+              </div>
+              <div class="field full"><label>Comments</label><textarea id="f-prdesc" placeholder="Background information or a summary of this purchase"></textarea></div>
+              <div class="attach-row">
+                <span class="attach-k">Attachments</span>
+                <button type="button" class="attach-add" id="pr-attach-drop">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                  Attach
+                </button>
+                <div class="file-chips" id="pr-attach-chips"></div>
+              </div>
+            </div></div>
+          </div>
+
+          <!-- Line items (each = its own line of work) -->
+          <div class="tab-panel" data-panel="lines">
+            <div id="line-list"></div>
+            <button class="add-rfq" id="add-lineitem-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add line item
+            </button>
+          </div>
+
+          <!-- Project control (per line) -->
+          <div class="tab-panel" data-panel="pc">
+            <div id="pc-line-list"></div>
+          </div>
+        </div>
+        <input type="file" id="file-input" multiple style="display:none" />
+        <input type="file" id="create-file-input" multiple style="display:none" />
+      </section>
+
+            <!-- ===== CREATE ===== -->
+      <section id="view-create" class="view">
+        <div class="detail-head">
+          <button class="back-btn" data-view="log" title="Back to log">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </button>
+          <div>
+            <div class="detail-id" style="font-family:var(--disp);letter-spacing:-.02em">New requisition</div>
+            <div class="detail-meta" id="create-proj-meta">Halifax Rapid Transit — PAA Phase · HaLRT</div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn btn-outline" data-view="log">Cancel</button>
+            <button class="btn btn-primary" id="submit-pr-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Submit PR
+            </button>
+          </div>
+        </div>
+
+        <div class="card form-card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div class="ch-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <h3>Request details</h3>
+          </div>
+          <div class="card-body">
+            <div class="create-grid">
+              <div class="field"><label>Request type</label><select id="c-reqtype"><option>Material</option><option>Service</option></select></div>
+              <div class="field"><label>Request date</label><input type="date" id="c-reqdate" /></div>
+              <div class="field"><label>Requester name</label><input type="text" id="c-requester" value="Mamon Abuhantash" /></div>
+              <div class="field"><label>Contact / email</label><input type="email" id="c-contact" value="mamon.abuhantash@halrt.ca" /></div>
+              <div class="field"><label>Phase / stage</label><select id="c-phase"><option>ADA Phase</option><option>PAA Phase</option></select></div>
+              <div class="field"><label>Category</label><select id="c-category"><option>Engineering/Subconsultant</option><option>General Expenses</option><option>Construction</option></select></div>
+              <div class="field"><label>Required on-site date</label><input type="date" id="c-onsite" /></div>
+              <div class="field"><label>Delivery location</label><input type="text" id="c-deliveryloc" placeholder="e.g. 100 King Street" /></div>
+              <div class="field"><label>Priority</label><select id="c-priority"><option>Routine</option><option>Urgent</option><option>Critical - Project Impact</option></select></div>
+              <div class="field"><label>Suggested supplier</label><select id="c-supplier"><option>No Preference</option><option>Suggested supplier</option></select></div>
+              <div class="field"><label>Approval to proceed</label><select id="c-proceed-approver"><option>Aaron Hoag</option><option>William Schreiber</option><option>Jeff Peroff</option></select></div>
+              <div class="field"><label>DOA approver</label><select id="c-doa-approver"><option>Aaron Hoag</option><option>William Schreiber</option><option>Jeff Peroff</option></select></div>
+            </div>
+            <div class="field full"><label>Comments</label><textarea id="c-prdesc" placeholder="Background information or a summary of this purchase"></textarea></div>
+            <div class="attach-row">
+              <span class="attach-k">Attachments</span>
+              <button type="button" class="attach-add" id="c-attach-drop">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                Attach
+              </button>
+              <div class="file-chips" id="c-attach-chips"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="ch-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+            <h3>Line items</h3>
+          </div>
+          <div class="lines-scroll">
+            <table class="lines">
+              <thead><tr>
+                <th></th><th style="min-width:180px">Description</th><th style="min-width:96px">UOM</th><th style="width:80px">Qty</th>
+                <th style="min-width:160px">Notes</th><th></th>
+              </tr></thead>
+              <tbody id="create-lines-body"></tbody>
+            </table>
+          </div>
+          <button class="add-line" id="create-add-line-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add line
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== SETTINGS ===== -->
+      <section id="view-settings" class="view">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Settings</div>
+          </div>
+          <div class="log-actions">
+            <button class="btn btn-primary" id="add-user-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+              Add user
+            </button>
+          </div>
+        </div>
+        <div class="settings-hint">Admins can add people, grant admin rights, and set each person's role per project.</div>
+        <div class="card add-user-card" id="add-user-card" style="display:none">
+          <div class="card-body">
+            <div class="au-grid">
+              <div class="field"><label>Full name</label><input type="text" id="au-name" placeholder="Jane Doe" /></div>
+              <div class="field"><label>Email</label><input type="email" id="au-email" placeholder="jane.doe@halrt.ca" /></div>
+              <div class="field"><label>Role</label><select id="au-role"><option value="member">Member</option><option value="admin">Admin</option></select></div>
+            </div>
+            <div class="au-actions">
+              <button class="btn btn-outline" id="au-cancel">Cancel</button>
+              <button class="btn btn-primary" id="au-save">Add user</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-card">
+          <table class="tbl users-tbl">
+            <thead><tr><th>User</th><th>Admin</th><th>HaLRT role</th><th>DNNP role</th><th></th></tr></thead>
+            <tbody id="users-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const UOM=["Each","m","m²","m³","kg","ton","lump sum","hour","day","set","lot"];
+  const SOURCING=["PO within AD Phase estimate","Alternative Procurement","Affiliate Subcontracting","Subcontractor/Vendor is not the lowest priced compliant bidder","Subconsultant"];
+  const BUYERS=["Ali","Amarachi","Unassigned"];
+  const APPROVERS=["Aaron Hoag","William Schreiber","Jeff Peroff"];
+  const BUDGET_STATUS=["Within Approved Budget","Requires Budget Adjustment"];
+  const PIPELINE=[
+    {key:"requester",label:"Requester enter PR"},
+    {key:"proceed",label:"Approval to Proceed"},
+    {key:"procurement",label:"Procurement adds info"},
+    {key:"pc",label:"Project controls adds info"},
+    {key:"doa",label:"DOA Approval"},
+    {key:"po",label:"PO created in SAP"}
+  ];
+  const STAGE_TO_PIPE={draft:0,pending_proceed:1,sourcing:2,project_control:3,pending_approval:4,approved:5,po_created:5,rejected:0,on_hold:2};
+
+  const PR_LABEL={draft:"Draft",submitted:"Submitted",in_procurement:"In procurement",approved:"Approved",rejected:"Rejected",onhold:"On Hold"};
+  const PR_CLASS={draft:"draft",submitted:"submitted",in_procurement:"onhold",approved:"approved",rejected:"rejected",onhold:"onhold"};
+  const STAGE_LABEL={draft:"Requester",pending_proceed:"Approval to proceed",sourcing:"Procurement",project_control:"Project control",pending_approval:"DOA approval",approved:"Approved",po_created:"PO created",rejected:"Rejected",on_hold:"On hold"};
+  const PILL_LABEL={draft:"Requester",pending_proceed:"Proceed",sourcing:"Procurement",project_control:"PC",pending_approval:"DOA",approved:"Approved",po_created:"PO created",rejected:"Rejected",on_hold:"On hold"};
+  const PRIO_CLASS={"Routine":"routine","Urgent":"urgent","Critical - Project Impact":"critical"};
+
+  const trash='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+  const chevron='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  const checkIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const clipIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>';
+  const xIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  const fileIco='<svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+
+  const projects=[
+    {id:"HaLRT",name:"Halifax Rapid Transit — PAA Phase"},
+    {id:"DNNP",name:"Darlington New Nuclear Project"}
+  ];
+  const CUR_USER={name:"Mamon Abuhantash"};
+
+  // ---- line item factory (each line item = its own unit of work) ----
+  let liSeq=100;
+  const li=(o)=>Object.assign({
+    id:"li"+(++liSeq),
+    desc:"",uom:"Each",qty:1,notes:"",
+    buyer:"Unassigned",vendor:"",poDesc:"",quoted:0,poNumber:"",sourcing:"PO within AD Phase estimate",leadTime:"",expDelivery:"",
+    attachments:{buyer:[],pc:[]},
+    nwaCode:"",origBudget:0,remBudget:0,budgetStatus:"Within Approved Budget",pcNotes:"",
+    proceed:"pending",proceedApprover:"Aaron Hoag",proceedComment:"",
+    stage:"draft",approver:"Aaron Hoag",comment:""
+  },o);
+
+  let prs=[
+    {id:"pr1",projectId:"HaLRT",prNumber:"PR-001",reqType:"Service",reqDate:"2026-06-12",requester:"Mamon Abuhantash",phase:"PAA Phase",category:"Engineering/Subconsultant",onsiteDate:"2026-06-18",deliveryLoc:"100 King Street",priority:"Routine",supplier:"No Preference",contact:"mamon.abuhantash@halrt.ca",
+      prDescription:"Signage design package for station wayfinding. Scope covers concept through IFC drawings for all ADA-phase platforms.",
+      attachmentsRequester:["Signage-spec.pdf"],
+      proceedApprover:"Aaron Hoag",prApprover:"Aaron Hoag",prStatus:"in_procurement",
+      lines:[ li({desc:"Signage design package",uom:"lump sum",qty:1,notes:"see attachment",buyer:"Ali",vendor:"AtkinsRéalis",poDesc:"Subconsultant design services — signage",quoted:58900,sourcing:"Subconsultant",leadTime:"3 weeks",expDelivery:"2026-07-10",nwaCode:"2200-1140",origBudget:60000,remBudget:41200,budgetStatus:"Within Approved Budget",pcNotes:"Budget confirmed against ADA design estimate.",proceed:"approved",stage:"pending_approval",approver:"Aaron Hoag"}) ]},
+
+    {id:"pr2",projectId:"HaLRT",prNumber:"PR-002",reqType:"Material",reqDate:"2026-06-05",requester:"Priya Nair",phase:"ADA Phase",category:"General Expenses",onsiteDate:"2026-06-20",deliveryLoc:"Site Trailer 3",priority:"Urgent",supplier:"Suggested supplier",contact:"priya.nair@halrt.ca",
+      prDescription:"Site trailer restock — stationery and break-room supplies for the ADA-phase crew.",
+      attachmentsRequester:[],
+      proceedApprover:"William Schreiber",prApprover:"William Schreiber",prStatus:"in_procurement",
+      lines:[
+        li({desc:"Markers",uom:"set",qty:4,buyer:"Amarachi",vendor:"Staples",poDesc:"Stationery",quoted:180,poNumber:"PO-44210",nwaCode:"1100-0500",origBudget:5000,remBudget:2600,proceed:"approved",stage:"approved",approver:"William Schreiber",comment:"Approved.",attachments:{buyer:["Staples-quote.pdf"],pc:[]}}),
+        li({desc:"Paper (letter)",uom:"lot",qty:2,buyer:"Amarachi",vendor:"Staples",poDesc:"Stationery",quoted:240,poNumber:"PO-44210",nwaCode:"1100-0500",origBudget:5000,remBudget:2600,proceed:"approved",stage:"approved",approver:"William Schreiber",comment:"Approved."}),
+        li({desc:"Coffee (bulk)",uom:"lot",qty:5,notes:"break room",buyer:"Ali",vendor:"Tim Hortons",poDesc:"Coffee & catering",quoted:300,sourcing:"PO within AD Phase estimate",leadTime:"2 days",expDelivery:"2026-06-14",nwaCode:"1100-0500",origBudget:5000,remBudget:2600,proceed:"approved",stage:"pending_approval",approver:"William Schreiber",attachments:{buyer:["TimH-comparison.xlsx"],pc:[]}}),
+        li({desc:"Cups & lids",uom:"set",qty:3,buyer:"Ali",vendor:"Tim Hortons",poDesc:"Coffee & catering",quoted:80,sourcing:"PO within AD Phase estimate",nwaCode:"1100-0500",origBudget:5000,remBudget:2600,proceed:"approved",stage:"sourcing",approver:"William Schreiber"})
+      ]},
+
+    {id:"pr3",projectId:"HaLRT",prNumber:"PR-003",reqType:"Service",reqDate:"2026-05-28",requester:"Devon Clarke",phase:"ADA Phase",category:"Construction",onsiteDate:"2026-07-01",deliveryLoc:"Site B — Laydown Yard",priority:"Critical - Project Impact",supplier:"No Preference",contact:"devon.clarke@halrt.ca",
+      prDescription:"Temporary shoring for the Site B excavation. Panels plus install labour; over original ADA estimate pending budget adjustment.",
+      attachmentsRequester:[],
+      proceedApprover:"Jeff Peroff",prApprover:"Jeff Peroff",prStatus:"onhold",
+      lines:[
+        li({desc:"Shoring panels",uom:"set",qty:12,buyer:"Ali",vendor:"M&G Steel",poDesc:"Temporary shoring",quoted:420000,sourcing:"Alternative Procurement",leadTime:"5 weeks",expDelivery:"2026-08-05",nwaCode:"3300-2210",origBudget:620000,remBudget:0,budgetStatus:"Requires Budget Adjustment",pcNotes:"Over estimate — escalated to Design & Construction Segment Integration Director.",proceed:"approved",stage:"on_hold",approver:"Jeff Peroff",comment:"On hold pending budget adjustment.",attachments:{buyer:[],pc:["Budget-status.pdf"]}}),
+        li({desc:"Install labour",uom:"day",qty:20,notes:"crew of 4",buyer:"Ali",vendor:"M&G Steel",poDesc:"Shoring install",quoted:221500,sourcing:"Alternative Procurement",leadTime:"5 weeks",nwaCode:"3300-2210",origBudget:620000,remBudget:0,budgetStatus:"Requires Budget Adjustment",pcNotes:"Over estimate — escalated to Design & Construction Segment Integration Director.",proceed:"approved",stage:"on_hold",approver:"Jeff Peroff",comment:"On hold pending budget adjustment."})
+      ]},
+
+    {id:"pr4",projectId:"HaLRT",prNumber:"PR-004",reqType:"Material",reqDate:"2026-05-20",requester:"Mamon Abuhantash",phase:"PAA Phase",category:"Construction",onsiteDate:"2026-06-01",deliveryLoc:"Site A — Main Gate",priority:"Routine",supplier:"No Preference",contact:"mamon.abuhantash@halrt.ca",
+      prDescription:"Perimeter safety fencing for Site A main gate. Standard site establishment item.",
+      attachmentsRequester:[],
+      proceedApprover:"Jeff Peroff",prApprover:"Jeff Peroff",prStatus:"draft",
+      lines:[ li({desc:"Safety fencing",uom:"m",qty:300,buyer:"Unassigned",nwaCode:"3300-1005",origBudget:22000,remBudget:22000,stage:"pending_proceed",proceed:"pending",proceedApprover:"Jeff Peroff",approver:"Jeff Peroff"}) ]},
+
+    {id:"pr5",projectId:"HaLRT",prNumber:"PR-005",reqType:"Service",reqDate:"2026-04-30",requester:"Priya Nair",phase:"ADA Phase",category:"Engineering/Subconsultant",onsiteDate:"2026-05-15",deliveryLoc:"N/A",priority:"Routine",supplier:"No Preference",contact:"priya.nair@halrt.ca",
+      prDescription:"Geotechnical site survey. Rejected as duplicate of PR-003 scope — returned to requester.",
+      attachmentsRequester:[],
+      proceedApprover:"Aaron Hoag",prApprover:"Aaron Hoag",prStatus:"rejected",
+      lines:[ li({desc:"Site survey",uom:"lump sum",qty:1,notes:"duplicate of PR-003 scope",buyer:"Ali",vendor:"GeoTech Solutions",poDesc:"Geotechnical survey",quoted:11800,sourcing:"Subconsultant",nwaCode:"2200-0980",origBudget:15000,remBudget:3200,proceed:"approved",stage:"rejected",approver:"Aaron Hoag",comment:"Duplicate of PR-003 scope."}) ]},
+
+    {id:"pr6",projectId:"DNNP",prNumber:"PR-101",reqType:"Material",reqDate:"2026-06-01",requester:"Jordan Lee",phase:"ADA Phase",category:"Construction",onsiteDate:"2026-06-25",deliveryLoc:"Warehouse 2",priority:"Routine",supplier:"No Preference",contact:"jordan.lee@dnnp.ca",
+      prDescription:"Warehouse pallet racking to free floor space ahead of the next material delivery wave.",
+      attachmentsRequester:[],
+      proceedApprover:"William Schreiber",prApprover:"William Schreiber",prStatus:"approved",
+      lines:[ li({desc:"Pallet racking",uom:"set",qty:6,buyer:"Amarachi",vendor:"Metric Storage Systems",poDesc:"Racking & shelving",quoted:3800,poNumber:"PO-51002",nwaCode:"4400-0330",origBudget:45000,remBudget:41000,proceed:"approved",stage:"approved",approver:"William Schreiber",comment:"Approved.",attachments:{buyer:["Racking-quote.pdf"],pc:[]}}) ]},
+
+    {id:"pr7",projectId:"DNNP",prNumber:"PR-102",reqType:"Service",reqDate:"2026-06-10",requester:"Casey Kim",phase:"PAA Phase",category:"General Expenses",onsiteDate:"2026-06-30",deliveryLoc:"N/A",priority:"Urgent",supplier:"No Preference",contact:"casey.kim@dnnp.ca",
+      prDescription:"SAT consultant training sessions for the PAA-phase operations team. Quote pending budget release.",
+      attachmentsRequester:[],
+      proceedApprover:"Jeff Peroff",prApprover:"Jeff Peroff",prStatus:"in_procurement",
+      lines:[ li({desc:"SAT training sessions",uom:"day",qty:8,buyer:"Ali",vendor:"KT Innovative Solutions",poDesc:"SAT consultant — training",quoted:46200,sourcing:"Subconsultant",leadTime:"1 week",expDelivery:"2026-06-28",nwaCode:"1100-0710",origBudget:50000,remBudget:4000,budgetStatus:"Requires Budget Adjustment",pcNotes:"Awaiting revised quote before budget release.",proceed:"approved",stage:"project_control",approver:"Jeff Peroff"}) ]}
+  ];
+
+  let users=[
+    {id:"u1",name:"Mamon Abuhantash",email:"mamon.abuhantash@halrt.ca",admin:true,access:{HaLRT:"buyer",DNNP:"none"}},
+    {id:"u2",name:"Aaron Hoag",email:"aaron.hoag@halrt.ca",admin:true,access:{HaLRT:"approver",DNNP:"approver"}},
+    {id:"u3",name:"Priya Nair",email:"priya.nair@halrt.ca",admin:false,access:{HaLRT:"requester",DNNP:"none"}},
+    {id:"u4",name:"Jordan Lee",email:"jordan.lee@dnnp.ca",admin:false,access:{HaLRT:"none",DNNP:"requester"}},
+    {id:"u5",name:"Casey Kim",email:"casey.kim@dnnp.ca",admin:false,access:{HaLRT:"viewer",DNNP:"viewer"}}
+  ];
+
+  let selectedProjectId="HaLRT", selectedPrId="pr1", prFilter="all", detailTab="request", dashRole="approver";
+  let createLines=[];
+  let createAttachments=[];
+
+  const $=id=>document.getElementById(id);
+  const money=n=>"$"+Number(n||0).toLocaleString("en-CA");
+  const esc=s=>String(s==null?"":s).replace(/"/g,"&quot;").replace(/</g,"&lt;");
+  const projName=id=>{const p=projects.find(x=>x.id===id);return p?p.name:id;};
+
+  const prTotal=pr=>{const q=pr.lines.reduce((s,l)=>s+(l.quoted||0),0);return q||pr.origBudget||0;};
+  const lineNo=(pr,l)=>pr.lines.indexOf(l)+1;
+  const firstDesc=pr=>pr.lines.length>1?`${pr.lines[0].desc} <span class="cell-mut">+${pr.lines.length-1} more</span>`:(pr.lines[0]?pr.lines[0].desc:"—");
+  const linesApproved=pr=>pr.lines.filter(l=>l.stage==="approved").length;
+  const allApproved=pr=>pr.lines.length>0 && pr.lines.every(l=>l.stage==="approved");
+  const needsAction=l=>l.stage==="pending_proceed"||l.stage==="pending_approval";
+  const pendingWith=pr=>{
+    const l=pr.lines.find(needsAction);
+    if(l) return l.stage==="pending_proceed"?l.proceedApprover:l.approver;
+    if(allApproved(pr)&&pr.prStatus!=="approved") return pr.prApprover;
+    return "—";
+  };
+
+  function toast(msg,err){const t=$("toast");$("toast-msg").textContent=msg;t.classList.toggle("error",!!err);t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),2600);}
+
+  function setView(name){
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    $("view-"+name).classList.add("active");
+    const navName=(name==="detail"||name==="create")?"log":name;
+    document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===navName));
+    $("content").scrollTop=0;$("app").classList.remove("nav-open");
+    if(name==="dashboard")renderDashboard();
+    if(name==="log")renderLog();
+    if(name==="detail"){detailTab="request";loadDetail();setDetailTab("request");}
+    if(name==="create")resetCreate();
+    if(name==="settings")renderUsers();
+  }
+
+  function syncProjSelect(){const sel=$("proj-switch");sel.innerHTML=projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join("");sel.value=selectedProjectId;}
+  const prPill=s=>`<span class="pill ${PR_CLASS[s]}">${PR_LABEL[s]}</span>`;
+  const stagePill=s=>`<span class="stage-pill stage-${s}">${PILL_LABEL[s]||STAGE_LABEL[s]}</span>`;
+
+  // ===================== DASHBOARD =====================
+  function renderDashboard(){
+    $("kpi-projects").textContent=projects.length;
+    $("kpi-total").textContent=prs.length;
+    const pend=prs.reduce((s,p)=>s+p.lines.filter(needsAction).length,0);
+    $("kpi-pending").textContent=pend;
+    const openVal=prs.filter(p=>p.prStatus!=="rejected").reduce((s,p)=>s+prTotal(p),0);
+    $("kpi-value").textContent=openVal>=1000?"$"+Math.round(openVal/1000)+"K":money(openVal);
+    $("dt-appr-num").textContent=pend;
+    $("viewas-select").value=dashRole;
+    renderDashPanel();
+  }
+  function renderDashPanel(){
+    document.querySelectorAll("#dash-tabs .tab").forEach(t=>t.classList.toggle("active",t.dataset.dtab===dashRole));
+    const panel=$("dash-panel");
+    panel.innerHTML=dashRole==="approver"?dashApprover():dashRole==="buyer"?dashBuyer():dashRequester();
+  }
+  function emptyRow(cols,msg){return `<tr><td colspan="${cols}"><div class="empty" style="padding:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div>${msg}</div></div></td></tr>`;}
+
+  function dashApprover(){
+    const rows=[];
+    prs.forEach(p=>p.lines.forEach(l=>{if(needsAction(l))rows.push({p,l});}));
+    const slice=rows.slice(0,4);
+    const body=slice.length?slice.map(({p,l})=>{
+      const who=l.stage==="pending_proceed"?l.proceedApprover:l.approver;
+        const kind=l.stage==="pending_proceed"?"Approval to proceed":"DOA approval";
+      return `<tr data-open-pr="${p.id}">
+        <td><span class="pr-code">${p.prNumber} · L${lineNo(p,l)}</span></td>
+        <td class="cell-strong">${l.desc}<div class="cell-mut">${kind} · ${l.vendor||"vendor TBD"}</div></td>
+        <td class="cell-mut">${who}</td>
+        <td class="num cell-money">${money(l.quoted||0)}</td>
+        <td class="num"><button class="aq-approve" data-dash-approve="${p.id}:${l.id}">${checkIco}Approve</button></td>
+      </tr>`;}).join(""):emptyRow(5,"You're all caught up — nothing waiting on your approval.");
+    return `<table class="tbl"><thead><tr><th>PR # · Line</th><th>Description</th><th>Pending with</th><th class="num">Value</th><th></th></tr></thead><tbody>${body}</tbody></table>`;
+  }
+
+  function dashBuyer(){
+    const rows=[];prs.forEach(p=>p.lines.forEach(l=>rows.push({p,l})));
+    const unassigned=rows.filter(x=>x.l.buyer==="Unassigned"||!x.l.buyer);
+    const slice=rows.slice(0,5);
+    const body=slice.map(({p,l})=>{
+      const bp=(l.buyer==="Unassigned"||!l.buyer)?`<span class="buyer-pill unassigned">Unassigned</span>`:`<span class="buyer-pill">${l.buyer}</span>`;
+      return `<tr data-open-pr="${p.id}">
+        <td><span class="pr-code">${p.prNumber} · L${lineNo(p,l)}</span></td>
+        <td class="cell-strong">${l.desc}<div class="cell-mut">${l.vendor||"vendor TBD"} · ${p.projectId}</div></td>
+        <td>${bp}</td>
+        <td class="num cell-money">${money(l.quoted||0)}</td>
+        <td>${stagePill(l.stage)}</td>
+      </tr>`;}).join("");
+    return `<div class="pool-summary">
+        <div class="pool-stat"><b>${rows.length}</b> line items</div>
+        <div class="pool-stat"><b>${unassigned.length}</b> unassigned (to pick)</div>
+        <div class="pool-stat"><b>${rows.filter(x=>x.l.stage==="approved").length}</b> approved</div>
+      </div>
+      <table class="tbl"><thead><tr><th>PR # · Line</th><th>Item / vendor</th><th>Buyer</th><th class="num">Value</th><th>Stage</th></tr></thead><tbody>${body}</tbody></table>`;
+  }
+
+  function dashRequester(){
+    const mine=prs.filter(p=>p.requester===CUR_USER.name).slice(0,4);
+    const body=mine.length?mine.map(p=>`
+      <tr data-open-pr="${p.id}">
+        <td><span class="pr-code">${p.prNumber}</span></td>
+        <td class="cell-strong">${firstDesc(p)}</td>
+        <td class="cell-mut">${linesApproved(p)}/${p.lines.length} lines approved</td>
+        <td class="cell-mut">${pendingWith(p)}</td>
+        <td>${prPill(p.prStatus)}</td>
+      </tr>`).join(""):emptyRow(5,"You haven't submitted any requisitions yet.");
+    return `<table class="tbl"><thead><tr><th>PR #</th><th>Description</th><th>Lines</th><th>Pending with</th><th>Status</th></tr></thead><tbody>${body}</tbody></table>`;
+  }
+
+  // ===================== PR LOG =====================
+  function renderLog(){
+    syncProjSelect();
+    const q=($("log-search").value||"").toLowerCase();
+    let rows=prs.filter(p=>p.projectId===selectedProjectId);
+    if(prFilter!=="all")rows=rows.filter(p=>p.prStatus===prFilter);
+    if(q)rows=rows.filter(p=>p.prNumber.toLowerCase().includes(q)||p.requester.toLowerCase().includes(q)||p.lines.some(l=>l.desc.toLowerCase().includes(q)));
+    document.querySelectorAll("#filters .chip").forEach(c=>{
+      const f=c.dataset.filter,base=prs.filter(p=>p.projectId===selectedProjectId);
+      const n=f==="all"?base.length:base.filter(p=>p.prStatus===f).length;
+      let el=c.querySelector(".c-num");if(!el){el=document.createElement("span");el.className="c-num";c.appendChild(el);}el.textContent=n;
+    });
+    const body=$("log-body");
+    if(!rows.length){body.innerHTML=`<tr><td colspan="8"><div class="empty" style="padding:40px">No requisitions match this filter.</div></td></tr>`;return;}
+    body.innerHTML=rows.map(p=>`
+      <tr data-open-pr="${p.id}">
+        <td><span class="pr-code">${p.prNumber}</span></td>
+        <td class="cell-strong">${firstDesc(p)}</td>
+        <td class="cell-mut">${p.requester}</td>
+        <td class="cell-mut">${p.lines.length}</td>
+        <td class="num cell-money">${money(prTotal(p))}</td>
+        <td class="cell-mut">${pendingWith(p)}</td>
+        <td>${prPill(p.prStatus)}</td>
+        <td class="num"><span class="chev">${chevron}</span></td>
+      </tr>`).join("");
+  }
+
+  // ===================== DETAIL =====================
+  function loadDetail(){
+    const p=prs.find(x=>x.id===selectedPrId);if(!p)return;
+    selectedProjectId=p.projectId;syncProjSelect();
+    $("d-id").textContent=`${p.projectId} · ${p.prNumber}`;
+    $("d-meta").textContent=`Requested by ${p.requester}`;
+    $("pr-prefix").textContent=p.projectId+" –";
+    $("f-prnum").value=p.prNumber;$("f-reqtype").value=p.reqType;$("f-reqdate").value=p.reqDate;$("f-requester").value=p.requester;
+    $("f-phase").value=p.phase;$("f-category").value=p.category;$("f-onsite").value=p.onsiteDate;
+    $("f-deliveryloc").value=p.deliveryLoc;$("f-priority").value=p.priority;$("f-supplier").value=p.supplier;$("f-contact").value=p.contact;
+    $("f-prapprover").value=p.prApprover;$("f-prdesc").value=p.prDescription||"";
+    $("m-status").textContent=PR_LABEL[p.prStatus];$("m-category").textContent=p.category;
+    $("m-rfqs").textContent=`${linesApproved(p)} / ${p.lines.length}`;$("m-total").textContent=money(prTotal(p));
+    $("tab-line-num").textContent=p.lines.length;
+    applyStatusTint(p);renderPipeline(p);renderPrAttach(p);renderLines(p);renderPcLines(p);updateApproveAll(p);
+  }
+  function applyStatusTint(p){
+    const TINTS=["tint-draft","tint-submitted","tint-approved","tint-rejected","tint-onhold"];
+    const card=$("m-status-card");
+    const tintKey={draft:"draft",submitted:"submitted",in_procurement:"onhold",approved:"approved",rejected:"rejected",onhold:"onhold"}[p.prStatus];
+    TINTS.forEach(t=>card.classList.remove(t));
+    card.classList.add("tint-"+tintKey);
+  }
+  function displayStage(l){return (l.stage==="approved"&&l.poNumber)?"po_created":l.stage;}
+  function linePipeIndex(l){
+    if(l.stage==="rejected")return 0;
+    if(l.stage==="approved")return 5;
+    return STAGE_TO_PIPE[l.stage]??0;
+  }
+  function pipelineIndex(p){
+    const active=p.lines.filter(l=>l.stage!=="on_hold");
+    const src=active.length?active:p.lines;
+    if(!src.length)return 0;
+    return Math.min(...src.map(linePipeIndex));
+  }
+  function renderPipeline(p){
+    const current=pipelineIndex(p);
+    const allPo=p.lines.length>0 && p.lines.every(l=>l.stage==="approved"&&l.poNumber);
+    const returned=p.prStatus==="rejected"||p.lines.some(l=>l.stage==="rejected");
+    $("pr-pipeline").innerHTML=`<div class="pipeline-track">${PIPELINE.map((s,i)=>{
+        let cls="upcoming";
+        if(allPo||i<current)cls="done";
+        else if(i===current)cls=returned?"returned":"current";
+        return `<div class="tl-step ${cls}"><div class="tl-dot">${(allPo||i<current)?"✓":i+1}</div><div class="tl-lab">${s.label}</div></div>`;
+      }).join("")}</div>`;
+  }
+  function canApproveLine(l){return l.stage==="pending_proceed"||l.stage==="pending_approval";}
+  function updateApproveAll(p){
+    const n=p.lines.filter(canApproveLine).length;
+    const btn=$("approve-all-btn");
+    btn.disabled=n===0;
+    btn.innerHTML=`${checkIco}Approve all${n?` (${n})`:""}`;
+  }
+  function linePrimaryBtn(l){
+    if(l.stage==="pending_proceed") return `<button class="li-approve" data-li-act="proceed:${l.id}">${checkIco}Approve</button>`;
+    if(l.stage==="sourcing") return `<button class="btn-proc" data-li-act="proc_done:${l.id}">Procurement done</button>`;
+    if(l.stage==="project_control") return `<button class="btn-proc" data-li-act="submit_doa:${l.id}">Send to DOA</button>`;
+    if(l.stage==="pending_approval") return `<button class="li-approve" data-li-act="approve:${l.id}">${checkIco}Approve</button>`;
+    return "";
+  }
+  function lineHeadActions(l,withDel){
+    return `<div class="rfq-right ${withDel===false?"no-del":""}">${stagePill(displayStage(l))}<div class="rfq-act">${linePrimaryBtn(l)}</div>${withDel===false?"":`<button class="line-del" data-li-del="${l.id}" title="Remove line item">${trash}</button>`}</div>`;
+  }
+  function optList(arr,cur){return arr.map(o=>`<option ${o===cur?"selected":""}>${o}</option>`).join("");}
+  function attachSlot(l,k,lab){
+    const files=(l.attachments&&l.attachments[k])||[];
+    return `<div class="attach-row">
+      <span class="attach-k">${lab}</span>
+      <button type="button" class="attach-add" data-li-drop="${l.id}:${k}">${clipIco}Attach</button>
+      ${files.map((f,i)=>`<span class="file-chip">${fileIco}${esc(f)}<button class="fx" data-li-remove="${l.id}:${k}:${i}">${xIco}</button></span>`).join("")}
+    </div>`;
+  }
+  function procInlineFields(l){
+    return `<div class="rfq-inline line-cols">
+      <div class="ih-field ih-w-desc"><span class="ih-lab">Description</span><input type="text" class="li-desc" value="${esc(l.desc)}" placeholder="What is being requested"/></div>
+      <div class="ih-field ih-w-buyer"><span class="ih-lab">Buyer</span><select class="li-buyer">${optList(BUYERS,l.buyer)}</select></div>
+      <div class="ih-field ih-w-vendor"><span class="ih-lab">Vendor</span><input type="text" class="li-vendor" value="${esc(l.vendor)}" placeholder="Supplier"/></div>
+      <div class="ih-field ih-w-amt"><span class="ih-lab">Amount</span><input class="mono li-quoted" type="number" value="${l.quoted||0}"/></div>
+      <div class="ih-field ih-w-po"><span class="ih-lab">PO number</span><input class="mono li-ponum" type="text" value="${esc(l.poNumber)}" placeholder="SAP PO"/></div>
+      <div class="ih-field ih-w-date"><span class="ih-lab">Expected delivery</span><input type="date" class="li-expdelivery" value="${esc(l.expDelivery)}"/></div>
+    </div>`;
+  }
+  function pcInlineFields(l){
+    return `<div class="rfq-inline pc-cols">
+      <div class="ih-field ih-w-desc"><span class="ih-lab">Description</span><input type="text" value="${esc(l.desc)}" readonly style="background:var(--bg)"/></div>
+      <div class="ih-field ih-w-md"><span class="ih-lab">NWA / CBS</span><input class="mono li-nwa" type="text" value="${esc(l.nwaCode)}" placeholder="2200-1140"/></div>
+      <div class="ih-field ih-w-md"><span class="ih-lab">Original budget</span><input class="mono li-origbudget" type="number" value="${l.origBudget||0}"/></div>
+      <div class="ih-field ih-w-md"><span class="ih-lab">Remaining budget</span><input class="mono li-rembudget" type="number" value="${l.remBudget||0}"/></div>
+      <div class="ih-field ih-w-src"><span class="ih-lab">Budget status</span><select class="li-budgetstatus">${optList(BUDGET_STATUS,l.budgetStatus)}</select></div>
+    </div>`;
+  }
+  function renderLines(p){
+    $("line-list").innerHTML=p.lines.map((l,i)=>`<div class="rfq-card" data-li="${l.id}">
+        <div class="rfq-head" data-li-toggle="${l.id}">
+          <svg class="rfq-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          ${procInlineFields(l)}
+          ${lineHeadActions(l)}
+        </div>
+        <div class="rfq-body">
+          <div>
+            <div class="rfq-section-label">Line details</div>
+            <div class="frow">
+              <div class="field"><label>UOM</label><select class="li-uom">${optList(UOM,l.uom)}</select></div>
+              <div class="field"><label>Quantity</label><input type="number" class="li-qty" value="${l.qty}" min="0"/></div>
+            </div>
+            <div class="frow" style="margin-top:10px">
+              <div class="field"><label>PO description</label><input type="text" class="li-podesc" value="${esc(l.poDesc)}"/></div>
+              <div class="field"><label>Sourcing method</label><select class="li-sourcing">${optList(SOURCING,l.sourcing)}</select></div>
+            </div>
+            <div class="frow" style="margin-top:10px">
+              <div class="field"><label>Lead time</label><input type="text" class="li-leadtime" value="${esc(l.leadTime)}" placeholder="e.g. 2 weeks"/></div>
+              <div class="field"><label>Notes</label><input type="text" class="li-notes" value="${esc(l.notes)}"/></div>
+            </div>
+          </div>
+          <div class="li-attach">
+            ${attachSlot(l,"buyer","Buyer comparison")}
+            ${attachSlot(l,"pc","Project control")}
+          </div>
+        </div>
+      </div>`).join("");
+  }
+  function renderPcLines(p){
+    $("pc-line-list").innerHTML=p.lines.map((l,i)=>`<div class="rfq-card" data-li="${l.id}">
+        <div class="rfq-head" data-li-toggle="${l.id}">
+          <svg class="rfq-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          ${pcInlineFields(l)}
+          <div class="rfq-right no-del">${stagePill(displayStage(l))}<div class="rfq-act">${linePrimaryBtn(l)}</div></div>
+        </div>
+        <div class="rfq-body">
+          <div>
+            <div class="rfq-section-label">Project control details</div>
+            <div class="field full"><label>PC notes</label><textarea class="li-pcnotes">${esc(l.pcNotes)}</textarea></div>
+          </div>
+          ${attachSlot(l,"pc","Attachments")}
+        </div>
+      </div>`).join("");
+  }
+  function renderPrAttach(p){
+    const files=p.attachmentsRequester||[];
+    $("pr-attach-chips").innerHTML=files.map((f,i)=>`<span class="file-chip">${fileIco}${esc(f)}<button class="fx" data-pr-remove="${i}">${xIco}</button></span>`).join("");
+  }
+  function commitLineEdits(p){
+    p.lines.forEach(l=>{
+      const lineCard=document.querySelector(`#line-list .rfq-card[data-li="${l.id}"]`);
+      const pcCard=document.querySelector(`#pc-line-list .rfq-card[data-li="${l.id}"]`);
+      const val=(card,sel)=>{if(!card)return null;const el=card.querySelector(sel);return el==null?null:el.value;};
+      const take=(card,sel,fn)=>{const v=val(card,sel);if(v!==null)fn(v);};
+      take(lineCard,".li-desc",v=>l.desc=v.trim());
+      take(lineCard,".li-uom",v=>l.uom=v);
+      take(lineCard,".li-qty",v=>l.qty=Number(v)||0);
+      take(lineCard,".li-notes",v=>l.notes=v.trim());
+      take(lineCard,".li-buyer",v=>l.buyer=v);
+      take(lineCard,".li-vendor",v=>l.vendor=v.trim());
+      take(lineCard,".li-podesc",v=>l.poDesc=v.trim());
+      take(lineCard,".li-quoted",v=>l.quoted=Number(v)||0);
+      take(lineCard,".li-ponum",v=>l.poNumber=v.trim());
+      take(lineCard,".li-sourcing",v=>l.sourcing=v);
+      take(lineCard,".li-leadtime",v=>l.leadTime=v.trim());
+      take(lineCard,".li-expdelivery",v=>l.expDelivery=v);
+      take(pcCard,".li-nwa",v=>l.nwaCode=v.trim());
+      take(pcCard,".li-origbudget",v=>l.origBudget=Number(v)||0);
+      take(pcCard,".li-rembudget",v=>l.remBudget=Number(v)||0);
+      take(pcCard,".li-budgetstatus",v=>l.budgetStatus=v);
+      take(pcCard,".li-pcnotes",v=>l.pcNotes=v);
+    });
+  }
+  function refreshPrRollup(p){
+    if(p.lines.every(l=>l.stage==="approved"))p.prStatus="approved";
+    else if(p.lines.some(l=>l.stage==="on_hold"))p.prStatus="onhold";
+    else if(p.lines.every(l=>l.stage==="rejected"))p.prStatus="rejected";
+    else if(p.lines.every(l=>l.stage==="draft"))p.prStatus="draft";
+    else if(p.lines.every(l=>l.stage==="draft"||l.stage==="pending_proceed"))p.prStatus="submitted";
+    else p.prStatus="in_procurement";
+  }
+  function refreshDetail(){
+    const stay=detailTab;
+    loadDetail();
+    setDetailTab(stay);
+  }
+  function saveDetail(){
+    const p=prs.find(x=>x.id===selectedPrId);if(!p)return;
+    const num=$("f-prnum").value.trim();if(!num){toast("PR number can't be blank.",true);return;}
+    p.prNumber=num;p.reqType=$("f-reqtype").value;p.reqDate=$("f-reqdate").value;p.requester=$("f-requester").value.trim();
+    p.phase=$("f-phase").value;p.category=$("f-category").value;p.onsiteDate=$("f-onsite").value;
+    p.deliveryLoc=$("f-deliveryloc").value.trim();p.priority=$("f-priority").value;p.supplier=$("f-supplier").value;p.contact=$("f-contact").value.trim();
+    p.prApprover=$("f-prapprover").value;p.prDescription=$("f-prdesc").value.trim();
+    commitLineEdits(p);
+    p.lines=p.lines.filter(l=>l.desc);
+    if(!p.lines.length){toast("A PR needs at least one line item.",true);return;}
+    refreshPrRollup(p);toast("Changes saved.");setView("log");
+  }
+  function setDetailTab(tab){detailTab=tab;document.querySelectorAll("#detail-tabs .tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===tab));document.querySelectorAll(".tab-panel").forEach(pl=>pl.classList.toggle("active",pl.dataset.panel===tab));}
+
+  function lineAction(act,lid){
+    const p=prs.find(x=>x.id===selectedPrId);if(!p)return;
+    const l=p.lines.find(x=>x.id===lid);if(!l)return;
+    commitLineEdits(p);
+    const cmtEl=document.querySelector(`[data-li-comment="${lid}"]`);const cmt=cmtEl?cmtEl.value.trim():"";
+    const nm="Line "+(p.lines.indexOf(l)+1);
+    if(act==="submit_proceed"){l.stage="pending_proceed";toast(nm+" submitted for approval to proceed.");}
+    else if(act==="proceed"){l.proceed="approved";l.proceedComment=cmt;l.stage="sourcing";toast(nm+" approved to proceed — procurement can add info.");}
+    else if(act==="proc_done"){l.stage="project_control";toast(nm+" sent to Project Control.");}
+    else if(act==="submit_doa"){l.stage="pending_approval";toast(nm+" submitted for DOA approval.");}
+    else if(act==="approve"){l.stage="approved";l.comment=cmt;toast(nm+" DOA approved.");}
+    else if(act==="hold"){l.stage="on_hold";l.comment=cmt;toast(nm+" put on hold.");}
+    else if(act==="reject"){
+      const prev={pending_proceed:"draft",sourcing:"pending_proceed",project_control:"sourcing",pending_approval:"project_control"};
+      const back=prev[l.stage]||"draft";
+      if(l.stage==="pending_proceed")l.proceed="pending";
+      l.comment=cmt||l.proceedComment;
+      l.stage=back;
+      toast(nm+" rejected — returned to "+STAGE_LABEL[back]+".");
+    }
+    refreshPrRollup(p);refreshDetail();
+  }
+  function approveAll(){
+    const p=prs.find(x=>x.id===selectedPrId);if(!p)return;
+    commitLineEdits(p);
+    const pending=p.lines.filter(canApproveLine);
+    if(!pending.length){toast("No line items are waiting for approval.",true);return;}
+    pending.forEach(l=>{
+      if(l.stage==="pending_proceed"){l.proceed="approved";l.stage="sourcing";}
+      else if(l.stage==="pending_approval"){l.stage="approved";}
+    });
+    refreshPrRollup(p);refreshDetail();
+    toast(pending.length+" line"+(pending.length!==1?"s":"")+" approved.");
+  }
+
+  // ---- attachments ----
+  let attachTarget=null;
+  function addFiles(lid,stage,names){
+    const p=prs.find(x=>x.id===selectedPrId);if(!p)return;
+    if(lid==="pr"){
+      p.attachmentsRequester=(p.attachmentsRequester||[]).concat(names);
+      renderPrAttach(p);
+      toast(names.length+" file"+(names.length!==1?"s":"")+" attached.");
+      return;
+    }
+    const l=p.lines.find(x=>x.id===lid);if(!l)return;
+    if(!l.attachments)l.attachments={buyer:[],pc:[]};
+    l.attachments[stage]=(l.attachments[stage]||[]).concat(names);
+    commitLineEdits(p);renderLines(p);renderPcLines(p);
+    document.querySelectorAll(`.rfq-card[data-li="${lid}"]`).forEach(c=>c.classList.add("open"));
+    toast(names.length+" file"+(names.length!==1?"s":"")+" attached.");
+  }
+
+  // ===================== CREATE =====================
+  function renderCreateLines(){
+    $("create-lines-body").innerHTML=createLines.map((l,i)=>`
+      <tr>
+        <td class="rownum">${i+1}</td>
+        <td><input type="text" class="l-desc" value="${esc(l.desc)}" placeholder="Item description"/></td>
+        <td><select class="l-uom">${optList(UOM,l.uom)}</select></td>
+        <td><input type="number" class="l-qty" value="${l.qty}" min="0"/></td>
+        <td><input type="text" class="l-notes" value="${esc(l.notes)}"/></td>
+        <td><button type="button" class="line-del" data-cdel="${i}">${trash}</button></td>
+      </tr>`).join("");
+  }
+  function renderCreateAttach(){
+    $("c-attach-chips").innerHTML=createAttachments.map((f,i)=>`<span class="file-chip">${fileIco}${esc(f)}<button class="fx" data-c-remove="${i}">${xIco}</button></span>`).join("");
+  }
+  function readCreateLines(){return [...$("create-lines-body").querySelectorAll("tr")].map(r=>({desc:r.querySelector(".l-desc").value.trim(),uom:r.querySelector(".l-uom").value,qty:Number(r.querySelector(".l-qty").value)||0,notes:r.querySelector(".l-notes").value.trim()}));}
+  function resetCreate(){
+    syncProjSelect();$("create-proj-meta").textContent=`${projName(selectedProjectId)} · ${selectedProjectId}`;
+    $("c-reqdate").value="2026-06-18";$("c-prdesc").value="";createAttachments=[];renderCreateAttach();
+    createLines=[{desc:"",uom:"Each",qty:1,notes:""}];renderCreateLines();
+  }
+  function submitPr(){
+    const rows=readCreateLines().filter(l=>l.desc);
+    if(!rows.length){toast("Add at least one line item with a description.",true);return;}
+    const proceedWho=$("c-proceed-approver").value;
+    const doaWho=$("c-doa-approver").value;
+    const count=prs.filter(x=>x.projectId===selectedProjectId).length;const id="pr"+(prs.length+1);
+    prs.push({id,projectId:selectedProjectId,prNumber:"PR-"+String(count+1).padStart(3,"0"),
+      reqType:$("c-reqtype").value,reqDate:$("c-reqdate").value||"2026-06-18",requester:$("c-requester").value.trim()||"Requester",
+      phase:$("c-phase").value,category:$("c-category").value,onsiteDate:$("c-onsite").value,deliveryLoc:$("c-deliveryloc").value.trim(),
+      priority:$("c-priority").value,supplier:$("c-supplier").value,contact:$("c-contact").value.trim(),
+      prDescription:$("c-prdesc").value.trim(),attachmentsRequester:createAttachments.slice(),
+      proceedApprover:proceedWho,prApprover:doaWho,prStatus:"submitted",
+      lines:rows.map(r=>li(Object.assign({buyer:"Unassigned",stage:"pending_proceed",proceed:"pending",proceedApprover:proceedWho,approver:doaWho},r)))
+    });
+    $("nav-log-count").textContent=prs.length;selectedPrId=id;
+    toast("PR submitted — waiting on approval to proceed.");setView("detail");
+  }
+
+  // ===================== SETTINGS =====================
+  function accessSel(uid,proj,val){const opt=(v,l)=>`<option value="${v}" ${v===val?"selected":""}>${l}</option>`;return `<select class="access-sel ${val==="none"?"none":""}" data-access="${uid}" data-proj="${proj}">${opt("none","No access")}${opt("requester","Requester")}${opt("buyer","Buyer")}${opt("approver","Approver")}${opt("viewer","Viewer")}</select>`;}
+  function renderUsers(){
+    $("users-body").innerHTML=users.map(u=>{
+      const initials=u.name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+      return `<tr>
+        <td><div style="display:flex;align-items:center;gap:11px"><div class="avatar" style="width:32px;height:32px;font-size:12px">${initials}</div><div class="u-cell"><b>${u.name}${u.admin?'<span class="admin-badge">ADMIN</span>':""}</b><span>${u.email}</span></div></div></td>
+        <td><label class="switch"><input type="checkbox" data-admin="${u.id}" ${u.admin?"checked":""}/><span class="sl"></span></label></td>
+        <td>${accessSel(u.id,"HaLRT",u.access.HaLRT)}</td>
+        <td>${accessSel(u.id,"DNNP",u.access.DNNP)}</td>
+        <td class="num"><button class="u-remove" data-remove="${u.id}" title="Remove user">${trash}</button></td>
+      </tr>`;
+    }).join("");
+  }
+
+  // ===================== EVENTS =====================
+  document.querySelectorAll("[data-view]").forEach(el=>el.addEventListener("click",()=>setView(el.dataset.view)));
+  $("proj-switch").addEventListener("change",e=>{selectedProjectId=e.target.value;renderLog();});
+  $("log-search").addEventListener("input",renderLog);
+  $("export-btn").addEventListener("click",()=>toast("Export queued — check your inbox."));
+  $("menu-btn").addEventListener("click",()=>$("app").classList.toggle("nav-open"));
+  $("scrim").addEventListener("click",()=>$("app").classList.remove("nav-open"));
+  document.querySelectorAll("#filters .chip").forEach(c=>c.addEventListener("click",()=>{document.querySelectorAll("#filters .chip").forEach(x=>x.classList.remove("active"));c.classList.add("active");prFilter=c.dataset.filter;renderLog();}));
+
+  document.querySelectorAll("#dash-tabs .tab").forEach(t=>t.addEventListener("click",()=>{dashRole=t.dataset.dtab;renderDashboard();}));
+  $("viewas-select").addEventListener("change",e=>{dashRole=e.target.value;renderDashboard();});
+  $("dash-panel").addEventListener("click",e=>{
+    const ap=e.target.closest("[data-dash-approve]");
+    if(ap){e.stopPropagation();const [pid,lid]=ap.dataset.dashApprove.split(":");const p=prs.find(x=>x.id===pid);const l=p&&p.lines.find(x=>x.id===lid);
+      if(l){if(l.stage==="pending_proceed"){l.proceed="approved";l.stage="sourcing";toast(p.prNumber+" · "+l.desc+" approved to proceed.");}else{l.stage="approved";toast(p.prNumber+" · "+l.desc+" approved.");}refreshPrRollup(p);renderDashboard();}return;}
+    const row=e.target.closest("[data-open-pr]");if(row){selectedPrId=row.dataset.openPr;setView("detail");}
+  });
+  $("log-body").addEventListener("click",e=>{const r=e.target.closest("[data-open-pr]");if(r){selectedPrId=r.dataset.openPr;setView("detail");}});
+
+  document.querySelectorAll("#detail-tabs .tab").forEach(t=>t.addEventListener("click",()=>setDetailTab(t.dataset.tab)));
+  $("save-btn").addEventListener("click",saveDetail);
+  $("approve-all-btn").addEventListener("click",approveAll);
+
+  function handleLineListClick(e){
+    const tog=e.target.closest("[data-li-toggle]");
+    if(tog && !e.target.closest("input,select,textarea,button,label,.ih-field,.rfq-right,.rfq-inline")){tog.closest(".rfq-card").classList.toggle("open");return;}
+    const del=e.target.closest("[data-li-del]");
+    if(del){e.stopPropagation();const p=prs.find(x=>x.id===selectedPrId);if(p.lines.length<=1){toast("A PR needs at least one line item.",true);return;}commitLineEdits(p);p.lines=p.lines.filter(x=>x.id!==del.dataset.liDel);$("tab-line-num").textContent=p.lines.length;$("m-total").textContent=money(prTotal(p));renderLines(p);renderPcLines(p);toast("Line item removed.");return;}
+    const act=e.target.closest("[data-li-act]");
+    if(act){const [a,lid]=act.dataset.liAct.split(":");lineAction(a,lid);return;}
+    const drop=e.target.closest("[data-li-drop]");
+    if(drop){attachTarget=drop.dataset.liDrop;$("file-input").click();return;}
+    const rm=e.target.closest("[data-li-remove]");
+    if(rm){const [lid,stage,idx]=rm.dataset.liRemove.split(":");const p=prs.find(x=>x.id===selectedPrId);const l=p.lines.find(x=>x.id===lid);l.attachments[stage].splice(+idx,1);renderLines(p);renderPcLines(p);document.querySelectorAll(`.rfq-card[data-li="${lid}"]`).forEach(c=>c.classList.add("open"));return;}
+  }
+  function bindDropzones(el){
+    el.addEventListener("click",handleLineListClick);
+    el.addEventListener("dragover",e=>{const dz=e.target.closest("[data-li-drop]");if(dz){e.preventDefault();dz.classList.add("drag");}});
+    el.addEventListener("dragleave",e=>{const dz=e.target.closest("[data-li-drop]");if(dz)dz.classList.remove("drag");});
+    el.addEventListener("drop",e=>{const dz=e.target.closest("[data-li-drop]");if(!dz)return;e.preventDefault();dz.classList.remove("drag");const [lid,stage]=dz.dataset.liDrop.split(":");const names=[...e.dataTransfer.files].map(f=>f.name);if(names.length)addFiles(lid,stage,names);});
+  }
+  bindDropzones($("line-list"));
+  bindDropzones($("pc-line-list"));
+  $("file-input").addEventListener("change",e=>{const names=[...e.target.files].map(f=>f.name);if(names.length&&attachTarget){const [lid,stage]=attachTarget.split(":");addFiles(lid,stage,names);}e.target.value="";attachTarget=null;});
+
+  $("pr-attach-drop").addEventListener("click",()=>{attachTarget="pr:requester";$("file-input").click();});
+  $("pr-attach-drop").addEventListener("dragover",e=>{e.preventDefault();e.currentTarget.classList.add("drag");});
+  $("pr-attach-drop").addEventListener("dragleave",e=>e.currentTarget.classList.remove("drag"));
+  $("pr-attach-drop").addEventListener("drop",e=>{e.preventDefault();e.currentTarget.classList.remove("drag");const names=[...e.dataTransfer.files].map(f=>f.name);if(names.length)addFiles("pr","requester",names);});
+  $("pr-attach-chips").addEventListener("click",e=>{const b=e.target.closest("[data-pr-remove]");if(!b)return;const p=prs.find(x=>x.id===selectedPrId);p.attachmentsRequester.splice(+b.dataset.prRemove,1);renderPrAttach(p);});
+
+  $("add-lineitem-btn").addEventListener("click",()=>{const p=prs.find(x=>x.id===selectedPrId);commitLineEdits(p);p.lines.push(li({buyer:"Unassigned",stage:"draft"}));$("tab-line-num").textContent=p.lines.length;renderLines(p);renderPcLines(p);document.querySelector("#line-list .rfq-card:last-child").classList.add("open");toast("Line item added.");});
+
+  // Create
+  $("create-add-line-btn").addEventListener("click",()=>{createLines=readCreateLines();createLines.push({desc:"",uom:"Each",qty:1,notes:""});renderCreateLines();});
+  $("create-lines-body").addEventListener("click",e=>{const b=e.target.closest("[data-cdel]");if(!b)return;createLines=readCreateLines();createLines.splice(+b.dataset.cdel,1);renderCreateLines();});
+  $("submit-pr-btn").addEventListener("click",submitPr);
+  $("c-attach-drop").addEventListener("click",()=>$("create-file-input").click());
+  $("c-attach-drop").addEventListener("dragover",e=>{e.preventDefault();e.currentTarget.classList.add("drag");});
+  $("c-attach-drop").addEventListener("dragleave",e=>e.currentTarget.classList.remove("drag"));
+  $("c-attach-drop").addEventListener("drop",e=>{e.preventDefault();e.currentTarget.classList.remove("drag");const names=[...e.dataTransfer.files].map(f=>f.name);if(names.length){createAttachments=createAttachments.concat(names);renderCreateAttach();toast(names.length+" file"+(names.length!==1?"s":"")+" attached.");}});
+  $("create-file-input").addEventListener("change",e=>{const names=[...e.target.files].map(f=>f.name);if(names.length){createAttachments=createAttachments.concat(names);renderCreateAttach();}e.target.value="";});
+  $("c-attach-chips").addEventListener("click",e=>{const b=e.target.closest("[data-c-remove]");if(!b)return;createAttachments.splice(+b.dataset.cRemove,1);renderCreateAttach();});
+
+  // Settings
+  $("add-user-btn").addEventListener("click",()=>{const c=$("add-user-card");c.style.display=c.style.display==="none"?"block":"none";if(c.style.display==="block"){$("au-name").value="";$("au-email").value="";$("au-role").value="member";$("au-name").focus();}});
+  $("au-cancel").addEventListener("click",()=>$("add-user-card").style.display="none");
+  $("au-save").addEventListener("click",()=>{const name=$("au-name").value.trim(),email=$("au-email").value.trim();if(!name||!email){toast("Enter a name and email.",true);return;}users.push({id:"u"+(users.length+1),name,email,admin:$("au-role").value==="admin",access:{HaLRT:"requester",DNNP:"none"}});$("add-user-card").style.display="none";renderUsers();toast(name.split(" ")[0]+" added.");});
+  $("users-body").addEventListener("change",e=>{const a=e.target.closest("[data-admin]");if(a){const u=users.find(x=>x.id===a.dataset.admin);u.admin=a.checked;renderUsers();toast(u.name.split(" ")[0]+(u.admin?" is now an admin.":" is no longer an admin."));return;}const s=e.target.closest("[data-access]");if(s){const u=users.find(x=>x.id===s.dataset.access);u.access[s.dataset.proj]=s.value;s.classList.toggle("none",s.value==="none");}});
+  $("users-body").addEventListener("click",e=>{const r=e.target.closest("[data-remove]");if(!r)return;const u=users.find(x=>x.id===r.dataset.remove);users=users.filter(x=>x.id!==r.dataset.remove);renderUsers();toast(u.name.split(" ")[0]+" removed.");});
+
+  // init
+  syncProjSelect();renderDashboard();
+</script>
+</body>
+</html>

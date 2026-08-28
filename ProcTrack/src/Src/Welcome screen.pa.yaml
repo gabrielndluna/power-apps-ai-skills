@@ -481,7 +481,7 @@ Screens:
                               RadiusBottomRight: =5
                               RadiusTopLeft: =5
                               RadiusTopRight: =5
-                              Width: =420
+                              Width: =540
                             Children:
                               - all_packages:
                                   Control: Button@0.0.45
@@ -541,6 +541,21 @@ Screens:
                                     LayoutMinWidth: =16
                                     OnSelect: =Set(varPackageFilter, "at_risk")
                                     Text: ="At Risk"
+                                    X: =40
+                                    Y: =40
+                              - archived_packages:
+                                  Control: Button@0.0.45
+                                  Properties:
+                                    Appearance: =If(varPackageFilter = "archived", "Primary", "Outline")
+                                    BasePaletteColor: =If(varPackageFilter = "archived", RGBA(214, 12, 48, 1), RGBA(255, 255, 255, 1))
+                                    BorderColor: =If(varPackageFilter = "archived", RGBA(192, 0, 0, 1), RGBA(180, 180, 180, 1))
+                                    BorderThickness: =0
+                                    FontColor: =If(varPackageFilter = "archived", RGBA(255, 255, 255, 1), RGBA(0, 0, 0, 1))
+                                    Height: =40
+                                    LayoutMinHeight: =16
+                                    LayoutMinWidth: =16
+                                    OnSelect: =Set(varPackageFilter, "archived")
+                                    Text: ="Archived"
                                     X: =40
                                     Y: =40
                         - Container1:
@@ -838,6 +853,16 @@ Screens:
                                       {
                                           _base: Filter(
                                               colProjectPackages,
+                                              (
+                                                  (
+                                                      varPackageFilter = "archived" &&
+                                                      archived = true
+                                                  ) ||
+                                                  (
+                                                      varPackageFilter <> "archived" &&
+                                                      archived <> true
+                                                  )
+                                              ) &&
                                               (
                                                   IsBlank(_q) ||
                                                   _q in packagedescription ||
@@ -1158,6 +1183,7 @@ Screens:
                                         comments:                           ThisItem.comments,
                                         sole_source:                        ThisItem.sole_source,
                                         packagefolderurl:                   ThisItem.packagefolderurl,
+                                        archived:                           ThisItem.archived,
 
                                         procpackageleadname:                ThisItem.procpackageleadname,
                                         procurementpackageleadid:           ThisItem.procurementpackageleadid,

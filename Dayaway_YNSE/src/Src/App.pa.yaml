@@ -108,12 +108,34 @@ App:
       Set(varDetailApproverComments, "");
       Set(varLeaveTime, "Full Day");
 
-      Set(varEmployeeRecord, LookUp(colEmployees, Email = User().Email));
+      Set(
+          varEmployeeRecord,
+          LookUp(
+              colEmployees,
+              Lower(Trim(Email)) = Lower(Trim(User().Email))
+          )
+      );
       Set(SelectedProject, varEmployeeRecord.'Project Name');
       Set(Selected_ProjectID, varEmployeeRecord.Project);
       Set(varHourThreshold, Coalesce(varEmployeeRecord.'Total Vacation Days', 0));
-      Set(varApproverEmail, Coalesce(varEmployeeRecord.'Approver Email', ""));
-      Set(varApproverName, Coalesce(varEmployeeRecord.'Approver Name', ""));
+      Set(varApproverEmail, Coalesce(Trim(varEmployeeRecord.'Approver Email'), ""));
+      Set(
+          varApproverName,
+          Coalesce(
+              Trim(varEmployeeRecord.'Approver Name'),
+              If(
+                  IsBlank(varApproverEmail),
+                  "",
+                  Trim(
+                      LookUp(
+                          colEmployees,
+                          Lower(Trim(Email)) = Lower(Trim(varApproverEmail))
+                      ).Title
+                  )
+              ),
+              ""
+          )
+      );
 
       ClearCollect(
           colPublic_Holidays,
@@ -149,7 +171,7 @@ App:
           !IsBlank(
               LookUp(
                   colEmployees,
-                  'Approver Email' = User().Email
+                  Lower(Trim('Approver Email')) = Lower(Trim(User().Email))
               )
           )
       );

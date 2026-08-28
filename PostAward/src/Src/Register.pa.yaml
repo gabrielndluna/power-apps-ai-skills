@@ -12,7 +12,8 @@ Screens:
       Fill: =RGBA(245, 245, 245, 1)
       LoadingSpinnerColor: =RGBA(214, 12, 48, 1)
       OnVisible: |-
-        =Set(varShowAddSub, false);
+        =Set(varShowAddSub, Coalesce(varPendingOpenAddSub, false));
+        Set(varPendingOpenAddSub, false);
         Set(varShowSettings, false);
         Set(varShowValidationErrors, false);
         If(
@@ -59,31 +60,43 @@ Screens:
                         {
                             approvedSum: Coalesce(
                                 Sum(
-                                    Filter(
-                                        colProjectChanges,
-                                        subcontractid = s.packageidentifier && status.Value = "Approved"
+                                    AddColumns(
+                                        Filter(
+                                            colProjectChanges,
+                                            subcontractid = s.packageidentifier && status.Value = "Approved"
+                                        ),
+                                        _amt,
+                                        Coalesce(finalvalue, value)
                                     ),
-                                    value
+                                    _amt
                                 ),
                                 0
                             ),
                             pendingSum: Coalesce(
                                 Sum(
-                                    Filter(
-                                        colProjectChanges,
-                                        subcontractid = s.packageidentifier && status.Value = "Pending"
+                                    AddColumns(
+                                        Filter(
+                                            colProjectChanges,
+                                            subcontractid = s.packageidentifier && status.Value = "Pending"
+                                        ),
+                                        _amt,
+                                        Coalesce(finalvalue, value)
                                     ),
-                                    value
+                                    _amt
                                 ),
                                 0
                             ),
                             potentialSum: Coalesce(
                                 Sum(
-                                    Filter(
-                                        colProjectChanges,
-                                        subcontractid = s.packageidentifier && status.Value = "Potential"
+                                    AddColumns(
+                                        Filter(
+                                            colProjectChanges,
+                                            subcontractid = s.packageidentifier && status.Value = "Potential"
+                                        ),
+                                        _amt,
+                                        Coalesce(finalvalue, value)
                                     ),
-                                    value
+                                    _amt
                                 ),
                                 0
                             )
@@ -112,7 +125,7 @@ Screens:
                             futureLiab: pendingSum + potentialSum,
                             eac: Coalesce(s.originalvalue, 0) + approvedSum + pendingSum + potentialSum,
                             isOver: Coalesce(s.invoicedtodate, 0) > (Coalesce(s.originalvalue, 0) + approvedSum),
-                            isClosed: !s.currentlyactive || s.closeoutstatus.Value = "Closed",
+                            isClosed: s.closeoutstatus.Value = "Closed",
                             changeCount: CountRows(
                                 Filter(colProjectChanges, subcontractid = s.packageidentifier)
                             )
@@ -204,7 +217,8 @@ Screens:
                                   Properties:
                                     Color: =RGBA(255, 255, 255, 1)
                                     Height: =20
-                                    Icon: =Icon.Text
+                                    Icon: =Icon.Home
+                                    OnSelect: =Navigate(Home, ScreenTransition.Fade)
                                     Width: =20
                                     X: =8
                                     Y: =8
@@ -442,31 +456,43 @@ Screens:
                                         {
                                         approvedSum: Coalesce(
                                         Sum(
+                                        AddColumns(
                                         Filter(
                                         colProjectChanges,
                                         subcontractid = s.packageidentifier && status.Value = "Approved"
                                         ),
-                                        value
+                                        _amt,
+                                        Coalesce(finalvalue, value)
+                                        ),
+                                        _amt
                                         ),
                                         0
                                         ),
                                         pendingSum: Coalesce(
                                         Sum(
+                                        AddColumns(
                                         Filter(
                                         colProjectChanges,
                                         subcontractid = s.packageidentifier && status.Value = "Pending"
                                         ),
-                                        value
+                                        _amt,
+                                        Coalesce(finalvalue, value)
+                                        ),
+                                        _amt
                                         ),
                                         0
                                         ),
                                         potentialSum: Coalesce(
                                         Sum(
+                                        AddColumns(
                                         Filter(
                                         colProjectChanges,
                                         subcontractid = s.packageidentifier && status.Value = "Potential"
                                         ),
-                                        value
+                                        _amt,
+                                        Coalesce(finalvalue, value)
+                                        ),
+                                        _amt
                                         ),
                                         0
                                         )
@@ -495,7 +521,7 @@ Screens:
                                         futureLiab: pendingSum + potentialSum,
                                         eac: Coalesce(s.originalvalue, 0) + approvedSum + pendingSum + potentialSum,
                                         isOver: Coalesce(s.invoicedtodate, 0) > (Coalesce(s.originalvalue, 0) + approvedSum),
-                                        isClosed: !s.currentlyactive || s.closeoutstatus.Value = "Closed",
+                                        isClosed: s.closeoutstatus.Value = "Closed",
                                         changeCount: CountRows(
                                         Filter(colProjectChanges, subcontractid = s.packageidentifier)
                                         )
@@ -852,7 +878,7 @@ Screens:
                                 )
                               Size: =10
                               Text: |-
-                                ="RESP. CA" & If(varSortColumn = "responsibleca", If(varSortAscending, " ^", " v"), "")
+                                ="CONTRACT ADMIN" & If(varSortColumn = "responsibleca", If(varSortAscending, " ^", " v"), "")
                         - reg_h_orig:
                             Control: Label@2.5.1
                             Properties:
@@ -1518,6 +1544,9 @@ Screens:
                                                 currentlyactive: true,
                                                 holdback: {Value: "Applicable"},
                                                 closeoutstatus: {Value: "In progress"},
+                                                currencycode: {Value: "CAD"},
+                                                indigenouscontribution: {Value: "0"},
+                                                worktype: {Value: "Consulting"},
                                                 invoicedtodate: 0
                                             }
                                               );
@@ -1599,9 +1628,9 @@ Screens:
                       Properties:
                         Color: =RGBA(108, 113, 118, 1)
                         Font: =Font.'Segoe UI'
-                        Height: =70
+                        Height: =90
                         Size: =12
-                        Text: ="Permissions use ProcTrack - Permissions. XLS opens the SharePoint subcontracts list for Export to Excel. ProcTrack package fields stay read-only in PostAward."
+                        Text: ="Permissions use ProcTrack - Permissions. Operational Owners listed on a subcontract get automatic view access to that project. XLS opens the SharePoint list for Excel export. ProcTrack package fields stay read-only in PostAward."
                         Wrap: =true
                   - reg_settings_close:
                       Control: Classic/Button@2.2.0

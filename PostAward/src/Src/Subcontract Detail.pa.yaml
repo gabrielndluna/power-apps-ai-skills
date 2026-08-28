@@ -17,6 +17,7 @@ Screens:
         Set(varDeletingChange, false);
         Set(varCaFreeText, false);
         Set(varBackupCaFreeText, false);
+        Set(varOwnerFreeText, false);
         ClearCollect(
             colSubChanges,
             Filter(
@@ -26,19 +27,19 @@ Screens:
         );
         Set(
             varApprovedSum,
-            Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved"), value), 0)
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved"), _amt, Coalesce(finalvalue, value)), _amt), 0)
         );
         Set(
             varPendingSum,
-            Coalesce(Sum(Filter(colSubChanges, status.Value = "Pending"), value), 0)
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Pending"), _amt, Coalesce(finalvalue, value)), _amt), 0)
         );
         Set(
             varPotentialSum,
-            Coalesce(Sum(Filter(colSubChanges, status.Value = "Potential"), value), 0)
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Potential"), _amt, Coalesce(finalvalue, value)), _amt), 0)
         );
         Set(
             varRejectedSum,
-            Coalesce(Sum(Filter(colSubChanges, status.Value = "Rejected"), value), 0)
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Rejected"), _amt, Coalesce(finalvalue, value)), _amt), 0)
         );
         Set(varCurrentValue, Coalesce(varSelectedSubcontract.originalvalue, 0) + varApprovedSum);
         Set(varFutureLiab, varPendingSum + varPotentialSum);
@@ -49,49 +50,31 @@ Screens:
         );
         Set(
             varIsClosed,
-            !varSelectedSubcontract.currentlyactive ||
             varSelectedSubcontract.closeoutstatus.Value = "Closed"
         );
         Set(
             varReasonDesign,
-            Coalesce(
-                Sum(
-                    Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"),
-                    value
-                ),
-                0
-            )
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), _amt, Coalesce(finalvalue, value)), _amt), 0)
         );
         Set(
             varReasonScope,
-            Coalesce(
-                Sum(
-                    Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"),
-                    value
-                ),
-                0
-            )
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), _amt, Coalesce(finalvalue, value)), _amt), 0)
         );
         Set(
             varReasonVar,
-            Coalesce(
-                Sum(
-                    Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"),
-                    value
-                ),
-                0
-            )
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), _amt, Coalesce(finalvalue, value)), _amt), 0)
         );
         Set(
             varReasonAccel,
-            Coalesce(
-                Sum(
-                    Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"),
-                    value
-                ),
-                0
-            )
-        )
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), _amt, Coalesce(finalvalue, value)), _amt), 0)
+        );
+        Set(
+            varReasonNewScope,
+            Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "New Scope"), _amt, Coalesce(finalvalue, value)), _amt), 0)
+        );
+        Set(varPctComplete, Min(100, Round(Coalesce(varSelectedSubcontract.invoicedtodate, 0) / Max(varCurrentValue, 1) * 100, 0)));
+        Set(varRollMaxStatus, Max(Abs(varApprovedSum), Abs(varPendingSum), Abs(varPotentialSum), Abs(varRejectedSum), 1));
+        Set(varRollMaxReason, Max(Abs(varReasonDesign), Abs(varReasonScope), Abs(varReasonVar), Abs(varReasonAccel), Abs(varReasonNewScope), 1))
     Children:
       - det_root:
           Control: GroupContainer@1.5.0
@@ -264,7 +247,7 @@ Screens:
                 Properties:
                   DropShadow: =DropShadow.None
                   FillPortions: =0
-                  Height: =58
+                  Height: =72
                   LayoutAlignItems: =LayoutAlignItems.Center
                   LayoutDirection: =LayoutDirection.Horizontal
                   LayoutGap: =10
@@ -306,6 +289,60 @@ Screens:
                               Height: =24
                               Size: =16
                               Text: =If(varIsOver, "Over Budget", If(varIsClosed, "Closed-out", "Active"))
+                  - det_pct_block:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutMinHeight: =48
+                        LayoutMinWidth: =140
+                        Width: =140
+                      Children:
+                        - det_pct_label:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(144, 151, 168, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =14
+                              Size: =9
+                              Text: ="% COMPLETE"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =140
+                              Wrap: =false
+                        - det_pct_value:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(27, 27, 27, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =20
+                              Size: =14
+                              Text: =Text(varPctComplete, "0") & "%"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =140
+                        - det_pct_track:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(228, 228, 228, 1)
+                              FillPortions: =0
+                              Height: =6
+                              Width: =140
+                            Children:
+                              - det_pct_fill:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Fill: =RGBA(214, 12, 48, 1)
+                                    Height: =6
+                                    Text: =""
+                                    Width: =Max(2, 140 * varPctComplete / 100)
+                                    X: =0
+                                    Y: =0
                   - det_metrics:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
@@ -347,7 +384,7 @@ Screens:
                                     FontWeight: =FontWeight.Bold
                                     Height: =14
                                     Size: =9
-                                    Text: ="ORIGINAL"
+                                    Text: ="ORIGINAL (" & Coalesce(varSelectedSubcontract.currencycode.Value, "CAD") & ")"
                               - det_m_orig_v:
                                   Control: Label@2.5.1
                                   Properties:
@@ -558,7 +595,7 @@ Screens:
                               Height: =28
                               PaddingLeft: =10
                               Size: =11
-                              Text: ="SUBCONTRACT BASICS"
+                              Text: ="SUBCONTRACT DETAILS"
                               VerticalAlign: =VerticalAlign.Middle
                               Width: =392
                         - det_basics_body:
@@ -569,7 +606,7 @@ Screens:
                               FillPortions: =1
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutGap: =8
+                              LayoutGap: =6
                               LayoutMinHeight: =280
                               PaddingBottom: =12
                               PaddingLeft: =10
@@ -766,44 +803,359 @@ Screens:
                                     VerticalAlign: =VerticalAlign.Middle
                                     Wrap: =false
                                     Width: =372
-                              - det_l_start:
-                                  Control: Label@2.5.1
+                              - det_row_dates:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
                                   Properties:
-                                    Color: =RGBA(60, 65, 71, 1)
-                                    Font: =Font.'Segoe UI'
-                                    FontWeight: =FontWeight.Semibold
-                                    Height: =14
-                                    Size: =10
-                                    Text: ="Start Date"
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =52
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =52
                                     Width: =372
-                              - det_start:
-                                  Control: Classic/DatePicker@2.6.0
+                                  Children:
+                                    - det_col_start:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =52
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          Width: =182
+                                        Children:
+                                          - det_l_start:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(60, 65, 71, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                Size: =10
+                                                Text: ="Start Date"
+                                                Width: =182
+                                          - det_start_wrap:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =36
+                                                Width: =182
+                                              Children:
+                                                - det_start:
+                                                    Control: Classic/DatePicker@2.6.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(201, 207, 210, 1)
+                                                      DefaultDate: =varSelectedSubcontract.startdate
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Width: =180
+                                                      X: =1
+                                                      Y: =1
+                                    - det_col_end:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =52
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          Width: =182
+                                        Children:
+                                          - det_l_end:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(60, 65, 71, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                Size: =10
+                                                Text: ="Subcontract End Date"
+                                                Width: =182
+                                          - det_end_wrap:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =36
+                                                Width: =182
+                                              Children:
+                                                - det_end:
+                                                    Control: Classic/DatePicker@2.6.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(201, 207, 210, 1)
+                                                      DefaultDate: =varSelectedSubcontract.completiondate
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Width: =180
+                                                      X: =1
+                                                      Y: =1
+                              - det_row_revised_sap:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
                                   Properties:
-                                    BorderColor: =RGBA(201, 207, 210, 1)
-                                    DefaultDate: =varSelectedSubcontract.startdate
-                                    DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
-                                    Font: =Font.'Segoe UI'
-                                    Height: =34
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =52
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =52
                                     Width: =372
-                              - det_l_end:
-                                  Control: Label@2.5.1
+                                  Children:
+                                    - det_col_revised:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =52
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          Width: =182
+                                        Children:
+                                          - det_l_revised:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(60, 65, 71, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                Size: =10
+                                                Text: ="Revised End Date"
+                                                Width: =182
+                                          - det_revised_wrap:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =36
+                                                Width: =182
+                                              Children:
+                                                - det_revised:
+                                                    Control: Classic/DatePicker@2.6.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(201, 207, 210, 1)
+                                                      DefaultDate: =varSelectedSubcontract.revisedenddate
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Width: =180
+                                                      X: =1
+                                                      Y: =1
+                                    - det_col_sap:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =52
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          Width: =182
+                                        Children:
+                                          - det_l_sap:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(60, 65, 71, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                Size: =10
+                                                Text: ="SAP Vendor Number"
+                                                Width: =182
+                                          - det_sap_wrap:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =36
+                                                Width: =182
+                                              Children:
+                                                - det_sap:
+                                                    Control: Classic/TextInput@2.3.2
+                                                    Properties:
+                                                      BorderColor: =RGBA(201, 207, 210, 1)
+                                                      Default: =varSelectedSubcontract.sapvendornumber
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Size: =11
+                                                      Width: =180
+                                                      X: =1
+                                                      Y: =1
+                              - det_row_currency_indigenous:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
                                   Properties:
-                                    Color: =RGBA(60, 65, 71, 1)
-                                    Font: =Font.'Segoe UI'
-                                    FontWeight: =FontWeight.Semibold
-                                    Height: =14
-                                    Size: =10
-                                    Text: ="Completion"
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =52
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =52
                                     Width: =372
-                              - det_end:
-                                  Control: Classic/DatePicker@2.6.0
+                                  Children:
+                                    - det_col_currency:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =52
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          Width: =182
+                                        Children:
+                                          - det_l_currency:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(60, 65, 71, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                Size: =10
+                                                Text: ="Currency"
+                                                Width: =182
+                                          - det_currency_wrap:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =36
+                                                Width: =182
+                                              Children:
+                                                - det_currency:
+                                                    Control: Classic/DropDown@2.3.1
+                                                    Properties:
+                                                      AllowEmptySelection: =false
+                                                      Default: =Coalesce(varSelectedSubcontract.currencycode.Value, "CAD")
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Items: =["CAD", "USD"]
+                                                      Size: =11
+                                                      Width: =180
+                                                      X: =1
+                                                      Y: =1
+                                    - det_col_indigenous:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =52
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          Width: =182
+                                        Children:
+                                          - det_l_indigenous:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(60, 65, 71, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                Size: =10
+                                                Text: ="Indigenous Contribution %"
+                                                Width: =182
+                                          - det_indigenous_wrap:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =36
+                                                Width: =182
+                                              Children:
+                                                - det_indigenous:
+                                                    Control: Classic/DropDown@2.3.1
+                                                    Properties:
+                                                      AllowEmptySelection: =false
+                                                      Default: =Coalesce(varSelectedSubcontract.indigenouscontribution.Value, "0")
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Items: =["0", "5", "10", "15", "20", "25", "50", "100"]
+                                                      Size: =11
+                                                      Width: =180
+                                                      X: =1
+                                                      Y: =1
+                              - det_row_worktype:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
                                   Properties:
-                                    BorderColor: =RGBA(201, 207, 210, 1)
-                                    DefaultDate: =varSelectedSubcontract.completiondate
-                                    DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
-                                    Font: =Font.'Segoe UI'
-                                    Height: =34
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =52
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =52
                                     Width: =372
+                                  Children:
+                                    - det_col_worktype:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =52
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          Width: =182
+                                        Children:
+                                          - det_l_worktype:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(60, 65, 71, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                Size: =10
+                                                Text: ="Work Type"
+                                                Width: =182
+                                          - det_worktype_wrap:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =36
+                                                Width: =182
+                                              Children:
+                                                - det_worktype:
+                                                    Control: Classic/DropDown@2.3.1
+                                                    Properties:
+                                                      AllowEmptySelection: =false
+                                                      Default: =Coalesce(varSelectedSubcontract.worktype.Value, "Boots on ground")
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Items: =["Boots on ground", "Supply only", "Consulting"]
+                                                      Size: =11
+                                                      Width: =180
+                                                      X: =1
+                                                      Y: =1
                         - det_people_head:
                             Control: Label@2.5.1
                             Properties:
@@ -881,7 +1233,7 @@ Screens:
                                                       FontWeight: =FontWeight.Semibold
                                                       Height: =16
                                                       Size: =10
-                                                      Text: ="Resp. CA"
+                                                      Text: ="Contract Admin"
                                                       VerticalAlign: =VerticalAlign.Middle
                                                 - det_ca_mode:
                                                     Control: Classic/Button@2.2.0
@@ -1054,6 +1406,122 @@ Screens:
                                                       Width: =182
                                                       X: =0
                                                       Y: =0
+                              - det_row_owner:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =56
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =56
+                                    Width: =372
+                                  Children:
+                                    - det_col_owner:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =56
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                          Width: =372
+                                        Children:
+                                          - det_owner_header:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =16
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutGap: =4
+                                                Width: =372
+                                              Children:
+                                                - det_l_owner:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =RGBA(60, 65, 71, 1)
+                                                      FillPortions: =1
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =16
+                                                      Size: =10
+                                                      Text: ="Operational Owner"
+                                                      VerticalAlign: =VerticalAlign.Middle
+                                                - det_owner_mode:
+                                                    Control: Classic/Button@2.2.0
+                                                    Properties:
+                                                      BorderThickness: =0
+                                                      Color: =RGBA(214, 12, 48, 1)
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.Disabled)
+                                                      Fill: =RGBA(0, 0, 0, 0)
+                                                      FillPortions: =0
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =16
+                                                      OnSelect: =Set(varOwnerFreeText, !varOwnerFreeText)
+                                                      Size: =9
+                                                      Text: =If(varOwnerFreeText, "Dir", "Type")
+                                                      Width: =36
+                                          - det_owner_fields:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =0
+                                                Height: =34
+                                                Width: =372
+                                              Children:
+                                                - det_owner_combo:
+                                                    Control: Classic/ComboBox@2.4.0
+                                                    Properties:
+                                                      BorderColor: =RGBA(201, 207, 210, 1)
+                                                      DefaultSelectedItems: |-
+                                                        =Table({DisplayName: varSelectedSubcontract.operationalowner})
+                                                      DisplayFields: =["DisplayName"]
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      IsSearchable: =true
+                                                      Items: |-
+                                                        =If(
+                                                            !IsBlank(Trim(Self.SearchText)),
+                                                            ShowColumns(
+                                                                Office365Users.SearchUser(
+                                                                    {searchTerm: Trim(Self.SearchText), top: 15}
+                                                                ),
+                                                                Id,
+                                                                DisplayName,
+                                                                Mail,
+                                                                UserPrincipalName,
+                                                                Department
+                                                            )
+                                                        )
+                                                      SearchFields: =["DisplayName", "Mail"]
+                                                      SelectMultiple: =false
+                                                      Size: =11
+                                                      Visible: =!varOwnerFreeText
+                                                      Width: =372
+                                                      X: =0
+                                                      Y: =0
+                                                - det_owner_txt:
+                                                    Control: Classic/TextInput@2.3.2
+                                                    Properties:
+                                                      BorderColor: =RGBA(201, 207, 210, 1)
+                                                      Default: =varSelectedSubcontract.operationalowner
+                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =34
+                                                      Size: =11
+                                                      Visible: =varOwnerFreeText
+                                                      Width: =372
+                                                      X: =0
+                                                      Y: =0
                               - det_row_active_hb:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -1157,7 +1625,7 @@ Screens:
                                                       Width: =182
                                                       X: =0
                                                       Y: =0
-                              - det_row_close_inv:
+                              - det_row_close:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
@@ -1181,7 +1649,7 @@ Screens:
                                           LayoutAlignItems: =LayoutAlignItems.Start
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutGap: =2
-                                          Width: =182
+                                          Width: =372
                                         Children:
                                           - det_l_close:
                                               Control: Label@2.5.1
@@ -1192,7 +1660,7 @@ Screens:
                                                 Height: =14
                                                 Size: =10
                                                 Text: ="Close-out Status"
-                                                Width: =182
+                                                Width: =372
                                           - det_close_wrap:
                                               Control: GroupContainer@1.5.0
                                               Variant: ManualLayout
@@ -1200,7 +1668,7 @@ Screens:
                                                 DropShadow: =DropShadow.None
                                                 FillPortions: =0
                                                 Height: =34
-                                                Width: =182
+                                                Width: =372
                                               Children:
                                                 - det_close:
                                                     Control: Classic/DropDown@2.3.1
@@ -1212,52 +1680,7 @@ Screens:
                                                       Height: =34
                                                       Items: =["In progress", "Close-out pending", "Holdback to process", "Closed"]
                                                       Size: =11
-                                                      Width: =182
-                                                      X: =0
-                                                      Y: =0
-                                    - det_col_inv:
-                                        Control: GroupContainer@1.5.0
-                                        Variant: AutoLayout
-                                        Properties:
-                                          AlignInContainer: =AlignInContainer.Start
-                                          DropShadow: =DropShadow.None
-                                          FillPortions: =0
-                                          Height: =52
-                                          LayoutAlignItems: =LayoutAlignItems.Start
-                                          LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutGap: =2
-                                          Width: =182
-                                        Children:
-                                          - det_l_inv:
-                                              Control: Label@2.5.1
-                                              Properties:
-                                                Color: =RGBA(60, 65, 71, 1)
-                                                Font: =Font.'Segoe UI'
-                                                FontWeight: =FontWeight.Semibold
-                                                Height: =14
-                                                Size: =10
-                                                Text: ="Invoiced to Date"
-                                                Width: =182
-                                          - det_inv_wrap:
-                                              Control: GroupContainer@1.5.0
-                                              Variant: ManualLayout
-                                              Properties:
-                                                DropShadow: =DropShadow.None
-                                                FillPortions: =0
-                                                Height: =34
-                                                Width: =182
-                                              Children:
-                                                - det_inv:
-                                                    Control: Classic/TextInput@2.3.2
-                                                    Properties:
-                                                      BorderColor: =RGBA(201, 207, 210, 1)
-                                                      Default: =Text(varSelectedSubcontract.invoicedtodate, "#,##0.00")
-                                                      DisplayMode: =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
-                                                      Font: =Font.'Segoe UI'
-                                                      Format: =TextFormat.Number
-                                                      Height: =34
-                                                      Size: =11
-                                                      Width: =182
+                                                      Width: =372
                                                       X: =0
                                                       Y: =0
                   - det_right:
@@ -1544,13 +1967,13 @@ Screens:
                                         Control: Label@2.5.1
                                         Properties:
                                           Align: =Align.Right
-                                          Color: =If(ThisItem.value < 0, RGBA(214, 12, 48, 1), RGBA(35, 38, 43, 1))
+                                          Color: =If(Coalesce(ThisItem.finalvalue, ThisItem.value) < 0, RGBA(214, 12, 48, 1), RGBA(35, 38, 43, 1))
                                           FillPortions: =0
                                           Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
                                           Height: =20
                                           Size: =11
-                                          Text: =Text(ThisItem.value, "$#,##0.00")
+                                          Text: =Text(Coalesce(ThisItem.finalvalue, ThisItem.value), "$#,##0.00")
                                           Width: =88
                                     - det_cr_st:
                                         Control: Label@2.5.1
@@ -1562,6 +1985,7 @@ Screens:
                                                 "Approved", RGBA(46, 158, 91, 1),
                                                 "Pending", RGBA(214, 154, 0, 1),
                                                 "Potential", RGBA(47, 111, 179, 1),
+                                                "Canceled", RGBA(108, 113, 118, 1),
                                                 RGBA(214, 12, 48, 1)
                                             )
                                           FillPortions: =0
@@ -1609,18 +2033,22 @@ Screens:
                                                     projectidentifier = varSelectedSubcontract.projectidentifier
                                                 )
                                             );
-                                            Set(varApprovedSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved"), value), 0));
-                                            Set(varPendingSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Pending"), value), 0));
-                                            Set(varPotentialSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Potential"), value), 0));
-                                            Set(varRejectedSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Rejected"), value), 0));
+                                            Set(varApprovedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                            Set(varPendingSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Pending"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                            Set(varPotentialSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Potential"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                            Set(varRejectedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Rejected"), _amt, Coalesce(finalvalue, value)), _amt), 0));
                                             Set(varCurrentValue, Coalesce(varSelectedSubcontract.originalvalue, 0) + varApprovedSum);
                                             Set(varFutureLiab, varPendingSum + varPotentialSum);
                                             Set(varEAC, varCurrentValue + varFutureLiab);
                                             Set(varIsOver, Coalesce(varSelectedSubcontract.invoicedtodate, 0) > varCurrentValue);
-                                            Set(varReasonDesign, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), value), 0));
-                                            Set(varReasonScope, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), value), 0));
-                                            Set(varReasonVar, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), value), 0));
-                                            Set(varReasonAccel, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), value), 0));
+                                            Set(varReasonDesign, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                            Set(varReasonScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                            Set(varReasonVar, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                            Set(varReasonAccel, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                            Set(varReasonNewScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "New Scope"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                            Set(varPctComplete, Min(100, Round(Coalesce(varSelectedSubcontract.invoicedtodate, 0) / Max(varCurrentValue, 1) * 100, 0)));
+                                            Set(varRollMaxStatus, Max(Abs(varApprovedSum), Abs(varPendingSum), Abs(varPotentialSum), Abs(varRejectedSum), 1));
+                                            Set(varRollMaxReason, Max(Abs(varReasonDesign), Abs(varReasonScope), Abs(varReasonVar), Abs(varReasonAccel), Abs(varReasonNewScope), 1));
                                             Set(varDeletingChange, false);
                                             Notify("Change deleted.", NotificationType.Success)
                                           Tooltip: ="Delete change"
@@ -1631,11 +2059,11 @@ Screens:
                             Properties:
                               DropShadow: =DropShadow.None
                               FillPortions: =0
-                              Height: =210
+                              Height: =240
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Horizontal
                               LayoutGap: =12
-                              LayoutMinHeight: =210
+                              LayoutMinHeight: =240
                               PaddingBottom: =10
                               PaddingLeft: =14
                               PaddingRight: =14
@@ -1676,10 +2104,11 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -1694,6 +2123,25 @@ Screens:
                                                 Size: =11
                                                 Text: ="Approved (" & CountRows(Filter(colSubChanges, status.Value = "Approved")) & ")"
                                                 VerticalAlign: =VerticalAlign.Middle
+                                          - det_rs_appr_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rs_appr_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(46, 158, 91, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varApprovedSum) / varRollMaxStatus)
+                                                      X: =0
+                                                      Y: =0
                                           - det_rs_appr_v:
                                               Control: Label@2.5.1
                                               Properties:
@@ -1706,18 +2154,18 @@ Screens:
                                                 Size: =11
                                                 Text: =Text(varApprovedSum, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
+                                                Width: =90
                                     - det_rs_pend:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -1732,6 +2180,25 @@ Screens:
                                                 Size: =11
                                                 Text: ="Pending (" & CountRows(Filter(colSubChanges, status.Value = "Pending")) & ")"
                                                 VerticalAlign: =VerticalAlign.Middle
+                                          - det_rs_pend_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rs_pend_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(214, 154, 0, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varPendingSum) / varRollMaxStatus)
+                                                      X: =0
+                                                      Y: =0
                                           - det_rs_pend_v:
                                               Control: Label@2.5.1
                                               Properties:
@@ -1744,18 +2211,18 @@ Screens:
                                                 Size: =11
                                                 Text: =Text(varPendingSum, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
+                                                Width: =90
                                     - det_rs_pot:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -1770,6 +2237,25 @@ Screens:
                                                 Size: =11
                                                 Text: ="Potential (" & CountRows(Filter(colSubChanges, status.Value = "Potential")) & ")"
                                                 VerticalAlign: =VerticalAlign.Middle
+                                          - det_rs_pot_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rs_pot_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(47, 111, 179, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varPotentialSum) / varRollMaxStatus)
+                                                      X: =0
+                                                      Y: =0
                                           - det_rs_pot_v:
                                               Control: Label@2.5.1
                                               Properties:
@@ -1782,18 +2268,18 @@ Screens:
                                                 Size: =11
                                                 Text: =Text(varPotentialSum, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
+                                                Width: =90
                                     - det_rs_rej:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -1808,6 +2294,25 @@ Screens:
                                                 Size: =11
                                                 Text: ="Rejected (" & CountRows(Filter(colSubChanges, status.Value = "Rejected")) & ")"
                                                 VerticalAlign: =VerticalAlign.Middle
+                                          - det_rs_rej_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rs_rej_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(214, 12, 48, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varRejectedSum) / varRollMaxStatus)
+                                                      X: =0
+                                                      Y: =0
                                           - det_rs_rej_v:
                                               Control: Label@2.5.1
                                               Properties:
@@ -1820,47 +2325,7 @@ Screens:
                                                 Size: =11
                                                 Text: =Text(varRejectedSum, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
-                                    - det_rs_tot:
-                                        Control: GroupContainer@1.5.0
-                                        Variant: AutoLayout
-                                        Properties:
-                                          DropShadow: =DropShadow.None
-                                          Fill: =RGBA(251, 251, 252, 1)
-                                          FillPortions: =0
-                                          Height: =26
-                                          LayoutAlignItems: =LayoutAlignItems.Center
-                                          LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
-                                          PaddingLeft: =10
-                                          PaddingRight: =10
-                                        Children:
-                                          - det_rs_tot_l:
-                                              Control: Label@2.5.1
-                                              Properties:
-                                                Color: =RGBA(35, 38, 43, 1)
-                                                FillPortions: =1
-                                                Font: =Font.'Segoe UI'
-                                                FontWeight: =FontWeight.Bold
-                                                Height: =20
-                                                Size: =11
-                                                Text: ="Approved to date"
-                                                VerticalAlign: =VerticalAlign.Middle
-                                          - det_rs_tot_v:
-                                              Control: Label@2.5.1
-                                              Properties:
-                                                Align: =Align.Right
-                                                Color: =RGBA(35, 38, 43, 1)
-                                                FillPortions: =0
-                                                Font: =Font.'Segoe UI'
-                                                FontWeight: =FontWeight.Bold
-                                                Height: =20
-                                                Size: =11
-                                                Text: =Text(varApprovedSum, "$#,##0.00")
-                                                VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
+                                                Width: =90
                               - det_roll_reason:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -1896,10 +2361,11 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -1914,6 +2380,25 @@ Screens:
                                                 Size: =11
                                                 Text: ="Design Change"
                                                 VerticalAlign: =VerticalAlign.Middle
+                                          - det_rr_design_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rr_design_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(214, 12, 48, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varReasonDesign) / varRollMaxReason)
+                                                      X: =0
+                                                      Y: =0
                                           - det_rr_design_v:
                                               Control: Label@2.5.1
                                               Properties:
@@ -1926,18 +2411,18 @@ Screens:
                                                 Size: =11
                                                 Text: =Text(varReasonDesign, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
+                                                Width: =90
                                     - det_rr_scope:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -1952,6 +2437,25 @@ Screens:
                                                 Size: =11
                                                 Text: ="Scope Gap"
                                                 VerticalAlign: =VerticalAlign.Middle
+                                          - det_rr_scope_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rr_scope_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(214, 12, 48, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varReasonScope) / varRollMaxReason)
+                                                      X: =0
+                                                      Y: =0
                                           - det_rr_scope_v:
                                               Control: Label@2.5.1
                                               Properties:
@@ -1964,18 +2468,18 @@ Screens:
                                                 Size: =11
                                                 Text: =Text(varReasonScope, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
+                                                Width: =90
                                     - det_rr_var:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -1990,6 +2494,25 @@ Screens:
                                                 Size: =11
                                                 Text: ="Variation"
                                                 VerticalAlign: =VerticalAlign.Middle
+                                          - det_rr_var_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rr_var_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(214, 12, 48, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varReasonVar) / varRollMaxReason)
+                                                      X: =0
+                                                      Y: =0
                                           - det_rr_var_v:
                                               Control: Label@2.5.1
                                               Properties:
@@ -2002,18 +2525,18 @@ Screens:
                                                 Size: =11
                                                 Text: =Text(varReasonVar, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
+                                                Width: =90
                                     - det_rr_accel:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -2028,6 +2551,25 @@ Screens:
                                                 Size: =11
                                                 Text: ="Acceleration"
                                                 VerticalAlign: =VerticalAlign.Middle
+                                          - det_rr_accel_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rr_accel_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(214, 12, 48, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varReasonAccel) / varRollMaxReason)
+                                                      X: =0
+                                                      Y: =0
                                           - det_rr_accel_v:
                                               Control: Label@2.5.1
                                               Properties:
@@ -2040,8 +2582,64 @@ Screens:
                                                 Size: =11
                                                 Text: =Text(varReasonAccel, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =110
-
+                                                Width: =90
+                                    - det_rr_newscope:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =0
+                                          Height: =28
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =28
+                                          PaddingLeft: =10
+                                          PaddingRight: =10
+                                        Children:
+                                          - det_rr_newscope_l:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(74, 79, 85, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Normal
+                                                Height: =20
+                                                Size: =11
+                                                Text: ="New Scope"
+                                                VerticalAlign: =VerticalAlign.Middle
+                                          - det_rr_newscope_bar:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: ManualLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                Fill: =RGBA(236, 238, 240, 1)
+                                                FillPortions: =0
+                                                Height: =10
+                                                Width: =120
+                                              Children:
+                                                - det_rr_newscope_fill:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Fill: =RGBA(214, 12, 48, 1)
+                                                      Height: =10
+                                                      Text: =""
+                                                      Width: =Max(4, 116 * Abs(varReasonNewScope) / varRollMaxReason)
+                                                      X: =0
+                                                      Y: =0
+                                          - det_rr_newscope_v:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Align: =Align.Right
+                                                Color: =RGBA(74, 79, 85, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =20
+                                                Size: =11
+                                                Text: =Text(varReasonNewScope, "$#,##0.00")
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Width: =90
                                     - det_rr_tot:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
@@ -2049,10 +2647,10 @@ Screens:
                                           DropShadow: =DropShadow.None
                                           Fill: =RGBA(251, 251, 252, 1)
                                           FillPortions: =0
-                                          Height: =26
+                                          Height: =28
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =26
+                                          LayoutMinHeight: =28
                                           PaddingLeft: =10
                                           PaddingRight: =10
                                         Children:
@@ -2077,7 +2675,7 @@ Screens:
                                                 FontWeight: =FontWeight.Bold
                                                 Height: =20
                                                 Size: =11
-                                                Text: =Text(varReasonDesign + varReasonScope + varReasonVar + varReasonAccel, "$#,##0.00")
+                                                Text: =Text(varReasonDesign + varReasonScope + varReasonVar + varReasonAccel + varReasonNewScope, "$#,##0.00")
                                                 VerticalAlign: =VerticalAlign.Middle
                                                 Width: =110
 
@@ -2138,6 +2736,16 @@ Screens:
                                       varBackupCaFreeText,
                                       Trim(det_backup_txt.Text),
                                       Coalesce(Trim(det_backup_combo.Selected.DisplayName), varSelectedSubcontract.backupca)
+                                  ),
+                                  ownerName: If(
+                                      varOwnerFreeText,
+                                      Trim(det_owner_txt.Text),
+                                      Coalesce(Trim(det_owner_combo.Selected.DisplayName), varSelectedSubcontract.operationalowner)
+                                  ),
+                                  ownerEmail: If(
+                                      varOwnerFreeText,
+                                      "",
+                                      Lower(Coalesce(det_owner_combo.Selected.Mail, det_owner_combo.Selected.UserPrincipalName))
                                   )
                               },
                               Patch(
@@ -2149,12 +2757,18 @@ Screens:
                                   {
                                       startdate: det_start.SelectedDate,
                                       completiondate: det_end.SelectedDate,
+                                      revisedenddate: det_revised.SelectedDate,
+                                      sapvendornumber: Trim(det_sap.Text),
+                                      currencycode: det_currency.SelectedText,
+                                      indigenouscontribution: det_indigenous.SelectedText,
+                                      worktype: det_worktype.SelectedText,
                                       responsibleca: caName,
                                       backupca: backupName,
+                                      operationalowner: ownerName,
+                                      operationalowneremail: ownerEmail,
                                       currentlyactive: det_active.SelectedText.Value = "Yes",
                                       holdback: det_hb.SelectedText,
-                                      closeoutstatus: det_close.SelectedText,
-                                      invoicedtodate: Value(det_inv.Text)
+                                      closeoutstatus: det_close.SelectedText
                                   }
                               );
                               Set(
@@ -2192,7 +2806,7 @@ Screens:
                 Properties:
                   DropShadow: =DropShadow.Regular
                   Fill: =RGBA(255, 255, 255, 1)
-                  Height: =460
+                  Height: =520
                   LayoutAlignItems: =LayoutAlignItems.Start
                   LayoutDirection: =LayoutDirection.Vertical
                   LayoutGap: =8
@@ -2204,7 +2818,7 @@ Screens:
                   RadiusBottomRight: =12
                   RadiusTopLeft: =12
                   RadiusTopRight: =12
-                  Width: =580
+                  Width: =600
                   X: =(Parent.Width - Self.Width) / 2
                   Y: =(Parent.Height - Self.Height) / 2
                 Children:
@@ -2218,8 +2832,78 @@ Screens:
                         Height: =26
                         Size: =16
                         Text: =If(IsBlank(varEditingChange), "Add Change", "Edit Change")
-                        Width: =548
-                  - det_cp_row_ref_date:
+                        Width: =568
+                  - det_cp_row_ref:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =56
+                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =4
+                        LayoutMinHeight: =56
+                        Width: =568
+                      Children:
+                        - det_cp_ref_header:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =16
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =4
+                              Width: =568
+                            Children:
+                              - det_cp_ref_l:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(60, 65, 71, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =14
+                                    Size: =10
+                                    Text: ="Ref No."
+                                    Width: =56
+                              - det_cp_ref_hint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    Color: =RGBA(144, 151, 168, 1)
+                                    Fill: =RGBA(236, 238, 240, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =16
+                                    Size: =10
+                                    Text: ="?"
+                                    Tooltip: ="Subcontractor Change notice number or Client Change number"
+                                    Width: =16
+                        - det_cp_ref_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =36
+                              Width: =568
+                            Children:
+                              - det_cp_ref:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    BorderColor: =RGBA(201, 207, 210, 1)
+                                    BorderThickness: =1
+                                    Default: =varEditingChange.refnumber
+                                    Font: =Font.'Segoe UI'
+                                    Height: =34
+                                    Size: =12
+                                    Width: =566
+                                    X: =1
+                                    Y: =1
+                  - det_cp_row_dates:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -2228,53 +2912,10 @@ Screens:
                         Height: =56
                         LayoutAlignItems: =LayoutAlignItems.Start
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutGap: =12
+                        LayoutGap: =10
                         LayoutMinHeight: =56
-                        Width: =548
+                        Width: =568
                       Children:
-                        - det_cp_col_ref:
-                            Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
-                            Properties:
-                              DropShadow: =DropShadow.None
-                              FillPortions: =0
-                              Height: =56
-                              LayoutAlignItems: =LayoutAlignItems.Start
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutGap: =4
-                              Width: =268
-                            Children:
-                              - det_cp_ref_l:
-                                  Control: Label@2.5.1
-                                  Properties:
-                                    Color: =RGBA(60, 65, 71, 1)
-                                    Font: =Font.'Segoe UI'
-                                    FontWeight: =FontWeight.Semibold
-                                    Height: =14
-                                    Size: =10
-                                    Text: ="Ref No."
-                                    Width: =268
-                              - det_cp_ref_wrap:
-                                  Control: GroupContainer@1.5.0
-                                  Variant: ManualLayout
-                                  Properties:
-                                    DropShadow: =DropShadow.None
-                                    FillPortions: =0
-                                    Height: =36
-                                    Width: =268
-                                  Children:
-                                    - det_cp_ref:
-                                        Control: Classic/TextInput@2.3.2
-                                        Properties:
-                                          BorderColor: =RGBA(201, 207, 210, 1)
-                                          BorderThickness: =1
-                                          Default: =varEditingChange.refnumber
-                                          Font: =Font.'Segoe UI'
-                                          Height: =34
-                                          Size: =12
-                                          Width: =266
-                                          X: =1
-                                          Y: =1
                         - det_cp_col_date:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
@@ -2285,7 +2926,7 @@ Screens:
                               LayoutAlignItems: =LayoutAlignItems.Start
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =4
-                              Width: =268
+                              Width: =182
                             Children:
                               - det_cp_date_l:
                                   Control: Label@2.5.1
@@ -2295,8 +2936,8 @@ Screens:
                                     FontWeight: =FontWeight.Semibold
                                     Height: =14
                                     Size: =10
-                                    Text: ="Date"
-                                    Width: =268
+                                    Text: ="Change Date"
+                                    Width: =182
                               - det_cp_date_wrap:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
@@ -2304,7 +2945,7 @@ Screens:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
                                     Height: =36
-                                    Width: =268
+                                    Width: =182
                                   Children:
                                     - det_cp_date:
                                         Control: Classic/DatePicker@2.6.0
@@ -2313,7 +2954,89 @@ Screens:
                                           DefaultDate: =Coalesce(varEditingChange.changedate, Today())
                                           Font: =Font.'Segoe UI'
                                           Height: =34
-                                          Width: =266
+                                          Width: =180
+                                          X: =1
+                                          Y: =1
+                        - det_cp_col_received:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =56
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =4
+                              Width: =182
+                            Children:
+                              - det_cp_received_l:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(60, 65, 71, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =14
+                                    Size: =10
+                                    Text: ="Date Received"
+                                    Width: =182
+                              - det_cp_received_wrap:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =36
+                                    Width: =182
+                                  Children:
+                                    - det_cp_received:
+                                        Control: Classic/DatePicker@2.6.0
+                                        Properties:
+                                          BorderColor: =RGBA(201, 207, 210, 1)
+                                          DefaultDate: =varEditingChange.datereceived
+                                          Font: =Font.'Segoe UI'
+                                          Height: =34
+                                          Width: =180
+                                          X: =1
+                                          Y: =1
+                        - det_cp_col_executed:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =56
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =4
+                              Width: =182
+                            Children:
+                              - det_cp_executed_l:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(60, 65, 71, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =14
+                                    Size: =10
+                                    Text: ="Date Fully Executed"
+                                    Width: =182
+                              - det_cp_executed_wrap:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =36
+                                    Width: =182
+                                  Children:
+                                    - det_cp_executed:
+                                        Control: Classic/DatePicker@2.6.0
+                                        Properties:
+                                          BorderColor: =RGBA(201, 207, 210, 1)
+                                          DefaultDate: =varEditingChange.datefullyexecuted
+                                          Font: =Font.'Segoe UI'
+                                          Height: =34
+                                          Width: =180
                                           X: =1
                                           Y: =1
                   - det_cp_col_desc:
@@ -2327,7 +3050,7 @@ Screens:
                         LayoutDirection: =LayoutDirection.Vertical
                         LayoutGap: =4
                         LayoutMinHeight: =72
-                        Width: =548
+                        Width: =568
                       Children:
                         - det_cp_desc_l:
                             Control: Label@2.5.1
@@ -2338,7 +3061,7 @@ Screens:
                               Height: =14
                               Size: =10
                               Text: ="Description"
-                              Width: =548
+                              Width: =568
                         - det_cp_desc_wrap:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
@@ -2346,7 +3069,7 @@ Screens:
                               DropShadow: =DropShadow.None
                               FillPortions: =0
                               Height: =52
-                              Width: =548
+                              Width: =568
                             Children:
                               - det_cp_desc:
                                   Control: Classic/TextInput@2.3.2
@@ -2358,7 +3081,7 @@ Screens:
                                     Height: =50
                                     Mode: =TextMode.MultiLine
                                     Size: =12
-                                    Width: =546
+                                    Width: =566
                                     X: =1
                                     Y: =1
                   - det_cp_row_type_reason:
@@ -2372,7 +3095,7 @@ Screens:
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =12
                         LayoutMinHeight: =56
-                        Width: =548
+                        Width: =568
                       Children:
                         - det_cp_col_type:
                             Control: GroupContainer@1.5.0
@@ -2384,7 +3107,7 @@ Screens:
                               LayoutAlignItems: =LayoutAlignItems.Start
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =4
-                              Width: =268
+                              Width: =278
                             Children:
                               - det_cp_type_l:
                                   Control: Label@2.5.1
@@ -2395,7 +3118,7 @@ Screens:
                                     Height: =14
                                     Size: =10
                                     Text: ="Type"
-                                    Width: =268
+                                    Width: =278
                               - det_cp_type_wrap:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
@@ -2403,7 +3126,7 @@ Screens:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
                                     Height: =36
-                                    Width: =268
+                                    Width: =278
                                   Children:
                                     - det_cp_type:
                                         Control: Classic/DropDown@2.3.1
@@ -2414,7 +3137,7 @@ Screens:
                                           Height: =34
                                           Items: =["Change Order", "Claim", "Change Directive"]
                                           Size: =12
-                                          Width: =266
+                                          Width: =276
                                           X: =1
                                           Y: =1
                         - det_cp_col_reason:
@@ -2427,7 +3150,7 @@ Screens:
                               LayoutAlignItems: =LayoutAlignItems.Start
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =4
-                              Width: =268
+                              Width: =278
                             Children:
                               - det_cp_reason_l:
                                   Control: Label@2.5.1
@@ -2438,7 +3161,7 @@ Screens:
                                     Height: =14
                                     Size: =10
                                     Text: ="Reason"
-                                    Width: =268
+                                    Width: =278
                               - det_cp_reason_wrap:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
@@ -2446,7 +3169,7 @@ Screens:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
                                     Height: =36
-                                    Width: =268
+                                    Width: =278
                                   Children:
                                     - det_cp_reason:
                                         Control: Classic/DropDown@2.3.1
@@ -2455,12 +3178,12 @@ Screens:
                                           Default: =Coalesce(varEditingChange.reason.Value, "Design Change")
                                           Font: =Font.'Segoe UI'
                                           Height: =34
-                                          Items: =["Design Change", "Scope Gap", "Variation", "Acceleration"]
+                                          Items: =["Design Change", "Scope Gap", "Variation", "Acceleration", "New Scope"]
                                           Size: =12
-                                          Width: =266
+                                          Width: =276
                                           X: =1
                                           Y: =1
-                  - det_cp_row_val_st:
+                  - det_cp_row_values:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
@@ -2471,9 +3194,9 @@ Screens:
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =12
                         LayoutMinHeight: =56
-                        Width: =548
+                        Width: =568
                       Children:
-                        - det_cp_col_val:
+                        - det_cp_col_initial:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
@@ -2483,9 +3206,9 @@ Screens:
                               LayoutAlignItems: =LayoutAlignItems.Start
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =4
-                              Width: =268
+                              Width: =278
                             Children:
-                              - det_cp_val_l:
+                              - det_cp_initial_l:
                                   Control: Label@2.5.1
                                   Properties:
                                     Color: =RGBA(60, 65, 71, 1)
@@ -2493,30 +3216,87 @@ Screens:
                                     FontWeight: =FontWeight.Semibold
                                     Height: =14
                                     Size: =10
-                                    Text: ="Value"
-                                    Width: =268
-                              - det_cp_val_wrap:
+                                    Text: ="Initial Value"
+                                    Width: =278
+                              - det_cp_initial_wrap:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
                                     Height: =36
-                                    Width: =268
+                                    Width: =278
                                   Children:
-                                    - det_cp_val:
+                                    - det_cp_initial:
                                         Control: Classic/TextInput@2.3.2
                                         Properties:
                                           BorderColor: =RGBA(201, 207, 210, 1)
                                           BorderThickness: =1
-                                          Default: =Text(Coalesce(varEditingChange.value, 0), "#,##0.00")
+                                          Default: =Text(Coalesce(varEditingChange.initialvalue, varEditingChange.value, 0), "#,##0.00")
                                           Font: =Font.'Segoe UI'
                                           Format: =TextFormat.Number
                                           Height: =34
                                           Size: =12
-                                          Width: =266
+                                          Width: =276
                                           X: =1
                                           Y: =1
+                        - det_cp_col_final:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =56
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =4
+                              Width: =278
+                            Children:
+                              - det_cp_final_l:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(60, 65, 71, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =14
+                                    Size: =10
+                                    Text: ="Final Value"
+                                    Width: =278
+                              - det_cp_final_wrap:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =36
+                                    Width: =278
+                                  Children:
+                                    - det_cp_final:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(201, 207, 210, 1)
+                                          BorderThickness: =1
+                                          Default: =Text(Coalesce(varEditingChange.finalvalue, varEditingChange.value, 0), "#,##0.00")
+                                          Font: =Font.'Segoe UI'
+                                          Format: =TextFormat.Number
+                                          Height: =34
+                                          Size: =12
+                                          Width: =276
+                                          X: =1
+                                          Y: =1
+                  - det_cp_row_st_aecon:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =56
+                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                        LayoutMinHeight: =56
+                        Width: =568
+                      Children:
                         - det_cp_col_st:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
@@ -2527,7 +3307,7 @@ Screens:
                               LayoutAlignItems: =LayoutAlignItems.Start
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =4
-                              Width: =268
+                              Width: =278
                             Children:
                               - det_cp_st_l:
                                   Control: Label@2.5.1
@@ -2538,7 +3318,7 @@ Screens:
                                     Height: =14
                                     Size: =10
                                     Text: ="Status"
-                                    Width: =268
+                                    Width: =278
                               - det_cp_st_wrap:
                                   Control: GroupContainer@1.5.0
                                   Variant: ManualLayout
@@ -2546,7 +3326,7 @@ Screens:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
                                     Height: =36
-                                    Width: =268
+                                    Width: =278
                                   Children:
                                     - det_cp_st:
                                         Control: Classic/DropDown@2.3.1
@@ -2555,55 +3335,80 @@ Screens:
                                           Default: =Coalesce(varEditingChange.status.Value, "Pending")
                                           Font: =Font.'Segoe UI'
                                           Height: =34
-                                          Items: =["Approved", "Pending", "Potential", "Rejected"]
+                                          Items: =["Approved", "Pending", "Potential", "Rejected", "Canceled"]
                                           Size: =12
-                                          Width: =266
+                                          Width: =276
                                           X: =1
                                           Y: =1
-                  - det_cp_col_aecon:
-                      Control: GroupContainer@1.5.0
-                      Variant: AutoLayout
-                      Properties:
-                        DropShadow: =DropShadow.None
-                        FillPortions: =0
-                        Height: =56
-                        LayoutAlignItems: =LayoutAlignItems.Start
-                        LayoutDirection: =LayoutDirection.Vertical
-                        LayoutGap: =4
-                        LayoutMinHeight: =56
-                        Width: =548
-                      Children:
-                        - det_cp_aecon_l:
-                            Control: Label@2.5.1
-                            Properties:
-                              Color: =RGBA(60, 65, 71, 1)
-                              Font: =Font.'Segoe UI'
-                              FontWeight: =FontWeight.Semibold
-                              Height: =14
-                              Size: =10
-                              Text: ="Aecon Ref"
-                              Width: =548
-                        - det_cp_aecon_wrap:
+                        - det_cp_col_aecon:
                             Control: GroupContainer@1.5.0
-                            Variant: ManualLayout
+                            Variant: AutoLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               FillPortions: =0
-                              Height: =36
-                              Width: =548
+                              Height: =56
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =4
+                              Width: =278
                             Children:
-                              - det_cp_aecon:
-                                  Control: Classic/TextInput@2.3.2
+                              - det_cp_aecon_header:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
                                   Properties:
-                                    BorderColor: =RGBA(201, 207, 210, 1)
-                                    BorderThickness: =1
-                                    Default: =varEditingChange.aeconref
-                                    Font: =Font.'Segoe UI'
-                                    Height: =34
-                                    Size: =12
-                                    Width: =546
-                                    X: =1
-                                    Y: =1
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =16
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =4
+                                    Width: =278
+                                  Children:
+                                    - det_cp_aecon_l:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(60, 65, 71, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =14
+                                          Size: =10
+                                          Text: ="Aecon Ref"
+                                          Width: =70
+                                    - det_cp_aecon_hint:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          Color: =RGBA(144, 151, 168, 1)
+                                          Fill: =RGBA(236, 238, 240, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =10
+                                          Text: ="?"
+                                          Tooltip: ="Aecon Change order number"
+                                          Width: =16
+                              - det_cp_aecon_wrap:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =36
+                                    Width: =278
+                                  Children:
+                                    - det_cp_aecon:
+                                        Control: Classic/TextInput@2.3.2
+                                        Properties:
+                                          BorderColor: =RGBA(201, 207, 210, 1)
+                                          BorderThickness: =1
+                                          Default: =varEditingChange.aeconref
+                                          Font: =Font.'Segoe UI'
+                                          Height: =34
+                                          Size: =12
+                                          Width: =276
+                                          X: =1
+                                          Y: =1
                   - det_cp_actions:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
@@ -2616,7 +3421,7 @@ Screens:
                         LayoutGap: =8
                         LayoutJustifyContent: =LayoutJustifyContent.End
                         LayoutMinHeight: =42
-                        Width: =548
+                        Width: =568
                       Children:
                         - det_cp_delete:
                             Control: Classic/Button@2.2.0
@@ -2636,31 +3441,35 @@ Screens:
                                 Set(varShowAddChange, false);
                                 Set(varEditingChange, Blank());
                                 ClearCollect(
-                                                colSubChanges,
-                                                Filter(
-                                                    'PostAward - Changes',
-                                                    subcontractid = varSelectedSubcontract.packageidentifier
-                                                )
-                                            );
-                                            ClearCollect(
-                                                colProjectChanges,
-                                                Filter(
-                                                    'PostAward - Changes',
-                                                    projectidentifier = varSelectedSubcontract.projectidentifier
-                                                )
-                                            );
-                                            Set(varApprovedSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved"), value), 0));
-                                            Set(varPendingSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Pending"), value), 0));
-                                            Set(varPotentialSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Potential"), value), 0));
-                                            Set(varRejectedSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Rejected"), value), 0));
-                                            Set(varCurrentValue, Coalesce(varSelectedSubcontract.originalvalue, 0) + varApprovedSum);
-                                            Set(varFutureLiab, varPendingSum + varPotentialSum);
-                                            Set(varEAC, varCurrentValue + varFutureLiab);
-                                            Set(varIsOver, Coalesce(varSelectedSubcontract.invoicedtodate, 0) > varCurrentValue);
-                                            Set(varReasonDesign, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), value), 0));
-                                            Set(varReasonScope, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), value), 0));
-                                            Set(varReasonVar, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), value), 0));
-                                            Set(varReasonAccel, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), value), 0));
+                                    colSubChanges,
+                                    Filter(
+                                        'PostAward - Changes',
+                                        subcontractid = varSelectedSubcontract.packageidentifier
+                                    )
+                                );
+                                ClearCollect(
+                                    colProjectChanges,
+                                    Filter(
+                                        'PostAward - Changes',
+                                        projectidentifier = varSelectedSubcontract.projectidentifier
+                                    )
+                                );
+                                Set(varApprovedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varPendingSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Pending"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varPotentialSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Potential"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varRejectedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Rejected"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varCurrentValue, Coalesce(varSelectedSubcontract.originalvalue, 0) + varApprovedSum);
+                                Set(varFutureLiab, varPendingSum + varPotentialSum);
+                                Set(varEAC, varCurrentValue + varFutureLiab);
+                                Set(varIsOver, Coalesce(varSelectedSubcontract.invoicedtodate, 0) > varCurrentValue);
+                                Set(varReasonDesign, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varReasonScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varReasonVar, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varReasonAccel, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varReasonNewScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "New Scope"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                Set(varPctComplete, Min(100, Round(Coalesce(varSelectedSubcontract.invoicedtodate, 0) / Max(varCurrentValue, 1) * 100, 0)));
+                                Set(varRollMaxStatus, Max(Abs(varApprovedSum), Abs(varPendingSum), Abs(varPotentialSum), Abs(varRejectedSum), 1));
+                                Set(varRollMaxReason, Max(Abs(varReasonDesign), Abs(varReasonScope), Abs(varReasonVar), Abs(varReasonAccel), Abs(varReasonNewScope), 1));
                                 Notify("Change deleted.", NotificationType.Success)
                               RadiusBottomLeft: =8
                               RadiusBottomRight: =8
@@ -2702,71 +3511,88 @@ Screens:
                               OnSelect: |-
                                 =If(
                                     IsBlank(Trim(det_cp_ref.Text)),
-                                          Notify("Ref No. is required.", NotificationType.Error),
-                                    If(
-                                        IsBlank(varEditingChange),
-                                        Patch(
-                                            'PostAward - Changes',
-                                            Defaults('PostAward - Changes'),
-                                            {
-                                                Title: Trim(det_cp_ref.Text),
-                                                subcontractid: varSelectedSubcontract.packageidentifier,
-                                                projectidentifier: varSelectedSubcontract.projectidentifier,
-                                                refnumber: Trim(det_cp_ref.Text),
-                                                changedate: det_cp_date.SelectedDate,
-                                                description: det_cp_desc.Text,
-                                                      changetype: det_cp_type.SelectedText,
-                                                      reason: det_cp_reason.SelectedText,
-                                                      value: Value(det_cp_val.Text),
-                                                      status: det_cp_st.SelectedText,
-                                                      aeconref: Trim(det_cp_aecon.Text)
-                                                  }
-                                              ),
-                                              Patch(
-                                                  'PostAward - Changes',
-                                                  LookUp('PostAward - Changes', ID = varEditingChange.ID),
-                                                  {
-                                                      Title: Trim(det_cp_ref.Text),
-                                                      refnumber: Trim(det_cp_ref.Text),
-                                                      changedate: det_cp_date.SelectedDate,
-                                                      description: det_cp_desc.Text,
-                                                      changetype: det_cp_type.SelectedText,
-                                                      reason: det_cp_reason.SelectedText,
-                                                      value: Value(det_cp_val.Text),
-                                                      status: det_cp_st.SelectedText,
-                                                      aeconref: Trim(det_cp_aecon.Text)
-                                                  }
-                                              )
-                                    );
-                                    Set(varShowAddChange, false);
-                                    Set(varEditingChange, Blank());
-                                    ClearCollect(
-                                                colSubChanges,
-                                                Filter(
-                                                    'PostAward - Changes',
-                                                    subcontractid = varSelectedSubcontract.packageidentifier
-                                                )
-                                            );
-                                            ClearCollect(
-                                                colProjectChanges,
-                                                Filter(
-                                                    'PostAward - Changes',
-                                                    projectidentifier = varSelectedSubcontract.projectidentifier
-                                                )
-                                            );
-                                            Set(varApprovedSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved"), value), 0));
-                                            Set(varPendingSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Pending"), value), 0));
-                                            Set(varPotentialSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Potential"), value), 0));
-                                            Set(varRejectedSum, Coalesce(Sum(Filter(colSubChanges, status.Value = "Rejected"), value), 0));
-                                            Set(varCurrentValue, Coalesce(varSelectedSubcontract.originalvalue, 0) + varApprovedSum);
-                                            Set(varFutureLiab, varPendingSum + varPotentialSum);
-                                            Set(varEAC, varCurrentValue + varFutureLiab);
-                                            Set(varIsOver, Coalesce(varSelectedSubcontract.invoicedtodate, 0) > varCurrentValue);
-                                            Set(varReasonDesign, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), value), 0));
-                                            Set(varReasonScope, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), value), 0));
-                                            Set(varReasonVar, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), value), 0));
-                                            Set(varReasonAccel, Coalesce(Sum(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), value), 0));
-                                    Notify("Change saved.", NotificationType.Success)
+                                    Notify("Ref No. is required.", NotificationType.Error),
+                                    With(
+                                        {
+                                            aeconRef: "SCO" & Substitute(Substitute(Upper(Trim(det_cp_aecon.Text)), "SCO", ""), " ", "")
+                                        },
+                                        If(
+                                            IsBlank(varEditingChange),
+                                            Patch(
+                                                'PostAward - Changes',
+                                                Defaults('PostAward - Changes'),
+                                                {
+                                                    Title: Trim(det_cp_ref.Text),
+                                                    subcontractid: varSelectedSubcontract.packageidentifier,
+                                                    projectidentifier: varSelectedSubcontract.projectidentifier,
+                                                    refnumber: Trim(det_cp_ref.Text),
+                                                    changedate: det_cp_date.SelectedDate,
+                                                    datereceived: det_cp_received.SelectedDate,
+                                                    datefullyexecuted: det_cp_executed.SelectedDate,
+                                                    description: det_cp_desc.Text,
+                                                    changetype: det_cp_type.SelectedText,
+                                                    reason: det_cp_reason.SelectedText,
+                                                    initialvalue: Value(det_cp_initial.Text),
+                                                    finalvalue: Value(det_cp_final.Text),
+                                                    value: Value(det_cp_final.Text),
+                                                    status: det_cp_st.SelectedText,
+                                                    aeconref: aeconRef
+                                                }
+                                            ),
+                                            Patch(
+                                                'PostAward - Changes',
+                                                LookUp('PostAward - Changes', ID = varEditingChange.ID),
+                                                {
+                                                    Title: Trim(det_cp_ref.Text),
+                                                    refnumber: Trim(det_cp_ref.Text),
+                                                    changedate: det_cp_date.SelectedDate,
+                                                    datereceived: det_cp_received.SelectedDate,
+                                                    datefullyexecuted: det_cp_executed.SelectedDate,
+                                                    description: det_cp_desc.Text,
+                                                    changetype: det_cp_type.SelectedText,
+                                                    reason: det_cp_reason.SelectedText,
+                                                    initialvalue: Value(det_cp_initial.Text),
+                                                    finalvalue: Value(det_cp_final.Text),
+                                                    value: Value(det_cp_final.Text),
+                                                    status: det_cp_st.SelectedText,
+                                                    aeconref: aeconRef
+                                                }
+                                            )
+                                        );
+                                        Set(varShowAddChange, false);
+                                        Set(varEditingChange, Blank());
+                                        ClearCollect(
+                                            colSubChanges,
+                                            Filter(
+                                                'PostAward - Changes',
+                                                subcontractid = varSelectedSubcontract.packageidentifier
+                                            )
+                                        );
+                                        ClearCollect(
+                                            colProjectChanges,
+                                            Filter(
+                                                'PostAward - Changes',
+                                                projectidentifier = varSelectedSubcontract.projectidentifier
+                                            )
+                                        );
+                                        Set(varApprovedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varPendingSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Pending"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varPotentialSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Potential"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varRejectedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Rejected"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varCurrentValue, Coalesce(varSelectedSubcontract.originalvalue, 0) + varApprovedSum);
+                                        Set(varFutureLiab, varPendingSum + varPotentialSum);
+                                        Set(varEAC, varCurrentValue + varFutureLiab);
+                                        Set(varIsOver, Coalesce(varSelectedSubcontract.invoicedtodate, 0) > varCurrentValue);
+                                        Set(varReasonDesign, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varReasonScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varReasonVar, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varReasonAccel, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varReasonNewScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "New Scope"), _amt, Coalesce(finalvalue, value)), _amt), 0));
+                                        Set(varPctComplete, Min(100, Round(Coalesce(varSelectedSubcontract.invoicedtodate, 0) / Max(varCurrentValue, 1) * 100, 0)));
+                                        Set(varRollMaxStatus, Max(Abs(varApprovedSum), Abs(varPendingSum), Abs(varPotentialSum), Abs(varRejectedSum), 1));
+                                        Set(varRollMaxReason, Max(Abs(varReasonDesign), Abs(varReasonScope), Abs(varReasonVar), Abs(varReasonAccel), Abs(varReasonNewScope), 1));
+                                        Notify("Change saved.", NotificationType.Success)
+                                    )
                                 )
                               RadiusBottomLeft: =8
                               RadiusBottomRight: =8

@@ -47,7 +47,7 @@ Screens:
                   LayoutMinHeight: =0
                   Fill: =RGBA(255, 255, 255, 1)
                   FillPortions: =0
-                  Height: =If(App.Width < 680, 196, 186)
+                  Height: =If(App.Width < 680, 228, 218)
                   LayoutDirection: =LayoutDirection.Vertical
                   LayoutGap: =0
                   PaddingBottom: =14
@@ -63,7 +63,7 @@ Screens:
                         DropShadow: =DropShadow.None
                         LayoutMinWidth: =0
                         FillPortions: =0
-                        Height: =40
+                        Height: =72
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =8
@@ -78,25 +78,21 @@ Screens:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
-                              Height: =36
+                              Height: =72
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              RadiusBottomLeft: =8
-                              RadiusBottomRight: =8
-                              RadiusTopLeft: =8
-                              RadiusTopRight: =8
-                              Width: =124
+                              Width: =180
                             Children:
                               - Logo_Dayaway_Appr:
                                   Control: Image@2.2.3
                                   Properties:
                                     BorderThickness: =0
-                                    Height: =32
+                                    Height: =72
                                     Image: ='Subtitle (1)'
                                     ImagePosition: =ImagePosition.Fit
-                                    Width: =116
-                                    X: =4
-                                    Y: =2
+                                    Width: =180
+                                    X: =0
+                                    Y: =0
                         - Logo_Department_Appr_Wrap:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
@@ -105,25 +101,21 @@ Screens:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
-                              Height: =36
+                              Height: =64
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              RadiusBottomLeft: =8
-                              RadiusBottomRight: =8
-                              RadiusTopLeft: =8
-                              RadiusTopRight: =8
-                              Width: =124
+                              Width: =160
                             Children:
                               - Logo_Department_Appr:
                                   Control: Image@2.2.3
                                   Properties:
                                     BorderThickness: =0
-                                    Height: =32
+                                    Height: =64
                                     Image: ='Department Logo'
                                     ImagePosition: =ImagePosition.Fit
-                                    Width: =116
-                                    X: =4
-                                    Y: =2
+                                    Width: =160
+                                    X: =0
+                                    Y: =0
                         - appr_brand_spacer:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout

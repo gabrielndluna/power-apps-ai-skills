@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ProcTrack — Interactive Design</title>
+  <style>
+    :root {
+      --aecon-red: #d60c30;
+      --aecon-red-dark: #b00a28;
+      --bg: #f5f5f5;
+      --surface: #ffffff;
+      --border: #d6dde0;
+      --text: #1e1e1e;
+      --muted: #6b7280;
+      --header-h: 108px;
+      --shadow: 0 1px 4px rgba(0,0,0,.08);
+      --radius: 8px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: #c8cdd0;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .prototype-bar {
+      width: min(1280px, 100%);
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 16px;
+      font-size: 13px;
+    }
+    .prototype-bar strong { color: #ffb3c0; }
+    .prototype-bar .nav-hint { color: #aaa; margin-left: auto; }
+    .prototype-bar button {
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .prototype-bar button.active {
+      background: var(--aecon-red);
+      border-color: var(--aecon-red);
+    }
+    .prototype-bar button:hover { filter: brightness(1.1); }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #0f7b3a;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+      font-size: 14px;
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: .25s ease;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: #c62828; }
+
+    .app-shell {
+      width: min(1280px, 100%);
+      height: min(860px, calc(100vh - 100px));
+      background: var(--bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .screen { display: none; flex-direction: column; height: 100%; padding: 16px; gap: 12px; overflow: auto; }
+    .screen.active { display: flex; }
+
+    /* Shared header */
+    .header {
+      background: var(--aecon-red);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      box-shadow: var(--shadow);
+      flex-shrink: 0;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+    }
+    .header-bottom {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      min-height: 32px;
+    }
+    .icon-btn {
+      width: 36px; height: 36px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.18);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,.28); }
+    .icon-btn.light {
+      background: #fff;
+      color: var(--aecon-red);
+      border-radius: 8px;
+      width: 32px; height: 32px;
+    }
+    .brand-title { font-size: 20px; font-weight: 700; line-height: 1.2; }
+    .brand-sub { font-size: 12px; opacity: .82; }
+    .spacer { flex: 1; }
+    .user-block { text-align: right; }
+    .user-block .label { font-size: 10px; font-weight: 700; opacity: .7; letter-spacing: .04em; }
+    .user-block .name { font-size: 13px; font-weight: 600; }
+
+    .project-picker {
+      flex: 1;
+      background: #fff;
+      border-radius: 8px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .project-picker label { color: var(--muted); font-weight: 600; font-size: 12px; }
+    .project-picker select {
+      border: none;
+      background: transparent;
+      flex: 1;
+      font: inherit;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Dashboard */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .kpi {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .kpi-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: rgba(214,12,48,.12);
+      color: var(--aecon-red);
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .kpi-value { font-size: 22px; font-weight: 700; line-height: 1; }
+    .kpi-label { font-size: 12px; color: var(--muted); }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 4px 0;
+    }
+    .search-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 0 12px;
+      font: inherit;
+      background: #fff;
+    }
+    .search-input:focus { outline: 2px solid rgba(214,12,48,.35); border-color: var(--aecon-red); }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .project-card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      border: 1px solid transparent;
+    }
+    .project-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.12);
+      border-color: rgba(214,12,48,.25);
+    }
+    .project-card h3 { font-size: 16px; margin-bottom: 2px; }
+    .project-card .pid { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+    .project-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .stat {
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 8px 4px;
+      text-align: center;
+    }
+    .stat b { display: block; font-size: 16px; }
+    .stat span { font-size: 10px; color: var(--muted); }
+    .open-btn {
+      width: 100%;
+      height: 36px;
+      background: var(--aecon-red);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .open-btn:hover { background: var(--aecon-red-dark); }
+
+    /* Welcome filters */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .chip {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .chip.active {
+      background: var(--aecon-red);
+      color: #fff;
+      border-color: var(--aecon-red);
+    }
+    .btn-main {
+      height: 40px;
+      padding: 0 18px;
+      background: var(--aecon-red);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .btn-main:hover { background: var(--aecon-red-dark); }
+    .btn-outline {
+      height: 40px;
+      padding: 0 18px;
+      background: #fff;
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .gallery-wrap {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      flex: 1;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+    .gallery-head {
+      display: grid;
+      grid-template-columns: 1.1fr 1.6fr 1fr 1fr 1fr 48px;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #eee;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .03em;
+      border-bottom: 1px solid var(--border);
+    }
+    .gallery-row {
+      display: grid;
+      grid-template-columns: 1.1fr 1.6fr 1fr 1fr 1fr 48px;
+      gap: 8px;
+      padding: 14px 12px;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background .12s;
+    }
+    .gallery-row:hover { background: #fafafa; }
+    .pkg-link {
+      color: var(--aecon-red);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+    .status-pill {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    .status-pill.on-track { background: #e8f5e9; color: #2e7d32; }
+    .status-pill.at-risk { background: #fff8dc; color: #b8860b; }
+    .status-pill.delayed { background: #ffebee; color: #c62828; }
+    .status-pill.awarded { background: #e3f2fd; color: #1565c0; }
+    .row-arrow {
+      color: #bbb;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    /* Package details */
+    .details-layout {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+    }
+    .panel {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-head {
+      background: var(--aecon-red);
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: .02em;
+    }
+    .panel-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label { font-size: 14px; }
+    .field input, .field select, .field textarea {
+      height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      padding: 0 10px;
+      font: inherit;
+      background: #fff;
+    }
+    .field textarea { height: 72px; padding: 8px 10px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      outline: 2px solid rgba(214,12,48,.3);
+      border-color: var(--aecon-red);
+    }
+
+    .package-number-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 40px;
+    }
+    .package-prefix {
+      font-size: 14px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .package-number-row input {
+      flex: 1;
+      min-width: 0;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      padding: 0 10px;
+      font: inherit;
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .metric {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    .metric .m-label { font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+    .metric .m-value { font-size: 18px; font-weight: 700; }
+    .metric .m-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .stage-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .stage-table th {
+      text-align: left;
+      padding: 8px 6px;
+      border-bottom: 2px solid var(--border);
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .04em;
+    }
+    .stage-table td { padding: 10px 6px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    .stage-table input[type="date"], .stage-table input[type="number"] {
+      width: 100%;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 6px;
+      font: inherit;
+      font-size: 12px;
+    }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+    }
+    .dot.done { background: #2e7d32; }
+    .dot.current { background: var(--aecon-red); }
+    .dot.pending { background: #ccc; }
+
+    .footer-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .create-form {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      max-width: 900px;
+    }
+    .create-form .field.full { grid-column: 1 / -1; }
+    .note {
+      font-size: 12px;
+      color: var(--muted);
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 900px) {
+      .kpi-row, .details-layout, .field-row, .metrics-row, .create-form { grid-template-columns: 1fr; }
+      .gallery-head, .gallery-row { grid-template-columns: 1fr 1.2fr 40px; }
+      .gallery-head span:nth-child(n+3):nth-child(-n+5),
+      .gallery-row > :nth-child(n+3):nth-child(-n+5) { display: none; }
+      .app-shell { height: auto; min-height: 70vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="prototype-bar">
+    <strong>ProcTrack</strong> interactive design mock
+    <button type="button" data-jump="dashboard" class="active">1. Dashboard</button>
+    <button type="button" data-jump="welcome">2. Packages</button>
+    <button type="button" data-jump="details">3. Package Details</button>
+    <button type="button" data-jump="create">4. Create Package</button>
+    <span class="nav-hint">Click through screens · edit Package # · Save updates the gallery</span>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <div class="app-shell">
+    <!-- ========== DASHBOARD ========== -->
+    <section id="screen-dashboard" class="screen active">
+      <header class="header" style="padding-bottom:12px">
+        <div class="header-top">
+          <div class="icon-btn" title="Home">⌂</div>
+          <div>
+            <div class="brand-title">ProcTrack</div>
+            <div class="brand-sub">Project procurement dashboard</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="user-block">
+            <div class="label">SIGNED IN AS</div>
+            <div class="name">Alex Rivera</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-icon">▣</div><div><div class="kpi-value" id="kpi-projects">2</div><div class="kpi-label">Active projects</div></div></div>
+        <div class="kpi"><div class="kpi-icon">▤</div><div><div class="kpi-value" id="kpi-packages">5</div><div class="kpi-label">Total packages</div></div></div>
+        <div class="kpi"><div class="kpi-icon">✓</div><div><div class="kpi-value" id="kpi-awarded">1</div><div class="kpi-label">Awarded</div></div></div>
+        <div class="kpi"><div class="kpi-icon">!</div><div><div class="kpi-value" id="kpi-attention">2</div><div class="kpi-label">Needs attention</div></div></div>
+      </div>
+
+      <div class="section-title">Your projects</div>
+      <div class="search-row">
+        <input class="search-input" id="project-search" type="search" placeholder="Search projects..." />
+      </div>
+      <div class="project-grid" id="project-grid"></div>
+    </section>
+
+    <!-- ========== WELCOME / PACKAGES ========== -->
+    <section id="screen-welcome" class="screen">
+      <header class="header">
+        <div class="header-top">
+          <button type="button" class="icon-btn" data-goto="dashboard" title="Back to dashboard">⌂</button>
+          <div>
+            <div class="brand-title">ProcTrack</div>
+            <div class="brand-sub">Package tracking</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="user-block">
+            <div class="label">SIGNED IN AS</div>
+            <div class="name">Alex Rivera</div>
+          </div>
+          <button type="button" class="icon-btn light" title="Export to Excel">📊</button>
+        </div>
+        <div class="header-bottom">
+          <div class="project-picker">
+            <label>Project</label>
+            <select id="welcome-project"></select>
+          </div>
+          <button type="button" class="btn-outline" style="height:32px;padding:0 12px;font-size:12px">Dashboard</button>
+        </div>
+      </header>
+
+      <div class="toolbar">
+        <button type="button" class="chip active" data-filter="all">All</button>
+        <button type="button" class="chip" data-filter="awarded">Awarded</button>
+        <button type="button" class="chip" data-filter="delayed">Delayed</button>
+        <button type="button" class="chip" data-filter="at-risk">At Risk</button>
+        <div class="spacer"></div>
+        <input class="search-input" id="package-search" type="search" placeholder="Search packages..." style="max-width:260px;height:32px" />
+        <button type="button" class="btn-main" data-goto="create">+ New Package</button>
+      </div>
+
+      <div class="gallery-wrap">
+        <div class="gallery-head">
+          <span>PACKAGE #</span>
+          <span>DESCRIPTION</span>
+          <span>CONTRACT TYPE</span>
+          <span>STAGE DUE</span>
+          <span>STATUS</span>
+          <span></span>
+        </div>
+        <div id="package-gallery"></div>
+      </div>
+    </section>
+
+    <!-- ========== PACKAGE DETAILS ========== -->
+    <section id="screen-details" class="screen">
+      <header class="header">
+        <div class="header-top">
+          <button type="button" class="icon-btn" data-goto="welcome" title="Back">←</button>
+          <div>
+            <div class="brand-title">ProcTrack</div>
+            <div class="brand-sub">Package tracking</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="user-block">
+            <div class="label">SIGNED IN AS</div>
+            <div class="name">Alex Rivera</div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="project-picker">
+            <label>Project</label>
+            <select id="details-project" disabled></select>
+          </div>
+        </div>
+      </header>
+
+      <div class="metrics-row">
+        <div class="metric">
+          <div class="m-label">CURRENT STAGE</div>
+          <div class="m-value" id="m-stage">RFQ Closing</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">ORIGINAL RAS</div>
+          <div class="m-value" id="m-ras">06/15/2026</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">DAYS TO AWARD</div>
+          <div class="m-value" id="m-award">42 days</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">DAYS TO RAS</div>
+          <div class="m-value" id="m-days-ras">68 days</div>
+        </div>
+      </div>
+
+      <div class="details-layout">
+        <div class="panel">
+          <div class="panel-head">
+            <span>ⓘ</span> PACKAGE BASICS
+            <div class="spacer"></div>
+            <span style="font-size:11px;font-weight:600;opacity:.9">PREREQ DESIGN</span>
+            <input type="checkbox" id="prereq" checked style="accent-color:#44eb44;width:18px;height:18px" />
+          </div>
+          <div class="panel-body">
+            <div class="note">Package # shows project identifier as a label + editable item number (matches current app).</div>
+            <div class="field-row">
+              <div class="field">
+                <label>Package #</label>
+                <div class="package-number-row">
+                  <span class="package-prefix" id="pkg-prefix">ABC -</span>
+                  <input type="text" id="item-number-input" />
+                </div>
+              </div>
+              <div class="field">
+                <label>MPL</label>
+                <input type="text" id="mpl-input" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <input type="text" id="desc-input" />
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Quality Program</label>
+                <select id="qp-input">
+                  <option>CSA</option>
+                  <option>ISO</option>
+                  <option>Owner Spec</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Site/Location</label>
+                <input type="text" id="site-input" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Contract Type</label>
+                <select id="ct-input">
+                  <option>Lump Sum</option>
+                  <option>Unit Price</option>
+                  <option>T&amp;M</option>
+                  <option>Standard Purchase Order</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Package Bundle</label>
+                <input type="text" id="bundle-input" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Package Folder</label>
+              <input type="url" id="folder-input" placeholder="https://..." />
+            </div>
+
+            <div style="font-weight:700;font-size:13px;margin-top:4px;color:var(--aecon-red)">PEOPLE &amp; LEADS</div>
+            <div class="field-row">
+              <div class="field"><label>Operations Lead</label><input type="text" id="ops-input" /></div>
+              <div class="field"><label>Procurement Lead</label><input type="text" id="proc-input" /></div>
+            </div>
+            <div class="field"><label>Technical Lead</label><input type="text" id="tech-input" /></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            Path to Award Tracking
+            <div class="spacer"></div>
+            <button type="button" class="btn-outline" style="height:28px;padding:0 10px;font-size:11px;color:#fff;background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4)">Recalculate Plan</button>
+            <label style="font-size:11px;display:flex;align-items:center;gap:6px;font-weight:600">
+              <input type="checkbox" id="sole-source" style="accent-color:#44eb44" /> SOLE SOURCE
+            </label>
+          </div>
+          <div class="panel-body" style="padding:8px 10px">
+            <table class="stage-table">
+              <thead>
+                <tr>
+                  <th>STAGE</th>
+                  <th>DURATION</th>
+                  <th>PLANNED</th>
+                  <th>FORECAST</th>
+                  <th>ACTUAL</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="stage-body"></tbody>
+            </table>
+            <div class="field" style="margin-top:8px">
+              <label>Comments</label>
+              <textarea id="comments-input"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-actions">
+        <button type="button" class="btn-outline" data-goto="welcome">Cancel</button>
+        <button type="button" class="btn-main" id="save-btn">💾 Save Changes</button>
+      </div>
+    </section>
+
+    <!-- ========== CREATE ========== -->
+    <section id="screen-create" class="screen">
+      <header class="header">
+        <div class="header-top">
+          <button type="button" class="icon-btn" data-goto="welcome" title="Back">←</button>
+          <div>
+            <div class="brand-title">ProcTrack</div>
+            <div class="brand-sub">Create new package</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="user-block">
+            <div class="label">SIGNED IN AS</div>
+            <div class="name">Alex Rivera</div>
+          </div>
+        </div>
+        <div class="header-bottom">
+          <div class="project-picker">
+            <label>Project</label>
+            <select id="create-project"></select>
+          </div>
+        </div>
+      </header>
+
+      <div class="create-form">
+        <div class="field">
+          <label>Item #</label>
+          <input type="text" id="create-item" value="004" />
+        </div>
+        <div class="field">
+          <label>Prerequisite Design?</label>
+          <select><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field full">
+          <label>Description</label>
+          <input type="text" id="create-desc" placeholder="Package description" />
+        </div>
+        <div class="field">
+          <label>Quality Program</label>
+          <select><option>CSA</option><option>ISO</option></select>
+        </div>
+        <div class="field">
+          <label>Site/Location</label>
+          <select><option>Site A</option><option>Site B</option></select>
+        </div>
+        <div class="field">
+          <label>Procurement Lead</label>
+          <input type="text" value="Jordan Lee" />
+        </div>
+        <div class="field">
+          <label>Operations Lead</label>
+          <input type="text" value="Sam Patel" />
+        </div>
+        <div class="field">
+          <label>Package Bundle</label>
+          <input type="text" value="Civil" />
+        </div>
+        <div class="field">
+          <label>Required at Site (RAS)</label>
+          <input type="date" value="2026-09-01" />
+        </div>
+        <div class="field">
+          <label>MPL</label>
+          <input type="text" placeholder="MPL code" />
+        </div>
+        <div class="field">
+          <label>Est. Budget</label>
+          <input type="number" placeholder="0" />
+        </div>
+      </div>
+      <div class="footer-actions">
+        <button type="button" class="btn-outline" data-goto="welcome">Cancel</button>
+        <button type="button" class="btn-main" id="add-package-btn">Add Package</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const projects = [
+      {
+        id: "ABC",
+        name: "Highway Expansion — Corridor A",
+        packages: 3,
+        awarded: 1,
+        delayed: 1,
+        atRisk: 1
+      },
+      {
+        id: "XYZ",
+        name: "Transit Hub Modernization",
+        packages: 2,
+        awarded: 0,
+        delayed: 0,
+        atRisk: 1
+      }
+    ];
+
+    let packages = [
+      {
+        id: "p1",
+        projectId: "ABC",
+        itemnumber: "001",
+        description: "Structural steel supply",
+        mpl: "MPL-100",
+        contractType: "Lump Sum",
+        qualityProgram: "CSA",
+        site: "Site A",
+        bundle: "Structural",
+        folder: "https://sharepoint.example/pkg001",
+        ops: "Sam Patel",
+        proc: "Jordan Lee",
+        tech: "Casey Kim",
+        status: "at-risk",
+        stage: "RFQ Closing",
+        stageDue: "Apr 12, 2026",
+        ras: "06/15/2026",
+        daysToAward: "42 days",
+        daysToRas: "68 days",
+        comments: "",
+        stages: [
+          { name: "1 SOW Completion", duration: 15, planned: "2026-02-01", forecast: "2026-02-01", actual: "2026-02-03", state: "done" },
+          { name: "2 RFQ Issue", duration: 30, planned: "2026-02-16", forecast: "2026-02-18", actual: "2026-02-18", state: "done" },
+          { name: "3 RFQ Closing", duration: 30, planned: "2026-03-20", forecast: "2026-04-12", actual: "", state: "current" },
+          { name: "4 Eval and Sign Off", duration: 30, planned: "2026-04-19", forecast: "2026-05-12", actual: "", state: "pending" },
+          { name: "5 Contract Award", duration: 30, planned: "2026-05-19", forecast: "2026-06-11", actual: "", state: "pending" },
+          { name: "6 On Site", duration: null, planned: "2026-06-15", forecast: "2026-06-15", actual: "", state: "pending" }
+        ]
+      },
+      {
+        id: "p2",
+        projectId: "ABC",
+        itemnumber: "002",
+        description: "Electrical packages — Phase 1",
+        mpl: "MPL-210",
+        contractType: "Unit Price",
+        qualityProgram: "ISO",
+        site: "Site A",
+        bundle: "Electrical",
+        folder: "",
+        ops: "Sam Patel",
+        proc: "Morgan Diaz",
+        tech: "Riley Chen",
+        status: "delayed",
+        stage: "SOW Completion",
+        stageDue: "Mar 01, 2026",
+        ras: "07/01/2026",
+        daysToAward: "80 days",
+        daysToRas: "95 days",
+        comments: "Waiting on design deliverable.",
+        stages: [
+          { name: "1 SOW Completion", duration: 15, planned: "2026-02-15", forecast: "2026-03-01", actual: "", state: "current" },
+          { name: "2 RFQ Issue", duration: 30, planned: "2026-03-02", forecast: "2026-03-16", actual: "", state: "pending" },
+          { name: "3 RFQ Closing", duration: 30, planned: "2026-04-01", forecast: "2026-04-15", actual: "", state: "pending" },
+          { name: "4 Eval and Sign Off", duration: 30, planned: "2026-05-01", forecast: "2026-05-15", actual: "", state: "pending" },
+          { name: "5 Contract Award", duration: 30, planned: "2026-05-31", forecast: "2026-06-14", actual: "", state: "pending" },
+          { name: "6 On Site", duration: null, planned: "2026-07-01", forecast: "2026-07-01", actual: "", state: "pending" }
+        ]
+      },
+      {
+        id: "p3",
+        projectId: "ABC",
+        itemnumber: "003",
+        description: "Site fencing & gates",
+        mpl: "MPL-050",
+        contractType: "Lump Sum",
+        qualityProgram: "Owner Spec",
+        site: "Site B",
+        bundle: "Civil",
+        folder: "https://sharepoint.example/pkg003",
+        ops: "Sam Patel",
+        proc: "Jordan Lee",
+        tech: "Casey Kim",
+        status: "awarded",
+        stage: "Award Completion",
+        stageDue: "Complete",
+        ras: "04/01/2026",
+        daysToAward: "—",
+        daysToRas: "—",
+        comments: "Awarded to NorthFence Ltd.",
+        stages: [
+          { name: "1 SOW Completion", duration: 15, planned: "2025-11-01", forecast: "2025-11-01", actual: "2025-11-01", state: "done" },
+          { name: "2 RFQ Issue", duration: 20, planned: "2025-11-16", forecast: "2025-11-16", actual: "2025-11-16", state: "done" },
+          { name: "3 RFQ Closing", duration: 20, planned: "2025-12-06", forecast: "2025-12-06", actual: "2025-12-08", state: "done" },
+          { name: "4 Eval and Sign Off", duration: 20, planned: "2025-12-26", forecast: "2025-12-26", actual: "2025-12-28", state: "done" },
+          { name: "5 Contract Award", duration: 20, planned: "2026-01-15", forecast: "2026-01-15", actual: "2026-01-20", state: "done" },
+          { name: "6 On Site", duration: null, planned: "2026-04-01", forecast: "2026-04-01", actual: "", state: "current" }
+        ]
+      },
+      {
+        id: "p4",
+        projectId: "XYZ",
+        itemnumber: "010",
+        description: "Platform finishes package",
+        mpl: "MPL-880",
+        contractType: "T&M",
+        qualityProgram: "CSA",
+        site: "Hub North",
+        bundle: "Architectural",
+        folder: "",
+        ops: "Taylor Brooks",
+        proc: "Jordan Lee",
+        tech: "Avery Nguyen",
+        status: "at-risk",
+        stage: "Evaluating",
+        stageDue: "May 02, 2026",
+        ras: "08/30/2026",
+        daysToAward: "55 days",
+        daysToRas: "120 days",
+        comments: "",
+        stages: [
+          { name: "1 SOW Completion", duration: 15, planned: "2026-01-10", forecast: "2026-01-10", actual: "2026-01-12", state: "done" },
+          { name: "2 RFQ Issue", duration: 30, planned: "2026-01-25", forecast: "2026-01-25", actual: "2026-01-28", state: "done" },
+          { name: "3 RFQ Closing", duration: 30, planned: "2026-02-24", forecast: "2026-03-01", actual: "2026-03-02", state: "done" },
+          { name: "4 Eval and Sign Off", duration: 30, planned: "2026-04-01", forecast: "2026-05-02", actual: "", state: "current" },
+          { name: "5 Contract Award", duration: 30, planned: "2026-05-01", forecast: "2026-06-01", actual: "", state: "pending" },
+          { name: "6 On Site", duration: null, planned: "2026-08-30", forecast: "2026-08-30", actual: "", state: "pending" }
+        ]
+      },
+      {
+        id: "p5",
+        projectId: "XYZ",
+        itemnumber: "011",
+        description: "MEP coordination package",
+        mpl: "MPL-900",
+        contractType: "Lump Sum",
+        qualityProgram: "ISO",
+        site: "Hub North",
+        bundle: "MEP",
+        folder: "",
+        ops: "Taylor Brooks",
+        proc: "Morgan Diaz",
+        tech: "Riley Chen",
+        status: "on-track",
+        stage: "RFQ Issuing",
+        stageDue: "Apr 20, 2026",
+        ras: "09/15/2026",
+        daysToAward: "90 days",
+        daysToRas: "140 days",
+        comments: "",
+        stages: [
+          { name: "1 SOW Completion", duration: 15, planned: "2026-03-01", forecast: "2026-03-01", actual: "2026-03-01", state: "done" },
+          { name: "2 RFQ Issue", duration: 30, planned: "2026-03-16", forecast: "2026-04-20", actual: "", state: "current" },
+          { name: "3 RFQ Closing", duration: 30, planned: "2026-04-15", forecast: "2026-05-20", actual: "", state: "pending" },
+          { name: "4 Eval and Sign Off", duration: 30, planned: "2026-05-15", forecast: "2026-06-19", actual: "", state: "pending" },
+          { name: "5 Contract Award", duration: 30, planned: "2026-06-14", forecast: "2026-07-19", actual: "", state: "pending" },
+          { name: "6 On Site", duration: null, planned: "2026-09-15", forecast: "2026-09-15", actual: "", state: "pending" }
+        ]
+      }
+    ];
+
+    let selectedProjectId = "ABC";
+    let selectedPackageId = "p1";
+    let packageFilter = "all";
+
+    function toast(msg, isError) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.toggle("error", !!isError);
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 2600);
+    }
+
+    function showScreen(name) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById("screen-" + name).classList.add("active");
+      document.querySelectorAll(".prototype-bar [data-jump]").forEach(b => {
+        b.classList.toggle("active", b.dataset.jump === name);
+      });
+      if (name === "welcome") renderGallery();
+      if (name === "dashboard") renderProjects();
+      if (name === "details") loadDetails();
+      if (name === "create") syncProjectSelects();
+    }
+
+    function syncProjectSelects() {
+      ["welcome-project", "details-project", "create-project"].forEach(id => {
+        const sel = document.getElementById(id);
+        const current = sel.value || selectedProjectId;
+        sel.innerHTML = projects.map(p =>
+          `<option value="${p.id}">${p.name} (${p.id})</option>`
+        ).join("");
+        sel.value = current;
+      });
+    }
+
+    function renderProjects() {
+      const q = (document.getElementById("project-search").value || "").toLowerCase();
+      const grid = document.getElementById("project-grid");
+      const list = projects.filter(p =>
+        !q || p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q)
+      );
+      grid.innerHTML = list.map(p => `
+        <article class="project-card" data-open-project="${p.id}">
+          <h3>${p.name}</h3>
+          <div class="pid">${p.id}</div>
+          <div class="project-stats">
+            <div class="stat"><b>${p.packages}</b><span>Packages</span></div>
+            <div class="stat"><b>${p.awarded}</b><span>Awarded</span></div>
+            <div class="stat"><b>${p.delayed}</b><span>Delayed</span></div>
+            <div class="stat"><b>${p.atRisk}</b><span>At risk</span></div>
+          </div>
+          <button type="button" class="open-btn" data-open-project="${p.id}">Open project</button>
+        </article>
+      `).join("");
+
+      document.getElementById("kpi-projects").textContent = projects.length;
+      document.getElementById("kpi-packages").textContent = packages.length;
+      document.getElementById("kpi-awarded").textContent = packages.filter(p => p.status === "awarded").length;
+      document.getElementById("kpi-attention").textContent =
+        packages.filter(p => p.status === "delayed" || p.status === "at-risk").length;
+    }
+
+    function statusLabel(s) {
+      return ({
+        "on-track": "On Track",
+        "at-risk": "At Risk",
+        delayed: "Delayed",
+        awarded: "Awarded"
+      })[s] || s;
+    }
+
+    function renderGallery() {
+      syncProjectSelects();
+      document.getElementById("welcome-project").value = selectedProjectId;
+      const q = (document.getElementById("package-search").value || "").toLowerCase();
+      let rows = packages.filter(p => p.projectId === selectedProjectId);
+      if (packageFilter !== "all") rows = rows.filter(p => p.status === packageFilter);
+      if (q) {
+        rows = rows.filter(p =>
+          (p.projectId + "-" + p.itemnumber).toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          p.itemnumber.toLowerCase().includes(q)
+        );
+      }
+      const el = document.getElementById("package-gallery");
+      if (!rows.length) {
+        el.innerHTML = `<div style="padding:40px;text-align:center;color:var(--muted)">No packages match this filter.</div>`;
+        return;
+      }
+      el.innerHTML = rows.map(p => `
+        <div class="gallery-row" data-open-package="${p.id}">
+          <div class="pkg-link">${p.projectId}-${p.itemnumber}</div>
+          <div style="font-weight:600">${p.description}</div>
+          <div>${p.contractType}</div>
+          <div>${p.stageDue}</div>
+          <div><span class="status-pill ${p.status}">${statusLabel(p.status)}</span></div>
+          <div class="row-arrow">›</div>
+        </div>
+      `).join("");
+    }
+
+    function loadDetails() {
+      const p = packages.find(x => x.id === selectedPackageId);
+      if (!p) return;
+      selectedProjectId = p.projectId;
+      syncProjectSelects();
+      document.getElementById("details-project").value = p.projectId;
+      document.getElementById("pkg-prefix").textContent = p.projectId + " - ";
+      document.getElementById("item-number-input").value = p.itemnumber;
+      document.getElementById("mpl-input").value = p.mpl;
+      document.getElementById("desc-input").value = p.description;
+      document.getElementById("qp-input").value = p.qualityProgram;
+      document.getElementById("site-input").value = p.site;
+      document.getElementById("ct-input").value = p.contractType;
+      document.getElementById("bundle-input").value = p.bundle;
+      document.getElementById("folder-input").value = p.folder || "";
+      document.getElementById("ops-input").value = p.ops;
+      document.getElementById("proc-input").value = p.proc;
+      document.getElementById("tech-input").value = p.tech;
+      document.getElementById("comments-input").value = p.comments || "";
+      document.getElementById("m-stage").textContent = p.stage;
+      document.getElementById("m-ras").textContent = p.ras;
+      document.getElementById("m-award").textContent = p.daysToAward;
+      document.getElementById("m-days-ras").textContent = p.daysToRas;
+
+      document.getElementById("stage-body").innerHTML = p.stages.map(s => `
+        <tr>
+          <td><span class="dot ${s.state}"></span> ${s.name}</td>
+          <td>${s.duration == null ? "NA" : `<input type="number" value="${s.duration}" style="width:56px" />`}</td>
+          <td><input type="date" value="${s.planned}" /></td>
+          <td><input type="date" value="${s.forecast}" /></td>
+          <td>${s.actual ? `<input type="date" value="${s.actual}" />` : `<input type="date" />`}</td>
+          <td></td>
+        </tr>
+      `).join("");
+    }
+
+    function saveDetails() {
+      const p = packages.find(x => x.id === selectedPackageId);
+      if (!p) return;
+      const newItem = document.getElementById("item-number-input").value.trim();
+      if (!newItem) {
+        toast("Item number cannot be blank.", true);
+        return;
+      }
+      p.itemnumber = newItem;
+      p.mpl = document.getElementById("mpl-input").value.trim();
+      p.description = document.getElementById("desc-input").value.trim();
+      p.qualityProgram = document.getElementById("qp-input").value;
+      p.site = document.getElementById("site-input").value.trim();
+      p.contractType = document.getElementById("ct-input").value;
+      p.bundle = document.getElementById("bundle-input").value.trim();
+      p.folder = document.getElementById("folder-input").value.trim();
+      p.ops = document.getElementById("ops-input").value.trim();
+      p.proc = document.getElementById("proc-input").value.trim();
+      p.tech = document.getElementById("tech-input").value.trim();
+      p.comments = document.getElementById("comments-input").value;
+      toast("All changes saved successfully!");
+      showScreen("welcome");
+    }
+
+    function addPackage() {
+      const item = document.getElementById("create-item").value.trim() || "999";
+      const desc = document.getElementById("create-desc").value.trim() || "New package";
+      const id = "p" + (packages.length + 1);
+      packages.push({
+        id,
+        projectId: selectedProjectId,
+        itemnumber: item,
+        description: desc,
+        mpl: "",
+        contractType: "Lump Sum",
+        qualityProgram: "CSA",
+        site: "Site A",
+        bundle: "Civil",
+        folder: "",
+        ops: "Sam Patel",
+        proc: "Jordan Lee",
+        tech: "Casey Kim",
+        status: "on-track",
+        stage: "SOW Completion",
+        stageDue: "TBD",
+        ras: "09/01/2026",
+        daysToAward: "—",
+        daysToRas: "—",
+        comments: "",
+        stages: [
+          { name: "1 SOW Completion", duration: 15, planned: "2026-04-01", forecast: "2026-04-01", actual: "", state: "current" },
+          { name: "2 RFQ Issue", duration: 30, planned: "2026-04-16", forecast: "2026-04-16", actual: "", state: "pending" },
+          { name: "3 RFQ Closing", duration: 30, planned: "2026-05-16", forecast: "2026-05-16", actual: "", state: "pending" },
+          { name: "4 Eval and Sign Off", duration: 30, planned: "2026-06-15", forecast: "2026-06-15", actual: "", state: "pending" },
+          { name: "5 Contract Award", duration: 30, planned: "2026-07-15", forecast: "2026-07-15", actual: "", state: "pending" },
+          { name: "6 On Site", duration: null, planned: "2026-09-01", forecast: "2026-09-01", actual: "", state: "pending" }
+        ]
+      });
+      const proj = projects.find(x => x.id === selectedProjectId);
+      if (proj) proj.packages += 1;
+      selectedPackageId = id;
+      toast("Package created — opening details.");
+      showScreen("details");
+    }
+
+    // Events
+    document.querySelectorAll("[data-goto]").forEach(el => {
+      el.addEventListener("click", () => showScreen(el.dataset.goto));
+    });
+    document.querySelectorAll("[data-jump]").forEach(el => {
+      el.addEventListener("click", () => showScreen(el.dataset.jump));
+    });
+
+    document.getElementById("project-grid").addEventListener("click", e => {
+      const btn = e.target.closest("[data-open-project]");
+      if (!btn) return;
+      selectedProjectId = btn.dataset.openProject;
+      showScreen("welcome");
+    });
+
+    document.getElementById("package-gallery").addEventListener("click", e => {
+      const row = e.target.closest("[data-open-package]");
+      if (!row) return;
+      selectedPackageId = row.dataset.openPackage;
+      showScreen("details");
+    });
+
+    document.getElementById("welcome-project").addEventListener("change", e => {
+      selectedProjectId = e.target.value;
+      renderGallery();
+    });
+
+    document.querySelectorAll("[data-filter]").forEach(chip => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll("[data-filter]").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        packageFilter = chip.dataset.filter;
+        renderGallery();
+      });
+    });
+
+    document.getElementById("project-search").addEventListener("input", renderProjects);
+    document.getElementById("package-search").addEventListener("input", renderGallery);
+    document.getElementById("save-btn").addEventListener("click", saveDetails);
+    document.getElementById("add-package-btn").addEventListener("click", addPackage);
+    document.getElementById("create-project").addEventListener("change", e => {
+      selectedProjectId = e.target.value;
+    });
+
+    // Init
+    syncProjectSelects();
+    renderProjects();
+  </script>
+</body>
+</html>
