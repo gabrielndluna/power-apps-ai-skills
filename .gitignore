@@ -1,6 +1,5 @@
 # Ignore generated packages and references
 _reference/
-*.msapp
 *.msapp.zip
 *.msapp.tar.gz
 *.msapp.tmp
