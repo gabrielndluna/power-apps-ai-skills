@@ -33,7 +33,7 @@ ComponentDefinitions:
         DisplayName: OnPressAction
         Description: Onselect of the button
         ReturnType: None
-        Default: =
+        Default: =false
       Text:
         PropertyKind: Input
         DisplayName: Text

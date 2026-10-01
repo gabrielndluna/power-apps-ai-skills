@@ -16,7 +16,7 @@ Generated from ProcTrack Packages/Projects exports (awarded packages only).
 |---|---|---|
 | `sapvendornumber` | Single line of text | |
 | `revisedenddate` | Date and time (Date only) | Revised Subcontract End Date |
-| `currencycode` | Choice | `CAD`, `USD` (default CAD). Do **not** name it `currency` (SharePoint Currency = number). |
+| `currencycode` | Choice | `CAD`, `USD` (default CAD). Do **not** name it `currency` (SharePoint Currency = number). Until this column exists and the SharePoint connection is refreshed in Studio, the app keeps currency in `varSubCurrency` (defaults to CAD) and does not Patch it. |
 | `indigenouscontribution` | Choice | `0`, `5`, `10`, `15`, `20`, `25`, `50`, `100` |
 | `worktype` | Choice | `Boots on ground`, `Supply only`, `Consulting` |
 | `operationalowner` | Single line of text | Display name |

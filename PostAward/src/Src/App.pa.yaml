@@ -27,25 +27,60 @@ App:
       Set(varCaFreeText, false);
       Set(varBackupCaFreeText, false);
       Set(varOwnerFreeText, false);
+      Set(varDetLeftTab, "details");
+      Set(varSubCurrency, "CAD");
       Set(varPendingOpenAddSub, false);
+      Set(varExporting, false);
+      Set(varExportResult, Blank());
       Set(
           varSubcontractsListUrl,
           "https://aecon1.sharepoint.com/sites/CivilPlanningteam/Lists/PostAward%20-%20Subcontracts/AllItems.aspx"
       );
 
-      ClearCollect(
-          colUserPermissions,
-          Filter('ProcTrack - Permissions', Title = varCurrentUserEmail)
+      Set(varCurrentUserEmail, Lower(varCurrentUserEmail));
+      Set(
+          varUserPerm,
+          LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail)
+      );
+      Set(varIsAdmin, Coalesce(varUserPerm.IsAdmin, false));
+      If(
+          IsBlank(varUserPerm),
+          Notify(
+              "No ProcTrack - Permissions row for " & varCurrentUserEmail,
+              NotificationType.Warning
+          )
       );
 
       ClearCollect(
-          colPermittedProjects,
-          Filter(
-              ForAll(
-                  colUserPermissions As perm,
-                  LookUp('ProcTrack - Projects', projectidentifier = perm.Project)
+          colMyProjectIds,
+          Distinct(
+              Filter(
+                  Split(
+                      Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                      ";"
+                  ),
+                  !IsBlank(Trim(ThisRecord.Value))
               ),
-              !IsBlank(projectidentifier)
+              Value
+          )
+      );
+      Clear(colPermittedProjects);
+      ForAll(
+          colMyProjectIds As idRow,
+          Collect(
+              colPermittedProjects,
+              LookUp('ProcTrack - Projects', projectid = Trim(idRow.Value))
+          )
+      );
+      ClearCollect(
+          colPermittedProjects,
+          Filter(colPermittedProjects, !IsBlank(projectid))
+      );
+      If(
+          CountRows(colPermittedProjects) = 0,
+          Notify(
+              "colPermittedProjects is empty (check Permissions Edit_Projects/View_Projects vs Projects.projectid).",
+              NotificationType.Warning
           )
       );
 
@@ -77,22 +112,25 @@ App:
           )
       );
 
-      ClearCollect(colPermittedPackages, Blank());
+      Clear(colPermittedPackages);
       ForAll(
-          colUserPermissions As perm,
+          colPermittedProjects As p,
           Collect(
               colPermittedPackages,
-              Filter('ProcTrack - Packages', projectidentifier = perm.Project)
+              Filter(
+                  'ProcTrack - Packages',
+                  ProjectID = p.projectid || projectidentifier = p.projectidentifier
+              )
           )
       );
 
-      ClearCollect(colProjectSubcontracts, Blank());
-      ClearCollect(colProjectChanges, Blank());
-      ClearCollect(colProjectPackages, Blank());
-      ClearCollect(colRegisterView, Blank());
-      ClearCollect(colAwardedAvailable, Blank());
-      ClearCollect(colSubChanges, Blank());
-      ClearCollect(colHomeAttention, Blank());
-      ClearCollect(colHomePendingChanges, Blank());
+      Clear(colProjectSubcontracts);
+      Clear(colProjectChanges);
+      Clear(colProjectPackages);
+      Clear(colRegisterView);
+      Clear(colAwardedAvailable);
+      Clear(colSubChanges);
+      Clear(colHomeAttention);
+      Clear(colHomePendingChanges);
     StartScreen: =Home
     Theme: =PowerAppsTheme

@@ -25,7 +25,8 @@ App:
           {
               WeekStart: Today(),
               WeekEnd: Today(),
-              WeekLabel: ""
+              WeekLabel: "",
+              WeekStatus: ""
           }
       );
       Clear(colMissingWeeks);

@@ -28,7 +28,19 @@ Screens:
         );
         Set(varSupplierDefault, "No Preference");
         Set(varShowAddSupplier, false);
-        Reset(np_supplier)
+        Reset(np_supplier);
+        With(
+            {
+                proceedRule: LookUp(colApproverRules, Project = varSelectedProject.projectidentifier && RuleType.Value = "Proceed" && Category = "Engineering/Subconsultant"),
+                doaRule: First(Sort(Filter(colApproverRules, Project = varSelectedProject.projectidentifier && RuleType.Value = "DOA" && Category = "Engineering/Subconsultant"), minamount, SortOrder.Ascending))
+            },
+            Set(varNewProceedEmail, Lower(Trim(Coalesce(proceedRule.approveremail, If(!IsBlank(Find("@", Coalesce(proceedRule.approvername, ""))), proceedRule.approvername, Blank())))));
+            Set(varNewProceedName, Coalesce(proceedRule.approvername, varNewProceedEmail));
+            Set(varNewDoaEmail, Lower(Trim(Coalesce(doaRule.approveremail, If(!IsBlank(Find("@", Coalesce(doaRule.approvername, ""))), doaRule.approvername, Blank())))));
+            Set(varNewDoaName, Coalesce(doaRule.approvername, varNewDoaEmail))
+        );
+        Reset(np_proceed);
+        Reset(np_doa)
     Children:
       - np_root:
           Control: GroupContainer@1.5.0
@@ -133,13 +145,16 @@ Screens:
                               With(
                                   {
                                       nextNum: CountRows(Filter(colPermittedPRs, projectidentifier = varSelectedProject.projectidentifier)) + 1,
-                                      proceedWho: Coalesce(np_proceed.Selected.displayname, User().FullName),
-                                      doaWho: Coalesce(np_doa.Selected.displayname, User().FullName)
+                                      catVal: Coalesce(np_category.Selected.Value, "Engineering/Subconsultant"),
+                                      proceedRule: LookUp(colApproverRules, Project = varSelectedProject.projectidentifier && RuleType.Value = "Proceed" && Category = Coalesce(np_category.Selected.Value, "Engineering/Subconsultant")),
+                                      doaRule: First(Sort(Filter(colApproverRules, Project = varSelectedProject.projectidentifier && RuleType.Value = "DOA" && Category = Coalesce(np_category.Selected.Value, "Engineering/Subconsultant")), minamount, SortOrder.Ascending))
                                   },
                                   With(
                                       {
                                           prNum: "PR-" & Text(nextNum, "000"),
-                                          prId: varSelectedProject.projectidentifier & "-PR-" & Text(nextNum, "000")
+                                          prId: varSelectedProject.projectidentifier & "-PR-" & Text(nextNum, "000"),
+                                          proceedWho: Lower(Trim(Coalesce(Coalesce(np_proceed.Selected.Mail, np_proceed.Selected.UserPrincipalName), varNewProceedEmail, proceedRule.approveremail, If(!IsBlank(Find("@", Coalesce(proceedRule.approvername, ""))), Trim(proceedRule.approvername), Blank()), LookUp(colProjectPermissions, Lower(displayname) = Lower(Coalesce(proceedRule.approvername, ""))).Title, First(colApprovers).Title, varCurrentUserEmail))),
+                                          doaWho: Lower(Trim(Coalesce(Coalesce(np_doa.Selected.Mail, np_doa.Selected.UserPrincipalName), varNewDoaEmail, doaRule.approveremail, If(!IsBlank(Find("@", Coalesce(doaRule.approvername, ""))), Trim(doaRule.approvername), Blank()), LookUp(colProjectPermissions, Lower(displayname) = Lower(Coalesce(doaRule.approvername, ""))).Title, First(colApprovers).Title, varCurrentUserEmail)))
                                       },
                                       Patch(
                                           'PRTrack - Requisitions',
@@ -162,7 +177,7 @@ Screens:
                                               proceedapprover: proceedWho,
                                               doaapprover: doaWho,
                                               comments: np_comments.Text,
-                                              prstatus: { Value: "Submitted" }
+                                              prstatus: { Value: "Draft" }
                                           }
                                       );
                                       ForAll(
@@ -182,7 +197,7 @@ Screens:
                                                   proceedstatus: { Value: "Pending" },
                                                   proceedapprover: proceedWho,
                                                   doaapprover: doaWho,
-                                                  stage: { Value: "Pending proceed" }
+                                                  stage: { Value: "Draft" }
                                               }
                                           )
                                       );
@@ -195,9 +210,22 @@ Screens:
                                           Filter('PRTrack - LineItems', pridentifier = prId)
                                       );
                                       ClearCollect(colProjectPRs, Filter(colPermittedPRs, projectidentifier = varSelectedProject.projectidentifier));
-                                      ClearCollect(colProjectLines, Filter(colPermittedLines, StartsWith(pridentifier, varSelectedProject.projectidentifier & "-")));
+                                      ClearCollect(colProjectLines, Filter(colPermittedLines, pridentifier in colProjectPRs.Title));
                                       Set(varSelectedPR, LookUp(colPermittedPRs, Title = prId));
-                                      Notify("PR submitted - waiting on approval to proceed.", NotificationType.Success);
+                                      Set(varDetailTab, "request");
+                                      ClearCollect(
+                                          colDraftLines,
+                                          {
+                                              lineid: GUID(),
+                                              lineno: 1,
+                                              description: "",
+                                              uom: "Each",
+                                              qty: 1,
+                                              notes: ""
+                                          }
+                                      );
+                                      Notify("Draft saved. Add supporting documents, then Submit PR.", NotificationType.Success);
+                                      Set(varOpenAttachOnDetail, true);
                                       Navigate('PR Detail', ScreenTransition.Fade)
                                   )
                               )
@@ -207,8 +235,8 @@ Screens:
                         RadiusTopLeft: =10
                         RadiusTopRight: =10
                         Size: =13
-                        Text: ="Submit PR"
-                        Width: =130
+                        Text: ="Next"
+                        Width: =100
             - np_body:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -568,6 +596,19 @@ Screens:
                                           Font: =Font.'Segoe UI'
                                           Height: =36
                                           Items: =["Engineering/Subconsultant", "General Expenses", "Construction"]
+                                          OnChange: |-
+                                            =With(
+                                                {
+                                                    proceedRule: LookUp(colApproverRules, Project = varSelectedProject.projectidentifier && RuleType.Value = "Proceed" && Category = Self.Selected.Value),
+                                                    doaRule: First(Sort(Filter(colApproverRules, Project = varSelectedProject.projectidentifier && RuleType.Value = "DOA" && Category = Self.Selected.Value), minamount, SortOrder.Ascending))
+                                                },
+                                                Set(varNewProceedEmail, Lower(Trim(Coalesce(proceedRule.approveremail, If(!IsBlank(Find("@", Coalesce(proceedRule.approvername, ""))), proceedRule.approvername, Blank())))));
+                                                Set(varNewProceedName, Coalesce(proceedRule.approvername, varNewProceedEmail));
+                                                Set(varNewDoaEmail, Lower(Trim(Coalesce(doaRule.approveremail, If(!IsBlank(Find("@", Coalesce(doaRule.approvername, ""))), doaRule.approvername, Blank())))));
+                                                Set(varNewDoaName, Coalesce(doaRule.approvername, varNewDoaEmail));
+                                                Reset(np_proceed);
+                                                Reset(np_doa)
+                                            )
                                           Size: =12
                         - np_row4:
                             Control: GroupContainer@1.5.0
@@ -818,21 +859,49 @@ Screens:
                                           Size: =11
                                           Text: ="Proceed Approver"
                                     - np_proceed:
-                                        Control: Classic/DropDown@2.3.1
+                                        Control: Classic/ComboBox@2.4.0
                                         Properties:
                                           BorderColor: =RGBA(232, 234, 239, 1)
-                                          BorderThickness: =1
-                                          Color: =RGBA(22, 39, 63, 1)
-                                          Fill: =RGBA(255, 255, 255, 1)
-                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
-                                          HoverFill: =RGBA(255, 255, 255, 1)
                                           ChevronBackground: =RGBA(255, 255, 255, 1)
                                           ChevronFill: =RGBA(176, 51, 63, 1)
-                                          AllowEmptySelection: =false
+                                          DefaultSelectedItems: |-
+                                            =If(
+                                                !IsBlank(varNewProceedEmail),
+                                                Table(
+                                                    {
+                                                        Id: varNewProceedEmail,
+                                                        DisplayName: Coalesce(varNewProceedName, varNewProceedEmail),
+                                                        Mail: varNewProceedEmail,
+                                                        UserPrincipalName: varNewProceedEmail,
+                                                        Department: ""
+                                                    }
+                                                )
+                                            )
+                                          DisplayFields: =["DisplayName"]
+                                          Fill: =RGBA(255, 255, 255, 1)
                                           Font: =Font.'Segoe UI'
                                           Height: =36
-                                          Items: =colApprovers
-                                          Items.Value: =displayname
+                                          InputTextPlaceholder: ="Search by name or email"
+                                          IsSearchable: =true
+                                          Items: |-
+                                            =If(
+                                                !IsBlank(Trim(Self.SearchText)),
+                                                ShowColumns(
+                                                    Office365Users.SearchUser(
+                                                        { searchTerm: Trim(Self.SearchText), top: 15 }
+                                                    ),
+                                                    Id, DisplayName, Mail, UserPrincipalName, Department
+                                                )
+                                            )
+                                          OnChange: |-
+                                            =If(
+                                                !IsBlank(Self.Selected),
+                                                Set(varNewProceedEmail, Lower(Coalesce(Self.Selected.Mail, Self.Selected.UserPrincipalName)));
+                                                Set(varNewProceedName, Self.Selected.DisplayName)
+                                            )
+                                          SearchFields: =["DisplayName", "Mail"]
+                                          SelectMultiple: =false
+                                          Size: =12
                               - np_f_doa:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -856,21 +925,49 @@ Screens:
                                           Size: =11
                                           Text: ="DOA Approver"
                                     - np_doa:
-                                        Control: Classic/DropDown@2.3.1
+                                        Control: Classic/ComboBox@2.4.0
                                         Properties:
                                           BorderColor: =RGBA(232, 234, 239, 1)
-                                          BorderThickness: =1
-                                          Color: =RGBA(22, 39, 63, 1)
-                                          Fill: =RGBA(255, 255, 255, 1)
-                                          HoverBorderColor: =RGBA(176, 51, 63, 1)
-                                          HoverFill: =RGBA(255, 255, 255, 1)
                                           ChevronBackground: =RGBA(255, 255, 255, 1)
                                           ChevronFill: =RGBA(176, 51, 63, 1)
-                                          AllowEmptySelection: =false
+                                          DefaultSelectedItems: |-
+                                            =If(
+                                                !IsBlank(varNewDoaEmail),
+                                                Table(
+                                                    {
+                                                        Id: varNewDoaEmail,
+                                                        DisplayName: Coalesce(varNewDoaName, varNewDoaEmail),
+                                                        Mail: varNewDoaEmail,
+                                                        UserPrincipalName: varNewDoaEmail,
+                                                        Department: ""
+                                                    }
+                                                )
+                                            )
+                                          DisplayFields: =["DisplayName"]
+                                          Fill: =RGBA(255, 255, 255, 1)
                                           Font: =Font.'Segoe UI'
                                           Height: =36
-                                          Items: =colApprovers
-                                          Items.Value: =displayname
+                                          InputTextPlaceholder: ="Search by name or email"
+                                          IsSearchable: =true
+                                          Items: |-
+                                            =If(
+                                                !IsBlank(Trim(Self.SearchText)),
+                                                ShowColumns(
+                                                    Office365Users.SearchUser(
+                                                        { searchTerm: Trim(Self.SearchText), top: 15 }
+                                                    ),
+                                                    Id, DisplayName, Mail, UserPrincipalName, Department
+                                                )
+                                            )
+                                          OnChange: |-
+                                            =If(
+                                                !IsBlank(Self.Selected),
+                                                Set(varNewDoaEmail, Lower(Coalesce(Self.Selected.Mail, Self.Selected.UserPrincipalName)));
+                                                Set(varNewDoaName, Self.Selected.DisplayName)
+                                            )
+                                          SearchFields: =["DisplayName", "Mail"]
+                                          SelectMultiple: =false
+                                          Size: =12
                   - np_lines_card:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout

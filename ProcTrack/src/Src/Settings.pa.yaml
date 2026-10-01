@@ -1,0 +1,1279 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Settings:
+    Properties:
+      Fill: =RGBA(245, 245, 245, 1)
+      LoadingSpinnerColor: =RGBA(214, 12, 48, 1)
+      OnVisible: |-
+        =Set(varSettingsTab, If(varIsAdmin, "users", "columns"));
+        Set(varSettingsSelectedEmail, "");
+        Set(varSettingsSelectedName, "");
+        Set(varSettingsGrantAdmin, false);
+        Set(varSettingsEditProject, Blank());
+        Set(varSettingsFilter, "");
+        ClearCollect(colAllProjects, 'ProcTrack - Projects');
+        ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+        ClearCollect(
+            colSettingsProjectAccess,
+            ForAll(
+                colAllProjects As p,
+                {
+                    projectid: p.projectid,
+                    projectidentifier: p.projectidentifier,
+                    projectname: p.projectname,
+                    access: "None"
+                }
+            )
+        );
+        Reset(set_user_combo)
+    Children:
+      - set_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(245, 245, 245, 1)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =10
+            PaddingBottom: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =12
+            Width: =Parent.Width
+          Children:
+            - set_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.Light
+                  Fill: =RGBA(214, 12, 48, 1)
+                  FillPortions: =0
+                  Height: =64
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =10
+                  PaddingBottom: =10
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =10
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                Children:
+                  - set_back_btn:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(214, 12, 48, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =34
+                        OnSelect: =Back()
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Text: ="Back"
+                        Width: =72
+                  - set_header_title_col:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                      Children:
+                        - set_header_title:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =24
+                              Size: =18
+                              Text: ="Settings"
+                        - set_header_sub:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 0.85)
+                              Font: =Font.'Segoe UI'
+                              Height: =16
+                              Size: =11
+                              Text: =User().FullName & "  |  " & If(varIsAdmin, "Admin", "User")
+            - set_tabs:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =40
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =8
+                  LayoutMinHeight: =40
+                Children:
+                  - set_tab_users:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =If(varSettingsTab = "users", RGBA(255, 255, 255, 1), RGBA(48, 48, 48, 1))
+                        Fill: =If(varSettingsTab = "users", RGBA(214, 12, 48, 1), RGBA(255, 255, 255, 1))
+                        FillPortions: =1
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Set(varSettingsTab, "users")
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Text: ="Users"
+                        Visible: =varIsAdmin
+                  - set_tab_projects:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =If(varSettingsTab = "projects", RGBA(255, 255, 255, 1), RGBA(48, 48, 48, 1))
+                        Fill: =If(varSettingsTab = "projects", RGBA(214, 12, 48, 1), RGBA(255, 255, 255, 1))
+                        FillPortions: =1
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: |-
+                          =Set(varSettingsTab, "projects");
+                          Set(varSettingsEditProject, Blank());
+                          Reset(set_proj_id);
+                          Reset(set_proj_name);
+                          Reset(set_proj_code)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Text: ="Projects"
+                        Visible: =varIsAdmin
+                  - set_tab_columns:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =If(varSettingsTab = "columns", RGBA(255, 255, 255, 1), RGBA(48, 48, 48, 1))
+                        Fill: =If(varSettingsTab = "columns", RGBA(214, 12, 48, 1), RGBA(255, 255, 255, 1))
+                        FillPortions: =1
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        OnSelect: =Set(varSettingsTab, "columns")
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Text: ="Columns"
+            - set_body:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =1
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMinHeight: =0
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                Children:
+                  - set_users_panel:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =0
+                        Visible: =varIsAdmin && varSettingsTab = "users"
+                      Children:
+                        - set_users_add_card:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              PaddingBottom: =14
+                              PaddingLeft: =14
+                              PaddingRight: =14
+                              PaddingTop: =12
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - set_users_add_title:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(48, 48, 48, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =14
+                                    Text: ="Add or update user"
+                              - set_users_add_hint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    Size: =11
+                                    Text: ="Search a person, set project access (View/Edit), optionally Admin, then Save."
+                              - set_user_combo:
+                                  Control: Classic/ComboBox@2.4.0
+                                  Properties:
+                                    BorderColor: =RGBA(200, 204, 210, 1)
+                                    ChevronBackground: =RGBA(214, 12, 48, 1)
+                                    ChevronFill: =RGBA(255, 255, 255, 1)
+                                    DisplayFields: =["DisplayName"]
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    Height: =40
+                                    InputTextPlaceholder: ="Search by name or email"
+                                    IsSearchable: =true
+                                    Items: |-
+                                      =If(
+                                          !IsBlank(Trim(Self.SearchText)),
+                                          ShowColumns(
+                                              Office365Users.SearchUser(
+                                                  {
+                                                      searchTerm: Trim(Self.SearchText),
+                                                      top: 15
+                                                  }
+                                              ),
+                                              Id,
+                                              DisplayName,
+                                              Mail,
+                                              UserPrincipalName,
+                                              Department
+                                          )
+                                      )
+                                    OnChange: |-
+                                      =Set(
+                                          varSettingsSelectedEmail,
+                                          Lower(Coalesce(Self.Selected.Mail, Self.Selected.UserPrincipalName))
+                                      );
+                                      Set(varSettingsSelectedName, Self.Selected.DisplayName);
+                                      With(
+                                          {
+                                              existing: LookUp(colAllPermissions, Lower(Title) = varSettingsSelectedEmail)
+                                          },
+                                          Set(varSettingsGrantAdmin, Coalesce(existing.IsAdmin, false));
+                                          ClearCollect(
+                                              colSettingsProjectAccess,
+                                              ForAll(
+                                                  colAllProjects As p,
+                                                  {
+                                                      projectid: p.projectid,
+                                                      projectidentifier: p.projectidentifier,
+                                                      projectname: p.projectname,
+                                                      access: If(
+                                                          !IsBlank(LookUp(Split(Coalesce(existing.Edit_Projects, ""), ";"), Trim(Value) = p.projectid)),
+                                                          "Edit",
+                                                          If(
+                                                              !IsBlank(LookUp(Split(Coalesce(existing.View_Projects, ""), ";"), Trim(Value) = p.projectid)),
+                                                              "View",
+                                                              "None"
+                                                          )
+                                                      )
+                                                  }
+                                              )
+                                          )
+                                      )
+                                    SearchFields: =["DisplayName", "Mail"]
+                                    SelectMultiple: =false
+                                    Width: =Parent.Width
+                              - set_selected_hint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    Size: =11
+                                    Text: =varSettingsSelectedName & "  |  " & varSettingsSelectedEmail
+                                    Visible: =!IsBlank(varSettingsSelectedEmail)
+                              - set_admin_chk:
+                                  Control: CheckBox@0.0.30
+                                  Properties:
+                                    BasePaletteColor: =RGBA(214, 12, 48, 1)
+                                    Checked: =varSettingsGrantAdmin
+                                    CheckboxSize: =20
+                                    Height: =28
+                                    Label: ="Admin (manage users and projects)"
+                                    OnCheck: =Set(varSettingsGrantAdmin, true)
+                                    OnUncheck: =Set(varSettingsGrantAdmin, false)
+                                    Width: =280
+                              - set_access_gallery:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_BlankGallery
+                                  Properties:
+                                    Height: =Min(220, Max(80, CountRows(colSettingsProjectAccess) * 44))
+                                    Items: =colSettingsProjectAccess
+                                    TemplatePadding: =0
+                                    TemplateSize: =42
+                                    Width: =Parent.Width
+                                  Children:
+                                    - set_access_row:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(250, 251, 252, 1)
+                                          Height: =40
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          PaddingLeft: =8
+                                          PaddingRight: =8
+                                          RadiusBottomLeft: =6
+                                          RadiusBottomRight: =6
+                                          RadiusTopLeft: =6
+                                          RadiusTopRight: =6
+                                          Width: =Parent.TemplateWidth
+                                        Children:
+                                          - set_access_proj:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(48, 48, 48, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                Height: =28
+                                                Size: =12
+                                                Text: =ThisItem.projectidentifier & " - " & ThisItem.projectname
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
+                                          - set_access_dd:
+                                              Control: Classic/DropDown@2.3.1
+                                              Properties:
+                                                AllowEmptySelection: =false
+                                                BorderColor: =RGBA(200, 204, 210, 1)
+                                                Default: =ThisItem.access
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                Height: =32
+                                                Items: =["None", "View", "Edit"]
+                                                OnChange: |-
+                                                  =Patch(
+                                                      colSettingsProjectAccess,
+                                                      ThisItem,
+                                                      { access: Self.Selected.Value }
+                                                  )
+                                                Size: =11
+                                                Width: =100
+                              - set_users_actions:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =40
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                  Children:
+                                    - set_users_spacer:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =1
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                    - set_users_clear:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(200, 204, 210, 1)
+                                          Color: =RGBA(48, 48, 48, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =36
+                                          OnSelect: |-
+                                            =Reset(set_user_combo);
+                                            Set(varSettingsSelectedEmail, "");
+                                            Set(varSettingsSelectedName, "");
+                                            Set(varSettingsGrantAdmin, false);
+                                            ClearCollect(
+                                                colSettingsProjectAccess,
+                                                ForAll(
+                                                    colAllProjects As p,
+                                                    {
+                                                        projectid: p.projectid,
+                                                        projectidentifier: p.projectidentifier,
+                                                        projectname: p.projectname,
+                                                        access: "None"
+                                                    }
+                                                )
+                                            )
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Size: =12
+                                          Text: ="Clear"
+                                          Width: =90
+                                    - set_users_save:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderThickness: =0
+                                          Color: =RGBA(255, 255, 255, 1)
+                                          DisplayMode: =If(IsBlank(varSettingsSelectedEmail), DisplayMode.Disabled, DisplayMode.Edit)
+                                          Fill: =RGBA(214, 12, 48, 1)
+                                          Height: =36
+                                          OnSelect: |-
+                                            =If(
+                                                IsBlank(varSettingsSelectedEmail),
+                                                Notify("Select a person first.", NotificationType.Warning),
+                                                With(
+                                                    {
+                                                        editIds: Concat(
+                                                            Filter(colSettingsProjectAccess, access = "Edit" && !IsBlank(projectid)),
+                                                            projectid,
+                                                            ";"
+                                                        ),
+                                                        viewIds: Concat(
+                                                            Filter(colSettingsProjectAccess, access = "View" && !IsBlank(projectid)),
+                                                            projectid,
+                                                            ";"
+                                                        ),
+                                                        existing: LookUp(colAllPermissions, Lower(Title) = varSettingsSelectedEmail)
+                                                    },
+                                                    Collect(
+                                                        colAllPermissions,
+                                                        Patch(
+                                                            'ProcTrack - Permissions',
+                                                            Coalesce(existing, Defaults('ProcTrack - Permissions')),
+                                                            {
+                                                                Title: varSettingsSelectedEmail,
+                                                                Name: varSettingsSelectedName,
+                                                                IsAdmin: varSettingsGrantAdmin,
+                                                                Edit_Projects: editIds,
+                                                                View_Projects: viewIds
+                                                            }
+                                                        )
+                                                    );
+                                                    ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+                                                    If(
+                                                        varSettingsSelectedEmail = varCurrentUserEmail,
+                                                        Set(varUserPerm, LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail));
+                                                        Set(varIsAdmin, Coalesce(varUserPerm.IsAdmin, false))
+                                                    );
+                                                    Notify("User saved. Flow will grant app access on new records.", NotificationType.Success)
+                                                )
+                                            )
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Size: =12
+                                          Text: ="Save user"
+                                          Width: =120
+                        - set_users_list_card:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              PaddingBottom: =12
+                              PaddingLeft: =14
+                              PaddingRight: =14
+                              PaddingTop: =12
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - set_users_list_title:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(48, 48, 48, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =14
+                                    Text: ="All users"
+                              - set_users_filter:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    BorderColor: =RGBA(200, 204, 210, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =34
+                                    HintText: ="Filter by name or email"
+                                    OnChange: =Set(varSettingsFilter, Lower(Trim(Self.Text)))
+                                    Size: =12
+                                    Width: =Parent.Width
+                              - set_users_gallery:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_BlankGallery
+                                  Properties:
+                                    Height: =280
+                                    Items: |-
+                                      =Filter(
+                                          colAllPermissions,
+                                          IsBlank(varSettingsFilter) ||
+                                          varSettingsFilter in Lower(Coalesce(Name, "")) ||
+                                          varSettingsFilter in Lower(Coalesce(Title, ""))
+                                      )
+                                    TemplatePadding: =0
+                                    TemplateSize: =56
+                                    Width: =Parent.Width
+                                  Children:
+                                    - set_ug_row:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(250, 251, 252, 1)
+                                          Height: =52
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          PaddingLeft: =10
+                                          PaddingRight: =10
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Width: =Parent.TemplateWidth
+                                        Children:
+                                          - set_ug_text:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =1
+                                                LayoutDirection: =LayoutDirection.Vertical
+                                                LayoutGap: =0
+                                                LayoutMinHeight: =0
+                                              Children:
+                                                - set_ug_name:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =RGBA(48, 48, 48, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =18
+                                                      Size: =12
+                                                      Text: =ThisItem.Name
+                                                      Wrap: =false
+                                                - set_ug_email:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =RGBA(106, 122, 127, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =16
+                                                      Size: =10
+                                                      Text: |-
+                                                        =ThisItem.Title & If(ThisItem.IsAdmin, "  ·  Admin", "") &
+                                                        "  ·  Edit " & CountRows(Filter(Split(Coalesce(ThisItem.Edit_Projects, ""), ";"), !IsBlank(Trim(Value)))) &
+                                                        "  ·  View " & CountRows(Filter(Split(Coalesce(ThisItem.View_Projects, ""), ";"), !IsBlank(Trim(Value))))
+                                                      Wrap: =false
+                                          - set_ug_edit:
+                                              Control: Classic/Button@2.2.0
+                                              Properties:
+                                                BorderThickness: =0
+                                                Color: =RGBA(255, 255, 255, 1)
+                                                Fill: =RGBA(214, 12, 48, 1)
+                                                Height: =30
+                                                OnSelect: |-
+                                                  =Set(varSettingsSelectedEmail, Lower(ThisItem.Title));
+                                                  Set(varSettingsSelectedName, ThisItem.Name);
+                                                  Set(varSettingsGrantAdmin, Coalesce(ThisItem.IsAdmin, false));
+                                                  ClearCollect(
+                                                      colSettingsProjectAccess,
+                                                      ForAll(
+                                                          colAllProjects As p,
+                                                          {
+                                                              projectid: p.projectid,
+                                                              projectidentifier: p.projectidentifier,
+                                                              projectname: p.projectname,
+                                                              access: If(
+                                                                  !IsBlank(LookUp(Split(Coalesce(ThisItem.Edit_Projects, ""), ";"), Trim(Value) = p.projectid)),
+                                                                  "Edit",
+                                                                  If(
+                                                                      !IsBlank(LookUp(Split(Coalesce(ThisItem.View_Projects, ""), ";"), Trim(Value) = p.projectid)),
+                                                                      "View",
+                                                                      "None"
+                                                                  )
+                                                              )
+                                                          }
+                                                      )
+                                                  )
+                                                RadiusBottomLeft: =6
+                                                RadiusBottomRight: =6
+                                                RadiusTopLeft: =6
+                                                RadiusTopRight: =6
+                                                Size: =11
+                                                Text: ="Edit"
+                                                Width: =70
+                  - set_projects_panel:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        LayoutMinHeight: =0
+                        Visible: =varIsAdmin && varSettingsTab = "projects"
+                      Children:
+                        - set_proj_form_card:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              PaddingBottom: =14
+                              PaddingLeft: =14
+                              PaddingRight: =14
+                              PaddingTop: =12
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - set_proj_form_title:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(48, 48, 48, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =14
+                                    Text: =If(IsBlank(varSettingsEditProject), "Add project", "Edit project")
+                              - set_proj_form_hint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =32
+                                    Size: =11
+                                    Text: ="projectid is stable. Changing identifier/code/name does not break permissions or packages."
+                                    Wrap: =true
+                              - set_proj_fields_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =70
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =10
+                                  Children:
+                                    - set_proj_id_col:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =1
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                        Children:
+                                          - set_proj_id_lbl:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(106, 122, 127, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =16
+                                                Size: =10
+                                                Text: ="Project identifier"
+                                          - set_proj_id:
+                                              Control: Classic/TextInput@2.3.2
+                                              Properties:
+                                                BorderColor: =RGBA(200, 204, 210, 1)
+                                                Default: =varSettingsEditProject.projectidentifier
+                                                Font: =Font.'Segoe UI'
+                                                Height: =36
+                                                Size: =12
+                                    - set_proj_code_col:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =1
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =2
+                                        Children:
+                                          - set_proj_code_lbl:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(106, 122, 127, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =16
+                                                Size: =10
+                                                Text: ="Project code"
+                                          - set_proj_code:
+                                              Control: Classic/TextInput@2.3.2
+                                              Properties:
+                                                BorderColor: =RGBA(200, 204, 210, 1)
+                                                Default: =varSettingsEditProject.projectcode
+                                                Font: =Font.'Segoe UI'
+                                                Height: =36
+                                                Size: =12
+                              - set_proj_name_lbl:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =16
+                                    Size: =10
+                                    Text: ="Project name"
+                              - set_proj_name:
+                                  Control: Classic/TextInput@2.3.2
+                                  Properties:
+                                    BorderColor: =RGBA(200, 204, 210, 1)
+                                    Default: =varSettingsEditProject.projectname
+                                    Font: =Font.'Segoe UI'
+                                    Height: =36
+                                    Size: =12
+                                    Width: =Parent.Width
+                              - set_proj_logo_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =88
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =12
+                                  Children:
+                                    - set_proj_logo_preview:
+                                        Control: Image@2.2.3
+                                        Properties:
+                                          BorderColor: =RGBA(200, 204, 210, 1)
+                                          FillPortions: =0
+                                          Height: =80
+                                          Image: =varSettingsEditProject.project_logo
+                                          Width: =80
+                                    - set_proj_logo_help:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(106, 122, 127, 1)
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          Height: =70
+                                          Size: =11
+                                          Text: ="Logo preview from SharePoint Image column project_logo. Upload/replace the image in the Projects list (or add an Add picture control in Studio after import)."
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Wrap: =true
+                              - set_proj_actions:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =40
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =8
+                                  Children:
+                                    - set_proj_spacer:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: ManualLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =1
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                    - set_proj_cancel:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderColor: =RGBA(200, 204, 210, 1)
+                                          Color: =RGBA(48, 48, 48, 1)
+                                          Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =36
+                                          OnSelect: |-
+                                            =Set(varSettingsEditProject, Blank());
+                                            Reset(set_proj_id);
+                                            Reset(set_proj_name);
+                                            Reset(set_proj_code)
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Size: =12
+                                          Text: ="Cancel"
+                                          Width: =90
+                                    - set_proj_save:
+                                        Control: Classic/Button@2.2.0
+                                        Properties:
+                                          BorderThickness: =0
+                                          Color: =RGBA(255, 255, 255, 1)
+                                          DisplayMode: |-
+                                            =If(
+                                                IsBlank(Trim(set_proj_id.Text)) || IsBlank(Trim(set_proj_name.Text)),
+                                                DisplayMode.Disabled,
+                                                DisplayMode.Edit
+                                            )
+                                          Fill: =RGBA(214, 12, 48, 1)
+                                          Height: =36
+                                          OnSelect: |-
+                                            =If(
+                                                IsBlank(Trim(set_proj_id.Text)) || IsBlank(Trim(set_proj_name.Text)),
+                                                Notify("Identifier and name are required.", NotificationType.Warning),
+                                                If(
+                                                    IsBlank(varSettingsEditProject),
+                                                    With(
+                                                        { newId: Lower(Text(GUID())) },
+                                                        Patch(
+                                                            'ProcTrack - Projects',
+                                                            Defaults('ProcTrack - Projects'),
+                                                            {
+                                                                projectid: newId,
+                                                                projectidentifier: Trim(set_proj_id.Text),
+                                                                projectname: Trim(set_proj_name.Text),
+                                                                projectcode: Trim(set_proj_code.Text),
+                                                                Title: Trim(set_proj_id.Text),
+                                                                creationdate: Today()
+                                                            }
+                                                        );
+                                                        With(
+                                                            {
+                                                                existing: LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail),
+                                                                editIds: If(
+                                                                    IsBlank(LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail)),
+                                                                    newId,
+                                                                    If(
+                                                                        IsBlank(LookUp(Split(Coalesce(LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail).Edit_Projects, ""), ";"), Trim(Value) = newId)),
+                                                                        If(
+                                                                            IsBlank(Trim(Coalesce(LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail).Edit_Projects, ""))),
+                                                                            newId,
+                                                                            Trim(LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail).Edit_Projects) & ";" & newId
+                                                                        ),
+                                                                        LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail).Edit_Projects
+                                                                    )
+                                                                )
+                                                            },
+                                                            Patch(
+                                                                'ProcTrack - Permissions',
+                                                                Coalesce(existing, Defaults('ProcTrack - Permissions')),
+                                                                {
+                                                                    Title: varCurrentUserEmail,
+                                                                    Name: User().FullName,
+                                                                    IsAdmin: If(IsBlank(existing), true, Coalesce(existing.IsAdmin, true)),
+                                                                    Edit_Projects: editIds,
+                                                                    View_Projects: Coalesce(existing.View_Projects, "")
+                                                                }
+                                                            )
+                                                        );
+                                                        Notify("Project created. You were granted Edit access.", NotificationType.Success)
+                                                    ),
+                                                    Patch(
+                                                        'ProcTrack - Projects',
+                                                        varSettingsEditProject,
+                                                        {
+                                                            projectidentifier: Trim(set_proj_id.Text),
+                                                            projectname: Trim(set_proj_name.Text),
+                                                            projectcode: Trim(set_proj_code.Text),
+                                                            Title: Trim(set_proj_id.Text)
+                                                        }
+                                                    );
+                                                    Notify("Project updated.", NotificationType.Success)
+                                                );
+                                                ClearCollect(colAllProjects, 'ProcTrack - Projects');
+                                                Set(varUserPerm, LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail));
+                                                Set(varIsAdmin, Coalesce(varUserPerm.IsAdmin, false));
+                                                ClearCollect(
+                                                    colMyProjectIds,
+                                                    Distinct(
+                                                        Filter(
+                                                            Split(
+                                                                Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                                                                ";"
+                                                            ),
+                                                            !IsBlank(Trim(ThisRecord.Value))
+                                                        ),
+                                                        Value
+                                                    )
+                                                );
+                                                Clear(colPermittedProjects);
+                                                ForAll(
+                                                    colMyProjectIds As idRow,
+                                                    Collect(
+                                                        colPermittedProjects,
+                                                        LookUp('ProcTrack - Projects', projectid = Trim(idRow.Value))
+                                                    )
+                                                );
+                                                ClearCollect(
+                                                    colPermittedProjects,
+                                                    Filter(colPermittedProjects, !IsBlank(projectid))
+                                                );
+                                                Set(varSettingsEditProject, Blank());
+                                                Reset(set_proj_id);
+                                                Reset(set_proj_name);
+                                                Reset(set_proj_code)
+                                            )
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Size: =12
+                                          Text: =If(IsBlank(varSettingsEditProject), "Add project", "Save project")
+                                          Width: =130
+                        - set_proj_list_card:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              PaddingBottom: =12
+                              PaddingLeft: =14
+                              PaddingRight: =14
+                              PaddingTop: =12
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - set_proj_list_title:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(48, 48, 48, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    Size: =14
+                                    Text: ="All projects"
+                              - set_proj_gallery:
+                                  Control: Gallery@2.15.0
+                                  Variant: BrowseLayout_Vertical_BlankGallery
+                                  Properties:
+                                    Height: =280
+                                    Items: =SortByColumns(colAllProjects, "projectidentifier", SortOrder.Ascending)
+                                    TemplatePadding: =0
+                                    TemplateSize: =64
+                                    Width: =Parent.Width
+                                  Children:
+                                    - set_pg_row:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Fill: =RGBA(250, 251, 252, 1)
+                                          Height: =60
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =10
+                                          PaddingLeft: =10
+                                          PaddingRight: =10
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          Width: =Parent.TemplateWidth
+                                        Children:
+                                          - set_pg_logo:
+                                              Control: Image@2.2.3
+                                              Properties:
+                                                FillPortions: =0
+                                                Height: =40
+                                                Image: =ThisItem.project_logo
+                                                Width: =40
+                                          - set_pg_text:
+                                              Control: GroupContainer@1.5.0
+                                              Variant: AutoLayout
+                                              Properties:
+                                                DropShadow: =DropShadow.None
+                                                FillPortions: =1
+                                                LayoutDirection: =LayoutDirection.Vertical
+                                                LayoutGap: =0
+                                              Children:
+                                                - set_pg_name:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =RGBA(48, 48, 48, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =18
+                                                      Size: =12
+                                                      Text: =ThisItem.projectname
+                                                      Wrap: =false
+                                                - set_pg_meta:
+                                                    Control: Label@2.5.1
+                                                    Properties:
+                                                      Color: =RGBA(106, 122, 127, 1)
+                                                      Font: =Font.'Segoe UI'
+                                                      Height: =16
+                                                      Size: =10
+                                                      Text: |-
+                                                        =ThisItem.projectidentifier &
+                                                        If(!IsBlank(ThisItem.projectcode), "  ·  code " & ThisItem.projectcode, "") &
+                                                        "  ·  id " & ThisItem.projectid
+                                                      Wrap: =false
+                                          - set_pg_edit:
+                                              Control: Classic/Button@2.2.0
+                                              Properties:
+                                                BorderThickness: =0
+                                                Color: =RGBA(255, 255, 255, 1)
+                                                Fill: =RGBA(214, 12, 48, 1)
+                                                Height: =30
+                                                OnSelect: |-
+                                                  =Set(varSettingsEditProject, ThisItem);
+                                                  Reset(set_proj_id);
+                                                  Reset(set_proj_name);
+                                                  Reset(set_proj_code)
+                                                RadiusBottomLeft: =6
+                                                RadiusBottomRight: =6
+                                                RadiusTopLeft: =6
+                                                RadiusTopRight: =6
+                                                Size: =11
+                                                Text: ="Edit"
+                                                Width: =70
+                  - set_columns_panel:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        PaddingBottom: =16
+                        PaddingLeft: =16
+                        PaddingRight: =16
+                        PaddingTop: =14
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Visible: =varSettingsTab = "columns"
+                      Children:
+                        - set_columns_title:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(48, 48, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              Size: =14
+                              Text: ="Column Settings"
+                        - set_columns_hint:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =20
+                              Size: =11
+                              Text: ="Choose which four columns appear on the package list."
+                        - set_col_row1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =40
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                            Children:
+                              - set_col1_lbl:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(48, 48, 48, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =30
+                                    Size: =12
+                                    Text: ="Column 1"
+                                    Width: =100
+                              - set_col1:
+                                  Control: ModernCombobox@1.1.0
+                                  Properties:
+                                    DefaultSelectedItems: =LookUp(colColumns, key = varCol1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    ItemDisplayText: =ThisItem.key
+                                    Items: =Filter(colColumns, slotEligible)
+                                    OnChange: |-
+                                      =Set(varCol1, Self.Selected.key);
+                                      Set(
+                                          varUserPrefs,
+                                          Patch(
+                                              'ProcTrack - UserColumnPrefs',
+                                              Coalesce(varUserPrefs, Defaults('ProcTrack - UserColumnPrefs')),
+                                              {
+                                                  Title: varCurrentUserEmail,
+                                                  Col1: varCol1,
+                                                  Col2: varCol2,
+                                                  Col3: varCol3,
+                                                  Col4: varCol4
+                                              }
+                                          )
+                                      )
+                        - set_col_row2:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =40
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                            Children:
+                              - set_col2_lbl:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(48, 48, 48, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =30
+                                    Size: =12
+                                    Text: ="Column 2"
+                                    Width: =100
+                              - set_col2:
+                                  Control: ModernCombobox@1.1.0
+                                  Properties:
+                                    DefaultSelectedItems: =LookUp(colColumns, key = varCol2)
+                                    FillPortions: =1
+                                    Height: =34
+                                    ItemDisplayText: =ThisItem.key
+                                    Items: =Filter(colColumns, slotEligible)
+                                    OnChange: |-
+                                      =Set(varCol2, Self.Selected.key);
+                                      Set(
+                                          varUserPrefs,
+                                          Patch(
+                                              'ProcTrack - UserColumnPrefs',
+                                              Coalesce(varUserPrefs, Defaults('ProcTrack - UserColumnPrefs')),
+                                              {
+                                                  Title: varCurrentUserEmail,
+                                                  Col1: varCol1,
+                                                  Col2: varCol2,
+                                                  Col3: varCol3,
+                                                  Col4: varCol4
+                                              }
+                                          )
+                                      )
+                        - set_col_row3:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =40
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                            Children:
+                              - set_col3_lbl:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(48, 48, 48, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =30
+                                    Size: =12
+                                    Text: ="Column 3"
+                                    Width: =100
+                              - set_col3:
+                                  Control: ModernCombobox@1.1.0
+                                  Properties:
+                                    DefaultSelectedItems: =LookUp(colColumns, key = varCol3)
+                                    FillPortions: =1
+                                    Height: =34
+                                    ItemDisplayText: =ThisItem.key
+                                    Items: =Filter(colColumns, slotEligible)
+                                    OnChange: |-
+                                      =Set(varCol3, Self.Selected.key);
+                                      Set(
+                                          varUserPrefs,
+                                          Patch(
+                                              'ProcTrack - UserColumnPrefs',
+                                              Coalesce(varUserPrefs, Defaults('ProcTrack - UserColumnPrefs')),
+                                              {
+                                                  Title: varCurrentUserEmail,
+                                                  Col1: varCol1,
+                                                  Col2: varCol2,
+                                                  Col3: varCol3,
+                                                  Col4: varCol4
+                                              }
+                                          )
+                                      )
+                        - set_col_row4:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =40
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                            Children:
+                              - set_col4_lbl:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(48, 48, 48, 1)
+                                    FillPortions: =0
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =30
+                                    Size: =12
+                                    Text: ="Column 4"
+                                    Width: =100
+                              - set_col4:
+                                  Control: ModernCombobox@1.1.0
+                                  Properties:
+                                    DefaultSelectedItems: =LookUp(colColumns, key = varCol4)
+                                    FillPortions: =1
+                                    Height: =34
+                                    ItemDisplayText: =ThisItem.key
+                                    Items: =Filter(colColumns, slotEligible)
+                                    OnChange: |-
+                                      =Set(varCol4, Self.Selected.key);
+                                      Set(
+                                          varUserPrefs,
+                                          Patch(
+                                              'ProcTrack - UserColumnPrefs',
+                                              Coalesce(varUserPrefs, Defaults('ProcTrack - UserColumnPrefs')),
+                                              {
+                                                  Title: varCurrentUserEmail,
+                                                  Col1: varCol1,
+                                                  Col2: varCol2,
+                                                  Col3: varCol3,
+                                                  Col4: varCol4
+                                              }
+                                          )
+                                      )

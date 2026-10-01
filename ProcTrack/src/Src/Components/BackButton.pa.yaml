@@ -15,7 +15,7 @@ ComponentDefinitions:
         DisplayName: OnPressAction
         Description: A custom property
         ReturnType: None
-        Default: =
+        Default: =false
     Properties:
       Fill: =ColorValue("#FFFFFF00")
       Height: =25

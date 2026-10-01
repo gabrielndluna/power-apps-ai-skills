@@ -30,7 +30,7 @@ pac canvas unpack --msapp RoleFit/RoleFit.msapp --sources RoleFit/src --layout S
 # then edit Src/*.pa.yaml and pack
 ```
 
-For a Studio export with newly added connectors, unpack to a temporary folder first and copy the refreshed `.msapr` into the working `src/` so current YAML edits are not overwritten. For Office 365 Users search formulas, follow `_canvas-notes/office365-users.md`.
+For a Studio export with newly added connectors, unpack to a temporary folder first and copy the refreshed `.msapr` into the working `src/` so current YAML edits are not overwritten. For Office 365 Users search formulas, follow `_canvas-notes/office365-users.md`. For SharePoint file upload/view UI, follow `_canvas-notes/attachments.md` (Form + ClassicAttachmentsEdit — do not fake attachments with Patch).
 
 ### Office 365 Users ComboBox (validated Staffclock YNSE)
 
@@ -101,6 +101,7 @@ Round-trip test (unpack seed → pack unchanged) must pass before adding YAML.
 - [ ] packed.json has LoadFromYaml: true
 - [ ] User tests import after each major screen addition
 - [ ] Large SharePoint loads are bounded by delegable date/status filters (see `_canvas-notes/delegation.md`)
+- [ ] Attachment upload uses Form + ClassicAttachmentsEdit (see `_canvas-notes/attachments.md`)
 ```
 
 ## Folder layout (per app)

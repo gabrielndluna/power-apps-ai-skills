@@ -242,7 +242,22 @@ Screens:
                                     IsSearchable: =false
                                     Items: |-
                                       =AddColumns(colPermittedProjects, Display, projectname)
-                                    OnChange: "=If(\n    !IsBlank(Self.Selected),\n    Set(varSelectedProject, Self.Selected);\n    \n    // Refresh packages collection for this project\n    ClearCollect(\n        colProjectPackages,\n        Filter(\n            'ProcTrack - Packages',\n            projectidentifier = Self.Selected.projectidentifier\n        )\n    );\n    \n    // Check if user can edit THIS specific project\n    Set(\n        varCanEditCurrentProject,\n        !IsBlank(\n            LookUp(\n                colUserPermissions,\n                Project = Self.Selected.projectidentifier && Edit_allowed = \"yes\"\n            )\n        )\n    )\n)"
+                                    OnChange: |-
+                                      =If(
+                                          !IsBlank(Self.Selected),
+                                          Set(varSelectedProject, Self.Selected);
+                                          ClearCollect(
+                                              colProjectPackages,
+                                              Filter(
+                                                  'ProcTrack - Packages',
+                                                  ProjectID = Self.Selected.projectid || projectidentifier = Self.Selected.projectidentifier
+                                              )
+                                          );
+                                          Set(
+                                              varCanEditCurrentProject,
+                                              varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = Self.Selected.projectid))
+                                          )
+                                      )
                                     PressedBorderColor: =RGBA(0, 0, 0, 0)
                                     PressedColor: =RGBA(33, 33, 33, 1)
                                     PressedFill: =RGBA(255, 255, 255, 1)
@@ -281,11 +296,12 @@ Screens:
                 Properties:
                   DropShadow: =DropShadow.None
                   Fill: =RGBA(255, 255, 255, 1)
-                  FillPortions: =8
+                  FillPortions: =0
+                  Height: =66
                   LayoutAlignItems: =LayoutAlignItems.Center
                   LayoutDirection: =LayoutDirection.Horizontal
-                  LayoutGap: =5
-                  LayoutMinHeight: =16
+                  LayoutGap: =8
+                  LayoutMinHeight: =66
                   LayoutMinWidth: =16
                   PaddingBottom: =5
                   PaddingLeft: =8
@@ -304,7 +320,7 @@ Screens:
                           =// DisplayMode
                           If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                         FocusedBorderThickness: =4
-                        Height: =45
+                        Height: =38
                         HoverBorderColor: =RGBA(0, 0, 0, 0)
                         HoverColor: =RGBA(54, 176, 75, 1)
                         HoverFill: =RGBA(0, 0, 0, 0)
@@ -347,7 +363,7 @@ Screens:
                               LayoutMinWidth: =16
                               PaddingBottom: =
                               PaddingTop: =
-                              Size: =20
+                              Size: =18
                               Text: |-
                                 =If(
                                     !IsBlank(First(colPackageDetails).actualawarddate) And !IsBlank(First(colPackageDetails).actualsowdate) And !IsBlank(First(colPackageDetails).actualrfqissuedate) And !IsBlank(First(colPackageDetails).actualrfqclosingdate) And !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),
@@ -387,11 +403,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(214, 221, 224, 1)
+                        FillPortions: =1
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutMaxWidth: =200
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
+                        LayoutMinHeight: =54
+                        LayoutMinWidth: =180
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusBottomLeft: =5
@@ -407,9 +423,10 @@ Screens:
                               DisabledBorderColor: =RGBA(245, 245, 245, 1)
                               DisabledColor: =RGBA(225, 223, 221, 1)
                               DisabledFill: =RGBA(0, 0, 0, 0)
-                              FillPortions: =1
+                              FillPortions: =0
                               FocusedBorderThickness: =4
-                              Height: =30
+                              Height: =24
+                              Width: =24
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
                               HoverColor: =RGBA(16, 110, 190, 1)
                               HoverFill: =RGBA(0, 0, 0, 0)
@@ -424,48 +441,66 @@ Screens:
                             Variant: AutoLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              FillPortions: =4
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
-                              PaddingLeft: =8
-                              PaddingRight: =8
+                              LayoutGap: =2
+                              LayoutMinHeight: =36
+                              LayoutMinWidth: =0
+                              PaddingLeft: =4
+                              PaddingRight: =4
                             Children:
                               - Text4_6:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
+                                    AutoHeight: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
-                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
                                     LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =
-                                    PaddingTop: =
-                                    Size: =12
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Wrap: =false
                                     Text: ="ORIGINAL RAS"
                               - days_to_award_2:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
                                     AlignInContainer: =AlignInContainer.Stretch
+                                    AutoHeight: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
-                                    FillPortions: =2
+                                    Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =
-                                    PaddingTop: =
+                                    Height: =20
+                                    LayoutMinHeight: =20
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =11
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Wrap: =false
                                     Text: =Text(First(colPackageDetails).ras_original_input, "mm/dd/yyyy")
-                                    Width: =100
                   - Container10_2:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(214, 221, 224, 1)
+                        FillPortions: =1
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutMaxWidth: =200
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
+                        LayoutMinHeight: =54
+                        LayoutMinWidth: =180
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusBottomLeft: =5
@@ -481,9 +516,10 @@ Screens:
                               DisabledBorderColor: =RGBA(245, 245, 245, 1)
                               DisabledColor: =RGBA(225, 223, 221, 1)
                               DisabledFill: =RGBA(0, 0, 0, 0)
-                              FillPortions: =1
+                              FillPortions: =0
                               FocusedBorderThickness: =4
-                              Height: =30
+                              Height: =24
+                              Width: =24
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
                               HoverColor: =RGBA(16, 110, 190, 1)
                               HoverFill: =RGBA(0, 0, 0, 0)
@@ -498,35 +534,54 @@ Screens:
                             Variant: AutoLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              FillPortions: =4
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
-                              PaddingLeft: =8
-                              PaddingRight: =8
+                              LayoutGap: =2
+                              LayoutMinHeight: =36
+                              LayoutMinWidth: =0
+                              PaddingLeft: =4
+                              PaddingRight: =4
                             Children:
                               - Text4_5:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
+                                    AutoHeight: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
-                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
                                     LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =
-                                    PaddingTop: =
-                                    Size: =12
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Wrap: =false
                                     Text: ="DAYS PLAN/FORE/ACT"
                               - days_to_award_1:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
                                     AlignInContainer: =AlignInContainer.Stretch
+                                    AutoHeight: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
-                                    FillPortions: =2
+                                    Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =
-                                    PaddingTop: =
+                                    Height: =20
+                                    LayoutMinHeight: =20
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =11
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Wrap: =false
                                     Text: |-
                                       =Text(
                                           DateDiff(
@@ -553,18 +608,17 @@ Screens:
                                           ),
                                           "—"
                                       )
-                                    Width: =100
                   - Container10:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(214, 221, 224, 1)
+                        FillPortions: =1
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutMaxWidth: =200
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
+                        LayoutMinHeight: =54
+                        LayoutMinWidth: =180
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusBottomLeft: =5
@@ -580,9 +634,10 @@ Screens:
                               DisabledBorderColor: =RGBA(245, 245, 245, 1)
                               DisabledColor: =RGBA(225, 223, 221, 1)
                               DisabledFill: =RGBA(0, 0, 0, 0)
-                              FillPortions: =1
+                              FillPortions: =0
                               FocusedBorderThickness: =4
-                              Height: =30
+                              Height: =24
+                              Width: =24
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
                               HoverColor: =RGBA(16, 110, 190, 1)
                               HoverFill: =RGBA(0, 0, 0, 0)
@@ -597,36 +652,55 @@ Screens:
                             Variant: AutoLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              FillPortions: =4
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
-                              PaddingLeft: =8
-                              PaddingRight: =8
+                              LayoutGap: =2
+                              LayoutMinHeight: =36
+                              LayoutMinWidth: =0
+                              PaddingLeft: =4
+                              PaddingRight: =4
                             Children:
                               - Text4_3:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
+                                    AutoHeight: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
-                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
                                     LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =
-                                    PaddingTop: =
-                                    Size: =12
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Wrap: =false
                                     Text: ="DAYS TO AWARD"
                               - days_to_award:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
                                     AlignInContainer: =AlignInContainer.Stretch
+                                    AutoHeight: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
-                                    FillPortions: =2
+                                    Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =
-                                    PaddingTop: =
-                                    Text: |+
+                                    Height: =20
+                                    LayoutMinHeight: =20
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =11
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                                    Text: |-
                                       =If(
                                           !IsBlank(First(colPackageDetails).actualawarddate),
                                           "Awarded",
@@ -640,18 +714,17 @@ Screens:
                                               )
                                           )
                                       )
-                                    Width: =300
                   - Container10_1:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(214, 221, 224, 1)
+                        FillPortions: =1
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutMaxWidth: =200
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
+                        LayoutMinHeight: =54
+                        LayoutMinWidth: =180
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusBottomLeft: =5
@@ -667,9 +740,10 @@ Screens:
                               DisabledBorderColor: =RGBA(245, 245, 245, 1)
                               DisabledColor: =RGBA(225, 223, 221, 1)
                               DisabledFill: =RGBA(0, 0, 0, 0)
-                              FillPortions: =1
+                              FillPortions: =0
                               FocusedBorderThickness: =4
-                              Height: =30
+                              Height: =24
+                              Width: =24
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
                               HoverColor: =RGBA(16, 110, 190, 1)
                               HoverFill: =RGBA(0, 0, 0, 0)
@@ -684,36 +758,55 @@ Screens:
                             Variant: AutoLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              FillPortions: =4
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
-                              PaddingLeft: =8
-                              PaddingRight: =8
+                              LayoutGap: =2
+                              LayoutMinHeight: =36
+                              LayoutMinWidth: =0
+                              PaddingLeft: =4
+                              PaddingRight: =4
                             Children:
                               - Text4_4:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
+                                    AutoHeight: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
-                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
                                     LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =
-                                    PaddingTop: =
-                                    Size: =12
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =9
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Wrap: =false
                                     Text: ="DAYS TO RAS"
                               - days_to_ras:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
                                     AlignInContainer: =AlignInContainer.Stretch
+                                    AutoHeight: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
-                                    FillPortions: =2
+                                    Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =
-                                    PaddingTop: =
-                                    Text: |+
+                                    Height: =20
+                                    LayoutMinHeight: =20
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =11
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width
+                                    Wrap: =false
+                                    Text: |-
                                       =If(
                                           !IsBlank(First(colPackageDetails).actualawarddate),
                                           If(
@@ -731,7 +824,6 @@ Screens:
                                               )
                                           )
                                       )
-                                    Width: =300
             - Container12:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -747,11 +839,12 @@ Screens:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
-                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
                         LayoutDirection: =LayoutDirection.Vertical
-                        LayoutGap: =10
+                        LayoutGap: =8
                         LayoutMinHeight: =16
                         LayoutMinWidth: =16
+                        LayoutOverflowY: =LayoutOverflow.Scroll
                       Children:
                         - Container16:
                             Control: GroupContainer@1.5.0
@@ -759,17 +852,21 @@ Screens:
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              FillPortions: =10
-                              LayoutAlignItems: =LayoutAlignItems.Center
+                              FillPortions: =0
+                              Height: =320
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
+                              LayoutGap: =6
+                              LayoutMinHeight: =320
                               LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
                               RadiusBottomLeft: =5
                               RadiusBottomRight: =5
                               RadiusTopLeft: =5
                               RadiusTopRight: =5
-                              X: =40
-                              Y: =40
                             Children:
                               - Container18:
                                   Control: GroupContainer@1.5.0
@@ -777,11 +874,19 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     Fill: =RGBA(214, 12, 48, 1)
+                                    FillPortions: =0
+                                    Height: =34
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMaxHeight: =43
-                                    LayoutMinHeight: =16
+                                    LayoutGap: =6
+                                    LayoutMinHeight: =34
                                     LayoutMinWidth: =16
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    RadiusBottomLeft: =4
+                                    RadiusBottomRight: =4
+                                    RadiusTopLeft: =4
+                                    RadiusTopRight: =4
                                   Children:
                                     - Icon7:
                                         Control: Classic/Icon@2.5.0
@@ -791,127 +896,196 @@ Screens:
                                           DisabledBorderColor: =RGBA(245, 245, 245, 1)
                                           DisabledColor: =RGBA(225, 223, 221, 1)
                                           DisabledFill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =0
                                           FocusedBorderThickness: =4
-                                          Height: =30
+                                          Height: =20
                                           HoverBorderColor: =RGBA(0, 0, 0, 0)
                                           HoverColor: =RGBA(16, 110, 190, 1)
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.Information
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =20
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =Parent.Width*0.1
+                                          Width: =22
                                     - Text7:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
                                           Color: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =14
+                                          Height: =20
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =12
                                           Text: ="PACKAGE BASICS"
-                                          Width: =Parent.Width*0.3
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =118
+                                          Wrap: =false
                                     - Text8:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
                                           Align: =Align.Right
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
                                           Color: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =10
+                                          Height: =20
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =9
                                           Text: ="PREREQ DESIGN"
-                                          Width: =Parent.Width*0.2
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =78
+                                          Wrap: =false
                                     - prereq_design_checkmark:
                                         Control: CheckBox@0.0.30
                                         Properties:
                                           BasePaletteColor: =RGBA(68, 235, 68, 1)
-                                          CheckboxSize: =25
+                                          CheckboxSize: =20
                                           Checked: =First(colPackageDetails).prerequisitedesigndeliverable = "Yes"
                                           DisplayMode: |-
                                             =// DisplayMode
                                             If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
-                                          FillPortions: =0.5
+                                          FillPortions: =0
+                                          Height: =28
                                           Label: =
-                                          LayoutMaxWidth: =45
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinHeight: =28
+                                          LayoutMinWidth: =28
                                           OnCheck: |-
                                             =Patch(colPackageDetails, First(colPackageDetails), {prerequisitedesigndeliverable: If(Self.Checked, "Yes", "No")})
                                           OnUncheck: |-
                                             =Patch(colPackageDetails, First(colPackageDetails), {prerequisitedesigndeliverable: If(Self.Checked, "Yes", "No")})
-                                          Width: =Parent.Width*0.1
+                                          Width: =30
                                     - Text7_2:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
                                           Align: =Align.Right
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
                                           Color: =RGBA(255, 255, 255, 1)
                                           FillPortions: =1
+                                          Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          Height: =20
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                           Size: =9
                                           Text: |-
-                                            ="created: " & First(colPackageDetails).Created
-                                          Width: |+
-                                            =Parent.Width*0.3
+                                            ="created: " & Text(First(colPackageDetails).Created, "mm/dd/yyyy")
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Wrap: =false
                               - Container19:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
-                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    FillPortions: =0
+                                    Height: =48
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutGap: =5
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingLeft: =5
-                                    PaddingRight: =5
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                   Children:
                                     - Container7_5:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
                                           DropShadow: =DropShadow.None
                                           FillPortions: =1
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          Height: =48
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                         Children:
                                           - Text3_5:
-                                              Control: ModernText@1.0.0
+                                              Control: Label@2.5.1
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                AutoHeight: =false
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Color: =RGBA(79, 90, 94, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                LayoutMinHeight: =14
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =10
                                                 Text: |-
                                                   ="Package #"
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
                                           - package_number_row:
                                               Control: GroupContainer@1.5.0
                                               Variant: AutoLayout
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
                                                 DropShadow: =DropShadow.None
-                                                Height: =40
-                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                FillPortions: =0
+                                                Height: =32
+                                                LayoutAlignItems: =LayoutAlignItems.Stretch
                                                 LayoutDirection: =LayoutDirection.Horizontal
                                                 LayoutGap: =4
-                                                LayoutMinHeight: =40
-                                                LayoutMinWidth: =16
+                                                LayoutMinHeight: =32
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingTop: =0
                                               Children:
                                                 - package_prefix_label:
-                                                    Control: ModernText@1.0.0
+                                                    Control: Label@2.5.1
                                                     Properties:
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
-                                                      Size: =14
+                                                      AutoHeight: =false
+                                                      BorderColor: =RGBA(0, 0, 0, 0)
+                                                      Color: =RGBA(48, 48, 48, 1)
+                                                      FillPortions: =0
+                                                      Font: =Font.'Segoe UI'
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Height: =32
+                                                      LayoutMinHeight: =32
+                                                      LayoutMinWidth: =0
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =0
+                                                      PaddingTop: =0
+                                                      Size: =11
                                                       Text: =First(colPackageDetails).projectidentifier & " - "
                                                       VerticalAlign: =VerticalAlign.Middle
+                                                      Width: =Max(24, Len(First(colPackageDetails).projectidentifier & " -") * 7 + 4)
+                                                      Wrap: =false
                                                 - item_number_input:
                                                     Control: ModernTextInput@1.1.0
                                                     Properties:
@@ -923,35 +1097,54 @@ Screens:
                                                         =If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                       Fill: =RGBA(255, 255, 255, 1)
                                                       FillPortions: =1
-                                                      Height: =40
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =32
+                                                      LayoutMinHeight: =32
+                                                      LayoutMinWidth: =0
                                                       OnChange: |-
                                                         =Patch(colPackageDetails, First(colPackageDetails), {itemnumber: Self.Text})
                                                       RadiusBottomLeft: =5
                                                       RadiusBottomRight: =5
                                                       RadiusTopLeft: =5
                                                       RadiusTopRight: =5
+                                                      Size: =11
                                     - Container7_6:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
                                           DropShadow: =DropShadow.None
                                           FillPortions: =1
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          Height: =48
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                         Children:
                                           - Text3_6:
-                                              Control: ModernText@1.0.0
+                                              Control: Label@2.5.1
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                AutoHeight: =false
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Color: =RGBA(79, 90, 94, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                LayoutMinHeight: =14
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =10
                                                 Text: ="MPL"
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
                                           - mpl_input_1:
                                               Control: ModernTextInput@1.1.0
                                               Properties:
@@ -963,35 +1156,54 @@ Screens:
                                                   =// DisplayMode
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =40
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                Height: =32
+                                                LayoutMinHeight: =32
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {mplcode: Self.Text})
                                                 RadiusBottomLeft: =5
                                                 RadiusBottomRight: =5
                                                 RadiusTopLeft: =5
                                                 RadiusTopRight: =5
+                                                Size: =11
                               - Container7_4:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
-                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    FillPortions: =0
+                                    Height: =48
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Vertical
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingLeft: =5
-                                    PaddingRight: =5
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                   Children:
                                     - Text3_4:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
                                           AlignInContainer: =AlignInContainer.Stretch
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =16
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(79, 90, 94, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =14
+                                          LayoutMinHeight: =14
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =10
                                           Text: ="Description"
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Wrap: =false
                                     - description_input:
                                         Control: ModernTextInput@1.1.0
                                         Properties:
@@ -1003,46 +1215,71 @@ Screens:
                                             =// DisplayMode
                                             If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                           Fill: =RGBA(255, 255, 255, 1)
-                                          Height: =40
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          Height: =32
+                                          LayoutMinHeight: =32
+                                          LayoutMinWidth: =0
                                           OnChange: |-
                                             =Patch(colPackageDetails, First(colPackageDetails), {packagedescription: Self.Text})
                                           RadiusBottomLeft: =5
                                           RadiusBottomRight: =5
                                           RadiusTopLeft: =5
                                           RadiusTopRight: =5
+                                          Size: =11
                               - Container19_1:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
-                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    FillPortions: =0
+                                    Height: =48
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutGap: =5
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingLeft: =5
-                                    PaddingRight: =5
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                   Children:
                                     - Container7_7:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          Height: =48
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                         Children:
                                           - Text3_7:
-                                              Control: ModernText@1.0.0
+                                              Control: Label@2.5.1
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                AutoHeight: =false
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Color: =RGBA(79, 90, 94, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                LayoutMinHeight: =14
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =10
                                                 Text: ="Quality Program"
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
                                           - quality_program_input_1:
                                               Control: DropDown@0.0.45
                                               Properties:
@@ -1056,7 +1293,7 @@ Screens:
                                                   =// DisplayMode
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =40
+                                                Height: =32
                                                 Items: |-
                                                   =// Items
                                                   [
@@ -1069,8 +1306,8 @@ Screens:
                                                       "NCA-4000",
                                                       "N291"
                                                   ]
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                LayoutMinHeight: =32
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {qualityprogram: Self.Selected.Value})
                                     - Container7_8:
@@ -1078,19 +1315,39 @@ Screens:
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          Height: =48
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                         Children:
                                           - Text3_8:
-                                              Control: ModernText@1.0.0
+                                              Control: Label@2.5.1
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                AutoHeight: =false
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Color: =RGBA(79, 90, 94, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                LayoutMinHeight: =14
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =10
                                                 Text: ="Site/Location"
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
                                           - bopsite_input:
                                               Control: ModernTextInput@1.1.0
                                               Properties:
@@ -1102,50 +1359,71 @@ Screens:
                                                   =// DisplayMode
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =40
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                Height: =32
+                                                LayoutMinHeight: =32
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {bopsite: Self.Text})
                                                 RadiusBottomLeft: =5
                                                 RadiusBottomRight: =5
                                                 RadiusTopLeft: =5
                                                 RadiusTopRight: =5
+                                                Size: =11
                               - Container19_2:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
-                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    FillPortions: =0
+                                    Height: =48
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutGap: =5
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingLeft: =5
-                                    PaddingRight: =5
+                                    LayoutGap: =10
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                   Children:
                                     - Container7_9:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          Height: =48
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          PaddingLeft: =5
-                                          PaddingRight: =5
-                                          X: =40
-                                          Y: =40
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                         Children:
                                           - Text3_9:
-                                              Control: ModernText@1.0.0
+                                              Control: Label@2.5.1
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                AutoHeight: =false
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Color: =RGBA(79, 90, 94, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                LayoutMinHeight: =14
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =10
                                                 Text: ="Contract Type"
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
                                           - contract_type_input_1:
                                               Control: DropDown@0.0.45
                                               Properties:
@@ -1159,7 +1437,7 @@ Screens:
                                                   =// DisplayMode
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =40
+                                                Height: =32
                                                 Items: |-
                                                   =// Items
                                                   [
@@ -1175,8 +1453,8 @@ Screens:
                                                       "Standard Purchase Order",
                                                       "Self Perform"
                                                   ]
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                LayoutMinHeight: =32
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {contracttype: Self.Selected.Value})
                                     - Container7_10:
@@ -1184,19 +1462,39 @@ Screens:
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          Height: =48
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =48
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                         Children:
                                           - Text3_10:
-                                              Control: ModernText@1.0.0
+                                              Control: Label@2.5.1
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                AutoHeight: =false
+                                                BorderColor: =RGBA(0, 0, 0, 0)
+                                                Color: =RGBA(79, 90, 94, 1)
+                                                FillPortions: =0
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Semibold
+                                                Height: =14
+                                                LayoutMinHeight: =14
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =10
                                                 Text: ="Package Bundle"
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
                                           - package_bundle_input_1:
                                               Control: ModernTextInput@1.1.0
                                               Properties:
@@ -1208,45 +1506,69 @@ Screens:
                                                   =// DisplayMode
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =40
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                Height: =32
+                                                LayoutMinHeight: =32
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {operationspackagebundle: Self.Text})
                                                 RadiusBottomLeft: =5
                                                 RadiusBottomRight: =5
                                                 RadiusTopLeft: =5
                                                 RadiusTopRight: =5
+                                                Size: =11
                               - Container7_17:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
-                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    FillPortions: =0
+                                    Height: =48
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Vertical
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingLeft: =5
-                                    PaddingRight: =5
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =48
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                   Children:
                                     - package_folder_title:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
                                           AlignInContainer: =AlignInContainer.Stretch
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =16
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(79, 90, 94, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =14
+                                          LayoutMinHeight: =14
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =10
                                           Text: ="Package Folder"
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Wrap: =false
                                     - Container32:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
+                                          FillPortions: =0
+                                          Height: =32
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          PaddingLeft: =8
-                                          PaddingRight: =8
+                                          LayoutGap: =4
+                                          LayoutMinHeight: =32
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                         Children:
                                           - packagefolder_input:
                                               Control: ModernTextInput@1.1.0
@@ -1260,9 +1582,9 @@ Screens:
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
                                                 FillPortions: =1
-                                                Height: =40
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                Height: =32
+                                                LayoutMinHeight: =32
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {packagefolderurl: Self.Text})
                                                 RadiusBottomLeft: =5
@@ -1270,8 +1592,6 @@ Screens:
                                                 RadiusTopLeft: =5
                                                 RadiusTopRight: =5
                                                 Size: =10
-                                                X: =40
-                                                Y: =40
                                           - icon_open_url:
                                               Control: Classic/Icon@2.5.0
                                               Properties:
@@ -1280,13 +1600,14 @@ Screens:
                                                 DisabledBorderColor: =RGBA(245, 245, 245, 1)
                                                 DisabledColor: =RGBA(225, 223, 221, 1)
                                                 DisabledFill: =RGBA(0, 0, 0, 0)
+                                                FillPortions: =0
                                                 FocusedBorderThickness: =4
                                                 Height: =20
                                                 HoverBorderColor: =RGBA(0, 0, 0, 0)
                                                 HoverColor: =RGBA(16, 110, 190, 1)
                                                 HoverFill: =RGBA(0, 0, 0, 0)
                                                 Icon: =Icon.OpenInNewWindow
-                                                LayoutMinHeight: =16
+                                                LayoutMinHeight: =20
                                                 LayoutMinWidth: =16
                                                 OnSelect: |-
                                                   =If(
@@ -1296,18 +1617,23 @@ Screens:
                                                 PressedBorderColor: =RGBA(0, 0, 0, 0)
                                                 PressedColor: =RGBA(16, 110, 190, 1)
                                                 PressedFill: =RGBA(0, 0, 0, 0)
-                                                Width: =35
+                                                Width: =28
                         - Container15:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              FillPortions: =4
-                              LayoutAlignItems: =LayoutAlignItems.Center
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
+                              LayoutGap: =4
+                              LayoutMinHeight: =172
                               LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
                               RadiusBottomLeft: =5
                               RadiusBottomRight: =5
                               RadiusTopLeft: =5
@@ -1319,11 +1645,19 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     Fill: =RGBA(214, 12, 48, 1)
+                                    FillPortions: =0
+                                    Height: =34
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMaxHeight: =43
-                                    LayoutMinHeight: =16
+                                    LayoutGap: =6
+                                    LayoutMinHeight: =34
                                     LayoutMinWidth: =16
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    RadiusBottomLeft: =4
+                                    RadiusBottomRight: =4
+                                    RadiusTopLeft: =4
+                                    RadiusTopRight: =4
                                   Children:
                                     - Icon7_1:
                                         Control: Classic/Icon@2.5.0
@@ -1333,54 +1667,84 @@ Screens:
                                           DisabledBorderColor: =RGBA(245, 245, 245, 1)
                                           DisabledColor: =RGBA(225, 223, 221, 1)
                                           DisabledFill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =0
                                           FocusedBorderThickness: =4
-                                          Height: =30
+                                          Height: =20
                                           HoverBorderColor: =RGBA(0, 0, 0, 0)
                                           HoverColor: =RGBA(16, 110, 190, 1)
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.People
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =20
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =Parent.Width*0.1
+                                          Width: =22
                                     - Text7_1:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
                                           Color: =RGBA(255, 255, 255, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =14
+                                          Height: =20
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =12
                                           Text: ="PEOPLE & LEADS"
-                                          Width: =Parent.Width*0.4
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =160
+                                          Wrap: =false
                               - Container21:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =40
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =8
-                                    PaddingLeft: =8
-                                    PaddingRight: =8
-                                    PaddingTop: =8
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =40
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =4
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    PaddingTop: =4
                                   Children:
                                     - Text10:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(48, 48, 48, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =20
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =11
                                           Text: ="Operations Lead"
-                                          Width: =Parent.Width*0.35
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =104
+                                          Wrap: =false
                                     - operations_lead_picture:
                                         Control: Image@2.2.3
                                         Properties:
                                           BorderColor: =RGBA(0, 18, 107, 1)
-                                          Height: =35
+                                          FillPortions: =0
+                                          Height: =28
                                           Image: |
                                             =With(
                                                 {
@@ -1393,18 +1757,16 @@ Screens:
                                                     img
                                                 )
                                             )
+                                          LayoutMinHeight: =28
                                           OnSelect: =
                                           RadiusBottomLeft: =100
                                           RadiusBottomRight: =100
                                           RadiusTopLeft: =100
                                           RadiusTopRight: =100
-                                          Width: =Parent.Width*0.1
-                                          X: =24
-                                          Y: =4
+                                          Width: =28
                                     - operations_lead_input_1:
                                         Control: ModernCombobox@1.1.0
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
                                           BorderColor: =RGBA(214, 221, 224, 1)
                                           BorderThickness: =2
                                           DefaultSelectedItems: |-
@@ -1444,7 +1806,7 @@ Screens:
                                             If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                           Fill: =RGBA(255, 255, 255, 1)
                                           FillPortions: =1
-                                          Height: =40
+                                          Height: =32
                                           InputTextPlaceholder: ="Search by name"
                                           ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                           Items: |
@@ -1461,41 +1823,59 @@ Screens:
                                                     Department
                                                 )
                                             )
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinHeight: =32
+                                          LayoutMinWidth: =0
                                           OnChange: "=Patch(\n    colPackageDetails, \n    First(colPackageDetails), \n    {\n        opspackageleadname:         If(!IsBlank(Self.Selected.DisplayName), Self.Selected.DisplayName, \"\"),\n        operationspackageleadid:    If(!IsBlank(Self.Selected.UserPrincipalName), Self.Selected.UserPrincipalName, \"\"),\n        \n        // Auto-update bundle when ops lead changes\n        operationspackagebundle:    If(\n            !IsBlank(Self.Selected.DisplayName),\n            LookUp(\n                'ProcTrack - Ops Leads',\n                Name = Self.Selected.DisplayName,\n                Bundle\n            ),\n            First(colPackageDetails).operationspackagebundle\n        )\n    }\n)"
                                           RadiusBottomLeft: =5
                                           RadiusBottomRight: =5
                                           RadiusTopLeft: =5
                                           RadiusTopRight: =5
                                           SelectMultiple: =false
-                                          Size: =12
+                                          Size: =11
                               - Container21_1:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =40
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =8
-                                    PaddingLeft: =8
-                                    PaddingRight: =8
-                                    PaddingTop: =8
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =40
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =4
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    PaddingTop: =4
                                   Children:
                                     - Text10_1:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(48, 48, 48, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =20
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =11
                                           Text: ="Procurement Lead"
-                                          Width: =Parent.Width*0.35
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =104
+                                          Wrap: =false
                                     - Image7_1:
                                         Control: Image@2.2.3
                                         Properties:
                                           BorderColor: =RGBA(0, 18, 107, 1)
-                                          Height: =35
+                                          FillPortions: =0
+                                          Height: =28
                                           Image: |
                                             =With(
                                                 {
@@ -1508,18 +1888,16 @@ Screens:
                                                     img
                                                 )
                                             )
+                                          LayoutMinHeight: =28
                                           OnSelect: =
                                           RadiusBottomLeft: =100
                                           RadiusBottomRight: =100
                                           RadiusTopLeft: =100
                                           RadiusTopRight: =100
-                                          Width: =Parent.Width*0.1
-                                          X: =24
-                                          Y: =4
+                                          Width: =28
                                     - procurement_lead_input_1:
                                         Control: ModernCombobox@1.1.0
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
                                           BorderColor: =RGBA(214, 221, 224, 1)
                                           BorderThickness: =2
                                           DefaultSelectedItems: |-
@@ -1558,7 +1936,7 @@ Screens:
                                             If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                           Fill: =RGBA(255, 255, 255, 1)
                                           FillPortions: =1
-                                          Height: =40
+                                          Height: =32
                                           InputTextPlaceholder: ="Search by name"
                                           ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                           Items: |-
@@ -1575,8 +1953,8 @@ Screens:
                                                     Department
                                                 )
                                             )
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinHeight: =32
+                                          LayoutMinWidth: =0
                                           OnChange: |-
                                             =Patch(
                                                 colPackageDetails, 
@@ -1591,35 +1969,51 @@ Screens:
                                           RadiusTopLeft: =5
                                           RadiusTopRight: =5
                                           SelectMultiple: =false
-                                          Size: =12
-                                          X: =40
-                                          Y: =40
+                                          Size: =11
                               - Container21_8:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
+                                    FillPortions: =0
+                                    Height: =40
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =8
-                                    PaddingLeft: =8
-                                    PaddingRight: =8
-                                    PaddingTop: =8
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =40
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =4
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    PaddingTop: =4
                                   Children:
                                     - Text10_7:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(48, 48, 48, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =20
+                                          LayoutMinHeight: =20
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =11
                                           Text: ="Technical Lead"
-                                          Width: =Parent.Width*0.35
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =104
+                                          Wrap: =false
                                     - Image7_2:
                                         Control: Image@2.2.3
                                         Properties:
                                           BorderColor: =RGBA(0, 18, 107, 1)
-                                          Height: =35
+                                          FillPortions: =0
+                                          Height: =28
                                           Image: |
                                             =With(
                                                 {
@@ -1632,18 +2026,16 @@ Screens:
                                                     img
                                                 )
                                             )
+                                          LayoutMinHeight: =28
                                           OnSelect: =
                                           RadiusBottomLeft: =100
                                           RadiusBottomRight: =100
                                           RadiusTopLeft: =100
                                           RadiusTopRight: =100
-                                          Width: =Parent.Width*0.1
-                                          X: =24
-                                          Y: =4
+                                          Width: =28
                                     - technical_lead_input_1:
                                         Control: ModernCombobox@1.1.0
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
                                           BorderColor: =RGBA(214, 221, 224, 1)
                                           BorderThickness: =2
                                           DefaultSelectedItems: |-
@@ -1682,7 +2074,7 @@ Screens:
                                             If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                           Fill: =RGBA(255, 255, 255, 1)
                                           FillPortions: =1
-                                          Height: =40
+                                          Height: =32
                                           InputTextPlaceholder: ="Search by name"
                                           ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                           Items: |
@@ -1699,8 +2091,8 @@ Screens:
                                                     Department
                                                 )
                                             )
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinHeight: =32
+                                          LayoutMinWidth: =0
                                           OnChange: |-
                                             =Patch(
                                                 colPackageDetails, 
@@ -1715,18 +2107,19 @@ Screens:
                                           RadiusTopLeft: =5
                                           RadiusTopRight: =5
                                           SelectMultiple: =false
-                                          Size: =12
+                                          Size: =11
                   - Container14:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =2
-                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
                         LayoutDirection: =LayoutDirection.Vertical
                         LayoutGap: =10
                         LayoutMinHeight: =16
                         LayoutMinWidth: =16
+                        LayoutOverflowY: =LayoutOverflow.Scroll
                       Children:
                         - Container22:
                             Control: GroupContainer@1.5.0
@@ -1737,10 +2130,11 @@ Screens:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =3
-                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
+                              LayoutMinHeight: =300
                               LayoutMinWidth: =16
+                              PaddingBottom: =4
                               RadiusBottomLeft: =5
                               RadiusBottomRight: =5
                               RadiusTopLeft: =5
@@ -1755,9 +2149,10 @@ Screens:
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
-                                    LayoutMaxHeight: =40
-                                    LayoutMinHeight: =40
+                                    LayoutMaxHeight: =34
+                                    LayoutMinHeight: =34
                                     LayoutMinWidth: =16
+                                    PaddingLeft: =8
                                   Children:
                                     - Text7_3:
                                         Control: ModernText@1.0.0
@@ -1905,16 +2300,16 @@ Screens:
                                   Variant: AutoLayout
                                   Properties:
                                     Fill: =RGBA(214, 221, 224, 1)
-                                    FillPortions: =2
+                                    FillPortions: =0
+                                    Height: =30
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMaxHeight: =43
-                                    LayoutMinHeight: =16
+                                    LayoutMinHeight: =30
                                     LayoutMinWidth: =16
-                                    PaddingBottom: =8
+                                    PaddingBottom: =4
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =8
+                                    PaddingTop: =4
                                   Children:
                                     - header_package_1:
                                         Control: Label@2.5.1
@@ -1997,15 +2392,15 @@ Screens:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
-                                    FillPortions: =2
+                                    FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
+                                    LayoutMinHeight: =38
                                     LayoutMinWidth: =16
-                                    PaddingBottom: =8
+                                    PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =8
+                                    PaddingTop: =3
                                   Children:
                                     - header_package_2:
                                         Control: Label@2.5.1
@@ -2210,15 +2605,15 @@ Screens:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
-                                    FillPortions: =2
+                                    FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
+                                    LayoutMinHeight: =38
                                     LayoutMinWidth: =16
-                                    PaddingBottom: =8
+                                    PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =8
+                                    PaddingTop: =3
                                   Children:
                                     - header_package_3:
                                         Control: Label@2.5.1
@@ -2432,15 +2827,15 @@ Screens:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
-                                    FillPortions: =2
+                                    FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
+                                    LayoutMinHeight: =38
                                     LayoutMinWidth: =16
-                                    PaddingBottom: =8
+                                    PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =8
+                                    PaddingTop: =3
                                   Children:
                                     - header_package_4:
                                         Control: Label@2.5.1
@@ -2652,15 +3047,15 @@ Screens:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
-                                    FillPortions: =2
+                                    FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
+                                    LayoutMinHeight: =38
                                     LayoutMinWidth: =16
-                                    PaddingBottom: =8
+                                    PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =8
+                                    PaddingTop: =3
                                   Children:
                                     - header_package_5:
                                         Control: Label@2.5.1
@@ -2861,15 +3256,15 @@ Screens:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
-                                    FillPortions: =2
+                                    FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
+                                    LayoutMinHeight: =38
                                     LayoutMinWidth: =16
-                                    PaddingBottom: =8
+                                    PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =8
+                                    PaddingTop: =3
                                   Children:
                                     - header_package_6:
                                         Control: Label@2.5.1
@@ -3079,15 +3474,15 @@ Screens:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
-                                    FillPortions: =2
+                                    FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
+                                    LayoutMinHeight: =38
                                     LayoutMinWidth: =16
-                                    PaddingBottom: =8
+                                    PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =8
+                                    PaddingTop: =3
                                   Children:
                                     - header_package_7:
                                         Control: Label@2.5.1
@@ -3105,14 +3500,26 @@ Screens:
                                         Control: ModernTextInput@1.1.0
                                         Properties:
                                           Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.End
                                           Appearance: =Appearance.FilledLighter
                                           Default: =
                                           DisplayMode: =DisplayMode.View
                                           Fill: =RGBA(255, 255, 255, 1)
+                                          Height: =16
+                                          LayoutMinWidth: =0
                                           Placeholder: =
                                           Width: =header_description_1.Width - DayLabel1_5.Width
                                           X: =140
                                           Y: =7
+                                    - OnSite_duration_spacer:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderThickness: =0
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          FillPortions: =0
+                                          Height: =16
+                                          Width: =15
                                     - DayLabel1_5:
                                         Control: Label@2.5.1
                                         Properties:
@@ -3228,11 +3635,17 @@ Screens:
                               BorderColor: =RGBA(122, 138, 143, 1)
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              FillPortions: =2
-                              LayoutAlignItems: =LayoutAlignItems.Center
+                              FillPortions: =0
+                              Height: =170
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
+                              LayoutGap: =4
+                              LayoutMinHeight: =170
                               LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =4
                               Visible: =varShowComments
                             Children:
                               - Container18_5:
@@ -3241,34 +3654,48 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Height: =28
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMaxHeight: =40
-                                    LayoutMinHeight: =40
+                                    LayoutMinHeight: =28
                                     LayoutMinWidth: =16
                                   Children:
                                     - Text7_5:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
                                           Color: =RGBA(0, 0, 0, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =14
+                                          Height: =24
+                                          LayoutMinHeight: =24
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =13
                                           Text: ="Comments"
-                                          Width: =Parent.Width*0.4
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =Parent.Width
+                                          Wrap: =false
                               - Container19_4:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
-                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutGap: =5
-                                    LayoutMinHeight: =16
+                                    LayoutMinHeight: =110
                                     LayoutMinWidth: =16
-                                    PaddingLeft: =5
-                                    PaddingRight: =5
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
                                   Children:
                                     - comments_input:
                                         Control: ModernTextInput@1.1.0
@@ -3279,9 +3706,9 @@ Screens:
                                           Default: =First(colPackageDetails).comments
                                           Fill: =RGBA(255, 255, 255, 1)
                                           FillPortions: =1
-                                          Height: =40
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          Height: =110
+                                          LayoutMinHeight: =110
+                                          LayoutMinWidth: =0
                                           OnChange: |-
                                             =Patch(colPackageDetails, First(colPackageDetails), {comments: Self.Text});
                                             Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {comments: Self.Text})
@@ -3289,9 +3716,8 @@ Screens:
                                           RadiusBottomRight: =5
                                           RadiusTopLeft: =5
                                           RadiusTopRight: =5
+                                          Size: =11
                                           Type: =TextInputType.Multiline
-                                          X: =40
-                                          Y: =40
                         - Container24:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
@@ -3299,11 +3725,16 @@ Screens:
                               BorderColor: =RGBA(122, 138, 143, 1)
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              FillPortions: =2
-                              LayoutAlignItems: =LayoutAlignItems.Center
+                              FillPortions: =0
+                              Height: =236
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
+                              LayoutGap: =6
                               LayoutMinWidth: =16
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =2
                             Children:
                               - Container18_4:
                                   Control: GroupContainer@1.5.0
@@ -3311,53 +3742,80 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =0
+                                    Height: =28
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMaxHeight: =40
-                                    LayoutMinHeight: =40
+                                    LayoutMinHeight: =28
                                     LayoutMinWidth: =16
                                   Children:
                                     - Text7_4:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
                                           Color: =RGBA(0, 0, 0, 1)
+                                          FillPortions: =0
+                                          Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =14
+                                          Height: =24
+                                          LayoutMinHeight: =24
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =13
                                           Text: ="Post-Award Details"
-                                          Width: =Parent.Width*0.4
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =Parent.Width
+                                          Wrap: =false
                               - Container19_3:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
-                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    FillPortions: =0
+                                    Height: =56
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutGap: =5
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingLeft: =5
-                                    PaddingRight: =5
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =56
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =2
+                                    PaddingLeft: =4
+                                    PaddingRight: =4
+                                    PaddingTop: =2
                                   Children:
                                     - Container7_11:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =50
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
                                         Children:
                                           - Text3_11:
                                               Control: ModernText@1.0.0
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
+                                                AutoHeight: =false
+                                                Height: =16
                                                 LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =11
                                                 Text: ="Subcontractor"
+                                                Wrap: =false
                                           - subcontractor_input:
                                               Control: ModernTextInput@1.1.0
                                               Properties:
@@ -3369,9 +3827,9 @@ Screens:
                                                   =// DisplayMode
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =40
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                Height: =30
+                                                LayoutMinHeight: =30
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {subcontractorname: Self.Text});
                                                   Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {subcontractorname: Self.Text})
@@ -3379,24 +3837,35 @@ Screens:
                                                 RadiusBottomRight: =5
                                                 RadiusTopLeft: =5
                                                 RadiusTopRight: =5
+                                                Size: =11
                                     - Container7_12:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =50
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
                                         Children:
                                           - Text3_12:
                                               Control: ModernText@1.0.0
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
+                                                AutoHeight: =false
+                                                Height: =16
                                                 LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =11
                                                 Text: ="PO Number"
+                                                Wrap: =false
                                           - POnumber_input:
                                               Control: ModernTextInput@1.1.0
                                               Properties:
@@ -3408,9 +3877,9 @@ Screens:
                                                   =// DisplayMode
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =40
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                Height: =30
+                                                LayoutMinHeight: =30
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {purchaseordernumber: Self.Text});
                                                   Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {purchaseordernumber: Self.Text})
@@ -3418,24 +3887,35 @@ Screens:
                                                 RadiusBottomRight: =5
                                                 RadiusTopLeft: =5
                                                 RadiusTopRight: =5
+                                                Size: =11
                                     - Container7_13:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutGap: =2
+                                          LayoutMinHeight: =50
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
                                         Children:
                                           - Text3_13:
                                               Control: ModernText@1.0.0
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
+                                                AutoHeight: =false
+                                                Height: =16
                                                 LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                Size: =16
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
+                                                Size: =11
                                                 Text: ="Award Value"
+                                                Wrap: =false
                                           - award_value_input:
                                               Control: ModernTextInput@1.1.0
                                               Properties:
@@ -3447,9 +3927,9 @@ Screens:
                                                   =// DisplayMode
                                                   If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                 Fill: =RGBA(255, 255, 255, 1)
-                                                Height: =40
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
+                                                Height: =30
+                                                LayoutMinHeight: =30
+                                                LayoutMinWidth: =0
                                                 OnChange: |-
                                                   =Patch(colPackageDetails, First(colPackageDetails), {awardvalue: Value(Self.Text)});
                                                   Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {awardvalue: Value(Self.Text)})
@@ -3457,53 +3937,69 @@ Screens:
                                                 RadiusBottomRight: =5
                                                 RadiusTopLeft: =5
                                                 RadiusTopRight: =5
+                                                Size: =11
                               - Container23:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     Fill: =RGBA(214, 221, 224, 1)
-                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
-                                    PaddingBottom: =8
+                                    LayoutGap: =8
+                                    LayoutMinHeight: =120
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =6
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =8
+                                    PaddingTop: =6
                                   Children:
                                     - Container27:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          PaddingLeft: =8
-                                          PaddingRight: =8
+                                          LayoutGap: =4
+                                          LayoutMinHeight: =108
+                                          LayoutMinWidth: =0
+                                          PaddingLeft: =4
+                                          PaddingRight: =4
                                         Children:
                                           - Container21_2:
                                               Control: GroupContainer@1.5.0
                                               Variant: AutoLayout
                                               Properties:
                                                 DropShadow: =DropShadow.None
+                                                FillPortions: =1
                                                 LayoutAlignItems: =LayoutAlignItems.Center
                                                 LayoutDirection: =LayoutDirection.Horizontal
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                PaddingLeft: =8
-                                                PaddingRight: =8
+                                                LayoutMinHeight: =34
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =2
+                                                PaddingLeft: =4
+                                                PaddingRight: =4
+                                                PaddingTop: =2
                                               Children:
                                                 - Text10_2:
                                                     Control: ModernText@1.0.0
                                                     Properties:
+                                                      AlignInContainer: =AlignInContainer.Center
+                                                      AutoHeight: =false
                                                       FillPortions: =1
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =26
+                                                      LayoutMinHeight: =26
+                                                      LayoutMinWidth: =0
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =4
+                                                      PaddingTop: =0
+                                                      Size: =11
                                                       Text: ="Indigenous Award"
-                                                      Width: =Parent.Width*0.5
+                                                      Wrap: =false
                                                 - indigenous_award_input:
                                                     Control: ModernTextInput@1.1.0
                                                     Properties:
@@ -3516,9 +4012,9 @@ Screens:
                                                         If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                       Fill: =RGBA(255, 255, 255, 1)
                                                       FillPortions: =1
-                                                      Height: =40
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =28
+                                                      LayoutMinHeight: =28
+                                                      LayoutMinWidth: =0
                                                       OnChange: |-
                                                         =Patch(colPackageDetails, First(colPackageDetails), {indigenous_award: Value(Self.Text)});
                                                         Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {indigenous_award: Value(Self.Text)})
@@ -3527,26 +4023,38 @@ Screens:
                                                       RadiusBottomRight: =5
                                                       RadiusTopLeft: =5
                                                       RadiusTopRight: =5
+                                                      Size: =11
                                           - Container21_3:
                                               Control: GroupContainer@1.5.0
                                               Variant: AutoLayout
                                               Properties:
                                                 DropShadow: =DropShadow.None
+                                                FillPortions: =1
                                                 LayoutAlignItems: =LayoutAlignItems.Center
                                                 LayoutDirection: =LayoutDirection.Horizontal
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                PaddingLeft: =8
-                                                PaddingRight: =8
+                                                LayoutMinHeight: =34
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =2
+                                                PaddingLeft: =4
+                                                PaddingRight: =4
+                                                PaddingTop: =2
                                               Children:
                                                 - Text10_3:
                                                     Control: ModernText@1.0.0
                                                     Properties:
+                                                      AlignInContainer: =AlignInContainer.Center
+                                                      AutoHeight: =false
                                                       FillPortions: =1
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =26
+                                                      LayoutMinHeight: =26
+                                                      LayoutMinWidth: =0
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =4
+                                                      PaddingTop: =0
+                                                      Size: =11
                                                       Text: ="Ontario Award"
-                                                      Width: =Parent.Width*0.5
+                                                      Wrap: =false
                                                 - ontario_award_input:
                                                     Control: ModernTextInput@1.1.0
                                                     Properties:
@@ -3559,9 +4067,9 @@ Screens:
                                                         If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                       Fill: =RGBA(255, 255, 255, 1)
                                                       FillPortions: =1
-                                                      Height: =40
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =28
+                                                      LayoutMinHeight: =28
+                                                      LayoutMinWidth: =0
                                                       OnChange: |-
                                                         =Patch(colPackageDetails, First(colPackageDetails), {ontario_award: Value(Self.Text)});
                                                         Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {ontario_award: Value(Self.Text)})
@@ -3570,26 +4078,38 @@ Screens:
                                                       RadiusBottomRight: =5
                                                       RadiusTopLeft: =5
                                                       RadiusTopRight: =5
+                                                      Size: =11
                                           - Container21_9:
                                               Control: GroupContainer@1.5.0
                                               Variant: AutoLayout
                                               Properties:
                                                 DropShadow: =DropShadow.None
+                                                FillPortions: =1
                                                 LayoutAlignItems: =LayoutAlignItems.Center
                                                 LayoutDirection: =LayoutDirection.Horizontal
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                PaddingLeft: =8
-                                                PaddingRight: =8
+                                                LayoutMinHeight: =34
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =2
+                                                PaddingLeft: =4
+                                                PaddingRight: =4
+                                                PaddingTop: =2
                                               Children:
                                                 - Text10_8:
                                                     Control: ModernText@1.0.0
                                                     Properties:
+                                                      AlignInContainer: =AlignInContainer.Center
+                                                      AutoHeight: =false
                                                       FillPortions: =1
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =26
+                                                      LayoutMinHeight: =26
+                                                      LayoutMinWidth: =0
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =4
+                                                      PaddingTop: =0
+                                                      Size: =11
                                                       Text: ="Buyback/Resale Value"
-                                                      Width: =Parent.Width*0.5
+                                                      Wrap: =false
                                                 - buyback_resale_value:
                                                     Control: ModernTextInput@1.1.0
                                                     Properties:
@@ -3610,9 +4130,9 @@ Screens:
                                                         If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                       Fill: =RGBA(255, 255, 255, 1)
                                                       FillPortions: =1
-                                                      Height: =40
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =28
+                                                      LayoutMinHeight: =28
+                                                      LayoutMinWidth: =0
                                                       OnChange: |-
                                                         =Patch(colPackageDetails, First(colPackageDetails), {buybackresaletarget: Value(Self.Text)});
                                                         Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {buybackresaletarget: Value(Self.Text)})
@@ -3621,38 +4141,52 @@ Screens:
                                                       RadiusBottomRight: =5
                                                       RadiusTopLeft: =5
                                                       RadiusTopRight: =5
+                                                      Size: =11
                                     - Container28:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
                                         Properties:
                                           DropShadow: =DropShadow.None
-                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          FillPortions: =1
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          PaddingLeft: =8
-                                          PaddingRight: =8
+                                          LayoutGap: =4
+                                          LayoutMinHeight: =108
+                                          LayoutMinWidth: =0
+                                          PaddingLeft: =4
+                                          PaddingRight: =4
                                         Children:
                                           - Container21_4:
                                               Control: GroupContainer@1.5.0
                                               Variant: AutoLayout
                                               Properties:
                                                 DropShadow: =DropShadow.None
+                                                FillPortions: =1
                                                 LayoutAlignItems: =LayoutAlignItems.Center
                                                 LayoutDirection: =LayoutDirection.Horizontal
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                PaddingLeft: =8
-                                                PaddingRight: =8
+                                                LayoutMinHeight: =34
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =2
+                                                PaddingLeft: =4
+                                                PaddingRight: =4
+                                                PaddingTop: =2
                                               Children:
                                                 - Text10_4:
                                                     Control: ModernText@1.0.0
                                                     Properties:
+                                                      AlignInContainer: =AlignInContainer.Center
+                                                      AutoHeight: =false
                                                       FillPortions: =1
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =26
+                                                      LayoutMinHeight: =26
+                                                      LayoutMinWidth: =0
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =4
+                                                      PaddingTop: =0
+                                                      Size: =11
                                                       Text: ="Budgeted"
-                                                      Width: =Parent.Width*0.5
+                                                      Wrap: =false
                                                 - budgeted_input:
                                                     Control: ModernTextInput@1.1.0
                                                     Properties:
@@ -3665,9 +4199,9 @@ Screens:
                                                         If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                       Fill: =RGBA(255, 255, 255, 1)
                                                       FillPortions: =1
-                                                      Height: =40
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =28
+                                                      LayoutMinHeight: =28
+                                                      LayoutMinWidth: =0
                                                       OnChange: |-
                                                         =Patch(colPackageDetails, First(colPackageDetails), {budgetamount: Value(Self.Text)});
                                                         Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {budgetamount: Value(Self.Text)})
@@ -3676,26 +4210,38 @@ Screens:
                                                       RadiusBottomRight: =5
                                                       RadiusTopLeft: =5
                                                       RadiusTopRight: =5
+                                                      Size: =11
                                           - Container21_5:
                                               Control: GroupContainer@1.5.0
                                               Variant: AutoLayout
                                               Properties:
                                                 DropShadow: =DropShadow.None
+                                                FillPortions: =1
                                                 LayoutAlignItems: =LayoutAlignItems.Center
                                                 LayoutDirection: =LayoutDirection.Horizontal
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                PaddingLeft: =8
-                                                PaddingRight: =8
+                                                LayoutMinHeight: =34
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =2
+                                                PaddingLeft: =4
+                                                PaddingRight: =4
+                                                PaddingTop: =2
                                               Children:
                                                 - Text10_5:
                                                     Control: ModernText@1.0.0
                                                     Properties:
+                                                      AlignInContainer: =AlignInContainer.Center
+                                                      AutoHeight: =false
                                                       FillPortions: =1
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =26
+                                                      LayoutMinHeight: =26
+                                                      LayoutMinWidth: =0
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =4
+                                                      PaddingTop: =0
+                                                      Size: =11
                                                       Text: ="Awarded"
-                                                      Width: =Parent.Width*0.5
+                                                      Wrap: =false
                                                 - awarded_input:
                                                     Control: ModernTextInput@1.1.0
                                                     Properties:
@@ -3708,9 +4254,9 @@ Screens:
                                                         If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                       Fill: =RGBA(255, 255, 255, 1)
                                                       FillPortions: =1
-                                                      Height: =40
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =28
+                                                      LayoutMinHeight: =28
+                                                      LayoutMinWidth: =0
                                                       OnChange: |-
                                                         =Patch(colPackageDetails, First(colPackageDetails), {awardvalue: Value(Self.Text)});
                                                         Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {awardvalue: Value(Self.Text)})
@@ -3719,26 +4265,38 @@ Screens:
                                                       RadiusBottomRight: =5
                                                       RadiusTopLeft: =5
                                                       RadiusTopRight: =5
+                                                      Size: =11
                                           - Container21_6:
                                               Control: GroupContainer@1.5.0
                                               Variant: AutoLayout
                                               Properties:
                                                 DropShadow: =DropShadow.None
+                                                FillPortions: =1
                                                 LayoutAlignItems: =LayoutAlignItems.Center
                                                 LayoutDirection: =LayoutDirection.Horizontal
-                                                LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
-                                                PaddingLeft: =8
-                                                PaddingRight: =8
+                                                LayoutMinHeight: =34
+                                                LayoutMinWidth: =0
+                                                PaddingBottom: =2
+                                                PaddingLeft: =4
+                                                PaddingRight: =4
+                                                PaddingTop: =2
                                               Children:
                                                 - Text10_6:
                                                     Control: ModernText@1.0.0
                                                     Properties:
+                                                      AlignInContainer: =AlignInContainer.Center
+                                                      AutoHeight: =false
                                                       FillPortions: =1
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =26
+                                                      LayoutMinHeight: =26
+                                                      LayoutMinWidth: =0
+                                                      PaddingBottom: =0
+                                                      PaddingLeft: =0
+                                                      PaddingRight: =4
+                                                      PaddingTop: =0
+                                                      Size: =11
                                                       Text: ="Variance"
-                                                      Width: =Parent.Width*0.5
+                                                      Wrap: =false
                                                 - budget_difference:
                                                     Control: ModernTextInput@1.1.0
                                                     Properties:
@@ -3769,9 +4327,9 @@ Screens:
                                                         If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                                                       Fill: =RGBA(255, 255, 255, 1)
                                                       FillPortions: =1
-                                                      Height: =40
-                                                      LayoutMinHeight: =16
-                                                      LayoutMinWidth: =16
+                                                      Height: =28
+                                                      LayoutMinHeight: =28
+                                                      LayoutMinWidth: =0
                                                       OnChange: |-
                                                         =Patch(colPackageDetails, First(colPackageDetails), {awardvalue: Value(Self.Text)});
                                                         Patch('ProcTrack - Packages', LookUp('ProcTrack - Packages', packageidentifier = First(colPackageDetails).packageidentifier), {awardvalue: Value(Self.Text)})
@@ -3780,6 +4338,7 @@ Screens:
                                                       RadiusBottomRight: =5
                                                       RadiusTopLeft: =5
                                                       RadiusTopRight: =5
+                                                      Size: =11
             - buttons_1:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout

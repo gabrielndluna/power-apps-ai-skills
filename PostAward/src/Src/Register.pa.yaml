@@ -24,12 +24,7 @@ Screens:
             !IsBlank(varSelectedProject),
             Set(
                 varCanEditCurrentProject,
-                !IsBlank(
-                    LookUp(
-                        colUserPermissions,
-                        Project = varSelectedProject.projectidentifier && Edit_allowed = "yes"
-                    )
-                )
+                varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = varSelectedProject.projectid))
             );
             ClearCollect(
                 colProjectSubcontracts,
@@ -66,7 +61,7 @@ Screens:
                                             subcontractid = s.packageidentifier && status.Value = "Approved"
                                         ),
                                         _amt,
-                                        Coalesce(finalvalue, value)
+                                        value
                                     ),
                                     _amt
                                 ),
@@ -80,7 +75,7 @@ Screens:
                                             subcontractid = s.packageidentifier && status.Value = "Pending"
                                         ),
                                         _amt,
-                                        Coalesce(finalvalue, value)
+                                        value
                                     ),
                                     _amt
                                 ),
@@ -94,7 +89,7 @@ Screens:
                                             subcontractid = s.packageidentifier && status.Value = "Potential"
                                         ),
                                         _amt,
-                                        Coalesce(finalvalue, value)
+                                        value
                                     ),
                                     _amt
                                 ),
@@ -200,10 +195,12 @@ Screens:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
                             Properties:
+                              AlignInContainer: =AlignInContainer.Center
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 0.18)
                               FillPortions: =0
                               Height: =36
+                              LayoutMaxWidth: =36
                               LayoutMinHeight: =36
                               LayoutMinWidth: =36
                               RadiusBottomLeft: =18
@@ -299,6 +296,7 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
                               Height: =32
+                              LayoutMaxWidth: =32
                               LayoutMinHeight: =32
                               LayoutMinWidth: =32
                               RadiusBottomLeft: =8
@@ -312,9 +310,63 @@ Screens:
                                   Properties:
                                     BorderColor: =RGBA(0, 0, 0, 0)
                                     BorderStyle: =BorderStyle.None
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    DisabledFill: =RGBA(0, 0, 0, 0)
+                                    DisplayMode: =If(varExporting, DisplayMode.Disabled, DisplayMode.Edit)
                                     Height: =22
+                                    HoverBorderColor: =RGBA(0, 0, 0, 0)
+                                    HoverFill: =RGBA(0, 0, 0, 0)
                                     Image: ='excel-icon-17'
-                                    OnSelect: =Launch(varSubcontractsListUrl)
+                                    OnSelect: |-
+                                      =Set(varExporting, true);
+                                      Set(
+                                          varExportResult,
+                                          'PostAward-Excelexport'.Run(
+                                              JSON(
+                                                  ForAll(
+                                                      reg_gallery.AllItems As s,
+                                                      {
+                                                          Project: Coalesce(varSelectedProject.projectname, s.projectidentifier, "") & "",
+                                                          Subcontract: Coalesce(s.subcontractnumber, "") & "",
+                                                          PONumber: Coalesce(s.ponumber, "") & "",
+                                                          Vendor: Coalesce(s.vendor, "") & "",
+                                                          Scope: Coalesce(s.scope, "") & "",
+                                                          Bundle: Coalesce(s.bundle, "") & "",
+                                                          ContractType: Coalesce(s.contracttype, "") & "",
+                                                          OriginalValue: Text(Coalesce(Value(s.originalvalue), 0)),
+                                                          ApprovedCO: Text(Coalesce(Value(s.apprCO), 0)),
+                                                          CurrentValue: Text(Coalesce(Value(s.currentValue), 0)),
+                                                          InvoicedToDate: Text(Coalesce(Value(s.invoicedtodate), 0)),
+                                                          FutureLiability: Text(Coalesce(Value(s.futureLiab), 0)),
+                                                          EAC: Text(Coalesce(Value(s.eac), 0)),
+                                                          ContractAdmin: Coalesce(s.responsibleca, "") & "",
+                                                          BackupCA: If(IsBlank(s.backupca), "-", s.backupca) & "",
+                                                          OperationalOwner: "-",
+                                                          CurrentlyActive: If(Coalesce(s.currentlyactive, false), "Yes", "No"),
+                                                          Holdback: If(IsBlank(s.holdback), "-", Coalesce(s.holdback.Value, "-")) & "",
+                                                          CloseoutStatus: If(IsBlank(s.closeoutstatus), "-", Coalesce(s.closeoutstatus.Value, "-")) & "",
+                                                          StartDate: If(IsBlank(s.startdate), "-", Text(s.startdate, "yyyy-mm-dd")),
+                                                          EndDate: If(IsBlank(s.completiondate), "-", Text(s.completiondate, "yyyy-mm-dd")),
+                                                          RevisedEndDate: "-",
+                                                          SAPVendorNumber: "-",
+                                                          Currency: Coalesce(varSubCurrency, "CAD"),
+                                                          IndigenousContribution: "-",
+                                                          WorkType: "-",
+                                                          IsOverBudget: If(Coalesce(s.isOver, false), "Yes", "No")
+                                                      }
+                                                  ),
+                                                  JSONFormat.Compact
+                                              )
+                                          )
+                                      );
+                                      Set(varExporting, false);
+                                      If(
+                                          !IsBlank(varExportResult.filelink),
+                                          Launch(Substitute(varExportResult.filelink, " ", "%20")),
+                                          Notify("Excel export failed - open Power Automate run history for PostAward - Excel export.", NotificationType.Error)
+                                      )
+                                    PressedBorderColor: =RGBA(0, 0, 0, 0)
+                                    PressedFill: =RGBA(0, 0, 0, 0)
                                     Width: =22
                                     X: =5
                                     Y: =5
@@ -327,6 +379,7 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 0.18)
                               FillPortions: =0
                               Height: =32
+                              LayoutMaxWidth: =32
                               LayoutMinHeight: =32
                               LayoutMinWidth: =32
                               RadiusBottomLeft: =16
@@ -391,9 +444,10 @@ Screens:
                                     Text: ="Project"
                                     Width: =68
                               - reg_project_combo:
-                                  Control: Classic/ComboBox@2.4.0
+                                  Control: Classic/DropDown@2.3.1
                                   Properties:
                                     AlignInContainer: =AlignInContainer.Center
+                                    AllowEmptySelection: =false
                                     BorderColor: =RGBA(0, 0, 0, 0)
                                     BorderThickness: =0
                                     ChevronBackground: =RGBA(255, 255, 255, 1)
@@ -401,51 +455,43 @@ Screens:
                                     ChevronHoverBackground: =RGBA(255, 255, 255, 1)
                                     ChevronHoverFill: =RGBA(214, 12, 48, 1)
                                     Color: =RGBA(33, 33, 33, 1)
-                                    DefaultSelectedItems: |-
-                                      =Filter(
-                                          AddColumns(colPermittedProjects, Display, projectname),
-                                          projectidentifier = varSelectedProject.projectidentifier
-                                      )
-                                    DisplayFields: =["Display"]
+                                    Default: =varSelectedProject.projectname
                                     Fill: =RGBA(255, 255, 255, 1)
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
                                     Height: =32
-                                    IsSearchable: =false
-                                    Items: =AddColumns(colPermittedProjects, Display, projectname)
+                                    Items: =Sort(Distinct(colPermittedProjects, projectname), Value)
                                     OnChange: |-
                                         =If(
-                                        !IsBlank(Self.Selected),
-                                        Set(varSelectedProject, Self.Selected);
+                                        !IsBlank(Self.Selected.Value),
+                                        Set(
+                                        varSelectedProject,
+                                        LookUp(colPermittedProjects, projectname = Self.Selected.Value)
+                                        );
                                         Set(
                                         varCanEditCurrentProject,
-                                        !IsBlank(
-                                        LookUp(
-                                        colUserPermissions,
-                                        Project = Self.Selected.projectidentifier && Edit_allowed = "yes"
-                                        )
-                                        )
+                                        varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = varSelectedProject.projectid))
                                         );
                                         ClearCollect(
                                         colProjectSubcontracts,
                                         Filter(
                                         'PostAward - Subcontracts',
-                                        projectidentifier = Self.Selected.projectidentifier
+                                        projectidentifier = varSelectedProject.projectidentifier
                                         )
                                         );
                                         ClearCollect(
                                         colProjectChanges,
                                         Filter(
                                         'PostAward - Changes',
-                                        projectidentifier = Self.Selected.projectidentifier
+                                        projectidentifier = varSelectedProject.projectidentifier
                                         )
                                         );
                                         ClearCollect(
                                         colProjectPackages,
                                         Filter(
                                         colPermittedPackages,
-                                        projectidentifier = Self.Selected.projectidentifier
+                                        projectidentifier = varSelectedProject.projectidentifier
                                         )
                                         );
                                         ClearCollect(
@@ -462,7 +508,7 @@ Screens:
                                         subcontractid = s.packageidentifier && status.Value = "Approved"
                                         ),
                                         _amt,
-                                        Coalesce(finalvalue, value)
+                                        value
                                         ),
                                         _amt
                                         ),
@@ -476,7 +522,7 @@ Screens:
                                         subcontractid = s.packageidentifier && status.Value = "Pending"
                                         ),
                                         _amt,
-                                        Coalesce(finalvalue, value)
+                                        value
                                         ),
                                         _amt
                                         ),
@@ -490,7 +536,7 @@ Screens:
                                         subcontractid = s.packageidentifier && status.Value = "Potential"
                                         ),
                                         _amt,
-                                        Coalesce(finalvalue, value)
+                                        value
                                         ),
                                         _amt
                                         ),
@@ -543,11 +589,8 @@ Screens:
                                         )
                                         )
                                         )
-                                    SearchFields: =["ComplianceAssetId"]
-                                    SelectMultiple: =false
-                                    SelectionColor: =RGBA(33, 33, 33, 1)
-                                    SelectionFill: =RGBA(255, 255, 255, 1)
                                     Size: =12
+                                    Width: =Parent.Width - 76
             - reg_toolbar:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -1029,7 +1072,7 @@ Screens:
                         LayoutMinHeight: =100
                         OnSelect: |-
                           =Set(varSelectedSubcontract, ThisItem);
-                          Navigate('Subcontract Detail', ScreenTransition.Fade)
+                          Set(varDetLeftTab, "details"); Navigate('Subcontract Detail', ScreenTransition.Fade)
                         TemplatePadding: =0
                         TemplateSize: =64
                         Visible: =CountRows(colRegisterView) > 0
@@ -1261,7 +1304,7 @@ Screens:
                                     Icon: =Icon.ChevronRight
                                     OnSelect: |-
                                       =Set(varSelectedSubcontract, ThisItem);
-                                      Navigate('Subcontract Detail', ScreenTransition.Fade)
+                                      Set(varDetLeftTab, "details"); Navigate('Subcontract Detail', ScreenTransition.Fade)
                                     Tooltip: ="View subcontract details"
                                     Width: =28
                   - reg_empty:
@@ -1369,88 +1412,35 @@ Screens:
                         Text: ="Awarded package"
                         VerticalAlign: =VerticalAlign.Middle
                   - reg_add_pkg:
-                      Control: Classic/ComboBox@2.4.0
+                      Control: Classic/DropDown@2.3.1
                       Properties:
+                        AllowEmptySelection: =true
                         BorderColor: =If(varShowValidationErrors && IsBlank(Self.Selected), RGBA(214, 12, 48, 1), RGBA(201, 207, 210, 1))
-                        DisplayFields: =["Display"]
                         Fill: =RGBA(255, 255, 255, 1)
                         FillPortions: =0
                         Font: =Font.'Segoe UI'
                         Height: =44
-                        IsSearchable: =true
                         Items: |-
-                          =AddColumns(
-                              colAwardedAvailable,
-                              Display,
-                              Coalesce(itemnumber, packageidentifier) & " - " & Coalesce(subcontractorname, packagedescription)
+                          =SortByColumns(
+                              AddColumns(
+                                  colAwardedAvailable,
+                                  Value,
+                                  Coalesce(itemnumber, packageidentifier) & " - " & Coalesce(subcontractorname, packagedescription)
+                              ),
+                              "Value"
                           )
-                        SearchFields: =["Display"]
-                        SelectMultiple: =false
                         Size: =12
-                  - reg_add_ca_header:
-                      Control: GroupContainer@1.5.0
-                      Variant: AutoLayout
+                  - reg_add_ca_label:
+                      Control: Label@2.5.1
                       Properties:
-                        DropShadow: =DropShadow.None
-                        FillPortions: =0
-                        Height: =28
-                        LayoutAlignItems: =LayoutAlignItems.Center
-                        LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutGap: =8
-                        LayoutMinHeight: =28
-                      Children:
-                        - reg_add_ca_label:
-                            Control: Label@2.5.1
-                            Properties:
-                              Color: =RGBA(60, 65, 71, 1)
-                              FillPortions: =1
-                              Font: =Font.'Segoe UI'
-                              FontWeight: =FontWeight.Semibold
-                              Height: =24
-                              Size: =12
-                              Text: ="Responsible CA"
-                              VerticalAlign: =VerticalAlign.Middle
-                        - reg_add_ca_mode:
-                            Control: Classic/Button@2.2.0
-                            Properties:
-                              BorderThickness: =0
-                              Color: =RGBA(214, 12, 48, 1)
-                              Fill: =RGBA(0, 0, 0, 0)
-                              FillPortions: =0
-                              Font: =Font.'Segoe UI'
-                              Height: =24
-                              OnSelect: =Set(varCaFreeText, !varCaFreeText)
-                              Size: =11
-                              Text: =If(varCaFreeText, "Use directory search", "Type a name instead")
-                              Width: =170
-                  - reg_add_ca_combo:
-                      Control: Classic/ComboBox@2.4.0
-                      Properties:
-                        BorderColor: =RGBA(201, 207, 210, 1)
-                        DisplayFields: =["DisplayName"]
-                        Fill: =RGBA(255, 255, 255, 1)
+                        Color: =RGBA(60, 65, 71, 1)
                         FillPortions: =0
                         Font: =Font.'Segoe UI'
-                        Height: =44
-                        IsSearchable: =true
-                        Items: |-
-                          =If(
-                              !IsBlank(Trim(Self.SearchText)),
-                              ShowColumns(
-                                  Office365Users.SearchUser(
-                                      {searchTerm: Trim(Self.SearchText), top: 15}
-                                  ),
-                                  Id,
-                                  DisplayName,
-                                  Mail,
-                                  UserPrincipalName,
-                                  Department
-                              )
-                          )
-                        SearchFields: =["DisplayName", "Mail"]
-                        SelectMultiple: =false
+                        FontWeight: =FontWeight.Semibold
+                        Height: =20
                         Size: =12
-                        Visible: =!varCaFreeText
+                        Text: ="Responsible CA"
+                        VerticalAlign: =VerticalAlign.Middle
                   - reg_add_ca_txt:
                       Control: Classic/TextInput@2.3.2
                       Properties:
@@ -1461,7 +1451,6 @@ Screens:
                         Height: =44
                         HintText: ="Type responsible CA name"
                         Size: =12
-                        Visible: =varCaFreeText
                   - reg_add_spacer:
                       Control: GroupContainer@1.5.0
                       Variant: ManualLayout
@@ -1515,11 +1504,7 @@ Screens:
                                 =With(
                                     {
                                         pkg: reg_add_pkg.Selected,
-                                        caName: If(
-                                            varCaFreeText,
-                                            Trim(reg_add_ca_txt.Text),
-                                            Trim(reg_add_ca_combo.Selected.DisplayName)
-                                        )
+                                        caName: Trim(reg_add_ca_txt.Text)
                                     },
                                     If(
                                         IsBlank(pkg) || IsBlank(caName),
@@ -1544,7 +1529,6 @@ Screens:
                                                 currentlyactive: true,
                                                 holdback: {Value: "Applicable"},
                                                 closeoutstatus: {Value: "In progress"},
-                                                currencycode: {Value: "CAD"},
                                                 indigenouscontribution: {Value: "0"},
                                                 worktype: {Value: "Consulting"},
                                                 invoicedtodate: 0
@@ -1630,7 +1614,7 @@ Screens:
                         Font: =Font.'Segoe UI'
                         Height: =90
                         Size: =12
-                        Text: ="Permissions use ProcTrack - Permissions. Operational Owners listed on a subcontract get automatic view access to that project. XLS opens the SharePoint list for Excel export. ProcTrack package fields stay read-only in PostAward."
+                        Text: ="Permissions use ProcTrack - Permissions. Operational Owners listed on a subcontract get automatic view access to that project. Excel runs PostAward - Excel export for the filtered gallery rows. ProcTrack package fields stay read-only in PostAward."
                         Wrap: =true
                   - reg_settings_close:
                       Control: Classic/Button@2.2.0

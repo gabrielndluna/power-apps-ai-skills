@@ -26,13 +26,28 @@ App:
       Set(varPipeReturned, false);
       Set(varSettingsSelectedEmail, "");
       Set(varSettingsSelectedName, "");
+      Set(varRuleSelectedEmail, "");
+      Set(varRuleSelectedName, "");
       Set(varShowLogDelete, false);
       Set(varSkipGalleryNav, false);
       Set(varDeletePR, Blank());
       Set(varShowLineDelete, false);
       Set(varDeleteLine, Blank());
       Set(varShowAddSupplier, false);
+      Set(varShowAddVendor, false);
+      Set(varShowAddBuyer, false);
+      Set(varBuyerPickEmail, "");
+      Set(varBuyerPickName, "");
       Set(varSupplierDefault, "No Preference");
+      Set(varIsProceedApprover, false);
+      Set(varIsDoaApprover, false);
+      Set(varAttachName, "");
+      Set(varShowAttachmentPane, false);
+      Set(varOpenAttachOnDetail, false);
+      Set(varNewProceedEmail, "");
+      Set(varNewProceedName, "");
+      Set(varNewDoaEmail, "");
+      Set(varNewDoaName, "");
 
       ClearCollect(
           colUserPermissions,
@@ -85,6 +100,7 @@ App:
               varCurrentRole,
               "Approver", "approver",
               "Buyer", "buyer",
+              "Project Controls", "pc",
               "requester"
           )
       );
@@ -144,6 +160,9 @@ App:
               leadtime: "",
               expdelivery: Today(),
               nwacode: "",
+              nwaname: "",
+              cbsnumber: "",
+              cbsname: "",
               origbudget: 0,
               rembudget: 0,
               budgetstatus: { Value: "" },
@@ -158,12 +177,97 @@ App:
       );
       Clear(colPermittedLines);
       ForAll(
+          colPermittedPRs As pr,
+          If(
+              !IsBlank(pr.Title),
+              Collect(
+                  colPermittedLines,
+                  Filter(
+                      'PRTrack - LineItems',
+                      pridentifier = pr.Title
+                  )
+              )
+          )
+      );
+
+      ClearCollect(
+          colAllPermissions,
+          {
+              ID: 0,
+              Title: "",
+              Project: "",
+              displayname: "",
+              Role: { Value: "" },
+              Admin: false
+          }
+      );
+      Clear(colAllPermissions);
+      ForAll(
           colPermittedProjects As p,
           Collect(
-              colPermittedLines,
-              Filter(
-                  'PRTrack - LineItems',
-                  StartsWith(pridentifier, p.projectidentifier & "-")
+              colAllPermissions,
+              Filter('PRTrack - Permissions', Project = p.projectidentifier)
+          )
+      );
+
+      ClearCollect(
+          colAllApproverRules,
+          {
+              ID: 0,
+              Project: "",
+              RuleType: { Value: "" },
+              Category: "",
+              approvername: "",
+              approveremail: "",
+              minamount: 0
+          }
+      );
+      Clear(colAllApproverRules);
+      ForAll(
+          colPermittedProjects As p,
+          Collect(
+              colAllApproverRules,
+              Filter('PRTrack - ApproverRules', Project = p.projectidentifier)
+          )
+      );
+
+      ClearCollect(
+          colAllNWA,
+          {
+              ID: 0,
+              Project: "",
+              Title: "",
+              nwacode: "",
+              nwaname: ""
+          }
+      );
+      Clear(colAllNWA);
+      ForAll(
+          colPermittedProjects As p,
+          Collect(
+              colAllNWA,
+              Filter('PRTrack - NWA', Project = p.projectidentifier)
+          )
+      );
+
+      ClearCollect(
+          colAllAttachments,
+          {
+              ID: 0,
+              Title: "",
+              parenttype: { Value: "" },
+              parentid: "",
+              category: { Value: "" }
+          }
+      );
+      Clear(colAllAttachments);
+      ForAll(
+          colPermittedPRs As pr,
+          If(
+              !IsBlank(pr.Title),
+              Collect(
+                  colAllAttachments,
+                  Filter('PRTrack - Attachments', parentid = pr.Title)
               )
           )
       );
@@ -174,11 +278,11 @@ App:
       );
       ClearCollect(
           colProjectLines,
-          Filter(colPermittedLines, StartsWith(pridentifier, varSelectedProject.projectidentifier & "-"))
+          Filter(colPermittedLines, pridentifier in colProjectPRs.Title)
       );
       ClearCollect(
           colProjectPermissions,
-          Filter('PRTrack - Permissions', Project = varSelectedProject.projectidentifier)
+          Filter(colAllPermissions, Project = varSelectedProject.projectidentifier)
       );
       ClearCollect(
           colApprovers,
@@ -187,6 +291,43 @@ App:
       ClearCollect(
           colBuyers,
           Filter(colProjectPermissions, Role.Value = "Buyer")
+      );
+      ClearCollect(colBuyerPick, { displayname: "Unassigned" });
+      Collect(colBuyerPick, colBuyers);
+      ClearCollect(
+          colApproverRules,
+          Filter(colAllApproverRules, Project = varSelectedProject.projectidentifier)
+      );
+      ClearCollect(
+          colNWA,
+          Filter(colAllNWA, Project = varSelectedProject.projectidentifier)
+      );
+      ClearCollect(
+          colAttachments,
+          Filter(colAllAttachments, parentid in colProjectPRs.Title)
+      );
+      ClearCollect(colSuppliers, { Value: "No Preference" });
+      Collect(
+          colSuppliers,
+          Filter(
+              Distinct(colPermittedPRs, supplier.Value),
+              !IsBlank(Value) && Value <> "No Preference" && Value <> "Suggested supplier"
+          )
+      );
+      ClearCollect(
+          colVendors,
+          Filter(Distinct(colPermittedLines, vendor), !IsBlank(Value))
+      );
+      ForAll(
+          Filter(colSuppliers, !IsBlank(Value) && Value <> "No Preference") As s,
+          If(
+              CountRows(Filter(colVendors, Value = s.Value)) = 0,
+              Collect(colVendors, { Value: s.Value })
+          )
+      );
+      If(
+          CountRows(colVendors) = 0,
+          Collect(colVendors, { Value: "No Preference" })
       );
       ClearCollect(
           colUserHits,
@@ -199,14 +340,17 @@ App:
           }
       );
       Clear(colUserHits);
-      ClearCollect(colSuppliers, { Value: "No Preference" });
-      Collect(
-          colSuppliers,
-          Filter(
-              Distinct(colPermittedPRs, supplier.Value),
-              !IsBlank(Value) && Value <> "No Preference" && Value <> "Suggested supplier"
-          )
+      ClearCollect(
+          colRuleHits,
+          {
+              Id: "",
+              DisplayName: "",
+              Mail: "",
+              UserPrincipalName: "",
+              Department: ""
+          }
       );
+      Clear(colRuleHits);
       ClearCollect(
           colDraftLines,
           {

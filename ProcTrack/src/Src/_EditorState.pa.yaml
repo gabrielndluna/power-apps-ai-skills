@@ -8,9 +8,11 @@
 # ************************************************************************************************
 EditorState:
   ScreensOrder:
+    - Project Dashboard
     - Welcome screen
     - Create New Package
     - Package Details
+    - Settings
   ComponentDefinitionsOrder:
     - Search_Bar
     - Create_Subtitle

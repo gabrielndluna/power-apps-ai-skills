@@ -19,8 +19,12 @@ Screens:
                 colProjectPackages,
                 Filter(
                     'ProcTrack - Packages',
-                    projectidentifier = varSelectedProject.projectidentifier
+                    ProjectID = varSelectedProject.projectid || projectidentifier = varSelectedProject.projectidentifier
                 )
+            );
+            Set(
+                varCanEditCurrentProject,
+                varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = varSelectedProject.projectid))
             )
         )
     Children:
@@ -273,7 +277,7 @@ Screens:
                                     Height: =18
                                     HoverColor: =RGBA(255, 255, 255, 0.85)
                                     Icon: =Icon.Settings
-                                    OnSelect: =Set(varShowSettings, true)
+                                    OnSelect: =Navigate(Settings, ScreenTransition.Fade)
                                     Width: =18
                                     X: =7
                                     Y: =7
@@ -358,7 +362,22 @@ Screens:
                                     IsSearchable: =false
                                     Items: |-
                                       =AddColumns(colPermittedProjects, Display, projectname)
-                                    OnChange: "=If(\r\n    !IsBlank(Self.Selected),\r\n    Set(varSelectedProject, Self.Selected);\r\n    \r\n    // Refresh packages collection for this project\r\n    ClearCollect(\r\n        colProjectPackages,\r\n        Filter(\r\n            'ProcTrack - Packages',\r\n            projectidentifier = Self.Selected.projectidentifier\r\n        )\r\n    );\r\n    \r\n    // Check if user can edit THIS specific project\r\n    Set(\r\n        varCanEditCurrentProject,\r\n        !IsBlank(\r\n            LookUp(\r\n                colUserPermissions,\r\n                Project = Self.Selected.projectidentifier && Edit_allowed = \"yes\"\r\n            )\r\n        )\r\n    )\r\n)"
+                                    OnChange: |-
+                                      =If(
+                                          !IsBlank(Self.Selected),
+                                          Set(varSelectedProject, Self.Selected);
+                                          ClearCollect(
+                                              colProjectPackages,
+                                              Filter(
+                                                  'ProcTrack - Packages',
+                                                  ProjectID = Self.Selected.projectid || projectidentifier = Self.Selected.projectidentifier
+                                              )
+                                          );
+                                          Set(
+                                              varCanEditCurrentProject,
+                                              varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = Self.Selected.projectid))
+                                          )
+                                      )
                                     PressedBorderColor: =RGBA(0, 0, 0, 0)
                                     PressedColor: =RGBA(33, 33, 33, 1)
                                     PressedFill: =RGBA(255, 255, 255, 1)
@@ -790,8 +809,8 @@ Screens:
                                 )
                               Size: =12
                               Text: ="DESCRIPTION" & If(varSortColumn = "packagedescription", If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.22
-                              X: =headers_container.Width * 0.07
+                              Width: =headers_container.Width * 0.14
+                              X: =headers_container.Width * 0.12
                               Y: =10
                         - header_package:
                             Control: Label@2.5.1
@@ -810,7 +829,7 @@ Screens:
                               Size: =12
                               Text: |-
                                 ="PACKAGE #" & If(varSortColumn = "itemnumber", If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.07
+                              Width: =headers_container.Width * 0.12
                               Y: =10
                         - header_stage_due:
                             Control: Label@2.5.1
@@ -1660,50 +1679,56 @@ Screens:
                               X: =Parent.Width * 0.29 + 10
                               Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
                         - gallery_description:
-                            Control: ModernText@1.0.0
+                            Control: Label@2.5.1
                             Properties:
                               Align: =Align.Center
+                              AutoHeight: =false
+                              BorderColor: =RGBA(0, 0, 0, 0)
                               Color: =RGBA(30, 30, 30, 1)
+                              Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
+                              Height: =22
                               OnSelect: =Select(Parent)
+                              Overflow: =Overflow.Hidden
                               PaddingBottom: =0
-                              PaddingLeft: =0
-                              PaddingRight: =0
+                              PaddingLeft: =4
+                              PaddingRight: =16
                               PaddingTop: =0
-                              RadiusBottomLeft: =0
-                              RadiusBottomRight: =0
-                              RadiusTopLeft: =0
-                              RadiusTopRight: =0
-                              Size: =14
+                              Size: =12
                               Text: =ThisItem.packagedescription
-                              Width: =Parent.Width * 0.22
-                              X: =Parent.Width * 0.07
+                              Tooltip: =ThisItem.packagedescription
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =Parent.Width * 0.14
+                              Wrap: =false
+                              X: =Parent.Width * 0.12
                               Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
                         - gallery_package:
-                            Control: ModernText@1.0.0
+                            Control: Label@2.5.1
                             Properties:
+                              AutoHeight: =false
+                              BorderColor: =RGBA(0, 0, 0, 0)
                               Color: =If(!IsBlank(ThisItem.packagefolderurl), RGBA(192, 0, 0, 1), RGBA(192, 0, 0, 0.45))
-                              Fill: =RGBA(192, 0, 0, 0.01)
+                              Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Bold
+                              Height: =22
                               OnSelect: |-
                                 =If(
                                     !IsBlank(ThisItem.packagefolderurl),
                                     Launch(ThisItem.packagefolderurl)
                                 )
+                              Overflow: =Overflow.Hidden
                               PaddingBottom: =0
-                              PaddingLeft: =20
-                              PaddingRight: =0
+                              PaddingLeft: =8
+                              PaddingRight: =4
                               PaddingTop: =0
-                              RadiusBottomLeft: =0
-                              RadiusBottomRight: =0
-                              RadiusTopLeft: =0
-                              RadiusTopRight: =0
-                              Size: =14
+                              Size: =12
                               Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
+                              Tooltip: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
                               Underline: =!IsBlank(ThisItem.packagefolderurl)
-                              Width: =Parent.Width * 0.07
-                              X: |+
-                                =0
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =Parent.Width * 0.12
+                              Wrap: =false
+                              X: =0
                               Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
                         - gallery_status_label:
                             Control: Label@2.5.1
@@ -1795,239 +1820,3 @@ Screens:
                                     ""
                                 )
                               Width: =358
-      - Container29:
-          Control: GroupContainer@1.5.0
-          Variant: ManualLayout
-          Properties:
-            Fill: =RGBA(214, 221, 224, 0.5)
-            Height: =Parent.Height
-            Visible: =varShowSettings
-            Width: =Parent.Width
-            Y: =
-          Children:
-            - Container30:
-                Control: GroupContainer@1.5.0
-                Variant: ManualLayout
-                Properties:
-                  Fill: =RGBA(255, 255, 255, 1)
-                  Height: =350
-                  Width: =540
-                  X: =(Parent.Width - Self.Width) / 2
-                  Y: =(Parent.Height - Self.Height) / 2
-                Children:
-                  - lbl_settings_title:
-                      Control: Label@2.5.1
-                      Properties:
-                        BorderColor: =RGBA(0, 0, 0, 0)
-                        BorderStyle: =BorderStyle.None
-                        BorderThickness: =2
-                        Color: =RGBA(50, 49, 48, 1)
-                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
-                        DisabledColor: =RGBA(161, 159, 157, 1)
-                        FocusedBorderThickness: =4
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Semibold
-                        Size: =18
-                        Text: ="Column Settings"
-                        Width: =250
-                        X: =1
-                  - Icon10:
-                      Control: Classic/Icon@2.5.0
-                      Properties:
-                        BorderColor: =RGBA(0, 0, 0, 0)
-                        Color: =RGBA(53, 61, 63, 1)
-                        DisabledBorderColor: =RGBA(245, 245, 245, 1)
-                        DisabledColor: =RGBA(225, 223, 221, 1)
-                        DisabledFill: =RGBA(0, 0, 0, 0)
-                        FocusedBorderThickness: =4
-                        Height: =36
-                        HoverBorderColor: =RGBA(0, 0, 0, 0)
-                        HoverColor: =RGBA(16, 110, 190, 1)
-                        HoverFill: =RGBA(0, 0, 0, 0)
-                        Icon: =Icon.Cancel
-                        OnSelect: =Set(varShowSettings, false)
-                        PressedBorderColor: =RGBA(0, 0, 0, 0)
-                        PressedColor: =RGBA(16, 110, 190, 1)
-                        PressedFill: =RGBA(0, 0, 0, 0)
-                        Width: =33
-                        X: =507
-                  - cbo_slot4:
-                      Control: ModernCombobox@1.1.0
-                      Properties:
-                        DefaultSelectedItems: =LookUp(colColumns, key = varCol4)
-                        Height: =30
-                        ItemDisplayText: =ThisItem.key
-                        Items: =Filter(colColumns, slotEligible)
-                        OnChange: |-
-                          =Set(varCol4, Self.Selected.key);
-                          Set(
-                              varUserPrefs,
-                              Patch(
-                                  'ProcTrack - UserColumnPrefs',
-                                  Coalesce(varUserPrefs, Defaults('ProcTrack - UserColumnPrefs')),
-                                  {
-                                      Title: varCurrentUserEmail,
-                                      Col1: varCol1,
-                                      Col2: varCol2,
-                                      Col3: varCol3,
-                                      Col4: varCol4
-                                  }
-                              )
-                          )
-                        Width: =219
-                        X: =259
-                        Y: =269
-                  - cbo_slot3:
-                      Control: ModernCombobox@1.1.0
-                      Properties:
-                        DefaultSelectedItems: =LookUp(colColumns, key = varCol3)
-                        Height: =30
-                        ItemDisplayText: =ThisItem.key
-                        Items: =Filter(colColumns, slotEligible)
-                        OnChange: |-
-                          =Set(varCol3, Self.Selected.key);
-                          Set(
-                              varUserPrefs,
-                              Patch(
-                                  'ProcTrack - UserColumnPrefs',
-                                  Coalesce(varUserPrefs, Defaults('ProcTrack - UserColumnPrefs')),
-                                  {
-                                      Title: varCurrentUserEmail,
-                                      Col1: varCol1,
-                                      Col2: varCol2,
-                                      Col3: varCol3,
-                                      Col4: varCol4
-                                  }
-                              )
-                          )
-                        Width: =219
-                        X: =259
-                        Y: =212
-                  - cbo_slot2:
-                      Control: ModernCombobox@1.1.0
-                      Properties:
-                        DefaultSelectedItems: =LookUp(colColumns, key = varCol2)
-                        Height: =30
-                        ItemDisplayText: =ThisItem.key
-                        Items: =Filter(colColumns, slotEligible)
-                        OnChange: |-
-                          =Set(varCol2, Self.Selected.key);
-                          Set(
-                              varUserPrefs,
-                              Patch(
-                                  'ProcTrack - UserColumnPrefs',
-                                  Coalesce(varUserPrefs, Defaults('ProcTrack - UserColumnPrefs')),
-                                  {
-                                      Title: varCurrentUserEmail,
-                                      Col1: varCol1,
-                                      Col2: varCol2,
-                                      Col3: varCol3,
-                                      Col4: varCol4
-                                  }
-                              )
-                          )
-                        Width: =219
-                        X: =259
-                        Y: =150
-                  - cbo_slot1:
-                      Control: ModernCombobox@1.1.0
-                      Properties:
-                        DefaultSelectedItems: =LookUp(colColumns, key = varCol1)
-                        Height: =30
-                        ItemDisplayText: =ThisItem.key
-                        Items: =Filter(colColumns, slotEligible)
-                        OnChange: |-
-                          =Set(varCol1, Self.Selected.key);
-                          Set(
-                              varUserPrefs,
-                              Patch(
-                                  'ProcTrack - UserColumnPrefs',
-                                  Coalesce(varUserPrefs, Defaults('ProcTrack - UserColumnPrefs')),
-                                  {
-                                      Title: varCurrentUserEmail,
-                                      Col1: varCol1,
-                                      Col2: varCol2,
-                                      Col3: varCol3,
-                                      Col4: varCol4
-                                  }
-                              )
-                          )
-                        Width: =219
-                        X: =259
-                        Y: =88
-                  - lbl_settings_title_1:
-                      Control: Label@2.5.1
-                      Properties:
-                        Align: =Align.Center
-                        BorderColor: =RGBA(0, 0, 0, 0)
-                        BorderStyle: =BorderStyle.None
-                        BorderThickness: =2
-                        Color: =RGBA(50, 49, 48, 1)
-                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
-                        DisabledColor: =RGBA(161, 159, 157, 1)
-                        FocusedBorderThickness: =4
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Semibold
-                        Height: =30
-                        Size: =14
-                        Text: ="Column 1"
-                        Width: =250
-                        X: =9
-                        Y: =88
-                  - lbl_settings_title_2:
-                      Control: Label@2.5.1
-                      Properties:
-                        Align: =Align.Center
-                        BorderColor: =RGBA(0, 0, 0, 0)
-                        BorderStyle: =BorderStyle.None
-                        BorderThickness: =2
-                        Color: =RGBA(50, 49, 48, 1)
-                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
-                        DisabledColor: =RGBA(161, 159, 157, 1)
-                        FocusedBorderThickness: =4
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Semibold
-                        Height: =30
-                        Size: =14
-                        Text: ="Column 2"
-                        Width: =250
-                        X: =9
-                        Y: =150
-                  - lbl_settings_title_3:
-                      Control: Label@2.5.1
-                      Properties:
-                        Align: =Align.Center
-                        BorderColor: =RGBA(0, 0, 0, 0)
-                        BorderStyle: =BorderStyle.None
-                        BorderThickness: =2
-                        Color: =RGBA(50, 49, 48, 1)
-                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
-                        DisabledColor: =RGBA(161, 159, 157, 1)
-                        FocusedBorderThickness: =4
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Semibold
-                        Height: =30
-                        Size: =14
-                        Text: ="Column 3"
-                        Width: =250
-                        X: =9
-                        Y: =212
-                  - lbl_settings_title_4:
-                      Control: Label@2.5.1
-                      Properties:
-                        Align: =Align.Center
-                        BorderColor: =RGBA(0, 0, 0, 0)
-                        BorderStyle: =BorderStyle.None
-                        BorderThickness: =2
-                        Color: =RGBA(50, 49, 48, 1)
-                        DisabledBorderColor: =RGBA(0, 0, 0, 0)
-                        DisabledColor: =RGBA(161, 159, 157, 1)
-                        FocusedBorderThickness: =4
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Semibold
-                        Height: =30
-                        Size: =14
-                        Text: ="Column 4"
-                        Width: =250
-                        X: =9
-                        Y: =269

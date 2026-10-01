@@ -79,27 +79,84 @@ Screens:
                         DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
                         Value * 7,
                         "Days"
-                    )
+                    ),
+                    weekEnd: DateAdd(
+                        DateAdd(
+                            DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                            Value * 7,
+                            "Days"
+                        ),
+                        6,
+                        "Days"
+                    ),
+                    submittedWeekdays: CountRows(
+                        Distinct(
+                            Filter(
+                                colMyHours,
+                                Date >= DateAdd(
+                                    DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                                    Value * 7,
+                                    "Days"
+                                ) &&
+                                Date <= DateAdd(
+                                    DateAdd(
+                                        DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                                        Value * 7,
+                                        "Days"
+                                    ),
+                                    6,
+                                    "Days"
+                                ) &&
+                                Weekday(Date, StartOfWeek.Monday) < 6 &&
+                                (
+                                    Text(ApprovalStatus_1) = "Pending" ||
+                                    Text(ApprovalStatus_1) = "Approved"
+                                )
+                            ),
+                            Text(Date, "yyyy-mm-dd")
+                        )
+                    ),
+                    hasRejectedWeekday: CountRows(
+                        Filter(
+                            colMyHours,
+                            Date >= DateAdd(
+                                DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                                Value * 7,
+                                "Days"
+                            ) &&
+                            Date <= DateAdd(
+                                DateAdd(
+                                    DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
+                                    Value * 7,
+                                    "Days"
+                                ),
+                                6,
+                                "Days"
+                            ) &&
+                            Weekday(Date, StartOfWeek.Monday) < 6 &&
+                            Text(ApprovalStatus_1) = "Rejected"
+                        )
+                    ) > 0
                 },
                 If(
                     weekStart <= varThisWeekStart &&
-                    CountRows(
-                        Filter(
-                            colMyHours,
-                            Date >= weekStart &&
-                            Date <= DateAdd(weekStart, 6, "Days") &&
-                            (
-                                Text(ApprovalStatus_1) = "Pending" ||
-                                Text(ApprovalStatus_1) = "Approved"
-                            )
-                        )
-                    ) = 0,
+                    (
+                        submittedWeekdays < 5 ||
+                        hasRejectedWeekday
+                    ),
                     Collect(
                         colMissingWeeks,
                         {
                             WeekStart: weekStart,
-                            WeekEnd: DateAdd(weekStart, 6, "Days"),
-                            WeekLabel: Text(weekStart, "mmm d") & " - " & Text(DateAdd(weekStart, 6, "Days"), "mmm d, yyyy")
+                            WeekEnd: weekEnd,
+                            WeekLabel: Text(weekStart, "mmm d") & " - " & Text(weekEnd, "mmm d, yyyy"),
+                            WeekStatus: If(
+                                hasRejectedWeekday,
+                                "Needs correction",
+                                submittedWeekdays = 0,
+                                "Not Submitted",
+                                "Partially Completed"
+                            )
                         }
                     )
                 )
@@ -401,7 +458,7 @@ Screens:
                                       =If(
                                           CountRows(colMissingWeeks) = 0,
                                           "All timesheets up to date",
-                                          Text(CountRows(colMissingWeeks)) & " week(s) not submitted"
+                                          Text(CountRows(colMissingWeeks)) & " week(s) need attention"
                                       )
                               - btn_GoHours:
                                   Control: Classic/Button@2.2.0
@@ -444,16 +501,22 @@ Screens:
                                     Width: =Parent.TemplateWidth - 100
                                     X: =12
                                     Y: =8
-                              - Label_NotSubmitted:
+                              - Label_WeekStatus:
                                   Control: Label@2.5.1
                                   Properties:
                                     BorderColor: =RGBA(0, 0, 0, 1)
-                                    Color: =RGBA(160, 96, 0, 1)
+                                    Color: |-
+                                      =Switch(
+                                          ThisItem.WeekStatus,
+                                          "Needs correction", RGBA(214, 12, 48, 1),
+                                          "Partially Completed", RGBA(0, 18, 107, 1),
+                                          RGBA(160, 96, 0, 1)
+                                      )
                                     Font: =Font.'Open Sans'
                                     Height: =22
                                     OnSelect: =Select(Parent)
                                     Size: =12
-                                    Text: ="Not Submitted"
+                                    Text: =ThisItem.WeekStatus
                                     Width: =Parent.TemplateWidth - 100
                                     X: =12
                                     Y: =34

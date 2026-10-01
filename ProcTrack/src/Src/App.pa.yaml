@@ -11,6 +11,17 @@ App:
     OnStart: |-
       =Set(varPackageFilter, "all");
       Set(varCanEditCurrentProject, false);
+      Set(varIsAdmin, false);
+      Set(varShowValidationErrors, false);
+      Set(varShowComments, false);
+      Set(varShowSettings, false);
+      Set(varSettingsTab, "users");
+      Set(varSettingsSelectedEmail, "");
+      Set(varSettingsSelectedName, "");
+      Set(varSettingsGrantAdmin, false);
+      Set(varSettingsEditProject, Blank());
+      Set(varSettingsFilter, "");
+      Set(varCurrentUserEmail, Lower(User().Email));
 
       Set(
           varIgnoredContractTypes,
@@ -67,38 +78,62 @@ App:
       );
       Clear(colPackageDetails);
 
-      Set(varShowValidationErrors, false);
-      Set(varShowComments, false);
-      Set(varCurrentUserEmail, User().Email);
+      // One Permissions row per user: Title, Name, IsAdmin, Edit_Projects, View_Projects
+      Set(
+          varUserPerm,
+          LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail)
+      );
+      Set(varIsAdmin, Coalesce(varUserPerm.IsAdmin, false));
 
       ClearCollect(
-          colUserPermissions,
-          Filter('ProcTrack - Permissions', Title = varCurrentUserEmail)
+          colMyProjectIds,
+          Distinct(
+              Filter(
+                  Split(
+                      Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                      ";"
+                  ),
+                  !IsBlank(Trim(ThisRecord.Value))
+              ),
+              Value
+          )
+      );
+
+      ClearCollect(colPermittedProjects, Blank());
+      Clear(colPermittedProjects);
+      ForAll(
+          colMyProjectIds As idRow,
+          Collect(
+              colPermittedProjects,
+              LookUp('ProcTrack - Projects', projectid = Trim(idRow.Value))
+          )
+      );
+      ClearCollect(
+          colPermittedProjects,
+          Filter(colPermittedProjects, !IsBlank(projectid))
       );
 
       Set(
           varUserCanEdit,
-          CountRows(Filter(colUserPermissions, Edit_allowed = "yes")) > 0
+          varIsAdmin || !IsBlank(varUserPerm.Edit_Projects)
       );
 
-      ClearCollect(
-          colPermittedProjects,
-          ForAll(
-              colUserPermissions As perm,
-              LookUp('ProcTrack - Projects', projectidentifier = perm.Project)
-          )
-      );
-
-      ClearCollect(colPermittedPackages, Blank());
+      Clear(colPermittedPackages);
       ForAll(
-          colUserPermissions As perm,
+          colPermittedProjects As p,
           Collect(
               colPermittedPackages,
-              Filter('ProcTrack - Packages', projectidentifier = perm.Project)
+              Filter(
+                  'ProcTrack - Packages',
+                  ProjectID = p.projectid || projectidentifier = p.projectidentifier
+              )
           )
       );
 
       Clear(colProjectPackages);
+      Clear(colSettingsProjectAccess);
+      Clear(colAllPermissions);
+      Clear(colAllProjects);
 
       // ── Column registry: only the swappable pool lives here ──────────────
       ClearCollect(
@@ -118,19 +153,16 @@ App:
           {key:"subcontractorname",       label:"Subcontractor",    type:"text",  sortField:"subcontractorname",       slotEligible:true}
       );
 
-      // Load this user's saved column preferences (blank record if none yet)
       Set(
           varUserPrefs,
           LookUp('ProcTrack - UserColumnPrefs', Title = varCurrentUserEmail)
       );
 
-      // Apply saved columns, falling back to the original defaults
       Set(varCol1, Coalesce(varUserPrefs.Col1, "contracttype"));
       Set(varCol2, Coalesce(varUserPrefs.Col2, "stagedue"));
       Set(varCol3, Coalesce(varUserPrefs.Col3, "requiredatsitedate"));
       Set(varCol4, Coalesce(varUserPrefs.Col4, "budgetamount"));
 
-      // ── Sort state: default = next due date, soonest first ───────────────
       Set(varSortColumn, "_sortDue");
       Set(varSortAscending, true);
     StartScreen: ='Project Dashboard'

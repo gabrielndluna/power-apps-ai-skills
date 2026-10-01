@@ -29,7 +29,7 @@ Screens:
         );
         ClearCollect(
             colProjectLines,
-            Filter(colPermittedLines, StartsWith(pridentifier, varSelectedProject.projectidentifier & "-"))
+            Filter(colPermittedLines, pridentifier in colProjectPRs.Title)
         )
     Children:
       - log_root:
@@ -268,21 +268,31 @@ Screens:
                                     Items: =colPermittedProjects
                                     Items.Value: =projectname
                                     OnChange: |-
-                                      =If(
-                                          !IsBlank(Self.Selected),
-                                          Set(varSelectedProject, Self.Selected);
-                                          Set(
-                                              varCurrentRole,
-                                              Coalesce(
-                                                  LookUp(colUserPermissions, Project = Self.Selected.projectidentifier).Role.Value,
-                                                  "Viewer"
-                                              )
-                                          );
-                                          ClearCollect(colProjectPRs, Filter(colPermittedPRs, projectidentifier = Self.Selected.projectidentifier));
-                                          ClearCollect(colProjectLines, Filter(colPermittedLines, StartsWith(pridentifier, Self.Selected.projectidentifier & "-")));
-                                          ClearCollect(colProjectPermissions, Filter('PRTrack - Permissions', Project = Self.Selected.projectidentifier));
-                                          ClearCollect(colApprovers, Filter(colProjectPermissions, Role.Value = "Approver"));
-                                          ClearCollect(colBuyers, Filter(colProjectPermissions, Role.Value = "Buyer"))
+                                      =With(
+                                          {
+                                              selProj: Self.Selected
+                                          },
+                                          If(
+                                              !IsBlank(selProj.projectidentifier),
+                                              Set(varSelectedProject, selProj);
+                                              Set(
+                                                  varCurrentRole,
+                                                  Coalesce(
+                                                      LookUp(colUserPermissions, Project = selProj.projectidentifier).Role.Value,
+                                                      "Viewer"
+                                                  )
+                                              );
+                                              ClearCollect(colProjectPRs, Filter(colPermittedPRs, projectidentifier = selProj.projectidentifier));
+                                              ClearCollect(colProjectLines, Filter(colPermittedLines, pridentifier in colProjectPRs.Title));
+                                              ClearCollect(colProjectPermissions, Filter(colAllPermissions, Project = selProj.projectidentifier));
+                                              ClearCollect(colApprovers, Filter(colProjectPermissions, Role.Value = "Approver"));
+                                              ClearCollect(colBuyers, Filter(colProjectPermissions, Role.Value = "Buyer"));
+                                              ClearCollect(colBuyerPick, { displayname: "Unassigned" });
+                                              Collect(colBuyerPick, colBuyers);
+                                              ClearCollect(colApproverRules, Filter(colAllApproverRules, Project = selProj.projectidentifier));
+                                              ClearCollect(colNWA, Filter(colAllNWA, Project = selProj.projectidentifier));
+                                              ClearCollect(colAttachments, Filter(colAllAttachments, parentid in colProjectPRs.Title))
+                                          )
                                       )
                   - log_content:
                       Control: GroupContainer@1.5.0
@@ -649,7 +659,7 @@ Screens:
                                                   "Rejected",
                                                   Coalesce(prstatus.Value, "") = "Draft" || Coalesce(prstatus.Value, "") = "On Hold" || CountRows(Filter(colProjectLines, pridentifier = Title && (stage.Value = "Draft" || IsBlank(stage.Value)))) > 0,
                                                   "Draft",
-                                                  CountRows(Filter(colProjectLines, pridentifier = Title)) > 0 && CountRows(Filter(colProjectLines, pridentifier = Title && stage.Value = "Approved")) = CountRows(Filter(colProjectLines, pridentifier = Title)),
+                                                  CountRows(Filter(colProjectLines, pridentifier = Title)) > 0 && CountRows(Filter(colProjectLines, pridentifier = Title && stage.Value <> "Rejected")) > 0 && CountRows(Filter(colProjectLines, pridentifier = Title && stage.Value <> "Rejected" && stage.Value = "Approved" && !IsBlank(ponumber))) = CountRows(Filter(colProjectLines, pridentifier = Title && stage.Value <> "Rejected")),
                                                   "PO created in SAP",
                                                   Switch(
                                                       Min(
@@ -662,6 +672,7 @@ Screens:
                                                                   "Sourcing", 2,
                                                                   "Project control", 3,
                                                                   "Pending approval", 4,
+                                                                  "PO creation", 5,
                                                                   "Approved", 5,
                                                                   0
                                                               )
@@ -672,11 +683,12 @@ Screens:
                                                       2, "Procurement",
                                                       3, "Project Controls",
                                                       4, "DOA Approval",
-                                                      5, "PO created in SAP",
+                                                      5, "PO Creation",
                                                       Switch(
                                                           prstatus.Value,
                                                           "In procurement", "Procurement",
                                                           "Submitted", "Approval to Proceed",
+                                                          "Pending PO", "PO Creation",
                                                           "Approved", "PO created in SAP",
                                                           "On Hold", "Draft",
                                                           Coalesce(prstatus.Value, "Draft")
@@ -869,6 +881,7 @@ Screens:
                                                       "Rejected", RGBA(253, 234, 237, 1),
                                                       "Approval to Proceed", RGBA(253, 243, 226, 1),
                                                       "DOA Approval", RGBA(253, 243, 226, 1),
+                                                      "PO Creation", RGBA(231, 246, 238, 1),
                                                       "Procurement", RGBA(255, 237, 213, 1),
                                                       "Project Controls", RGBA(255, 237, 213, 1),
                                                       RGBA(238, 240, 243, 1)
@@ -887,6 +900,7 @@ Screens:
                                                       "Procurement", 90,
                                                       "Project Controls", 114,
                                                       "DOA Approval", 108,
+                                                      "PO Creation", 108,
                                                       "PO created in SAP", 132,
                                                       "Rejected", 72,
                                                       90
@@ -903,6 +917,7 @@ Screens:
                                                             "Rejected", RGBA(209, 52, 74, 1),
                                                             "Approval to Proceed", RGBA(183, 121, 31, 1),
                                                             "DOA Approval", RGBA(183, 121, 31, 1),
+                                                            "PO Creation", RGBA(15, 157, 88, 1),
                                                             "Procurement", RGBA(194, 101, 20, 1),
                                                             "Project Controls", RGBA(194, 101, 20, 1),
                                                             RGBA(91, 100, 114, 1)

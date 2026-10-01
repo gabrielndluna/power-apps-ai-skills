@@ -23,13 +23,23 @@ Screens:
                 "Viewer"
             )
         );
+        Set(
+            varDashTab,
+            Switch(
+                varCurrentRole,
+                "Approver", "approver",
+                "Buyer", "buyer",
+                "Project Controls", "pc",
+                "requester"
+            )
+        );
         ClearCollect(
             colProjectPRs,
             Filter(colPermittedPRs, projectidentifier = varSelectedProject.projectidentifier)
         );
         ClearCollect(
             colProjectLines,
-            Filter(colPermittedLines, StartsWith(pridentifier, varSelectedProject.projectidentifier & "-"))
+            Filter(colPermittedLines, pridentifier in colProjectPRs.Title)
         )
     Children:
       - dash_root:
@@ -278,30 +288,43 @@ Screens:
                                     Items: =colPermittedProjects
                                     Items.Value: =projectname
                                     OnChange: |-
-                                      =If(
-                                          !IsBlank(Self.Selected),
-                                          Set(varSelectedProject, Self.Selected);
-                                          Set(
-                                              varCurrentRole,
-                                              Coalesce(
-                                                  LookUp(colUserPermissions, Project = Self.Selected.projectidentifier).Role.Value,
-                                                  "Viewer"
+                                      =With(
+                                          {
+                                              selProj: Self.Selected
+                                          },
+                                          If(
+                                              !IsBlank(selProj.projectidentifier),
+                                              Set(varSelectedProject, selProj);
+                                              Set(
+                                                  varCurrentRole,
+                                                  Coalesce(
+                                                      LookUp(colUserPermissions, Project = selProj.projectidentifier).Role.Value,
+                                                      "Viewer"
+                                                  )
+                                              );
+                                              ClearCollect(
+                                                  colProjectPRs,
+                                                  Filter(colPermittedPRs, projectidentifier = selProj.projectidentifier)
+                                              );
+                                              ClearCollect(
+                                                  colProjectLines,
+                                                  Filter(colPermittedLines, pridentifier in colProjectPRs.Title)
+                                              );
+                                              ClearCollect(
+                                                  colProjectPermissions,
+                                                  Filter(colAllPermissions, Project = selProj.projectidentifier)
+                                              );
+                                              ClearCollect(colApprovers, Filter(colProjectPermissions, Role.Value = "Approver"));
+                                              ClearCollect(colBuyers, Filter(colProjectPermissions, Role.Value = "Buyer"));
+                                              ClearCollect(colBuyerPick, { displayname: "Unassigned" });
+                                              Collect(colBuyerPick, colBuyers);
+                                              ClearCollect(colApproverRules, Filter(colAllApproverRules, Project = selProj.projectidentifier));
+                                              ClearCollect(colNWA, Filter(colAllNWA, Project = selProj.projectidentifier));
+                                              ClearCollect(
+                                                  colAttachments,
+                                                  Filter(colAllAttachments, parentid in colProjectPRs.Title)
                                               )
-                                          );
-                                          ClearCollect(
-                                              colProjectPRs,
-                                              Filter(colPermittedPRs, projectidentifier = Self.Selected.projectidentifier)
-                                          );
-                                          ClearCollect(
-                                              colProjectLines,
-                                              Filter(colPermittedLines, StartsWith(pridentifier, Self.Selected.projectidentifier & "-"))
-                                          );
-                                          ClearCollect(
-                                              colProjectPermissions,
-                                              Filter('PRTrack - Permissions', Project = Self.Selected.projectidentifier)
-                                          );
-                                          ClearCollect(colApprovers, Filter(colProjectPermissions, Role.Value = "Approver"));
-                                          ClearCollect(colBuyers, Filter(colProjectPermissions, Role.Value = "Buyer"))
+                                          )
                                       )
                   - dash_content:
                       Control: GroupContainer@1.5.0
@@ -711,6 +734,23 @@ Screens:
                                     RadiusTopRight: =8
                                     Size: =12
                                     Text: ="Procurement Pool"
+                              - dash_tab_pc:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderThickness: =0
+                                    Color: =If(varDashTab = "pc", RGBA(176, 51, 63, 1), RGBA(114, 122, 138, 1))
+                                    Fill: =If(varDashTab = "pc", RGBA(248, 235, 237, 1), RGBA(0, 0, 0, 0))
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =34
+                                    OnSelect: =Set(varDashTab, "pc")
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    Size: =12
+                                    Text: ="Project Controls (" & CountRows(Filter(colProjectLines, stage.Value = "Project control")) & ")"
                               - dash_tab_req:
                                   Control: Classic/Button@2.2.0
                                   Properties:
@@ -813,7 +853,7 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Height: =20
                                           Size: =10
-                                          Text: =If(varDashTab = "buyer", "BUYER", "PENDING WITH")
+                                          Text: =If(varDashTab = "buyer", "BUYER", If(varDashTab = "pc", "NWA", "PENDING WITH"))
                                     - dash_h4:
                                         Control: Label@2.5.1
                                         Properties:
@@ -843,7 +883,7 @@ Screens:
                                                   "Rejected",
                                                   Coalesce(prstatus.Value, "") = "Draft" || Coalesce(prstatus.Value, "") = "On Hold" || CountRows(Filter(colProjectLines, pridentifier = Title && (stage.Value = "Draft" || IsBlank(stage.Value)))) > 0,
                                                   "Draft",
-                                                  CountRows(Filter(colProjectLines, pridentifier = Title)) > 0 && CountRows(Filter(colProjectLines, pridentifier = Title && stage.Value = "Approved")) = CountRows(Filter(colProjectLines, pridentifier = Title)),
+                                                  CountRows(Filter(colProjectLines, pridentifier = Title)) > 0 && CountRows(Filter(colProjectLines, pridentifier = Title && stage.Value <> "Rejected")) > 0 && CountRows(Filter(colProjectLines, pridentifier = Title && stage.Value <> "Rejected" && stage.Value = "Approved" && !IsBlank(ponumber))) = CountRows(Filter(colProjectLines, pridentifier = Title && stage.Value <> "Rejected")),
                                                   "PO created in SAP",
                                                   Switch(
                                                       Min(
@@ -856,6 +896,7 @@ Screens:
                                                                   "Sourcing", 2,
                                                                   "Project control", 3,
                                                                   "Pending approval", 4,
+                                                                  "PO creation", 5,
                                                                   "Approved", 5,
                                                                   0
                                                               )
@@ -866,11 +907,12 @@ Screens:
                                                       2, "Procurement",
                                                       3, "Project Controls",
                                                       4, "DOA Approval",
-                                                      5, "PO created in SAP",
+                                                      5, "PO Creation",
                                                       Switch(
                                                           prstatus.Value,
                                                           "In procurement", "Procurement",
                                                           "Submitted", "Approval to Proceed",
+                                                          "Pending PO", "PO Creation",
                                                           "Approved", "PO created in SAP",
                                                           "On Hold", "Draft",
                                                           Coalesce(prstatus.Value, "Draft")
@@ -878,7 +920,7 @@ Screens:
                                                   )
                                               )
                                           ),
-                                          requesteremail = varCurrentUserEmail || requester = varCurrentUserName
+                                          requesteremail = varCurrentUserEmail
                                       )
                                     LayoutMinHeight: =0
                                     OnSelect: |-
@@ -985,7 +1027,15 @@ Screens:
                                                       Notify("Could not open this PR.", NotificationType.Error),
                                                       Navigate('PR Detail', ScreenTransition.Fade)
                                                   )
-                                                Text: =ThisItem.proceedapprover
+                                                Text: |-
+                                                  =With(
+                                                      { em: Lower(Trim(Coalesce(ThisItem.proceedapprover, ""))) },
+                                                      Coalesce(
+                                                          LookUp(colAllPermissions, Lower(Title) = em).displayname,
+                                                          If(!IsBlank(em) && !IsBlank(Find("@", em)), Office365Users.UserProfileV2(em).displayName, Blank()),
+                                                          ThisItem.proceedapprover
+                                                      )
+                                                  )
                                           - dash_c4:
                                               Control: GroupContainer@1.5.0
                                               Variant: ManualLayout
@@ -999,6 +1049,7 @@ Screens:
                                                       "Rejected", RGBA(253, 234, 237, 1),
                                                       "Approval to Proceed", RGBA(253, 243, 226, 1),
                                                       "DOA Approval", RGBA(253, 243, 226, 1),
+                                                      "PO Creation", RGBA(231, 246, 238, 1),
                                                       "Procurement", RGBA(255, 237, 213, 1),
                                                       "Project Controls", RGBA(255, 237, 213, 1),
                                                       RGBA(238, 240, 243, 1)
@@ -1033,6 +1084,7 @@ Screens:
                                                             "Rejected", RGBA(209, 52, 74, 1),
                                                             "Approval to Proceed", RGBA(183, 121, 31, 1),
                                                             "DOA Approval", RGBA(183, 121, 31, 1),
+                                                            "PO Creation", RGBA(15, 157, 88, 1),
                                                             "Procurement", RGBA(194, 101, 20, 1),
                                                             "Project Controls", RGBA(194, 101, 20, 1),
                                                             RGBA(91, 100, 114, 1)
@@ -1071,7 +1123,9 @@ Screens:
                                     Items: |-
                                       =If(
                                           varDashTab = "buyer",
-                                          colProjectLines,
+                                          Filter(colProjectLines, stage.Value = "Sourcing" || stage.Value = "PO creation"),
+                                          varDashTab = "pc",
+                                          Filter(colProjectLines, stage.Value = "Project control"),
                                           Filter(
                                               colPermittedLines,
                                               stage.Value = "Pending proceed" || stage.Value = "Pending approval"
@@ -1083,7 +1137,7 @@ Screens:
                                           varSelectedPR,
                                           LookUp(colPermittedPRs, Title = ThisItem.pridentifier)
                                       );
-                                      Set(varDetailTab, "lines");
+                                      Set(varDetailTab, If(varDashTab = "pc", "pc", "lines"));
                                       If(
                                           IsBlank(varSelectedPR.Title),
                                           Notify("Could not open this PR.", NotificationType.Error),
@@ -1123,7 +1177,7 @@ Screens:
                                                       varSelectedPR,
                                                       LookUp(colPermittedPRs, Title = ThisItem.pridentifier)
                                                   );
-                                                  Set(varDetailTab, "lines");
+                                                  Set(varDetailTab, If(varDashTab = "pc", "pc", "lines"));
                                                   If(
                                                       IsBlank(varSelectedPR.Title),
                                                       Notify("Could not open this PR.", NotificationType.Error),
@@ -1148,7 +1202,7 @@ Screens:
                                                       varSelectedPR,
                                                       LookUp(colPermittedPRs, Title = ThisItem.pridentifier)
                                                   );
-                                                  Set(varDetailTab, "lines");
+                                                  Set(varDetailTab, If(varDashTab = "pc", "pc", "lines"));
                                                   If(
                                                       IsBlank(varSelectedPR.Title),
                                                       Notify("Could not open this PR.", NotificationType.Error),
@@ -1168,7 +1222,7 @@ Screens:
                                                       varSelectedPR,
                                                       LookUp(colPermittedPRs, Title = ThisItem.pridentifier)
                                                   );
-                                                  Set(varDetailTab, "lines");
+                                                  Set(varDetailTab, If(varDashTab = "pc", "pc", "lines"));
                                                   If(
                                                       IsBlank(varSelectedPR.Title),
                                                       Notify("Could not open this PR.", NotificationType.Error),
@@ -1179,9 +1233,27 @@ Screens:
                                                       varDashTab = "buyer",
                                                       Coalesce(ThisItem.buyer, "Unassigned"),
                                                       If(
-                                                          ThisItem.stage.Value = "Pending proceed",
-                                                          ThisItem.proceedapprover,
-                                                          ThisItem.doaapprover
+                                                          varDashTab = "pc",
+                                                          Coalesce(ThisItem.nwacode, "-"),
+                                                          If(
+                                                              ThisItem.stage.Value = "Pending proceed",
+                                                              With(
+                                                                  { em: Lower(Trim(Coalesce(ThisItem.proceedapprover, ""))) },
+                                                                  Coalesce(
+                                                                      LookUp(colAllPermissions, Lower(Title) = em).displayname,
+                                                                      If(!IsBlank(em) && !IsBlank(Find("@", em)), Office365Users.UserProfileV2(em).displayName, Blank()),
+                                                                      ThisItem.proceedapprover
+                                                                  )
+                                                              ),
+                                                              With(
+                                                                  { em: Lower(Trim(Coalesce(ThisItem.doaapprover, ""))) },
+                                                                  Coalesce(
+                                                                      LookUp(colAllPermissions, Lower(Title) = em).displayname,
+                                                                      If(!IsBlank(em) && !IsBlank(Find("@", em)), Office365Users.UserProfileV2(em).displayName, Blank()),
+                                                                      ThisItem.doaapprover
+                                                                  )
+                                                              )
+                                                          )
                                                       )
                                                   )
                                           - dash_lc4:
@@ -1199,7 +1271,7 @@ Screens:
                                                       varSelectedPR,
                                                       LookUp(colPermittedPRs, Title = ThisItem.pridentifier)
                                                   );
-                                                  Set(varDetailTab, "lines");
+                                                  Set(varDetailTab, If(varDashTab = "pc", "pc", "lines"));
                                                   If(
                                                       IsBlank(varSelectedPR.Title),
                                                       Notify("Could not open this PR.", NotificationType.Error),
