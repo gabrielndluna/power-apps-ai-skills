@@ -11,158 +11,192 @@ Screens:
     Properties:
       Fill: =RGBA(245, 246, 251, 1)
       LoadingSpinnerColor: =RGBA(0, 18, 107, 1)
-      OnVisible: |-
-        =Set(varThisWeekStart, DateAdd(Today(), -(Weekday(Today(), StartOfWeek.Monday) - 1), "Days"));
-
-        Refresh('Hours Tracking (Hours)');
-
-        ClearCollect(
-            colPendingApprovalHours,
-            If(
-                varIsSuperAdmin,
-                Filter(
-                    'Hours Tracking (Hours)',
-                    ApprovalStatus_1 = "Pending"
-                ),
-                Filter(
-                    'Hours Tracking (Hours)',
-                    ApproverID_1 = User().Email &&
-                    ApprovalStatus_1 = "Pending"
-                )
-            )
-        );
-
-        Set(
-            varPendingApprovalWeeks,
-            CountRows(
-                Distinct(
-                    colPendingApprovalHours,
-                    Text(DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days"), "yyyy-mm-dd") & Employee_Name
-                )
-            )
-        );
-
-        ClearCollect(
-            colMyHours,
-            Filter(
-                'Hours Tracking (Hours)',
-                Employee = User().Email &&
-                Date >= varAppStartDate
-            )
-        );
-        Collect(
-            colMyHours,
-            Filter(
-                'Hours Tracking (Hours)',
-                Employee = Lower(User().Email) &&
-                Date >= varAppStartDate
-            )
-        );
-
-        Clear(colMissingWeeks);
-        ForAll(
-            Sequence(
-                RoundDown(
-                    DateDiff(
-                        DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                        varThisWeekStart,
-                        "Days"
-                    ) / 7,
-                    0
-                ) + 1,
-                0,
-                1
-            ),
-            With(
-                {
-                    weekStart: DateAdd(
-                        DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                        Value * 7,
-                        "Days"
-                    ),
-                    weekEnd: DateAdd(
-                        DateAdd(
-                            DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                            Value * 7,
-                            "Days"
-                        ),
-                        6,
-                        "Days"
-                    ),
-                    submittedWeekdays: CountRows(
-                        Distinct(
-                            Filter(
-                                colMyHours,
-                                Date >= DateAdd(
-                                    DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                                    Value * 7,
-                                    "Days"
-                                ) &&
-                                Date <= DateAdd(
-                                    DateAdd(
-                                        DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                                        Value * 7,
-                                        "Days"
-                                    ),
-                                    6,
-                                    "Days"
-                                ) &&
-                                Weekday(Date, StartOfWeek.Monday) < 6 &&
-                                (
-                                    Text(ApprovalStatus_1) = "Pending" ||
-                                    Text(ApprovalStatus_1) = "Approved"
-                                )
-                            ),
-                            Text(Date, "yyyy-mm-dd")
+      OnVisible: =If(varAppReady, Select(btn_LoadHome))
+    Children:
+      - btn_LoadHome:
+          Control: Classic/Button@2.2.0
+          Properties:
+            Height: =1
+            OnSelect: |-
+                =Set(varThisWeekStart, DateAdd(Today(), -(Weekday(Today(), StartOfWeek.Monday) - 1), "Days"));
+                Set(
+                    varTrackingStart,
+                    If(
+                        IsBlank(varApprovers.StartDate),
+                        varAppStartDate,
+                        If(
+                            DateAdd(varApprovers.StartDate, TimeZoneOffset(), "Minutes") > varAppStartDate,
+                            DateAdd(varApprovers.StartDate, TimeZoneOffset(), "Minutes"),
+                            varAppStartDate
                         )
-                    ),
-                    hasRejectedWeekday: CountRows(
+                    )
+                );
+                Set(
+                    varTrackingEnd,
+                    If(
+                        IsBlank(varApprovers.EndDate) || DateAdd(varApprovers.EndDate, TimeZoneOffset(), "Minutes") >= Today(),
+                        varThisWeekStart,
+                        DateAdd(
+                            DateAdd(varApprovers.EndDate, TimeZoneOffset(), "Minutes"),
+                            -(Weekday(DateAdd(varApprovers.EndDate, TimeZoneOffset(), "Minutes"), StartOfWeek.Monday) - 1),
+                            "Days"
+                        )
+                    )
+                );
+
+                Refresh('Hours Tracking (Hours)');
+
+                ClearCollect(
+                    colPendingApprovalHours,
+                    If(
+                        varIsSuperAdmin,
+                        Filter(
+                            'Hours Tracking (Hours)',
+                            ApprovalStatus_1 = "Pending"
+                        ),
+                        Filter(
+                            'Hours Tracking (Hours)',
+                            ApproverID_1 = User().Email &&
+                            ApprovalStatus_1 = "Pending"
+                        )
+                    )
+                );
+
+                Set(
+                    varPendingApprovalWeeks,
+                    CountRows(
+                        Distinct(
+                            colPendingApprovalHours,
+                            Text(DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days"), "yyyy-mm-dd") & Employee_Name
+                        )
+                    )
+                );
+
+                ClearCollect(
+                    colMyHours,
+                    Filter(
+                        'Hours Tracking (Hours)',
+                        Employee = User().Email &&
+                        Date >= varTrackingStart &&
+                        (IsBlank(varApprovers.EndDate) || Date <= DateAdd(varApprovers.EndDate, TimeZoneOffset(), "Minutes"))
+                    )
+                );
+                Collect(
+                    colMyHours,
+                    Filter(
+                        'Hours Tracking (Hours)',
+                        Employee = Lower(User().Email) &&
+                        Date >= varTrackingStart &&
+                        (IsBlank(varApprovers.EndDate) || Date <= DateAdd(varApprovers.EndDate, TimeZoneOffset(), "Minutes"))
+                    )
+                );
+
+                Set(
+                    varTrackingMonday,
+                    DateAdd(varTrackingStart, -(Weekday(varTrackingStart, StartOfWeek.Monday) - 1), "Days")
+                );
+                ClearCollect(
+                    colMyHourWeeks,
+                    AddColumns(
                         Filter(
                             colMyHours,
-                            Date >= DateAdd(
-                                DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                                Value * 7,
-                                "Days"
-                            ) &&
-                            Date <= DateAdd(
-                                DateAdd(
-                                    DateAdd(varAppStartDate, -(Weekday(varAppStartDate, StartOfWeek.Monday) - 1), "Days"),
-                                    Value * 7,
-                                    "Days"
-                                ),
-                                6,
-                                "Days"
-                            ) &&
+                            Weekday(Date, StartOfWeek.Monday) < 6 &&
+                            (
+                                Text(ApprovalStatus_1) = "Pending" ||
+                                Text(ApprovalStatus_1) = "Approved"
+                            )
+                        ),
+                        HourWeekKey,
+                        Text(DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days"), "yyyy-mm-dd"),
+                        HourDayKey,
+                        Text(Date, "yyyy-mm-dd")
+                    )
+                );
+                ClearCollect(
+                    colRejectedWeeks,
+                    AddColumns(
+                        Filter(
+                            colMyHours,
                             Weekday(Date, StartOfWeek.Monday) < 6 &&
                             Text(ApprovalStatus_1) = "Rejected"
-                        )
-                    ) > 0
-                },
-                If(
-                    weekStart <= varThisWeekStart &&
-                    (
-                        submittedWeekdays < 5 ||
-                        hasRejectedWeekday
-                    ),
-                    Collect(
-                        colMissingWeeks,
+                        ),
+                        HourWeekKey,
+                        Text(DateAdd(Date, -(Weekday(Date, StartOfWeek.Monday) - 1), "Days"), "yyyy-mm-dd")
+                    )
+                );
+                ClearCollect(
+                    colWeekSlots,
+                    ForAll(
+                        Sequence(
+                            Max(1, RoundDown(DateDiff(varTrackingMonday, varTrackingEnd, "Days") / 7, 0) + 1),
+                            0,
+                            1
+                        ),
                         {
-                            WeekStart: weekStart,
-                            WeekEnd: weekEnd,
-                            WeekLabel: Text(weekStart, "mmm d") & " - " & Text(weekEnd, "mmm d, yyyy"),
+                            WeekStart: DateAdd(varTrackingMonday, Value * 7, "Days"),
+                            WeekEnd: DateAdd(DateAdd(varTrackingMonday, Value * 7, "Days"), 6, "Days"),
+                            SlotKey: Text(DateAdd(varTrackingMonday, Value * 7, "Days"), "yyyy-mm-dd")
+                        }
+                    )
+                );
+                ClearCollect(
+                    colWeekResults,
+                    ForAll(
+                        colWeekSlots As Slot,
+                        {
+                            WeekStart: Slot.WeekStart,
+                            WeekEnd: Slot.WeekEnd,
+                            WeekLabel: Text(Slot.WeekStart, "mmm d") & " - " & Text(Slot.WeekEnd, "mmm d, yyyy"),
+                            SubmittedDays: CountRows(
+                                Distinct(
+                                    Filter(colMyHourWeeks As HourRow, HourRow.HourWeekKey = Slot.SlotKey),
+                                    HourDayKey
+                                )
+                            ),
+                            HasRejected: CountRows(Filter(colRejectedWeeks As RejectedRow, RejectedRow.HourWeekKey = Slot.SlotKey)) > 0
+                        }
+                    )
+                );
+                ClearCollect(
+                    colMissingWeeks,
+                    ForAll(
+                        Filter(
+                            colWeekResults,
+                            WeekStart <= varTrackingEnd &&
+                            (SubmittedDays < 5 || HasRejected)
+                        ),
+                        {
+                            WeekStart: WeekStart,
+                            WeekEnd: WeekEnd,
+                            WeekLabel: WeekLabel,
                             WeekStatus: If(
-                                hasRejectedWeekday,
+                                HasRejected,
                                 "Needs correction",
-                                submittedWeekdays = 0,
+                                SubmittedDays = 0,
                                 "Not Submitted",
                                 "Partially Completed"
                             )
                         }
                     )
-                )
-            )
-        );
-    Children:
+                );
+            Text: ="Load"
+            Visible: =false
+            Width: =1
+            X: =0
+            Y: =0
+      - tmr_HomeReady:
+          Control: Timer@2.1.0
+          Properties:
+            AutoStart: =false
+            Duration: =10
+            Height: =1
+            OnTimerEnd: =Select(btn_LoadHome)
+            Repeat: =false
+            Start: =varAppReady
+            Visible: =false
+            Width: =1
+            X: =0
+            Y: =0
       - home_root:
           Control: GroupContainer@1.5.0
           Variant: AutoLayout
@@ -360,7 +394,7 @@ Screens:
                         Font: =Font.'Segoe UI'
                         Height: =20
                         Size: =12
-                        Text: ="Supervisor · " & Coalesce(varApprover1Email, "Not assigned")
+                        Text: ="Supervisor · " & Coalesce(varApprover1Name, "Not assigned")
                         Width: =Parent.Width
             - home_rule:
                 Control: Rectangle@2.3.0

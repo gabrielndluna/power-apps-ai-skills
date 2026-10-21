@@ -1,0 +1,1019 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  HRManageHomeScr:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |-
+        =UpdateContext({ locSection: "MainConManager" });
+
+        Set(
+            varPendingCount,
+            CountRows(
+                Filter(
+                    'Vacations Tracking (Days)',
+                    Lower(ApproverID_1) = Lower(User().Email) || Lower(ProjectDirector_Email) = Lower(User().Email),
+                    ApprovalStatus_1 = "Pending" || ProjectDirector_ApprovalStatus.Value = "Pending",
+                    EndDate >= varYearStart,
+                    StartDate <= varYearEnd
+                )
+            )
+        );
+    Children:
+      - WebLayoutManager_1:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =Color.White
+            Height: |+
+              =768
+            Visible: =App.Width >= 680
+            Width: |+
+              =1366
+            X: =(App.Width - Self.Width) / 2
+            Y: =(App.Height - Self.Height) / 2
+          Children:
+            - SideBarConManager_1:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =ColorValue("#D60C30")
+                  Height: =Parent.Height
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =16
+                  Width: =Parent.Width * 0.085
+                Children:
+                  - IOCLogoWhite_2:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =75
+                        Image: ='IOC Logo White-No text'
+                        Width: =75
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =14
+                  - DashboardButton_2:
+                      Control: CanvasComponent
+                      ComponentName: DashboardButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: =Launch("https://app.powerbi.com/Redirect?action=OpenApp&appId=8b5f2e86-7dff-4932-bc91-59b17008279b&ctid=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&experience=power-bi")
+                        Width: =115
+                        Y: =678
+                  - SubmitRequestsButton_2:
+                      Control: CanvasComponent
+                      ComponentName: SubmitRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varEmployeeRow),
+                              Notify("Access denied. Your account is not registered in Employees. Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(EmployeeDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        Y: =377
+                  - ManageRequestsButton_2:
+                      Control: CanvasComponent
+                      ComponentName: ManageRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |+
+                          =If(
+                              IsBlank(varManagerRow),
+                              Notify("Access denied. Your account is not registered as a Manager.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(ManagerDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        Y: =294
+            - MainConManager_2:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =Color.White
+                  Height: =Parent.Height
+                  Visible: =locSection = "MainConManager"
+                  Width: =Parent.Width * 0.915
+                  X: =SideBarConManager_1.Width
+                Children:
+                  - NewWorkedHolidays_3:
+                      Control: CanvasComponent
+                      ComponentName: NewWorkedHolidays_2
+                      Properties:
+                        Height: =60
+                        OnPressAction: |-
+                          =Set(varShowRetro, true);
+                          Clear(colFlights);
+                        Width: =350
+                        X: =450
+                        Y: =674
+                  - DayAwayLogoOnly_4:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Image: ='Dayaway Logo With Name'
+                        ImagePosition: =ImagePosition.Fill
+                        Width: =263
+                        X: =944
+                  - ManageEmployees_1:
+                      Control: CanvasComponent
+                      ComponentName: ManageEmployees
+                      Properties:
+                        Fill: |
+                          =
+                        Height: =260
+                        OnPressAction: |-
+                          =Navigate(HREmployeeManageScr, ScreenTransition.Fade);
+                          Reset(TextInput3_1)
+                        Width: |+
+                          =280
+
+                        X: =30
+                        Y: =390
+                  - ManagePublicHolidays_1:
+                      Control: CanvasComponent
+                      ComponentName: ManagePublicHolidays
+                      Properties:
+                        Fill: =
+                        Height: =260
+                        OnPressAction: |-
+                          =Navigate(HRPublicHolidaysScr, ScreenTransition.Fade);
+                          Reset(TextInput3_3)
+                        Width: |+
+                          =280
+
+                        X: =333
+                        Y: =390
+                  - ManageProjects_1:
+                      Control: CanvasComponent
+                      ComponentName: ManageProjects
+                      Properties:
+                        Fill: |
+                          =
+                        Height: =260
+                        OnPressAction: =Navigate(HRProjects, ScreenTransition.Fade)
+                        Width: |+
+                          =280
+
+                        X: =637
+                        Y: =390
+                  - ManageHolidaysWorked_1:
+                      Control: CanvasComponent
+                      ComponentName: ManageHolidaysWorked
+                      Properties:
+                        Fill: |
+                          =
+                        Height: =260
+                        OnPressAction: =Navigate(HRWorkedHolidaysScr, ScreenTransition.Fade)
+                        Width: |+
+                          =280
+
+                        X: =940
+                        Y: =390
+                  - GreetingText_4:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =60
+                        PaddingLeft: =25
+                        PaddingRight: =25
+                        Size: =34
+                        Text: ="Admin Settings"
+                        Width: =Parent.Width - DayAwayLogoOnly_4.Width -20
+                        Wrap: =false
+                        Y: =40
+                  - AnalyticsCardManager_1:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =ColorValue("#D9ECFA")
+                        Height: =250
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Width: =Parent.Width*0.95
+                        X: '=(Parent.Width - Self.Width)/2 '
+                        Y: =120
+                      Children:
+                        - Image5_2:
+                            Control: Image@2.2.3
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =120
+                              Image: =User().Image
+                              RadiusBottomLeft: =100
+                              RadiusBottomRight: =100
+                              RadiusTopLeft: =100
+                              RadiusTopRight: =100
+                              Width: =120
+                              X: |
+                                =Parent.X  + 15
+                              Y: =32
+                        - NameLabel_4:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#494949")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Size: =24
+                              Text: |+
+                                =
+                                // Label.Text
+                                With(
+                                    { p: Office365Users.UserProfileV2(User().Email) },
+                                    If(
+                                        IsBlankOrError(p),
+                                        User().Email,
+                                        Coalesce(p.displayName, p.mail, User().Email)
+                                    )
+                                )
+
+                              Width: =450
+                              Wrap: =false
+                              X: '=Parent.X + 15 '
+                              Y: =147
+                        - EmployeeRoleLabel_3:
+                            Control: Label@2.5.1
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#D60C30")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Size: =16
+                              Text: |+
+                                =
+                                // Label.Text
+                                With(
+                                    { p: Office365Users.UserProfileV2(User().Email) },
+                                    Coalesce(p.jobTitle, "Title not set")
+                                )
+                              Width: =400
+                              X: =Parent.X + 15
+                              Y: =177
+            - BackDrop_16:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |
+                    =
+                    // Clear flight rows
+                    Clear(colFlights);
+
+                    // Reset all input controls
+                    Reset(DatePicker1_4);
+                    Reset(DatePicker1_5);
+                    Reset(Dropdown3_9);
+                    Reset(ManagerNameField_15);
+                    Reset(Dropdown3_11);
+                    Refresh('Vacations Tracking (Days)');
+                    Reset(ComboBox4);
+
+                    // Close the dialog
+                    Set(varShowRetro, false);
+                  Visible: =varShowRetro
+                  Width: =Parent.Width
+            - SubmitRequestBox_10:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =varShowRetro
+                  Width: =Parent.Width * 0.90
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_14:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Submit Retroactive Request"
+                        Width: =600
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y - 20
+                  - Dropdown3_9:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =ColorValue("#F5F5f5")
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: =["Vacation","Sick Day"]
+                        Items.Value: =Value
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Width: =Parent.Width * 0.20
+                        X: =687
+                        Y: |
+                          =198
+                  - DatePicker1_4:
+                      Control: Classic/DatePicker@2.6.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        Color: =ColorValue("#494949")
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =45
+                        IconBackground: =ColorValue("#D60C30")
+                        IconFill: =RGBA(255, 255, 255, 1)
+                        Size: =12
+                        Width: =Parent.Width * 0.20
+                        X: =687
+                        Y: =117
+                  - DatePicker1_5:
+                      Control: Classic/DatePicker@2.6.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        Color: =ColorValue("#494949")
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =45
+                        IconBackground: |
+                          =ColorValue("#D60C30")
+                        IconFill: =RGBA(255, 255, 255, 1)
+                        Size: =12
+                        Width: =Parent.Width * 0.20
+                        X: =953
+                        Y: =117
+                  - ManagerNameField_15:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: =Parent.Width * 0.52
+                        X: |
+                          =28
+                        Y: =198
+                  - Button2_2:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorValue("#D60c30")
+                        Color: =ColorValue("#D60c30")
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: =ColorValue("#d60c3000")
+                        Font: =Font.'Segoe UI'
+                        Height: =35
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =If(
+                              CountRows(colFlights) = 0,
+                              // 1st click: create Employee row, fixed & non-editable name/type
+                              Collect(
+                                  colFlights,
+                                  {
+                                      RowId: GUID(),
+                                      IsEmployee: true,   // <-- flag the employee row
+                                      TravellerName: Trim(varEmployeeRow.'First Name' & " " & varEmployeeRow.'Last Name'),
+                                      TravellerType: "Employee",
+                                      DepartureDate: Blank(),
+                                      DepartureLocation: "Select",
+                                      ArrivalDate: Blank(),
+                                      ArrivalLocation: ""
+                                  }
+                              ),
+                              CountRows(colFlights) = 1,
+                              // 2nd click: Companion 1 (default type, editable)
+                              Collect(
+                                  colFlights,
+                                  {
+                                      RowId: GUID(),
+                                      IsEmployee: false,
+                                      TravellerName: "",
+                                      TravellerType: "Companion 1",
+                                      DepartureDate: Blank(),
+                                      DepartureLocation: "Select",
+                                      ArrivalDate: Blank(),
+                                      ArrivalLocation: ""
+                                  }
+                              ),
+                              CountRows(colFlights) = 2,
+                              // 3rd click: Companion 2 (default type, editable)
+                              Collect(
+                                  colFlights,
+                                  {
+                                      RowId: GUID(),
+                                      IsEmployee: false,
+                                      TravellerName: "",
+                                      TravellerType: "Companion 2",
+                                      DepartureDate: Blank(),
+                                      DepartureLocation: "Select",
+                                      ArrivalDate: Blank(),
+                                      ArrivalLocation: ""
+                                  }
+                              ),
+                              // Already have 3 rows
+                              Notify("Maximum of 3 travellers (Employee + 2 companions).", NotificationType.Warning)
+                          );
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Add Flight"
+                        Visible: =If(Dropdown3_11.Selected.Value = "Yes", false, true)
+                        X: =1038
+                        Y: =278
+                  - Container3_2:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: |
+                          =35
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Visible: |-
+                          =If(
+                              CountRows(Gallery1_2.AllItems) > 0,
+                              true,
+                              false)
+                        Width: =1170
+                        X: =(Parent.Width- Self.Width) / 2
+                        Y: =Button2_2.Y + Button2_2.Height + 10
+                      Children:
+                        - Label6_9:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =35
+                              Size: =12
+                              Text: ="Traveller Name"
+                              X: =46
+                        - Label6_10:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =35
+                              Size: =12
+                              Text: ="Traveller Type"
+                              X: =241
+                        - Label6_11:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =35
+                              Size: =12
+                              Text: ="Departure Date"
+                              X: =408
+                        - Label6_12:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =35
+                              Size: =12
+                              Text: ="Departure Location"
+                              X: =589
+                        - Label6_13:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =35
+                              Size: =12
+                              Text: ="Arrival Date"
+                              X: =770
+                        - Label6_14:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =35
+                              Size: =12
+                              Text: ="Arrival Location"
+                              X: =944
+                  - Gallery1_2:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: |
+                          =200
+                        Items: =colFlights
+                        TemplateSize: |
+                          =50
+                        Visible: =If(Dropdown3_11.Selected.Value = "Yes", false, true)
+                        Width: =Container3_2.Width
+                        X: =(Parent.Width - Self.Width)/2
+                        Y: =Container3_2.Y + Container3_2.Height
+                      Children:
+                        - TextInput2_2:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: =1
+                              Color: =ColorValue("#494949")
+                              Default: =ThisItem.TravellerName
+                              DisplayMode: =If(ThisItem.TravellerType="Employee", DisplayMode.View, DisplayMode.Edit)
+                              Font: =Font.'Open Sans'
+                              Height: =30
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              OnChange: |
+                                =
+                                Patch(
+                                    colFlights,
+                                    ThisItem,                               // <-- the record in the collection bound to this row
+                                    { TravellerName: Trim(TextInput2_2.Text) }
+                                );
+                              OnSelect: =Select(Parent)
+                              Size: =12
+                              Width: =200
+                              X: =Rectangle1_2.X + 20
+                              Y: =(Rectangle1_2.Height- Self.Height)/2
+                        - NextArrow1_2:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              AccessibleLabel: =Self.Tooltip
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =ColorValue("#D60C30")
+                              DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                              DisabledColor: =RGBA(119, 119, 119, 1)
+                              Height: =30
+                              Icon: =Icon.Trash
+                              OnSelect: =Remove(colFlights, ThisItem)
+                              Tooltip: ="Delete Flight"
+                              Width: =30
+                              X: =1121
+                              Y: =6
+                        - Separator1_2:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =8
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =Parent.TemplateHeight - Self.Height
+                        - Rectangle1_2:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("#D60C30")
+                              Height: =Parent.TemplateHeight - Separator1_2.Height
+                              OnSelect: =Select(Parent)
+                              Visible: =ThisItem.IsSelected
+                              Width: =4
+                        - Dropdown4_4:
+                            Control: Classic/DropDown@2.3.1
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: =1
+                              ChevronBackground: |
+                                =ColorValue("#D60C30")
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              Color: =ColorValue("#494949")
+                              Default: =ThisItem.TravellerType
+                              Font: =Font.'Segoe UI'
+                              Height: =30
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =["Employee", "Companion 1", "Companion 2"]
+                              Items.Value: =Value
+                              OnChange: |
+                                =Patch(
+                                    colFlights,
+                                    ThisItem,                               // <-- the record in the collection bound to this row
+                                    { TravellerType: Trim(Self.Selected.Value) }
+                                );
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Size: =12
+                              Width: |
+                                =150
+                              X: =TextInput2_2.X + TextInput2_2.Width + 20
+                              Y: =(Rectangle1_2.Height- Self.Height)/2
+                        - DatePicker2_4:
+                            Control: Classic/DatePicker@2.6.0
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: =1
+                              Color: =ColorValue("#494949")
+                              DefaultDate: =ThisItem.DepartureDate
+                              Font: =Font.'Segoe UI'
+                              Height: =30
+                              IconBackground: =ColorValue("#D60C30")
+                              IconFill: =RGBA(255, 255, 255, 1)
+                              OnChange: |
+                                =
+                                Patch(
+                                    colFlights,
+                                    ThisItem,
+                                    { DepartureDate: Self.SelectedDate }
+                                );
+                              Size: =12
+                              Width: =150
+                              X: =Dropdown4_4.X + Dropdown4_4.Width + 20
+                              Y: =(Rectangle1_2.Height- Self.Height)/2
+                        - Dropdown4_5:
+                            Control: Classic/DropDown@2.3.1
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: =1
+                              ChevronBackground: |
+                                =ColorValue("#D60C30")
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              Color: =ColorValue("#494949")
+                              Default: =ThisItem.DepartureLocation
+                              Font: =Font.'Segoe UI'
+                              Height: =30
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              Items: =["Select", "Barbados", "Antigua", "Anguilla", "USVI"]
+                              Items.Value: =Value
+                              OnChange: |
+                                =
+
+                                Patch(
+                                    colFlights,
+                                    ThisItem,
+                                    { DepartureLocation: Trim(Self.Selected.Value) }   // use .Selected.Value if it's a dropdown
+                                );
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Size: =12
+                              Width: =170
+                              X: =DatePicker2_4.X + DatePicker2_4.Width + 20
+                              Y: =(Rectangle1_2.Height- Self.Height)/2
+                        - DatePicker2_5:
+                            Control: Classic/DatePicker@2.6.0
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: =1
+                              Color: =ColorValue("#494949")
+                              DefaultDate: =ThisItem.ArrivalDate
+                              Font: =Font.'Segoe UI'
+                              Height: =30
+                              IconBackground: |
+                                =ColorValue("#D60C30")
+                              IconFill: =RGBA(255, 255, 255, 1)
+                              OnChange: |
+                                =Patch(
+                                    colFlights,
+                                    ThisItem,
+                                    { ArrivalDate: Self.SelectedDate }
+                                );
+                              Size: =12
+                              Width: =150
+                              X: =Dropdown4_5.X + Dropdown4_5.Width + 20
+                              Y: =(Rectangle1_2.Height- Self.Height)/2
+                        - TextInput1_2:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: |
+                                =1
+                              Color: =ColorValue("#494949")
+                              Default: =ThisItem.ArrivalLocation
+                              Font: =Font.'Segoe UI'
+                              Height: |
+                                =30
+                              HintText: ="Location"
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              OnChange: |
+                                =Patch(
+                                    colFlights,
+                                    ThisItem,
+                                    { ArrivalLocation: Trim(Self.Text) }   // use .Selected.Value if it's a dropdown
+                                );
+                              PaddingBottom: =10
+                              PaddingLeft: =10
+                              PaddingRight: =10
+                              PaddingTop: =10
+                              RadiusBottomLeft: =0
+                              RadiusBottomRight: =0
+                              RadiusTopLeft: =0
+                              RadiusTopRight: =0
+                              Size: =12
+                              Width: |
+                                =170
+                              X: =DatePicker2_5.X + DatePicker2_5.Width + 20
+                              Y: =(Rectangle1_2.Height- Self.Height)/2
+                  - Label5_2:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Size: =24
+                        Text: ="Flight Information"
+                        Visible: |-
+                          =If(
+                              CountRows(Gallery1_2.AllItems) > 0,
+                              true,
+                              false)
+                        Width: =300
+                        X: =28
+                        Y: =Button2_2.Y
+                  - Button3_12:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: "=// =======================================================\r\n// 1) INITIALIZE\r\n// =======================================================\r\nSet(_valid, true);\r\n\r\n// Employee\r\nSet(\r\n    varEmployeeLine,\r\n    LookUp(\r\n        'Vacations Tracking (Employees)',\r\n        Lower(Email) = Lower(ComboBox4.Selected.Mail)\r\n    )\r\n);\r\n\r\n// Project\r\nSet(\r\n    _projectNameText,\r\n    Coalesce(\r\n        LookUp(\r\n            'Vacations Tracking (Projects)',\r\n            Lower('Project Name') = Lower(varEmployeeLine.'Project Name')\r\n        ).'Project Name',\r\n        varEmployeeLine.'Project Name'\r\n    )\r\n);\r\n\r\n// Dates\r\nSet(vStart, DatePicker1_4.SelectedDate);\r\nSet(vEnd,   DatePicker1_5.SelectedDate);\r\n\r\n// Flights\r\nSet(_hasFlights, CountRows(colFlights) > 0);\r\nSet(_r1, If(CountRows(colFlights) >= 1, First(colFlights), Blank()));\r\nSet(_r2, If(CountRows(colFlights) >= 2, Last(FirstN(colFlights, 2)), Blank()));\r\nSet(_r3, If(CountRows(colFlights) >= 3, Last(colFlights), Blank()));\r\n\r\n\r\n// =======================================================\r\n// 2) VALIDATIONS\r\n// =======================================================\r\n\r\n// Date checks\r\nIf(\r\n    Or(IsBlank(vStart), IsBlank(vEnd), vEnd < vStart),\r\n    Notify(\"Start and End dates are required and must be valid.\", NotificationType.Error);\r\n    Set(_valid, false)\r\n);\r\n\r\n// Same calendar year\r\nIf(\r\n    _valid &&\r\n    Or(\r\n        Year(vStart) <> Year(vEnd),\r\n        Year(vStart) <> Year(Today())\r\n    ),\r\n    Notify(\"Dates must be within the current calendar year.\", NotificationType.Error);\r\n    Set(_valid, false)\r\n);\r\n\r\n// Request type\r\nIf(\r\n    _valid && IsBlank(Dropdown3_9.Selected.Value),\r\n    Notify(\"Please select a Request Type.\", NotificationType.Error);\r\n    Set(_valid, false)\r\n);\r\n\r\n// Flight validation\r\nIf(\r\n    _valid && _hasFlights,\r\n    If(\r\n        Or(\r\n            IsBlank(_r1.DepartureDate),\r\n            IsBlank(_r1.ArrivalDate),\r\n            IsBlank(_r1.DepartureLocation),\r\n            IsBlank(_r1.ArrivalLocation)\r\n        ),\r\n        Notify(\"Primary traveler flight details are required.\", NotificationType.Error);\r\n        Set(_valid, false)\r\n    );\r\n\r\n    If(\r\n        _valid && CountRows(colFlights) >= 2 && IsBlank(_r2.TravellerName),\r\n        Notify(\"Please enter Companion 1 name.\", NotificationType.Error);\r\n        Set(_valid, false)\r\n    );\r\n\r\n    If(\r\n        _valid && CountRows(colFlights) >= 3 && IsBlank(_r3.TravellerName),\r\n        Notify(\"Please enter Companion 2 name.\", NotificationType.Error);\r\n        Set(_valid, false)\r\n    )\r\n);\r\n\r\n\r\n// =======================================================\r\n// 3) CALCULATIONS (ONLY IF STILL VALID)\r\n// =======================================================\r\nIf(_valid,\r\n\r\n    // ---------------------------------------------------\r\n    // Holidays\r\n    // ---------------------------------------------------\r\n    Set(\r\n        _holidaysForProject,\r\n        Filter(\r\n            'Vacations Tracking (Public Holidays)',\r\n            Projects = _projectNameText\r\n        )\r\n    );\r\n\r\n    // ---------------------------------------------------\r\n    // Business days (deterministic)\r\n    // ---------------------------------------------------\r\n    Set(\r\n        _businessDays,\r\n        Sum(\r\n            ForAll(\r\n                Sequence(DateDiff(vStart, vEnd) + 1),\r\n                With(\r\n                    { d: DateAdd(vStart, Value - 1) },\r\n                    If(\r\n                        Weekday(d, StartOfWeek.Monday) <= 5 &&\r\n                        IsBlank(LookUp(_holidaysForProject, Date = d)),\r\n                        1,\r\n                        0\r\n                    )\r\n                )\r\n            ),\r\n            Value\r\n        )\r\n    );\r\n\r\n    // ---------------------------------------------------\r\n    // Travel days\r\n    // ---------------------------------------------------\r\n    Set(\r\n        _travelDays,\r\n        If(\r\n            _hasFlights || Dropdown3_11.Selected.Value = \"Yes\",\r\n            Coalesce(varEmployeeLine.'Travel days per home leave', 0),\r\n            0\r\n        )\r\n    );\r\n\r\n    // ---------------------------------------------------\r\n    // ENTITLEMENT\r\n    // ---------------------------------------------------\r\n    Set(\r\n        varPublicHolidaysWorked4,\r\n        Coalesce(\r\n            Sum(\r\n                Filter(\r\n                    'Vacations Tracking (Worked Holidays)',\r\n                    Lower(Employee_email) = Lower(ComboBox4.Selected.Mail),\r\n                    Year = Year(Today())\r\n                ),\r\n                Total\r\n            ),\r\n            0\r\n        )\r\n    );\r\n\r\n    Set(\r\n        varEntitlement4,\r\n        Coalesce(\r\n            varEmployeeLine.'Vacation Entitlement (per anum)' +\r\n            varEmployeeLine.Carryover +\r\n            varPublicHolidaysWorked4,\r\n            0\r\n        )\r\n    );\r\n\r\n    // ---------------------------------------------------\r\n    // DAYS USED (CORRECT OVERLAP + APPROVAL LOGIC)\r\n    // ---------------------------------------------------\r\n    Set(\r\n        varDaysUsed4,\r\n        Coalesce(\r\n            Sum(\r\n                Filter(\r\n                    'Vacations Tracking (Days)',\r\n                    Lower(Employee) = Lower(ComboBox4.Selected.Mail),\r\n                    Archived <> \"Yes\" && Archived <> \"Withdrawn\",\r\n                    Type_of_leave <> \"Sick Day\",\r\n                    StartDate <= Date(Year(Today()), 12, 31),\r\n                    EndDate   >= Date(Year(Today()), 1, 1),\r\n                    (\r\n                        ApprovalStatus_1 = \"Approved\" ||\r\n                        ApprovalStatus_2 = \"Approved\" ||\r\n                        ProjectDirector_ApprovalStatus.Value = \"Approved\"\r\n                    )\r\n                ),\r\n                Days\r\n            ),\r\n            0\r\n        )\r\n    );\r\n    \r\n\r\n    // ---------------------------------------------------\r\n    // AVAILABLE\r\n    // ---------------------------------------------------\r\n    Set(\r\n        varDaysAvailable4,\r\n        Max(varEntitlement4 - varDaysUsed4, 0)\r\n    );\r\n\r\n    // ---------------------------------------------------\r\n    // DAYS REQUESTED (EXACT MATCH TO PATCH)\r\n    // ---------------------------------------------------\r\n    Set(\r\n        _daysRequested,\r\n        If(\r\n            Dropdown3_10.Selected.Value = \"First Half\" ||\r\n            Dropdown3_10.Selected.Value = \"Second Half\",\r\n            0.5,\r\n            Max((_businessDays - _travelDays), 0)\r\n        )\r\n    );\r\n\r\n    // ---------------------------------------------------\r\n    // FINAL AVAILABILITY CHECK\r\n    // ---------------------------------------------------\r\n    If(\r\n        _daysRequested > varDaysAvailable4,\r\n        Notify(\r\n            \"Not enough available vacation days.\" &\r\n            \" Requested: \" & _daysRequested &\r\n            \" | Available: \" & varDaysAvailable4 &\r\n            \" | Available: \" & varDaysAvailable4,\r\n            NotificationType.Error\r\n        );\r\n        Set(_valid, false)\r\n    )\r\n);\r\n\r\n\r\n// =======================================================\r\n// 4) PATCH\r\n// =======================================================\r\nIf(_valid,\r\n\r\n    Set(GUID_Var, GUID());\r\n\r\n    Patch(\r\n        'Vacations Tracking (Days)',\r\n        Defaults('Vacations Tracking (Days)'),\r\n        {\r\n            Employee: ComboBox4.Selected.Mail,\r\n            Employee_Name: ComboBox4.Selected.DisplayName,\r\n            Project: _projectNameText,\r\n            Title: GUID_Var,\r\n            LOG_ID: GUID_Var,\r\n\r\n            StartDate: vStart,\r\n            EndDate: vEnd,\r\n            Leave_Time: Dropdown3_10.Selected.Value,\r\n\r\n            Days: _daysRequested,\r\n            Travel_Days: _travelDays,\r\n\r\n            Type_of_leave: Dropdown3_9.Selected.Value,\r\n            Comments: ManagerNameField_15.Text,\r\n            App_Name: \"Dayaway_HR_Tracking\",\r\n\r\n            ApproverID_1: varEmployeeLine.'Approver Email',\r\n            ApprovalStatus_1: \"Pending\" ,\r\n\r\n            Flight_DepartureDate: _r1.DepartureDate,\r\n            Flight_DepartureLocation: _r1.DepartureLocation,\r\n            Flight_ArrivalDate: _r1.ArrivalDate,\r\n            Flight_ArrivalLocation: _r1.ArrivalLocation,\r\n\r\n            Companion_1: _r2.TravellerName,\r\n            Companion_2: _r3.TravellerName\r\n        }\r\n    );\r\n\r\n    Notify(\"Your request was submitted successfully.\", NotificationType.Success);\r\n\r\n    Clear(colFlights);\r\n    Reset(DatePicker1_4);\r\n    Reset(DatePicker1_5);\r\n    Reset(Dropdown3_9)\r\n);\r\n\r\nReset(Dropdown3_11);\r\nRefresh('Vacations Tracking (Days)');\r\nClear(colFlights);\r\nReset(DatePicker1_4);\r\nReset(DatePicker1_5);\r\nReset(Dropdown3_9);\r\nReset(ComboBox4);"
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Submit Request"
+                        Width: =200
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: =622
+                  - Label4_98:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =93
+                  - Label4_99:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Is this a Home Leave?"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =Dropdown3_11.X
+                        Y: =93
+                  - Label4_100:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Request Type"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =687
+                        Y: =173
+                  - Label4_101:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Start Date"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =687
+                        Y: =92
+                  - Label4_102:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="End Date"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =953
+                        Y: =92
+                  - Label4_103:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Comments"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: |
+                          =28
+                        Y: =173
+                  - Icon5_2:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#D60c30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |
+                          =
+                          // Clear flight rows
+                          Clear(colFlights);
+
+                          // Reset all input controls
+                          Reset(DatePicker1_4);
+                          Reset(DatePicker1_5);
+                          Reset(Dropdown3_9);
+                          Reset(ManagerNameField_15);
+                          Reset(Dropdown3_11);
+                          Refresh('Vacations Tracking (Days)');
+                          Reset(ComboBox4);
+
+                          // Close the dialog
+                          Set(varShowRetro, false);
+                        Width: =28
+                        X: =1170
+                        Y: =29
+                  - Dropdown3_10:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =ColorValue("#F5F5f5")
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        Default: ="Full Day"
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: =["Full Day","First Half", "Second Half"]
+                        Items.Value: =Value
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Visible: =If(DatePicker1_4.SelectedDate = DatePicker1_5.SelectedDate, true, false)
+                        Width: =Parent.Width * 0.20
+                        X: =953
+                        Y: =197
+                  - Label4_104:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Leave Time"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Visible: =If(DatePicker1_4.SelectedDate = DatePicker1_5.SelectedDate, true, false)
+                        X: =953
+                        Y: =172
+                  - Dropdown3_11:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =ColorValue("#F5F5f5")
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        Default: ="Select"
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: =["Yes","No", "Select"]
+                        Items.Value: =Value
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Width: |+
+                          =Parent.Width * 0.14
+                        X: =Parent.X + ComboBox4.Width - 20
+                        Y: =SummaryHeaderLabel_14.Y + 100
+                  - ComboBox4:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |+
+                          =1
+                        ChevronBackground: |+
+                          =ColorValue("#D60C30")
+                        ChevronFill: =RGBA(255, 255, 255, 1)
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        DisplayFields: =["DisplayName"]
+                        Fill: |+
+                          =ColorValue("#D9ECFA")
+                        Font: =Font.'Open Sans'
+                        Height: |+
+                          =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: |+
+                          =If(
+                              !IsBlank(Trim(Self.SearchText)),
+                              ShowColumns(
+                                  Office365Users.SearchUser(
+                                      { searchTerm: Trim(Self.SearchText), top: 15 }
+                                  ),
+                                  Id,            // GUID for the user
+                                  DisplayName,   // display name
+                                  Mail,          // email
+                                  UserPrincipalName,  // UPN
+                                  Department
+                              )
+                          )
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SearchFields: =["DisplayName","Mail","UserPrincipalName"]
+                        SelectMultiple: =false
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Width: |+
+                          =Parent.Width * 0.35
+                        X: =Parent.X - 40
+                        Y: =SummaryHeaderLabel_14.Y + 100

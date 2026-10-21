@@ -9,7 +9,7 @@
 App:
   Properties:
     OnStart: |-
-      =Set(varCurrentUserEmail, User().Email);
+      =Set(varCurrentUserEmail, Lower(User().Email));
       Set(varCanEditCurrentProject, false);
       Set(varSelectedProject, Blank());
       Set(varSelectedSubcontract, Blank());
@@ -23,6 +23,7 @@ App:
       Set(varShowSettings, false);
       Set(varShowAddChange, false);
       Set(varEditingChange, Blank());
+      Set(varShowDeleteSub, false);
       Set(varShowValidationErrors, false);
       Set(varCaFreeText, false);
       Set(varBackupCaFreeText, false);
@@ -32,17 +33,34 @@ App:
       Set(varPendingOpenAddSub, false);
       Set(varExporting, false);
       Set(varExportResult, Blank());
+      Set(varSettingsTab, "users");
+      Set(varSettingsSelectedEmail, "");
+      Set(varSettingsSelectedName, "");
+      Set(varSettingsEntraId, "");
+      Set(varSettingsGrantAdmin, false);
+      Set(varSettingsEditProject, Blank());
+      Set(varSettingsFilter, "");
+      Set(varShowUserModal, false);
+      Set(varShowProjectModal, false);
+      Set(varSettingsUserIsNew, true);
       Set(
           varSubcontractsListUrl,
           "https://aecon1.sharepoint.com/sites/CivilPlanningteam/Lists/PostAward%20-%20Subcontracts/AllItems.aspx"
       );
 
-      Set(varCurrentUserEmail, Lower(varCurrentUserEmail));
+      // One Permissions row per user (shared with ProcTrack)
+      ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+      ClearCollect(colAllProjects, 'ProcTrack - Projects');
+      Set(varUserPerm, LookUp(colAllPermissions, Lower(Title) = varCurrentUserEmail));
       Set(
-          varUserPerm,
-          LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail)
+          varIsAdmin,
+          !IsBlank(varUserPerm) &&
+          (
+              varUserPerm.IsAdmin = true ||
+              Lower(Text(varUserPerm.IsAdmin)) = "true" ||
+              Lower(Text(varUserPerm.IsAdmin)) = "yes"
+          )
       );
-      Set(varIsAdmin, Coalesce(varUserPerm.IsAdmin, false));
       If(
           IsBlank(varUserPerm),
           Notify(
@@ -53,43 +71,33 @@ App:
 
       ClearCollect(
           colMyProjectIds,
-          Distinct(
-              Filter(
-                  Split(
-                      Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
-                      ";"
-                  ),
-                  !IsBlank(Trim(ThisRecord.Value))
+          Filter(
+              Split(
+                  Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                  ";"
               ),
-              Value
-          )
-      );
-      Clear(colPermittedProjects);
-      ForAll(
-          colMyProjectIds As idRow,
-          Collect(
-              colPermittedProjects,
-              LookUp('ProcTrack - Projects', projectid = Trim(idRow.Value))
-          )
-      );
-      ClearCollect(
-          colPermittedProjects,
-          Filter(colPermittedProjects, !IsBlank(projectid))
-      );
-      If(
-          CountRows(colPermittedProjects) = 0,
-          Notify(
-              "colPermittedProjects is empty (check Permissions Edit_Projects/View_Projects vs Projects.projectid).",
-              NotificationType.Warning
+              !IsBlank(Trim(Value))
           )
       );
 
       ClearCollect(
+          colPermittedProjects,
+          If(
+              varIsAdmin,
+              Filter(colAllProjects, !IsBlank(projectid)),
+              Filter(
+                  colAllProjects,
+                  !IsBlank(LookUp(colMyProjectIds, Trim(Value) = projectid))
+              )
+          )
+      );
+
+      // Operational owners get automatic view of projects they own on a subcontract
+      ClearCollect(
           colOwnerSubs,
           Filter(
               'PostAward - Subcontracts',
-              !IsBlank(operationalowneremail) &&
-              Lower(Trim(operationalowneremail)) = Lower(Trim(varCurrentUserEmail))
+              operationalowneremail = varCurrentUserEmail
           )
       );
       ForAll(
@@ -105,11 +113,28 @@ App:
               Collect(
                   colPermittedProjects,
                   LookUp(
-                      'ProcTrack - Projects',
+                      colAllProjects,
                       projectidentifier = os.projectidentifier
                   )
               )
           )
+      );
+      ClearCollect(
+          colPermittedProjects,
+          Filter(colPermittedProjects, !IsBlank(projectid) || !IsBlank(projectidentifier))
+      );
+
+      If(
+          CountRows(colPermittedProjects) = 0,
+          Notify(
+              "No projects found for this user. Check ProcTrack - Permissions.",
+              NotificationType.Warning
+          )
+      );
+
+      Set(
+          varUserCanEdit,
+          varIsAdmin || !IsBlank(varUserPerm.Edit_Projects)
       );
 
       Clear(colPermittedPackages);
@@ -132,5 +157,7 @@ App:
       Clear(colSubChanges);
       Clear(colHomeAttention);
       Clear(colHomePendingChanges);
-    StartScreen: =Home
+      Clear(colSettingsProjectAccess);
+      Clear(colSettingsUserMatrix);
+    StartScreen: =Projects
     Theme: =PowerAppsTheme

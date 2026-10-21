@@ -9,6 +9,7 @@
 EditorState:
   ScreensOrder:
     - Project Dashboard
+    - Project Home
     - Welcome screen
     - Create New Package
     - Package Details

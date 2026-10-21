@@ -8,6 +8,8 @@
 # ************************************************************************************************
 EditorState:
   ScreensOrder:
+    - Projects
     - Home
     - Register
     - Subcontract Detail
+    - Settings

@@ -1,0 +1,1592 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  HREmployeeManageScr:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |-
+        =UpdateContext({ locSection: "MainConManager" });
+
+        Set(
+            varPendingCount,
+            CountRows(
+                Filter(
+                    'Vacations Tracking (Days)',
+                    Lower(ApproverID_1) = Lower(User().Email) || Lower(ProjectDirector_Email) = Lower(User().Email),
+                    ApprovalStatus_1 = "Pending" || ProjectDirector_ApprovalStatus.Value = "Pending",
+                    EndDate >= varYearStart,
+                    StartDate <= varYearEnd
+                )
+            )
+        );
+    Children:
+      - WebLayoutManager_2:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =Color.White
+            Height: =768
+            Visible: =App.Width >= 680
+            Width: =1366
+            X: =(App.Width - Self.Width) / 2
+            Y: =(App.Height - Self.Height) / 2
+          Children:
+            - SideBarConManager_2:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =ColorValue("#D60C30")
+                  Height: =Parent.Height
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =16
+                  Width: =Parent.Width * 0.085
+                Children:
+                  - IOCLogoWhite_3:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =75
+                        Image: ='IOC Logo White-No text'
+                        Width: =75
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =14
+                  - DashboardButton_3:
+                      Control: CanvasComponent
+                      ComponentName: DashboardButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: =Launch("https://app.powerbi.com/Redirect?action=OpenApp&appId=8b5f2e86-7dff-4932-bc91-59b17008279b&ctid=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&experience=power-bi")
+                        Width: =115
+                        Y: =678
+                  - SubmitRequestsButton_3:
+                      Control: CanvasComponent
+                      ComponentName: SubmitRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varEmployeeRow),
+                              Notify("Access denied. Your account is not registered in Employees.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(EmployeeDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        Y: =377
+                  - ManageRequestsButton_3:
+                      Control: CanvasComponent
+                      ComponentName: ManageRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varManagerRow),
+                              Notify("Access denied. Your account is not registered as a Manager.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(ManagerDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        Y: =294
+            - MainConManager_3:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =Color.White
+                  Height: =Parent.Height
+                  Visible: =locSection = "MainConManager"
+                  Width: =Parent.Width * 0.915
+                  X: =SideBarConManager_2.Width
+                Children:
+                  - BackButton_1:
+                      Control: CanvasComponent
+                      ComponentName: BackButton
+                      Properties:
+                        Fill: =ColorValue("#FFFFFF00")
+                        Height: =75
+                        OnPressAction: =Navigate(HRManageHomeScr, ScreenTransition.Fade)
+                        Width: =115
+                        X: =7
+                  - NewEmployeeButton_1:
+                      Control: CanvasComponent
+                      ComponentName: NewEmployeeButton
+                      Properties:
+                        Height: =60
+                        OnPressAction: |-
+                          =UpdateContext({ locShowSummary: true });
+                        Width: =350
+                        X: =(Parent.Width - Self.Width)/2
+                        Y: =Gallery2_4.Y + Gallery2_4.Height + 20
+                  - DayAwayLogoOnly_5:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Image: ='AECON Logo - Red with Transparent Back Ground'
+                        ImagePosition: =ImagePosition.Fill
+                        Width: =263
+                        X: =944
+                  - GreetingText_5:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =60
+                        PaddingLeft: =25
+                        PaddingRight: =25
+                        Size: =34
+                        Text: ="Employee Management"
+                        Width: =Parent.Width - DayAwayLogoOnly_5.Width -20
+                        Wrap: =false
+                        Y: |+
+                          =85
+                  - Container1_2:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =50
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width - 60
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =159
+                      Children:
+                        - Label13:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="First Name"
+                              X: =61
+                        - Label13_1:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Last Name"
+                              X: =193
+                        - Label13_2:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Email"
+                              X: =381
+                        - Label13_3:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Approver Name"
+                              X: =618
+                        - Label13_4:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Approver Email"
+                              X: =848
+                        - Label13_5:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#f5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Entitlement"
+                              X: =1005
+                  - TextInput3_1:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        Default: =
+                        Font: =Font.'Open Sans'
+                        Height: |
+                          =35
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Width: |
+                          =200
+                        X: =1020
+                        Y: =114
+                  - Label7_1:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        PaddingLeft: =0
+                        Size: =11
+                        Text: ="Filter by Employee First Name"
+                        Width: =200
+                        X: =1020
+                        Y: =84
+                  - Gallery2_4:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =450
+                        Items: |+
+                          =
+
+                          // Gallery.Items
+                          With(
+                              { q: Trim(TextInput3_1.Text) },
+                              If(
+                                  IsBlank(q),
+                                  'Vacations Tracking (Employees)',
+                                  Filter(
+                                      'Vacations Tracking (Employees)',
+                                      // Replace these column names with your actual ones
+                                      StartsWith('First Name', q)
+                                  )
+                              )
+                          )
+                        TemplateSize: =45
+                        Width: =Container1_2.Width
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Container1_2.Y + Container1_2.Height
+                      Children:
+                        - Rectangle_4:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("White")
+                              Height: =Parent.TemplateHeight - Separator_4.Height
+                              OnSelect: =Select(Parent)
+                              Visible: =ThisItem.IsSelected
+                              Width: =4
+                        - TableIcon_3:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              AccessibleLabel: =Self.Tooltip
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: |+
+                                =ColorValue("#494949")
+                              DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                              DisabledColor: =RGBA(119, 119, 119, 1)
+                              Height: =50
+                              Icon: =Icon.ChevronRight
+                              OnSelect: |+
+                                =// Select current gallery employee
+                                Set(varSelectedEmployee, ThisItem);
+
+                                // Bring employee's project
+                                Set(
+                                    varSelectedProject,
+                                    LookUp(
+                                        'Vacations Tracking (Projects)',
+                                        'Project Name' = varSelectedEmployee.'Project Name'
+                                    )
+                                );
+
+                                Set(
+                                    varPublicHolidaysWorkedEmp,
+                                    Sum(
+                                        Filter(
+                                            'Vacations Tracking (Worked Holidays)',
+
+                                            // If your email column is named 'Employee' (text), keep your original compare:
+                                            Lower(Employee_email) = Lower(varSelectedEmployee.Email),   // <-- if your column is actually 'Employee Email', change to Lower('Employee Email')
+
+                                            Year = Year(Today())
+                                        ),
+                                        Total
+                                    )
+                                );
+
+
+                                UpdateContext({ locShowEmployeeDetails: true });
+
+                              PaddingBottom: =16
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              PaddingTop: =16
+                              Tooltip: ="View item details"
+                              Width: =50
+                              X: =Parent.TemplateWidth - Self.Width
+                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                        - StartDateLabel_4:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.'Last Name'
+                              Width: =130
+                              X: =(DateCreatedLabel_4.X + DateCreatedLabel_4.Width + 15)
+                              Y: =(Rectangle_4.Height - Self.Height) / 2
+                        - EndDateLabel_4:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.Email
+                              Width: =230
+                              X: =(StartDateLabel_4.X + StartDateLabel_4.Width + 15)
+                              Y: =(Rectangle_4.Height - Self.Height) / 2
+                        - TotalDaysLabel_5:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.'Approver Name'
+                              Width: =200
+                              X: =(EndDateLabel_4.X + EndDateLabel_4.Width + 15)
+                              Y: =(Rectangle_4.Height - Self.Height) / 2
+                        - TotalDaysLabel_6:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.'Approver Email'
+                              Width: =230
+                              X: =(TotalDaysLabel_5.X + TotalDaysLabel_5.Width + 15)
+                              Y: =(Rectangle_4.Height - Self.Height) / 2
+                        - DateCreatedLabel_4:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(50, 49, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Normal, FontWeight.Normal)
+                              Height: =37
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =12
+                              Text: =ThisItem.'First Name'
+                              Width: =110
+                              Wrap: =false
+                              X: =80
+                              Y: =(Rectangle_4.Height - Self.Height) / 2
+                        - Separator_4:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("#D9ECFA")
+                              Height: =4
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =Parent.TemplateHeight - Self.Height
+                        - TotalDaysLabel_9:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Text: =ThisItem.'Vacation Entitlement (per anum)'
+                              Width: =60
+                              X: =(TotalDaysLabel_6.X + TotalDaysLabel_6.Width + 15)
+                              Y: =(Rectangle_4.Height - Self.Height) / 2
+                        - Image7:
+                            Control: Image@2.2.3
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Height: =35
+                              Image: |-
+                                =With(
+                                    { e: ThisItem.Email,
+                                      img: Office365Users.UserPhotoV2(ThisItem.Email)
+                                    },
+                                    If(
+                                        IsBlankOrError(img),
+                                        SampleImage,                // your fallback image (add a media asset or icon)
+                                        img
+                                    )
+                                )
+                              OnSelect: =Select(Parent)
+                              RadiusBottomLeft: =100
+                              RadiusBottomRight: =100
+                              RadiusTopLeft: =100
+                              RadiusTopRight: =100
+                              Width: =35
+                              X: =24
+                              Y: =4
+            - BackDrop_2:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |-
+                    =UpdateContext({ locShowSummary: false })
+                  Visible: =locShowSummary
+                  Width: =Parent.Width
+            - SubmitRequestBox_1:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =locShowSummary
+                  Width: |+
+                    =Parent.Width * 0.50
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_3:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Add New Employee"
+                        Width: =350
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y - 20
+                  - Dropdown3_1:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =ColorValue("#F5F5f5")
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: =["Vacation","Sick Day"]
+                        Items.Value: =Value
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Width: =Parent.Width * 0.20
+                        X: =756
+                        Y: =118
+                  - Button3_2:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#d60c30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: "=\n\nSet(\n    varNewEmployee,\n    Patch(\n        'Vacations Tracking (Employees)',\n        Defaults('Vacations Tracking (Employees)'),\n        {\n            Title:GUID(),\n            Entra_ID:Office365Users.UserProfileV2(ManagerNameField_7.Text).id,\n \n            'First Name': ManagerNameField_4.Text,\n            'Last Name': ManagerNameField_5.Text,\n            'Employee Title': ManagerNameField_6.Text,\n            Email: ManagerNameField_7.Text,\n            'Project Name': Dropdown3_2.Selected.'Project Name',\n            'Actual Entitlement':Value(ManagerNameField_10.Text),\n            'Approver Name':ComboBox3.Selected.DisplayName,\n            'Approver Email':ComboBox3.Selected.Mail,\n            'Travel days per home leave': Value(ManagerNameField_21.Text),\n            Year:Year(Today()),\n            'Vacation Entitlement (per anum)': Max(RoundDown(Value(ManagerNameField_10.Text) * ((13 - Month(DatePicker5.SelectedDate)) / 12), 0), 0)\n    \n\n        }\n    )\n);\n\nIf(\n    IsEmpty(Errors('Vacations Tracking (Employees)', varNewEmployee)),\n    Notify(\"Employee added successfully.\", NotificationType.Success);\n    Reset(ManagerNameField_4);\n    Reset(ManagerNameField_5);\n    Reset(ManagerNameField_6);\n    Reset(ManagerNameField_7);\n    Reset(ComboBox3);\n    Reset(ManagerNameField_9);\n    Reset(ManagerNameField_10);\n    Reset(ManagerNameField_21);\n    Reset(Dropdown3_2);\n    Reset(DatePicker5);\n    Refresh('Vacations Tracking (Employees)'),\n    Notify(\n        \"Add failed: \" & First(Errors('Vacations Tracking (Employees)', varNewEmployee)).Message,\n        NotificationType.Error\n    )\n);"
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Submit"
+                        Width: =200
+                        X: =241
+                        Y: =591
+                  - Label4_26:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="First Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =98
+                  - Label4_28:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Request Type"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =756
+                        Y: =93
+                  - Label4_30:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =384
+                  - Icon8:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#d60C30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |-
+                          =UpdateContext({ locShowSummary: false });
+
+                          Reset(ManagerNameField_4);
+                          Reset(ManagerNameField_5);
+                          Reset(ManagerNameField_6);
+                          Reset(ManagerNameField_7);
+                          Reset(ComboBox3);
+                          Reset(ManagerNameField_9);
+                          Reset(ManagerNameField_10);
+                          Reset(ManagerNameField_21);
+                          Reset(Dropdown3_2);
+                          Reset(DatePicker5);
+                          Refresh('Vacations Tracking (Employees)')
+                        Width: =28
+                        X: =630
+                        Y: =40
+                  - Dropdown3_2:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =ColorValue("#F5F5f5")
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: =SortByColumns('Vacations Tracking (Projects)', "ProjectName", SortOrder.Ascending)
+                        Items.Value: =ProjectName
+                        OnChange: |-
+                          =Set(
+                              varSelectedProject,
+                              Patch(
+                                  Self.Selected,
+                                  {
+                                      'Project Director Name': Self.Selected.'Project Director Name',
+                                      'Project Director Email': Self.Selected.'Project Director Email'
+                                  }
+                              )
+                          );
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Width: |+
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =409
+                  - ManagerNameField_4:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |+
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =123
+                  - Label4_32:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Last Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =98
+                  - ManagerNameField_5:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =123
+                  - Label4_33:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Title"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =191
+                  - ManagerNameField_6:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =216
+                  - Label4_34:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Email"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =191
+                  - ManagerNameField_7:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =216
+                  - Label4_35:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Approver Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =287
+                  - Label4_36:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Approver Email"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =287
+                  - ManagerNameField_9:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =ComboBox3.Selected.Mail
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =312
+                  - Label4_37:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Entitlement"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: =ManagerNameField_10.Width
+                        X: =351
+                        Y: =384
+                  - ManagerNameField_10:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: =Parent.Width * 0.220
+                        X: =351
+                        Y: =409
+                  - Label4_47:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Travel Days"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: =ManagerNameField_21.Width
+                        X: =508
+                        Y: =384
+                  - ManagerNameField_21:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: =Parent.Width * 0.220
+                        X: =508
+                        Y: =409
+                  - ComboBox3:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =RGBA(255, 255, 255, 1)
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        DisplayFields: =["DisplayName"]
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: |+
+                          =If(
+                              !IsBlank(Trim(Self.SearchText)),
+                              ShowColumns(
+                                  Office365Users.SearchUser(
+                                      { searchTerm: Trim(Self.SearchText), top: 15 }
+                                  ),
+                                  Id,            // GUID for the user
+                                  DisplayName,   // display name
+                                  Mail,          // email
+                                  UserPrincipalName,  // UPN
+                                  Department
+                              )
+                          )
+                        PaddingBottom: =10
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =10
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SearchFields: =["DisplayName","Mail","UserPrincipalName"]
+                        SelectMultiple: =false
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Width: =Parent.Width*0.45
+                        X: =27
+                        Y: =312
+                  - DatePicker5:
+                      Control: Classic/DatePicker@2.6.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |+
+                          =1
+                        Color: =ColorValue("#494949")
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        IconBackground: =ColorValue("#D60C30")
+                        IconFill: =RGBA(255, 255, 255, 1)
+                        PaddingBottom: =10
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =10
+                        Size: =12
+                        Width: =Parent.Width*0.45
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: |+
+                          =506
+                  - Label4_94:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Start Date"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =189
+                        Y: =481
+            - BackDrop_3:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |-
+                    =UpdateContext({ locShowEmployeeDetails: false })
+                  Visible: =locShowEmployeeDetails
+                  Width: =Parent.Width
+            - SubmitRequestBox_2:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =locShowEmployeeDetails
+                  Width: |
+                    =Parent.Width * 0.50
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_4:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Employee Summary"
+                        Width: =350
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y - 20
+                  - Button3_3:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =
+                          Set(
+                              varEmpSaved,
+                              Patch(
+                                  'Vacations Tracking (Employees)',
+                                  LookUp('Vacations Tracking (Employees)', ID = varSelectedEmployee.ID),
+                                  {
+                                      'First Name': ManagerNameField_11.Text,
+                                      'Last Name': ManagerNameField_12.Text,
+                                      'Employee Title': ManagerNameField_13.Text,
+                                      Email: ManagerNameField_14.Text,
+                                      'Project Name': Dropdown3_4.Selected.'Project Name',
+                                      'Vacation Entitlement (per anum)': Value(ManagerNameField_17.Text),
+                                      Carryover: Value(ManagerNameField_19.Text),
+                                      'Travel days per home leave': Value(ManagerNameField_20.Text),
+                                      'Approver Name' : ComboBox3_1.Selected.DisplayName,
+                                      'Approver Email': ComboBox3_1.Selected.Mail
+
+                                  }
+                              )
+                          );
+
+
+                          UpdateContext({ locShowEmployeeDetails: false });
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Save Changes"
+                        Width: =200
+                        X: =135
+                        Y: =608
+                  - Label4_27:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="First Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =196
+                  - Label4_31:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =482
+                  - Icon8_1:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#d60C30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |-
+                          =UpdateContext({ locShowEmployeeDetails: false });
+                          Reset(ManagerNameField_11);
+                          Reset(ManagerNameField_12);
+                          Reset(ManagerNameField_13);
+                          Reset(ManagerNameField_14);
+                          Reset(ComboBox3_1);
+                          Reset(ManagerNameField_16);
+                          Reset(ManagerNameField_17);
+                          Reset(ManagerNameField_18);
+                          Reset(ManagerNameField_19);
+                          Reset(ManagerNameField_20);
+                          Reset(Dropdown3_4);
+                        Width: =28
+                        X: =630
+                        Y: =40
+                  - Dropdown3_4:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =ColorValue("#F5F5f5")
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedEmployee.'Project Name'
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: =SortByColumns('Vacations Tracking (Projects)', "ProjectName", SortOrder.Ascending)
+                        Items.Value: =ProjectName
+                        OnChange: |-
+                          =Set(
+                              varSelectedProject,
+                              Patch(
+                                  Self.Selected,
+                                  {
+                                      'Project Director Name': Self.Selected.'Project Director Name',
+                                      'Project Director Email': Self.Selected.'Project Director Email'
+                                  }
+                              )
+                          );
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Size: =12
+                        Width: =Parent.Width * 0.30
+                        X: =28
+                        Y: =507
+                  - ManagerNameField_11:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedEmployee.'First Name'
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =221
+                  - Label4_38:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Last Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =196
+                  - ManagerNameField_12:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedEmployee.'Last Name'
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =221
+                  - Label4_39:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Title"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =289
+                  - ManagerNameField_13:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedEmployee.'Employee Title'
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =314
+                  - Label4_40:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Employee Email"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =289
+                  - ManagerNameField_14:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedEmployee.Email
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =314
+                  - Label4_41:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Approver Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =392
+                  - Label4_42:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Approver Email"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =392
+                  - ManagerNameField_16:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =ComboBox3_1.Selected.Mail
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =417
+                  - Label4_43:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Entitlement"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: |+
+                          =98.325
+                        X: =351
+                        Y: =482
+                  - ManagerNameField_17:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedEmployee.'Vacation Entitlement (per anum)'
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |+
+                          =98.325
+
+                        X: =351
+                        Y: =507
+                  - Label4_44:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Worked Holidays"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: =130
+                        X: =544
+                        Y: =482
+                  - ManagerNameField_18:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varPublicHolidaysWorkedEmp
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Lighter
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |+
+                          =98.325
+
+                        X: =560
+                        Y: =507
+                  - Label4_45:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Carryover"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: |
+                          =98.325
+                        X: =455
+                        Y: =482
+                  - ManagerNameField_19:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedEmployee.Carryover
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |+
+                          =98.325
+
+                        X: =455
+                        Y: =507
+                  - Image1:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Image: |-
+                          =With(
+                              { e: varSelectedEmployee.Email,
+                                img: Office365Users.UserPhotoV2(varSelectedEmployee.Email)
+                              },
+                              If(
+                                  IsBlankOrError(img),
+                                  SampleImage,                // your fallback image (add a media asset or icon)
+                                  img
+                              )
+                          )
+                        RadiusBottomLeft: =100
+                        RadiusBottomRight: =100
+                        RadiusTopLeft: =100
+                        RadiusTopRight: =100
+                        X: =282
+                        Y: =82
+                  - Label4_46:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Travel Days"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: |
+                          =98.325
+                        X: =246
+                        Y: =482
+                  - ManagerNameField_20:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedEmployee.'Travel days per home leave'
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |+
+                          =98.325
+
+                        X: =246
+                        Y: =507
+                  - ComboBox3_1:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        ChevronBackground: =ColorValue("#D60C30")
+                        ChevronFill: =RGBA(255, 255, 255, 1)
+                        ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                        Color: =ColorValue("#494949")
+                        DefaultSelectedItems: |-
+                          =With(
+                              {
+                                  approverEmail: Trim(varSelectedEmployee.'Approver Email')
+                              },
+                              If(
+                                  !IsBlank(approverEmail),
+                                  With(
+                                      { u: Office365Users.UserProfileV2(approverEmail) },
+                                      Table(
+                                          {
+                                              Id: u.id,
+                                              DisplayName: u.displayName,
+                                              Mail: Coalesce(u.mail, u.userPrincipalName),
+                                              UserPrincipalName: u.userPrincipalName,
+                                              Department: u.department
+                                          }
+                                      )
+                                  ),
+                                  []
+                              )
+                          )
+                        DisplayFields: =["DisplayName"]
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Items: |-
+                          =If(
+                              Len(Trim(Self.SearchText)) >= 2,
+                              ShowColumns(
+                                  Office365Users.SearchUser(
+                                      {
+                                          searchTerm: Trim(Self.SearchText),
+                                          top: 5
+                                      }
+                                  ),
+                                  Id,
+                                  DisplayName,
+                                  Mail,
+                                  UserPrincipalName,
+                                  Department
+                              )
+                          )
+                        OnChange: |-
+                          =Set(
+                              varSelectedEmployee,
+                              Patch(
+                                  varSelectedEmployee,
+                                  {
+                                      'Approver Name': Self.Selected.DisplayName,
+                                      'Approver Email': Self.Selected.Mail
+                                  }
+                              )
+                          );
+
+                          Reset(ManagerNameField_16);
+                        PaddingBottom: =10
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =10
+                        PressedColor: =RGBA(255, 255, 255, 1)
+                        PressedFill: =RGBA(0, 18, 107, 1)
+                        SearchFields: =["DisplayName","Mail"]
+                        SelectMultiple: =false
+                        SelectionColor: =RGBA(255, 255, 255, 1)
+                        SelectionFill: =RGBA(56, 96, 178, 1)
+                        Width: =Parent.Width*0.45
+                        X: =28
+                        Y: =417
+                  - Button3_25:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =
+                          Remove('Vacations Tracking (Employees)', varSelectedEmployee);
+                          Refresh('Vacations Tracking (Employees)');
+                          Notify ("Record Deleted");
+
+                          UpdateContext({ locShowEmployeeDetails: false });
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Delete"
+                        Width: =200
+                        X: =351
+                        Y: =608
+                  - Label4_96:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =20
+                        PaddingTop: =0
+                        Size: =9
+                        Text: =Year(Today())
+                        VerticalAlign: =VerticalAlign.Bottom
+                        Width: |
+                          =98.325
+                        X: =560
+                        Y: =552

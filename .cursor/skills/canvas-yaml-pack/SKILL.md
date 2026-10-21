@@ -4,6 +4,7 @@ description: >-
   Pack and import Power Apps Canvas apps from YAML source using pac canvas
   unpack/pack. Use when building or editing .pa.yaml screens, packing app.msapp,
   fixing ErrOpeningDocument_UnknownError, or validating incremental Studio imports.
+  Also use when laying out form inputs, columns, or cards inside nested containers.
 ---
 
 # Canvas YAML pack workflow
@@ -80,6 +81,40 @@ When a large pack fails, bisect screens:
 
 Round-trip test (unpack seed → pack unchanged) must pass before adding YAML.
 
+### Form inputs inside nested containers (validated Dayaway YNSE, 2026-10-13)
+
+Inputs were clipped and borders disappeared whenever a child was sized from a flexible parent. Studio confirmed the fix below. Follow it for every new text input, date picker, and card. Do not go back to `FillPortions` columns or `Width: =column.Width`.
+
+What failed:
+
+- `Width: =Parent.Width` on an input inside a column. Inside a nested column this is the **row** width, so the input is wider than its column and the column clips it.
+- `Width: =wrap_EmpFirst.Width` when that column is flexible (`FillPortions: 1`, no explicit Width). The property is larger than the box on screen. Same clip.
+- A card whose `Height` equals its row. AutoLayout clips children, so the card border and the checkbox disappear.
+
+What works. The column is ManualLayout and has an explicit width, so `Parent.Width` inside it matches the drawn box. The input is 8px narrower than that box.
+
+```
+row   AutoLayout, horizontal, LayoutGap 12, Height 76
+      LayoutMinWidth 0, LayoutMinHeight 0
+  column   ManualLayout, Height 68
+           Width: =(Parent.Width - 12) / 2
+           no FillPortions
+    label  X: =4  Y: =4   Height: =18  Width: =Parent.Width - 8
+    input  X: =4  Y: =26  Height: =36  Width: =Parent.Width - 8
+```
+
+Two columns plus the 12px gap equal the row. One full-width column uses `Width: =Parent.Width` on the ManualLayout column, and the input is still `Parent.Width - 8`.
+
+Cards in a row (Access checks): the row is taller than the card and has vertical padding. The card does not set a width; `FillPortions: 1` shares the row. The checkbox has no Width.
+
+```
+row    Height 64, PaddingTop 8, PaddingBottom 8, LayoutAlignItems Center
+  card Height 40, FillPortions 1, LayoutMinWidth 0, LayoutMinHeight 0
+    checkbox  Height 28, FillPortions 1, LayoutMinWidth 0, no Width
+```
+
+Full write-up: `_canvas-notes/layout-autolayout.md`.
+
 ### YAML content constraints
 
 - Prefer **ASCII** in formula string literals (`Y`, `~`, `-` not `✓`, `◑`, `–`) — unicode caused import issues in Role Workspace compare matrix
@@ -100,6 +135,7 @@ Round-trip test (unpack seed → pack unchanged) must pass before adding YAML.
 - [ ] No CanvasComponent unless Studio-validated seed exists
 - [ ] packed.json has LoadFromYaml: true
 - [ ] User tests import after each major screen addition
+- [ ] Form inputs sit inside a ManualLayout column with an explicit Width, inset by 8px. Do not size them from a flexible parent's .Width (see `_canvas-notes/layout-autolayout.md`)
 - [ ] Large SharePoint loads are bounded by delegable date/status filters (see `_canvas-notes/delegation.md`)
 - [ ] Attachment upload uses Form + ClassicAttachmentsEdit (see `_canvas-notes/attachments.md`)
 ```

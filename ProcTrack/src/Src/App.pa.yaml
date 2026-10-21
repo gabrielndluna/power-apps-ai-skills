@@ -18,6 +18,7 @@ App:
       Set(varSettingsTab, "users");
       Set(varSettingsSelectedEmail, "");
       Set(varSettingsSelectedName, "");
+      Set(varSettingsEntraId, "");
       Set(varSettingsGrantAdmin, false);
       Set(varSettingsEditProject, Blank());
       Set(varSettingsFilter, "");
@@ -79,38 +80,43 @@ App:
       Clear(colPackageDetails);
 
       // One Permissions row per user: Title, Name, IsAdmin, Edit_Projects, View_Projects
+      ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+      ClearCollect(colAllProjects, 'ProcTrack - Projects');
       Set(
           varUserPerm,
-          LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail)
+          LookUp(colAllPermissions, Lower(Title) = varCurrentUserEmail)
       );
-      Set(varIsAdmin, Coalesce(varUserPerm.IsAdmin, false));
+      Set(
+          varIsAdmin,
+          !IsBlank(varUserPerm) &&
+          (
+              varUserPerm.IsAdmin = true ||
+              Lower(Text(varUserPerm.IsAdmin)) = "true" ||
+              Lower(Text(varUserPerm.IsAdmin)) = "yes"
+          )
+      );
 
       ClearCollect(
           colMyProjectIds,
-          Distinct(
-              Filter(
-                  Split(
-                      Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
-                      ";"
-                  ),
-                  !IsBlank(Trim(ThisRecord.Value))
+          Filter(
+              Split(
+                  Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                  ";"
               ),
-              Value
+              !IsBlank(Trim(Value))
           )
       );
 
-      ClearCollect(colPermittedProjects, Blank());
-      Clear(colPermittedProjects);
-      ForAll(
-          colMyProjectIds As idRow,
-          Collect(
-              colPermittedProjects,
-              LookUp('ProcTrack - Projects', projectid = Trim(idRow.Value))
-          )
-      );
       ClearCollect(
           colPermittedProjects,
-          Filter(colPermittedProjects, !IsBlank(projectid))
+          If(
+              varIsAdmin,
+              colAllProjects,
+              Filter(
+                  colAllProjects,
+                  !IsBlank(LookUp(colMyProjectIds, Trim(Value) = projectid))
+              )
+          )
       );
 
       Set(
@@ -118,22 +124,38 @@ App:
           varIsAdmin || !IsBlank(varUserPerm.Edit_Projects)
       );
 
-      Clear(colPermittedPackages);
-      ForAll(
-          colPermittedProjects As p,
-          Collect(
+      // One delegable query per project. Do not filter colPermittedProjects inside this loop.
+      If(
+          CountRows(colPermittedProjects) > 0,
+          ClearCollect(
               colPermittedPackages,
               Filter(
                   'ProcTrack - Packages',
-                  ProjectID = p.projectid || projectidentifier = p.projectidentifier
+                  projectidentifier = First(colPermittedProjects).projectidentifier ||
+                  ProjectID = First(colPermittedProjects).projectid
+              )
+          );
+          If(
+              CountRows(colPermittedProjects) > 1,
+              ForAll(
+                  colPermittedProjects As proj,
+                  If(
+                      proj.projectidentifier <> First(colPermittedProjects).projectidentifier ||
+                      proj.projectid <> First(colPermittedProjects).projectid,
+                      Collect(
+                          colPermittedPackages,
+                          Filter(
+                              'ProcTrack - Packages',
+                              projectidentifier = proj.projectidentifier || ProjectID = proj.projectid
+                          )
+                      )
+                  )
               )
           )
       );
 
       Clear(colProjectPackages);
       Clear(colSettingsProjectAccess);
-      Clear(colAllPermissions);
-      Clear(colAllProjects);
 
       // ── Column registry: only the swappable pool lives here ──────────────
       ClearCollect(

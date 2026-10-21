@@ -16,6 +16,39 @@ Screens:
         Set(varPendingOpenAddSub, false);
         Set(varShowSettings, false);
         Set(varShowValidationErrors, false);
+        ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+        ClearCollect(colAllProjects, 'ProcTrack - Projects');
+        Set(varUserPerm, LookUp(colAllPermissions, Lower(Title) = varCurrentUserEmail));
+        Set(
+            varIsAdmin,
+            !IsBlank(varUserPerm) &&
+            (
+                varUserPerm.IsAdmin = true ||
+                Lower(Text(varUserPerm.IsAdmin)) = "true" ||
+                Lower(Text(varUserPerm.IsAdmin)) = "yes"
+            )
+        );
+        ClearCollect(
+            colMyProjectIds,
+            Filter(
+                Split(
+                    Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                    ";"
+                ),
+                !IsBlank(Trim(Value))
+            )
+        );
+        ClearCollect(
+            colPermittedProjects,
+            If(
+                varIsAdmin,
+                Filter(colAllProjects, !IsBlank(projectid)),
+                Filter(
+                    colAllProjects,
+                    !IsBlank(LookUp(colMyProjectIds, Trim(Value) = projectid))
+                )
+            )
+        );
         If(
             IsBlank(varSelectedProject) && CountRows(colPermittedProjects) > 0,
             Set(varSelectedProject, First(colPermittedProjects))
@@ -131,12 +164,12 @@ Screens:
             ClearCollect(
                 colAwardedAvailable,
                 Filter(
-                    colProjectPackages,
-                    !IsBlank(actualawarddate) &&
+                    colProjectPackages As pkg,
+                    !IsBlank(pkg.actualawarddate) &&
                     IsBlank(
                         LookUp(
                             colProjectSubcontracts,
-                            packageidentifier = ThisRecord.packageidentifier
+                            packageidentifier = pkg.packageidentifier
                         )
                     )
                 )
@@ -395,7 +428,7 @@ Screens:
                                     Height: =18
                                     HoverColor: =RGBA(255, 255, 255, 0.85)
                                     Icon: =Icon.Settings
-                                    OnSelect: =Set(varShowSettings, true)
+                                    OnSelect: =Navigate(Settings, ScreenTransition.None)
                                     Width: =18
                                     X: =7
                                     Y: =7
@@ -578,12 +611,12 @@ Screens:
                                         ClearCollect(
                                         colAwardedAvailable,
                                         Filter(
-                                        colProjectPackages,
-                                        !IsBlank(actualawarddate) &&
+                                        colProjectPackages As pkg,
+                                        !IsBlank(pkg.actualawarddate) &&
                                         IsBlank(
                                         LookUp(
                                         colProjectSubcontracts,
-                                        packageidentifier = ThisRecord.packageidentifier
+                                        packageidentifier = pkg.packageidentifier
                                         )
                                         )
                                         )
@@ -687,17 +720,18 @@ Screens:
                                 ClearCollect(
                                     colAwardedAvailable,
                                     Filter(
-                                        colProjectPackages,
-                                        !IsBlank(actualawarddate) &&
+                                        colProjectPackages As pkg,
+                                        !IsBlank(pkg.actualawarddate) &&
                                         IsBlank(
                                             LookUp(
                                                 colProjectSubcontracts,
-                                                packageidentifier = ThisRecord.packageidentifier
+                                                packageidentifier = pkg.packageidentifier
                                             )
                                         )
                                     )
                                 );
-                                Set(varShowAddSub, true)
+                                Set(varShowAddSub, true);
+                                Reset(reg_add_pkg)
                               RadiusBottomLeft: =8
                               RadiusBottomRight: =8
                               RadiusTopLeft: =8
@@ -842,9 +876,12 @@ Screens:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(235, 235, 235, 1)
                         FillPortions: =0
-                        Height: =40
+                        Height: =44
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =6
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusTopLeft: =8
@@ -857,7 +894,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =0
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "subcontractnumber",
@@ -865,9 +903,14 @@ Screens:
                                     Set(varSortColumn, "subcontractnumber");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="SUBCONTRACT" & If(varSortColumn = "subcontractnumber", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_vendor:
                             Control: Label@2.5.1
                             Properties:
@@ -875,7 +918,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =0
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "vendor",
@@ -883,9 +927,14 @@ Screens:
                                     Set(varSortColumn, "vendor");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="VENDOR" & If(varSortColumn = "vendor", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_scope:
                             Control: Label@2.5.1
                             Properties:
@@ -893,7 +942,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =0
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "scope",
@@ -901,9 +951,14 @@ Screens:
                                     Set(varSortColumn, "scope");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="SCOPE" & If(varSortColumn = "scope", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_ca:
                             Control: Label@2.5.1
                             Properties:
@@ -911,7 +966,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =0
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "responsibleca",
@@ -919,9 +975,14 @@ Screens:
                                     Set(varSortColumn, "responsibleca");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="CONTRACT ADMIN" & If(varSortColumn = "responsibleca", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_orig:
                             Control: Label@2.5.1
                             Properties:
@@ -930,7 +991,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =72
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "originalvalue",
@@ -938,9 +1000,14 @@ Screens:
                                     Set(varSortColumn, "originalvalue");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="ORIGINAL" & If(varSortColumn = "originalvalue", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_co:
                             Control: Label@2.5.1
                             Properties:
@@ -949,7 +1016,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =72
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "apprCO",
@@ -957,9 +1025,14 @@ Screens:
                                     Set(varSortColumn, "apprCO");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="CHANGE ORDERS" & If(varSortColumn = "apprCO", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_cur:
                             Control: Label@2.5.1
                             Properties:
@@ -968,7 +1041,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =72
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "currentValue",
@@ -976,9 +1050,14 @@ Screens:
                                     Set(varSortColumn, "currentValue");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="CURRENT VALUE" & If(varSortColumn = "currentValue", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_eac:
                             Control: Label@2.5.1
                             Properties:
@@ -987,7 +1066,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =72
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "eac",
@@ -995,9 +1075,14 @@ Screens:
                                     Set(varSortColumn, "eac");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="EAC" & If(varSortColumn = "eac", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_status:
                             Control: Label@2.5.1
                             Properties:
@@ -1006,7 +1091,8 @@ Screens:
                               FillPortions: =1
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =110
                               OnSelect: |-
                                 =If(
                                     varSortColumn = "_statusOrder",
@@ -1014,16 +1100,22 @@ Screens:
                                     Set(varSortColumn, "_statusOrder");
                                     Set(varSortAscending, true)
                                 )
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
                               Size: =10
                               Text: |-
                                 ="STATUS" & If(varSortColumn = "_statusOrder", If(varSortAscending, " ^", " v"), "")
+                              Wrap: =true
                         - reg_h_arrow:
                             Control: Label@2.5.1
                             Properties:
                               FillPortions: =0
-                              Height: =28
+                              Height: =36
+                              LayoutMinWidth: =0
                               Text: =""
-                              Width: =32
+                              Width: =28
                   - reg_gallery:
                       Control: Gallery@2.15.0
                       Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
@@ -1074,7 +1166,7 @@ Screens:
                           =Set(varSelectedSubcontract, ThisItem);
                           Set(varDetLeftTab, "details"); Navigate('Subcontract Detail', ScreenTransition.Fade)
                         TemplatePadding: =0
-                        TemplateSize: =64
+                        TemplateSize: =124
                         Visible: =CountRows(colRegisterView) > 0
                       Children:
                         - reg_row:
@@ -1084,10 +1176,14 @@ Screens:
                               DropShadow: =DropShadow.None
                               Fill: =If(ThisItem.isOver, RGBA(251, 234, 234, 1), RGBA(255, 255, 255, 1))
                               Height: =Parent.TemplateHeight
-                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutAlignItems: =LayoutAlignItems.Start
                               LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =6
+                              LayoutMinWidth: =0
+                              PaddingBottom: =6
                               PaddingLeft: =8
                               PaddingRight: =8
+                              PaddingTop: =8
                               Width: =Parent.TemplateWidth
                             Children:
                               - reg_c_sub:
@@ -1096,6 +1192,7 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutGap: =2
                                     LayoutMinHeight: =16
@@ -1107,17 +1204,27 @@ Screens:
                                           Color: =RGBA(214, 12, 48, 1)
                                           Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Bold
-                                          Height: =18
+                                          Height: =22
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                           Size: =12
                                           Text: =ThisItem.subcontractnumber
+                                          VerticalAlign: =VerticalAlign.Middle
                                     - reg_c_po:
                                         Control: Label@2.5.1
                                         Properties:
                                           Color: =RGBA(144, 151, 168, 1)
                                           Font: =Font.'Segoe UI'
-                                          Height: =16
+                                          Height: =18
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                           Size: =10
                                           Text: ="PO " & Coalesce(ThisItem.ponumber, "-")
+                                          VerticalAlign: =VerticalAlign.Middle
                               - reg_c_vendor:
                                   Control: Label@2.5.1
                                   Properties:
@@ -1125,9 +1232,15 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =36
+                                    Height: =44
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =4
+                                    PaddingTop: =0
                                     Size: =12
                                     Text: =ThisItem.vendor
+                                    VerticalAlign: =VerticalAlign.Top
                                     Wrap: =true
                               - reg_c_scope:
                                   Control: GroupContainer@1.5.0
@@ -1135,6 +1248,7 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutGap: =2
                                     LayoutMinHeight: =16
@@ -1145,9 +1259,15 @@ Screens:
                                         Properties:
                                           Color: =RGBA(90, 96, 102, 1)
                                           Font: =Font.'Segoe UI'
-                                          Height: =30
+                                          Height: =72
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =4
+                                          PaddingTop: =0
                                           Size: =11
                                           Text: =ThisItem.scope
+                                          VerticalAlign: =VerticalAlign.Top
                                           Wrap: =true
                                     - reg_c_bundle:
                                         Control: Label@2.5.1
@@ -1155,7 +1275,11 @@ Screens:
                                           Color: =RGBA(122, 127, 132, 1)
                                           Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Bold
-                                          Height: =14
+                                          Height: =16
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
                                           Size: =9
                                           Text: =ThisItem.bundle
                               - reg_c_ca:
@@ -1165,9 +1289,15 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =36
+                                    Height: =44
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =4
+                                    PaddingTop: =0
                                     Size: =12
                                     Text: =ThisItem.responsibleca
+                                    VerticalAlign: =VerticalAlign.Top
                                     Wrap: =true
                               - reg_c_orig:
                                   Control: Label@2.5.1
@@ -1176,9 +1306,15 @@ Screens:
                                     Color: =RGBA(144, 151, 168, 1)
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
-                                    Height: =20
+                                    Height: =22
+                                    LayoutMinWidth: =72
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                     Size: =12
                                     Text: =Text(ThisItem.originalvalue, "$#,##0")
+                                    VerticalAlign: =VerticalAlign.Middle
                               - reg_c_co:
                                   Control: Label@2.5.1
                                   Properties:
@@ -1187,9 +1323,15 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =20
+                                    Height: =22
+                                    LayoutMinWidth: =72
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                     Size: =12
                                     Text: =If(ThisItem.apprCO = 0, "-", If(ThisItem.apprCO > 0, "+", "") & Text(ThisItem.apprCO, "$#,##0"))
+                                    VerticalAlign: =VerticalAlign.Middle
                               - reg_c_cur:
                                   Control: Label@2.5.1
                                   Properties:
@@ -1198,9 +1340,15 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =20
+                                    Height: =22
+                                    LayoutMinWidth: =72
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                     Size: =12
                                     Text: =Text(ThisItem.currentValue, "$#,##0")
+                                    VerticalAlign: =VerticalAlign.Middle
                               - reg_c_eac:
                                   Control: Label@2.5.1
                                   Properties:
@@ -1209,98 +1357,92 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Bold
-                                    Height: =20
+                                    Height: =22
+                                    LayoutMinWidth: =72
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
                                     Size: =12
                                     Text: =Text(ThisItem.eac, "$#,##0")
+                                    VerticalAlign: =VerticalAlign.Middle
                               - reg_c_status:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
                                   Properties:
                                     DropShadow: =DropShadow.None
+                                    Fill: |-
+                                      =If(
+                                          ThisItem.isClosed,
+                                          RGBA(133, 133, 133, 0.12),
+                                          If(ThisItem.isOver, RGBA(214, 12, 48, 0.12), RGBA(56, 142, 60, 0.12))
+                                      )
                                     FillPortions: =1
-                                    Height: =24
+                                    Height: =22
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =6
                                     LayoutJustifyContent: =LayoutJustifyContent.Center
-                                    LayoutMinHeight: =24
-                                    LayoutMinWidth: =130
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =110
+                                    PaddingLeft: =8
+                                    PaddingRight: =6
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
                                   Children:
-                                    - reg_status_pill_wrap:
-                                        Control: GroupContainer@1.5.0
-                                        Variant: ManualLayout
+                                    - reg_status_dot:
+                                        Control: Circle@2.3.0
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Center
-                                          DropShadow: =DropShadow.None
-                                          Fill: =RGBA(0, 0, 0, 0)
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          BorderStyle: =BorderStyle.None
+                                          BorderThickness: =0
+                                          Fill: |-
+                                            =If(
+                                                ThisItem.isClosed,
+                                                RGBA(133, 133, 133, 1),
+                                                If(ThisItem.isOver, RGBA(214, 12, 48, 1), RGBA(56, 142, 60, 1))
+                                            )
                                           FillPortions: =0
-                                          Height: =24
-                                          LayoutMinHeight: =24
-                                          LayoutMinWidth: =128
-                                          Width: =128
-                                        Children:
-                                          - reg_status_pill_bg:
-                                              Control: Text@0.0.51
-                                              Properties:
-                                                BorderRadius: =12
-                                                Fill: |-
-                                                  =If(
-                                                      ThisItem.isClosed,
-                                                      RGBA(133, 133, 133, 0.12),
-                                                      If(ThisItem.isOver, RGBA(214, 12, 48, 0.12), RGBA(56, 142, 60, 0.12))
-                                                  )
-                                                Height: =24
-                                                Text: =""
-                                                Width: =128
-                                                X: =0
-                                                Y: =0
-                                          - reg_status_dot:
-                                              Control: Circle@2.3.0
-                                              Properties:
-                                                BorderColor: =RGBA(0, 0, 0, 0)
-                                                BorderStyle: =BorderStyle.None
-                                                BorderThickness: =0
-                                                Fill: |-
-                                                  =If(
-                                                      ThisItem.isClosed,
-                                                      RGBA(133, 133, 133, 1),
-                                                      If(ThisItem.isOver, RGBA(214, 12, 48, 1), RGBA(56, 142, 60, 1))
-                                                  )
-                                                Height: =8
-                                                Width: =8
-                                                X: =10
-                                                Y: =8
-                                          - reg_status_pill:
-                                              Control: Label@2.5.1
-                                              Properties:
-                                                Align: =Align.Left
-                                                Color: |-
-                                                  =If(
-                                                      ThisItem.isClosed,
-                                                      RGBA(106, 122, 127, 1),
-                                                      If(ThisItem.isOver, RGBA(214, 12, 48, 1), RGBA(16, 124, 65, 1))
-                                                  )
-                                                Font: =Font.'Segoe UI'
-                                                FontWeight: =FontWeight.Semibold
-                                                Height: =20
-                                                Size: =10
-                                                Text: |-
-                                                  =ThisItem.changeCount & " chg - " &
-                                                  If(
-                                                      ThisItem.isClosed,
-                                                      "Closed",
-                                                      If(ThisItem.isOver, "Over", "Active")
-                                                  )
-                                                VerticalAlign: =VerticalAlign.Middle
-                                                Width: =104
-                                                Wrap: =false
-                                                X: =22
-                                                Y: =2
+                                          Height: =8
+                                          LayoutMinWidth: =0
+                                          Width: =8
+                                    - reg_status_pill:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Left
+                                          Color: |-
+                                            =If(
+                                                ThisItem.isClosed,
+                                                RGBA(106, 122, 127, 1),
+                                                If(ThisItem.isOver, RGBA(214, 12, 48, 1), RGBA(16, 124, 65, 1))
+                                            )
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =18
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =10
+                                          Text: |-
+                                            =ThisItem.changeCount & " chg - " &
+                                            If(
+                                                ThisItem.isClosed,
+                                                "Closed",
+                                                If(ThisItem.isOver, "Over", "Active")
+                                            )
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Wrap: =false
                               - reg_c_arrow:
                                   Control: Classic/Icon@2.5.0
                                   Properties:
                                     Color: =RGBA(180, 180, 180, 1)
                                     FillPortions: =0
-                                    Height: =28
+                                    Height: =22
                                     Icon: =Icon.ChevronRight
                                     OnSelect: |-
                                       =Set(varSelectedSubcontract, ThisItem);
@@ -1545,91 +1687,3 @@ Screens:
                               RadiusTopRight: =9
                               Size: =12
                               Text: ="Add"
-      - reg_overlay_settings:
-          Control: GroupContainer@1.5.0
-          Variant: ManualLayout
-          Properties:
-            DropShadow: =DropShadow.None
-            Fill: =RGBA(0, 0, 0, 0.45)
-            Height: =Parent.Height
-            Visible: =varShowSettings
-            Width: =Parent.Width
-            X: =0
-            Y: =0
-          Children:
-            - reg_settings_panel:
-                Control: GroupContainer@1.5.0
-                Variant: AutoLayout
-                Properties:
-                  DropShadow: =DropShadow.Regular
-                  Fill: =RGBA(255, 255, 255, 1)
-                  Height: =280
-                  LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =10
-                  PaddingBottom: =16
-                  PaddingLeft: =18
-                  PaddingRight: =18
-                  PaddingTop: =16
-                  RadiusBottomLeft: =12
-                  RadiusBottomRight: =12
-                  RadiusTopLeft: =12
-                  RadiusTopRight: =12
-                  Width: =420
-                  X: =(Parent.Width - Self.Width) / 2
-                  Y: =(Parent.Height - Self.Height) / 2
-                Children:
-                  - reg_settings_title:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(27, 27, 27, 1)
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Bold
-                        Height: =28
-                        Size: =16
-                        Text: ="Settings"
-                  - reg_settings_user:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(60, 65, 71, 1)
-                        Font: =Font.'Segoe UI'
-                        Height: =40
-                        Size: =12
-                        Text: ="Signed in as " & User().FullName & " (" & varCurrentUserEmail & ")"
-                        Wrap: =true
-                  - reg_settings_edit:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(60, 65, 71, 1)
-                        Font: =Font.'Segoe UI'
-                        Height: =40
-                        Size: =12
-                        Text: |-
-                          ="Edit access for this project: " &
-                          If(varCanEditCurrentProject, "Yes", "No (view only)")
-                        Wrap: =true
-                  - reg_settings_help:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(108, 113, 118, 1)
-                        Font: =Font.'Segoe UI'
-                        Height: =90
-                        Size: =12
-                        Text: ="Permissions use ProcTrack - Permissions. Operational Owners listed on a subcontract get automatic view access to that project. Excel runs PostAward - Excel export for the filtered gallery rows. ProcTrack package fields stay read-only in PostAward."
-                        Wrap: =true
-                  - reg_settings_close:
-                      Control: Classic/Button@2.2.0
-                      Properties:
-                        BorderThickness: =0
-                        Color: =RGBA(255, 255, 255, 1)
-                        Fill: =RGBA(214, 12, 48, 1)
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Bold
-                        Height: =40
-                        OnSelect: =Set(varShowSettings, false)
-                        RadiusBottomLeft: =9
-                        RadiusBottomRight: =9
-                        RadiusTopLeft: =9
-                        RadiusTopRight: =9
-                        Size: =12
-                        Text: ="Close"
-                        Width: =110

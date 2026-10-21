@@ -1,0 +1,71 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =// 0) Visual constants
+      Set(varBarMaxWidth, 500);
+
+      // Entra object ID — guarded. If MyProfileV2 throws (common for guest users),
+      // we record it and continue instead of halting OnStart.
+      Set(varProfileFailed, false);
+      Set(
+          varMyAadId,
+          IfError(
+              Office365Users.MyProfileV2().id,
+              Set(varProfileFailed, true); ""
+          )
+      );
+
+      // 1) Employee row: Entra_ID first, email fallback. Both delegable.
+      Set(
+          varEmployeeRow,
+          Coalesce(
+              If(!IsBlank(varMyAadId),
+                 LookUp('Vacations Tracking (Employees)', Entra_ID = varMyAadId)
+              ),
+              LookUp('Vacations Tracking (Employees)', Email = User().Email)
+          )
+      );
+
+      Set(
+          varProjectRow,
+          LookUp('Vacations Tracking (Projects)', 'Project Name' = varEmployeeRow.'Project Name')
+      );
+
+      With(
+          {
+              rPerm:  LookUp('Vacations Tracking (Permissions)', User_Email = User().Email),
+              rEmp:   LookUp('Vacations Tracking (Employees)',   'Approver Email' = User().Email),
+              rMan:   LookUp('Vacations Tracking (Days)',        ApproverID_1 = User().Email),
+              rProj:  LookUp('Vacations Tracking (Projects)',    'Project Director Email' = User().Email),
+              rManPD: LookUp('Vacations Tracking (Days)',        ProjectDirector_Email = User().Email)
+          },
+          Set(varManagerRow, Coalesce(rPerm, rEmp, rProj, rMan, rManPD));
+          Set(HRManager, rPerm)
+      );
+
+      Set(varFirstName,       Coalesce(varEmployeeRow.'First Name', ""));
+      Set(varLastName,        Coalesce(varEmployeeRow.'Last Name', ""));
+      Set(varUserDisplayName, Trim($"{varFirstName} {varLastName}"));
+      Set(varUserProject,     Coalesce(varEmployeeRow.'Project Name', ""));
+      Set(varEmployeeRole,    Coalesce(varEmployeeRow.'Employee Title', ""));
+
+      Set(varYearStart, Date(Year(Today()), 1, 1));
+      Set(varYearEnd,   Date(Year(Today()), 12, 31));
+
+      Set(
+          varIsHR,
+          !IsBlank(LookUp('Vacations Tracking (Permissions)', User_Email = User().Email))
+      );
+
+      // Execution marker — proves OnStart reached the very end.
+      Set(varOnStartRan, true);
+    SizeBreakpoints: =[680, 900, 1200]
+    Theme: =PowerAppsTheme

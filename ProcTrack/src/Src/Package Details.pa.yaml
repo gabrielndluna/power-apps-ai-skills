@@ -38,16 +38,16 @@ Screens:
                   DropShadow: =DropShadow.Light
                   Fill: =RGBA(214, 12, 48, 1)
                   FillPortions: =0
-                  Height: =108
+                  Height: =140
                   LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =8
-                  LayoutMinHeight: =108
+                  LayoutGap: =6
+                  LayoutMinHeight: =140
                   LayoutMinWidth: =16
                   PaddingBottom: =12
                   PaddingLeft: =16
                   PaddingRight: =16
-                  PaddingTop: =12
+                  PaddingTop: =8
                   RadiusBottomLeft: =8
                   RadiusBottomRight: =8
                   RadiusTopLeft: =8
@@ -60,11 +60,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =44
+                        Height: =52
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =44
+                        LayoutMinHeight: =52
                         LayoutMinWidth: =16
                       Children:
                         - details_header_icon_wrap:
@@ -109,7 +109,7 @@ Screens:
                                   Properties:
                                     AutoHeight: =true
                                     FontColor: =RGBA(255, 255, 255, 1)
-                                    Size: =20
+                                    Size: =16
                                     Text: ="ProcTrack"
                                     Weight: ='TextCanvas.Weight'.Bold
                                     Width: =260
@@ -167,11 +167,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =32
+                        Height: =56
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =32
+                        LayoutMinHeight: =56
                         LayoutMinWidth: =16
                       Children:
                         - details_header_project_picker_wrap:
@@ -180,12 +180,13 @@ Screens:
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              FillPortions: =1
+                              FillPortions: =0
+                              Width: =520
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Horizontal
                               LayoutGap: =8
-                              Height: =32
-                              LayoutMinHeight: =32
+                              Height: =48
+                              LayoutMinHeight: =48
                               LayoutMinWidth: =16
                               PaddingBottom: =0
                               PaddingLeft: =12
@@ -205,7 +206,8 @@ Screens:
                                     Color: =RGBA(106, 122, 127, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =32
+                                    Height: =40
+                                    VerticalAlign: =VerticalAlign.Middle
                                     Size: =11
                                     Text: ="Project"
                                     Width: =68
@@ -235,7 +237,7 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =32
+                                    Height: =40
                                     HoverBorderColor: =RGBA(0, 0, 0, 0)
                                     HoverColor: =RGBA(33, 33, 33, 1)
                                     HoverFill: =RGBA(255, 255, 255, 1)
@@ -249,8 +251,8 @@ Screens:
                                           ClearCollect(
                                               colProjectPackages,
                                               Filter(
-                                                  'ProcTrack - Packages',
-                                                  ProjectID = Self.Selected.projectid || projectidentifier = Self.Selected.projectidentifier
+                                                  colPermittedPackages,
+                                                  ProjectID = varSelectedProject.projectid || projectidentifier = varSelectedProject.projectidentifier
                                               )
                                           );
                                           Set(
@@ -297,12 +299,12 @@ Screens:
                   DropShadow: =DropShadow.None
                   Fill: =RGBA(255, 255, 255, 1)
                   FillPortions: =0
-                  Height: =66
+                  Height: =56
                   LayoutAlignItems: =LayoutAlignItems.Center
                   LayoutDirection: =LayoutDirection.Horizontal
                   LayoutGap: =8
-                  LayoutMinHeight: =66
-                  LayoutMinWidth: =16
+                  LayoutMinHeight: =56
+                  LayoutMinWidth: =0
                   PaddingBottom: =5
                   PaddingLeft: =8
                   PaddingRight: =8
@@ -320,7 +322,8 @@ Screens:
                           =// DisplayMode
                           If(varCanEditCurrentProject, DisplayMode.Edit, DisplayMode.View)
                         FocusedBorderThickness: =4
-                        Height: =38
+                        Height: =24
+                        Width: =24
                         HoverBorderColor: =RGBA(0, 0, 0, 0)
                         HoverColor: =RGBA(54, 176, 75, 1)
                         HoverFill: =RGBA(0, 0, 0, 0)
@@ -351,7 +354,7 @@ Screens:
                               LayoutMinWidth: =16
                               PaddingBottom: =
                               PaddingTop: =
-                              Size: =12
+                              Size: =10
                               Text: ="CURRENT STAGE"
                         - current_stage_text:
                             Control: ModernText@1.0.0
@@ -363,7 +366,7 @@ Screens:
                               LayoutMinWidth: =16
                               PaddingBottom: =
                               PaddingTop: =
-                              Size: =18
+                              Size: =12
                               Text: |-
                                 =If(
                                     !IsBlank(First(colPackageDetails).actualawarddate) And !IsBlank(First(colPackageDetails).actualsowdate) And !IsBlank(First(colPackageDetails).actualrfqissuedate) And !IsBlank(First(colPackageDetails).actualrfqclosingdate) And !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),
@@ -406,8 +409,8 @@ Screens:
                         FillPortions: =1
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutMinHeight: =54
-                        LayoutMinWidth: =180
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusBottomLeft: =5
@@ -425,8 +428,8 @@ Screens:
                               DisabledFill: =RGBA(0, 0, 0, 0)
                               FillPortions: =0
                               FocusedBorderThickness: =4
-                              Height: =24
-                              Width: =24
+                              Height: =18
+                              Width: =18
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
                               HoverColor: =RGBA(16, 110, 190, 1)
                               HoverFill: =RGBA(0, 0, 0, 0)
@@ -444,8 +447,8 @@ Screens:
                               FillPortions: =1
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutGap: =2
-                              LayoutMinHeight: =36
+                              LayoutGap: =0
+                              LayoutMinHeight: =0
                               LayoutMinWidth: =0
                               PaddingLeft: =4
                               PaddingRight: =4
@@ -457,8 +460,8 @@ Screens:
                                     BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
                                     Font: =Font.'Segoe UI'
-                                    Height: =16
-                                    LayoutMinHeight: =16
+                                    Height: =14
+                                    LayoutMinHeight: =14
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -466,7 +469,6 @@ Screens:
                                     PaddingTop: =0
                                     Size: =9
                                     VerticalAlign: =VerticalAlign.Middle
-                                    Width: =Parent.Width
                                     Wrap: =false
                                     Text: ="ORIGINAL RAS"
                               - days_to_award_2:
@@ -478,8 +480,8 @@ Screens:
                                     Color: =RGBA(79, 90, 94, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =20
-                                    LayoutMinHeight: =20
+                                    Height: =16
+                                    LayoutMinHeight: =16
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -487,7 +489,6 @@ Screens:
                                     PaddingTop: =0
                                     Size: =11
                                     VerticalAlign: =VerticalAlign.Middle
-                                    Width: =Parent.Width
                                     Wrap: =false
                                     Text: =Text(First(colPackageDetails).ras_original_input, "mm/dd/yyyy")
                   - Container10_2:
@@ -499,8 +500,8 @@ Screens:
                         FillPortions: =1
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutMinHeight: =54
-                        LayoutMinWidth: =180
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusBottomLeft: =5
@@ -518,8 +519,8 @@ Screens:
                               DisabledFill: =RGBA(0, 0, 0, 0)
                               FillPortions: =0
                               FocusedBorderThickness: =4
-                              Height: =24
-                              Width: =24
+                              Height: =18
+                              Width: =18
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
                               HoverColor: =RGBA(16, 110, 190, 1)
                               HoverFill: =RGBA(0, 0, 0, 0)
@@ -537,8 +538,8 @@ Screens:
                               FillPortions: =1
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutGap: =2
-                              LayoutMinHeight: =36
+                              LayoutGap: =0
+                              LayoutMinHeight: =0
                               LayoutMinWidth: =0
                               PaddingLeft: =4
                               PaddingRight: =4
@@ -550,8 +551,8 @@ Screens:
                                     BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
                                     Font: =Font.'Segoe UI'
-                                    Height: =16
-                                    LayoutMinHeight: =16
+                                    Height: =14
+                                    LayoutMinHeight: =14
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -559,7 +560,6 @@ Screens:
                                     PaddingTop: =0
                                     Size: =9
                                     VerticalAlign: =VerticalAlign.Middle
-                                    Width: =Parent.Width
                                     Wrap: =false
                                     Text: ="DAYS PLAN/FORE/ACT"
                               - days_to_award_1:
@@ -571,8 +571,8 @@ Screens:
                                     Color: =RGBA(79, 90, 94, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =20
-                                    LayoutMinHeight: =20
+                                    Height: =16
+                                    LayoutMinHeight: =16
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -580,7 +580,6 @@ Screens:
                                     PaddingTop: =0
                                     Size: =11
                                     VerticalAlign: =VerticalAlign.Middle
-                                    Width: =Parent.Width
                                     Wrap: =false
                                     Text: |-
                                       =Text(
@@ -617,8 +616,8 @@ Screens:
                         FillPortions: =1
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutMinHeight: =54
-                        LayoutMinWidth: =180
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusBottomLeft: =5
@@ -636,8 +635,8 @@ Screens:
                               DisabledFill: =RGBA(0, 0, 0, 0)
                               FillPortions: =0
                               FocusedBorderThickness: =4
-                              Height: =24
-                              Width: =24
+                              Height: =18
+                              Width: =18
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
                               HoverColor: =RGBA(16, 110, 190, 1)
                               HoverFill: =RGBA(0, 0, 0, 0)
@@ -655,8 +654,8 @@ Screens:
                               FillPortions: =1
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutGap: =2
-                              LayoutMinHeight: =36
+                              LayoutGap: =0
+                              LayoutMinHeight: =0
                               LayoutMinWidth: =0
                               PaddingLeft: =4
                               PaddingRight: =4
@@ -668,8 +667,8 @@ Screens:
                                     BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
                                     Font: =Font.'Segoe UI'
-                                    Height: =16
-                                    LayoutMinHeight: =16
+                                    Height: =14
+                                    LayoutMinHeight: =14
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -677,7 +676,6 @@ Screens:
                                     PaddingTop: =0
                                     Size: =9
                                     VerticalAlign: =VerticalAlign.Middle
-                                    Width: =Parent.Width
                                     Wrap: =false
                                     Text: ="DAYS TO AWARD"
                               - days_to_award:
@@ -689,8 +687,8 @@ Screens:
                                     Color: =RGBA(79, 90, 94, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =20
-                                    LayoutMinHeight: =20
+                                    Height: =16
+                                    LayoutMinHeight: =16
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -698,7 +696,6 @@ Screens:
                                     PaddingTop: =0
                                     Size: =11
                                     VerticalAlign: =VerticalAlign.Middle
-                                    Width: =Parent.Width
                                     Wrap: =false
                                     Text: |-
                                       =If(
@@ -723,8 +720,8 @@ Screens:
                         FillPortions: =1
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutMinHeight: =54
-                        LayoutMinWidth: =180
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
                         PaddingLeft: =8
                         PaddingRight: =8
                         RadiusBottomLeft: =5
@@ -742,8 +739,8 @@ Screens:
                               DisabledFill: =RGBA(0, 0, 0, 0)
                               FillPortions: =0
                               FocusedBorderThickness: =4
-                              Height: =24
-                              Width: =24
+                              Height: =18
+                              Width: =18
                               HoverBorderColor: =RGBA(0, 0, 0, 0)
                               HoverColor: =RGBA(16, 110, 190, 1)
                               HoverFill: =RGBA(0, 0, 0, 0)
@@ -761,8 +758,8 @@ Screens:
                               FillPortions: =1
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutGap: =2
-                              LayoutMinHeight: =36
+                              LayoutGap: =0
+                              LayoutMinHeight: =0
                               LayoutMinWidth: =0
                               PaddingLeft: =4
                               PaddingRight: =4
@@ -774,8 +771,8 @@ Screens:
                                     BorderColor: =RGBA(0, 0, 0, 0)
                                     Color: =RGBA(79, 90, 94, 1)
                                     Font: =Font.'Segoe UI'
-                                    Height: =16
-                                    LayoutMinHeight: =16
+                                    Height: =14
+                                    LayoutMinHeight: =14
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -783,7 +780,6 @@ Screens:
                                     PaddingTop: =0
                                     Size: =9
                                     VerticalAlign: =VerticalAlign.Middle
-                                    Width: =Parent.Width
                                     Wrap: =false
                                     Text: ="DAYS TO RAS"
                               - days_to_ras:
@@ -795,8 +791,8 @@ Screens:
                                     Color: =RGBA(79, 90, 94, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =20
-                                    LayoutMinHeight: =20
+                                    Height: =16
+                                    LayoutMinHeight: =16
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -804,7 +800,6 @@ Screens:
                                     PaddingTop: =0
                                     Size: =11
                                     VerticalAlign: =VerticalAlign.Middle
-                                    Width: =Parent.Width
                                     Wrap: =false
                                     Text: |-
                                       =If(
@@ -829,7 +824,7 @@ Screens:
                 Variant: AutoLayout
                 Properties:
                   FillPortions: =85
-                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Horizontal
                   LayoutGap: =10
                   LayoutMinHeight: =16
@@ -842,7 +837,7 @@ Screens:
                         LayoutAlignItems: =LayoutAlignItems.Stretch
                         LayoutDirection: =LayoutDirection.Vertical
                         LayoutGap: =8
-                        LayoutMinHeight: =16
+                        LayoutMinHeight: =0
                         LayoutMinWidth: =16
                         LayoutOverflowY: =LayoutOverflow.Scroll
                       Children:
@@ -853,11 +848,10 @@ Screens:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
-                              Height: =320
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =6
-                              LayoutMinHeight: =320
+                              LayoutMinHeight: =0
                               LayoutMinWidth: =16
                               PaddingBottom: =8
                               PaddingLeft: =8
@@ -915,7 +909,6 @@ Screens:
                                           AutoHeight: =false
                                           BorderColor: =RGBA(0, 0, 0, 0)
                                           Color: =RGBA(255, 255, 255, 1)
-                                          FillPortions: =0
                                           Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
                                           Height: =20
@@ -928,7 +921,7 @@ Screens:
                                           Size: =12
                                           Text: ="PACKAGE BASICS"
                                           VerticalAlign: =VerticalAlign.Middle
-                                          Width: =118
+                                          FillPortions: =1
                                           Wrap: =false
                                     - Text8:
                                         Control: Label@2.5.1
@@ -950,7 +943,7 @@ Screens:
                                           Size: =9
                                           Text: ="PREREQ DESIGN"
                                           VerticalAlign: =VerticalAlign.Middle
-                                          Width: =78
+                                          Width: =108
                                           Wrap: =false
                                     - prereq_design_checkmark:
                                         Control: CheckBox@0.0.30
@@ -999,11 +992,11 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =48
+                                    Height: =52
                                     LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutGap: =10
-                                    LayoutMinHeight: =48
+                                    LayoutMinHeight: =52
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -1016,11 +1009,11 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =1
-                                          Height: =48
+                                          Height: =52
                                           LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutGap: =2
-                                          LayoutMinHeight: =48
+                                          LayoutMinHeight: =52
                                           LayoutMinWidth: =0
                                           PaddingBottom: =0
                                           PaddingLeft: =0
@@ -1087,7 +1080,7 @@ Screens:
                                                       Width: =Max(24, Len(First(colPackageDetails).projectidentifier & " -") * 7 + 4)
                                                       Wrap: =false
                                                 - item_number_input:
-                                                    Control: ModernTextInput@1.1.0
+                                                    Control: ModernTextInput@1.1.2
                                                     Properties:
                                                       AlignInContainer: =AlignInContainer.Stretch
                                                       BorderColor: =RGBA(214, 221, 224, 1)
@@ -1113,11 +1106,11 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =1
-                                          Height: =48
+                                          Height: =52
                                           LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutGap: =2
-                                          LayoutMinHeight: =48
+                                          LayoutMinHeight: =52
                                           LayoutMinWidth: =0
                                           PaddingBottom: =0
                                           PaddingLeft: =0
@@ -1146,7 +1139,7 @@ Screens:
                                                 VerticalAlign: =VerticalAlign.Middle
                                                 Wrap: =false
                                           - mpl_input_1:
-                                              Control: ModernTextInput@1.1.0
+                                              Control: ModernTextInput@1.1.2
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
                                                 BorderColor: =RGBA(214, 221, 224, 1)
@@ -1172,11 +1165,11 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =48
+                                    Height: =52
                                     LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutGap: =2
-                                    LayoutMinHeight: =48
+                                    LayoutMinHeight: =52
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -1205,7 +1198,7 @@ Screens:
                                           VerticalAlign: =VerticalAlign.Middle
                                           Wrap: =false
                                     - description_input:
-                                        Control: ModernTextInput@1.1.0
+                                        Control: ModernTextInput@1.1.2
                                         Properties:
                                           AlignInContainer: =AlignInContainer.Stretch
                                           BorderColor: =RGBA(214, 221, 224, 1)
@@ -1231,11 +1224,11 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =48
+                                    Height: =52
                                     LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutGap: =10
-                                    LayoutMinHeight: =48
+                                    LayoutMinHeight: =52
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -1248,11 +1241,11 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =1
-                                          Height: =48
+                                          Height: =52
                                           LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutGap: =2
-                                          LayoutMinHeight: =48
+                                          LayoutMinHeight: =52
                                           LayoutMinWidth: =0
                                           PaddingBottom: =0
                                           PaddingLeft: =0
@@ -1316,11 +1309,11 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =1
-                                          Height: =48
+                                          Height: =52
                                           LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutGap: =2
-                                          LayoutMinHeight: =48
+                                          LayoutMinHeight: =52
                                           LayoutMinWidth: =0
                                           PaddingBottom: =0
                                           PaddingLeft: =0
@@ -1349,7 +1342,7 @@ Screens:
                                                 VerticalAlign: =VerticalAlign.Middle
                                                 Wrap: =false
                                           - bopsite_input:
-                                              Control: ModernTextInput@1.1.0
+                                              Control: ModernTextInput@1.1.2
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
                                                 BorderColor: =RGBA(214, 221, 224, 1)
@@ -1375,11 +1368,11 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =48
+                                    Height: =52
                                     LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutGap: =10
-                                    LayoutMinHeight: =48
+                                    LayoutMinHeight: =52
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -1392,11 +1385,11 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =1
-                                          Height: =48
+                                          Height: =52
                                           LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutGap: =2
-                                          LayoutMinHeight: =48
+                                          LayoutMinHeight: =52
                                           LayoutMinWidth: =0
                                           PaddingBottom: =0
                                           PaddingLeft: =0
@@ -1463,11 +1456,11 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =1
-                                          Height: =48
+                                          Height: =52
                                           LayoutAlignItems: =LayoutAlignItems.Stretch
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutGap: =2
-                                          LayoutMinHeight: =48
+                                          LayoutMinHeight: =52
                                           LayoutMinWidth: =0
                                           PaddingBottom: =0
                                           PaddingLeft: =0
@@ -1496,7 +1489,7 @@ Screens:
                                                 VerticalAlign: =VerticalAlign.Middle
                                                 Wrap: =false
                                           - package_bundle_input_1:
-                                              Control: ModernTextInput@1.1.0
+                                              Control: ModernTextInput@1.1.2
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
                                                 BorderColor: =RGBA(214, 221, 224, 1)
@@ -1522,11 +1515,11 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =48
+                                    Height: =52
                                     LayoutAlignItems: =LayoutAlignItems.Stretch
                                     LayoutDirection: =LayoutDirection.Vertical
                                     LayoutGap: =2
-                                    LayoutMinHeight: =48
+                                    LayoutMinHeight: =52
                                     LayoutMinWidth: =0
                                     PaddingBottom: =0
                                     PaddingLeft: =0
@@ -1571,7 +1564,7 @@ Screens:
                                           PaddingTop: =0
                                         Children:
                                           - packagefolder_input:
-                                              Control: ModernTextInput@1.1.0
+                                              Control: ModernTextInput@1.1.2
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
                                                 BorderColor: =RGBA(214, 221, 224, 1)
@@ -1707,11 +1700,11 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =40
+                                    Height: =52
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutGap: =8
-                                    LayoutMinHeight: =40
+                                    LayoutMinHeight: =52
                                     LayoutMinWidth: =0
                                     PaddingBottom: =4
                                     PaddingLeft: =4
@@ -1765,7 +1758,7 @@ Screens:
                                           RadiusTopRight: =100
                                           Width: =28
                                     - operations_lead_input_1:
-                                        Control: ModernCombobox@1.1.0
+                                        Control: ModernCombobox@1.1.2
                                         Properties:
                                           BorderColor: =RGBA(214, 221, 224, 1)
                                           BorderThickness: =2
@@ -1838,11 +1831,11 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =40
+                                    Height: =52
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutGap: =8
-                                    LayoutMinHeight: =40
+                                    LayoutMinHeight: =52
                                     LayoutMinWidth: =0
                                     PaddingBottom: =4
                                     PaddingLeft: =4
@@ -1896,7 +1889,7 @@ Screens:
                                           RadiusTopRight: =100
                                           Width: =28
                                     - procurement_lead_input_1:
-                                        Control: ModernCombobox@1.1.0
+                                        Control: ModernCombobox@1.1.2
                                         Properties:
                                           BorderColor: =RGBA(214, 221, 224, 1)
                                           BorderThickness: =2
@@ -1976,11 +1969,11 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =40
+                                    Height: =52
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutGap: =8
-                                    LayoutMinHeight: =40
+                                    LayoutMinHeight: =52
                                     LayoutMinWidth: =0
                                     PaddingBottom: =4
                                     PaddingLeft: =4
@@ -2034,7 +2027,7 @@ Screens:
                                           RadiusTopRight: =100
                                           Width: =28
                                     - technical_lead_input_1:
-                                        Control: ModernCombobox@1.1.0
+                                        Control: ModernCombobox@1.1.2
                                         Properties:
                                           BorderColor: =RGBA(214, 221, 224, 1)
                                           BorderThickness: =2
@@ -2119,7 +2112,7 @@ Screens:
                         LayoutGap: =10
                         LayoutMinHeight: =16
                         LayoutMinWidth: =16
-                        LayoutOverflowY: =LayoutOverflow.Scroll
+                        LayoutOverflowY: =LayoutOverflow.Hide
                       Children:
                         - Container22:
                             Control: GroupContainer@1.5.0
@@ -2132,7 +2125,7 @@ Screens:
                               FillPortions: =3
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =300
+                              LayoutMinHeight: =0
                               LayoutMinWidth: =16
                               PaddingBottom: =4
                               RadiusBottomLeft: =5
@@ -2160,10 +2153,10 @@ Screens:
                                           Color: =RGBA(0, 0, 0, 1)
                                           FontWeight: =FontWeight.Semibold
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
                                           Size: =14
                                           Text: ="Path to Award Tracking"
-                                          Width: =Parent.Width*0.4
+                                          FillPortions: =1
+                                          LayoutMinWidth: =0
                                     - Container26:
                                         Control: GroupContainer@1.5.0
                                         Variant: AutoLayout
@@ -2202,10 +2195,9 @@ Screens:
                                                 Color: =RGBA(0, 0, 0, 1)
                                                 FontWeight: =FontWeight.Semibold
                                                 LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
                                                 Size: =10
                                                 Text: ="SOLE SOURCE"
-                                                Width: =Parent.Width*0.2
+                                                LayoutMinWidth: =0
                                           - sole_source_checkbox:
                                               Control: CheckBox@0.0.30
                                               Properties:
@@ -2219,7 +2211,6 @@ Screens:
                                                 Label: =
                                                 LayoutMaxWidth: =45
                                                 LayoutMinHeight: =16
-                                                LayoutMinWidth: =16
                                                 OnCheck: |-
                                                   =Patch(
                                                       colPackageDetails,
@@ -2272,7 +2263,8 @@ Screens:
                                                           revisedplannedawarddate: DateAdd(First(colPackageDetails).requiredatsitedate, -30, TimeUnit.Days)
                                                       }
                                                   )
-                                                Width: =Parent.Width*0.1
+                                                LayoutMinWidth: =0
+                                                Width: =28
                                     - Icon9:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -2304,12 +2296,13 @@ Screens:
                                     Height: =30
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =30
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     PaddingBottom: =4
                                     PaddingLeft: =8
                                     PaddingRight: =8
                                     PaddingTop: =4
+                                    LayoutGap: =4
                                   Children:
                                     - header_package_1:
                                         Control: Label@2.5.1
@@ -2321,8 +2314,8 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =12
                                           Text: ="STAGE"
-                                          Width: =Container11.Width*0.17
-                                          Y: =10
+                                          FillPortions: =17
+                                          LayoutMinWidth: =0
                                     - header_description_1:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2333,9 +2326,24 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =12
                                           Text: ="DURATION"
-                                          Width: =Container11.Width*0.13
-                                          X: =140
-                                          Y: =10
+                                          FillPortions: =8
+                                          LayoutMinWidth: =0
+                                    - header_duration_icon_gap:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          FillPortions: =0
+                                          Height: =16
+                                          LayoutMinWidth: =0
+                                          Text: =""
+                                          Width: =16
+                                    - header_duration_days_gap:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          FillPortions: =0
+                                          Height: =16
+                                          LayoutMinWidth: =0
+                                          Text: =""
+                                          Width: =36
                                     - header_lead_1:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2346,9 +2354,8 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =12
                                           Text: ="PLANNED"
-                                          Width: =Container11.Width*0.18
-                                          X: =290
-                                          Y: =10
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - header_stage_2:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2359,9 +2366,8 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =12
                                           Text: ="FORECAST"
-                                          Width: =Container11.Width*0.18
-                                          X: =440
-                                          Y: =10
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - header_stage_3:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2372,9 +2378,16 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =12
                                           Text: ="ACTUAL"
-                                          Width: =Container11.Width*0.18
-                                          X: =590
-                                          Y: =10
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
+                                    - header_clear_gap:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          FillPortions: =0
+                                          Height: =16
+                                          LayoutMinWidth: =0
+                                          Text: =""
+                                          Width: =20
                                     - header_award_1:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2385,9 +2398,8 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =12
                                           Text: ="STATUS"
-                                          Width: =Container11.Width*0.15
-                                          X: =740
-                                          Y: =10
+                                          FillPortions: =15
+                                          LayoutMinWidth: =0
                               - Container20:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -2395,12 +2407,13 @@ Screens:
                                     FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =38
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
                                     PaddingTop: =3
+                                    LayoutGap: =4
                                   Children:
                                     - header_package_2:
                                         Control: Label@2.5.1
@@ -2412,10 +2425,10 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =10
                                           Text: ="1 SOW Completion"
-                                          Width: =header_package_1.Width
-                                          Y: =3
+                                          FillPortions: =17
+                                          LayoutMinWidth: =0
                                     - SOWtoRFQ_days_input:
-                                        Control: ModernTextInput@1.1.0
+                                        Control: ModernTextInput@1.1.2
                                         Properties:
                                           Align: =Align.Center
                                           AlignInContainer: =AlignInContainer.End
@@ -2428,9 +2441,8 @@ Screens:
                                           PaddingBottom: =0
                                           PaddingTop: =0
                                           Placeholder: =
-                                          Width: =header_description_1.Width - DayLabel1.Width
-                                          X: =140
-                                          Y: =7
+                                          FillPortions: =8
+                                          LayoutMinWidth: =0
                                     - Icon5:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -2447,11 +2459,12 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.ArrowDown
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =15
+                                          FillPortions: =0
+                                          Width: =16
                                     - DayLabel1:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2463,12 +2476,11 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =8
                                           Text: ="Days"
-                                          Width: |+
-                                            =50
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =0
+                                          LayoutMinWidth: =0
+                                          Width: =36
                                     - SOWPlannedDate:
-                                        Control: ModernDatePicker@1.0.0
+                                        Control: ModernDatePicker@1.0.2
                                         Properties:
                                           DefaultDate: |-
                                             =If(
@@ -2487,9 +2499,8 @@ Screens:
                                             =// PaddingLeft
                                             (Self.Width - 120) / 2
                                           Placeholder: =
-                                          Width: =header_lead_1.Width
-                                          X: =290
-                                          Y: =7
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - SOWRevisedDate:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2506,9 +2517,8 @@ Screens:
                                                 Text(First(colPackageDetails).revisedplannedsowdate, "mmm dd, yyyy"),
                                                 "—"
                                             )
-                                          Width: =header_stage_2.Width
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - SOWActualDate:
                                         Control: Classic/DatePicker@2.6.0
                                         Properties:
@@ -2536,9 +2546,7 @@ Screens:
                                           OnChange: "=Patch(\r\n    colPackageDetails,\r\n    First(colPackageDetails),\r\n    {\r\n        actualsowdate: Self.SelectedDate,\r\n        revisedplannedsowdate: Self.SelectedDate,\r\n        \r\n        actualrfqissuedate: If(\r\n            First(colPackageDetails).sole_source = \"Yes\",\r\n            Self.SelectedDate,\r\n            First(colPackageDetails).actualrfqissuedate\r\n        ),\r\n        actualrfqclosingdate: If(\r\n            First(colPackageDetails).sole_source = \"Yes\",\r\n            Self.SelectedDate,\r\n            First(colPackageDetails).actualrfqclosingdate\r\n        ),\r\n        \r\n        revisedplannedrfqissuedate: If(\r\n            !IsBlank(First(colPackageDetails).actualrfqissuedate),\r\n            First(colPackageDetails).actualrfqissuedate,\r\n            Max(\r\n                First(colPackageDetails).revisedplannedrfqissuedate,\r\n                DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimesowtorfqissuedays, TimeUnit.Days)\r\n            )\r\n        ),\r\n        \r\n        revisedplannedrfqclosingdate: If(\r\n            !IsBlank(First(colPackageDetails).actualrfqclosingdate),\r\n            First(colPackageDetails).actualrfqclosingdate,\r\n            Max(\r\n                First(colPackageDetails).revisedplannedrfqclosingdate,\r\n                DateAdd(DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimesowtorfqissuedays, TimeUnit.Days), First(colPackageDetails).leadtimerfqissuetoclosingdays, TimeUnit.Days)\r\n            )\r\n        ),\r\n        \r\n        revisedplannedevaluationcompletio: If(\r\n            !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),\r\n            First(colPackageDetails).actualevaluationcompletiondate,\r\n            Max(\r\n                First(colPackageDetails).revisedplannedevaluationcompletio,\r\n                DateAdd(DateAdd(DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimesowtorfqissuedays, TimeUnit.Days), First(colPackageDetails).leadtimerfqissuetoclosingdays, TimeUnit.Days), First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days)\r\n            )\r\n        ),\r\n        \r\n        revisedplannedawarddate: If(\r\n            !IsBlank(First(colPackageDetails).actualawarddate),\r\n            First(colPackageDetails).actualawarddate,\r\n            Max(\r\n                First(colPackageDetails).revisedplannedawarddate,\r\n                DateAdd(DateAdd(DateAdd(DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimesowtorfqissuedays, TimeUnit.Days), First(colPackageDetails).leadtimerfqissuetoclosingdays, TimeUnit.Days), First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days), First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days)\r\n            )\r\n        )\r\n    }\r\n)"
                                           PaddingTop: =5
                                           Size: =10
-                                          Width: =header_stage_3.Width
-                                          X: =40
-                                          Y: =40
+                                          FillPortions: =18
                                     - ClearSOWActual:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -2554,7 +2562,7 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.Cancel
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           OnSelect: |-
                                             =Patch(
                                                 colPackageDetails,
@@ -2580,6 +2588,7 @@ Screens:
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Visible: =!IsBlank(SOWActualDate.SelectedDate)
+                                          FillPortions: =0
                                           Width: =20
                                     - Icon8:
                                         Control: Classic/Icon@2.5.0
@@ -2598,9 +2607,8 @@ Screens:
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =header_award_1.Width
-                                          X: =788
-                                          Y: =7
+                                          FillPortions: =15
+                                          LayoutMinWidth: =0
                               - Container20_1:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -2608,12 +2616,13 @@ Screens:
                                     FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =38
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
                                     PaddingTop: =3
+                                    LayoutGap: =4
                                   Children:
                                     - header_package_3:
                                         Control: Label@2.5.1
@@ -2625,10 +2634,10 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =10
                                           Text: ="2 RFQ Issue"
-                                          Width: =header_package_1.Width
-                                          Y: =3
+                                          FillPortions: =17
+                                          LayoutMinWidth: =0
                                     - RFQtoClosing_days_input:
-                                        Control: ModernTextInput@1.1.0
+                                        Control: ModernTextInput@1.1.2
                                         Properties:
                                           Align: =Align.Center
                                           AlignInContainer: =AlignInContainer.End
@@ -2639,9 +2648,8 @@ Screens:
                                           Height: =16
                                           OnChange: "=If(\r\n    First(colPackageDetails).sole_source = \"No\",\r\n    Patch(\r\n        colPackageDetails,\r\n        First(colPackageDetails),\r\n        {\r\n            leadtimerfqissuetoclosingdays: Value(Self.Text),\r\n            \r\n            revisedplannedrfqclosingdate: If(\r\n                !IsBlank(First(colPackageDetails).actualrfqclosingdate),\r\n                First(colPackageDetails).actualrfqclosingdate,\r\n                DateAdd(First(colPackageDetails).revisedplannedrfqissuedate, Value(Self.Text), TimeUnit.Days)\r\n            ),\r\n            \r\n            revisedplannedevaluationcompletio: If(\r\n                !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),\r\n                First(colPackageDetails).actualevaluationcompletiondate,\r\n                If(\r\n                    !IsBlank(First(colPackageDetails).actualrfqclosingdate),\r\n                    DateAdd(First(colPackageDetails).actualrfqclosingdate, First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days),\r\n                    DateAdd(DateAdd(First(colPackageDetails).revisedplannedrfqissuedate, Value(Self.Text), TimeUnit.Days), First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days)\r\n                )\r\n            ),\r\n            \r\n            revisedplannedawarddate: If(\r\n                !IsBlank(First(colPackageDetails).actualawarddate),\r\n                First(colPackageDetails).actualawarddate,\r\n                If(\r\n                    !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),\r\n                    DateAdd(First(colPackageDetails).actualevaluationcompletiondate, First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days),\r\n                    If(\r\n                        !IsBlank(First(colPackageDetails).actualrfqclosingdate),\r\n                        DateAdd(DateAdd(First(colPackageDetails).actualrfqclosingdate, First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days), First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days),\r\n                        DateAdd(DateAdd(DateAdd(First(colPackageDetails).revisedplannedrfqissuedate, Value(Self.Text), TimeUnit.Days), First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days), First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days)\r\n                    )\r\n                )\r\n            )\r\n        }\r\n    )\r\n)"
                                           Placeholder: =
-                                          Width: =header_description_1.Width - DayLabel1_1.Width
-                                          X: =140
-                                          Y: =7
+                                          FillPortions: =8
+                                          LayoutMinWidth: =0
                                     - Icon5_1:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -2658,11 +2666,12 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.ArrowDown
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =15
+                                          FillPortions: =0
+                                          Width: =16
                                     - DayLabel1_1:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2674,12 +2683,11 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =8
                                           Text: ="Days"
-                                          Width: |
-                                            =50
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =0
+                                          LayoutMinWidth: =0
+                                          Width: =36
                                     - RFQIssuePlannedDate:
-                                        Control: ModernDatePicker@1.0.0
+                                        Control: ModernDatePicker@1.0.2
                                         Properties:
                                           DefaultDate: |-
                                             =If(
@@ -2702,9 +2710,8 @@ Screens:
                                             =// PaddingLeft
                                             (Self.Width - 120) / 2
                                           Placeholder: =
-                                          Width: =header_lead_1.Width
-                                          X: =290
-                                          Y: =7
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - RFQIssueRevisedDate:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2722,9 +2729,8 @@ Screens:
                                                 If(!IsBlank(First(colPackageDetails).revisedplannedsowdate), Text(First(colPackageDetails).revisedplannedsowdate, "mmm dd, yyyy"), "—"),
                                                 If(!IsBlank(First(colPackageDetails).revisedplannedrfqissuedate), Text(First(colPackageDetails).revisedplannedrfqissuedate, "mmm dd, yyyy"), "—")
                                             )
-                                          Width: =header_stage_2.Width
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - RFQIssueActualDate:
                                         Control: Classic/DatePicker@2.6.0
                                         Properties:
@@ -2760,9 +2766,7 @@ Screens:
                                           OnChange: "=Patch(\r\n    colPackageDetails,\r\n    First(colPackageDetails),\r\n    {\r\n        actualrfqissuedate: Self.SelectedDate,\r\n        revisedplannedrfqissuedate: Self.SelectedDate,\r\n        \r\n        revisedplannedrfqclosingdate: If(\r\n            !IsBlank(First(colPackageDetails).actualrfqclosingdate),\r\n            First(colPackageDetails).actualrfqclosingdate,\r\n            Max(\r\n                First(colPackageDetails).revisedplannedrfqclosingdate,\r\n                DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimerfqissuetoclosingdays, TimeUnit.Days)\r\n            )\r\n        ),\r\n        \r\n        revisedplannedevaluationcompletio: If(\r\n            !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),\r\n            First(colPackageDetails).actualevaluationcompletiondate,\r\n            Max(\r\n                First(colPackageDetails).revisedplannedevaluationcompletio,\r\n                DateAdd(DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimerfqissuetoclosingdays, TimeUnit.Days), First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days)\r\n            )\r\n        ),\r\n        \r\n        revisedplannedawarddate: If(\r\n            !IsBlank(First(colPackageDetails).actualawarddate),\r\n            First(colPackageDetails).actualawarddate,\r\n            Max(\r\n                First(colPackageDetails).revisedplannedawarddate,\r\n                DateAdd(DateAdd(DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimerfqissuetoclosingdays, TimeUnit.Days), First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days), First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days)\r\n            )\r\n        )\r\n    }\r\n)"
                                           PaddingTop: =5
                                           Size: =10
-                                          Width: =header_stage_3.Width
-                                          X: =40
-                                          Y: =40
+                                          FillPortions: =18
                                     - ClearRFQIssueActual:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -2778,7 +2782,7 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.Cancel
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           OnSelect: |-
                                             =Patch(
                                                 colPackageDetails,
@@ -2802,6 +2806,7 @@ Screens:
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Visible: =!IsBlank(RFQIssueActualDate.SelectedDate) && First(colPackageDetails).sole_source = "No"
+                                          FillPortions: =0
                                           Width: =20
                                     - Icon8_1:
                                         Control: Classic/Icon@2.5.0
@@ -2820,9 +2825,8 @@ Screens:
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =header_award_1.Width
-                                          X: =788
-                                          Y: =7
+                                          FillPortions: =15
+                                          LayoutMinWidth: =0
                               - Container20_2:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -2830,12 +2834,13 @@ Screens:
                                     FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =38
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
                                     PaddingTop: =3
+                                    LayoutGap: =4
                                   Children:
                                     - header_package_4:
                                         Control: Label@2.5.1
@@ -2847,10 +2852,10 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =10
                                           Text: ="3 RFQ Closing"
-                                          Width: =header_package_1.Width
-                                          Y: =3
+                                          FillPortions: =17
+                                          LayoutMinWidth: =0
                                     - ClosingtoEval_days_input:
-                                        Control: ModernTextInput@1.1.0
+                                        Control: ModernTextInput@1.1.2
                                         Properties:
                                           Align: =Align.Center
                                           AlignInContainer: =AlignInContainer.End
@@ -2861,9 +2866,8 @@ Screens:
                                           Height: =16
                                           OnChange: "=Patch(\r\n    colPackageDetails,\r\n    First(colPackageDetails),\r\n    {\r\n        leadtimeclosingtoevaluationdays: Value(Self.Text),\r\n        \r\n        revisedplannedevaluationcompletio: If(\r\n            !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),\r\n            First(colPackageDetails).actualevaluationcompletiondate,\r\n            DateAdd(First(colPackageDetails).revisedplannedrfqclosingdate, Value(Self.Text), TimeUnit.Days)\r\n        ),\r\n        \r\n        revisedplannedawarddate: If(\r\n            !IsBlank(First(colPackageDetails).actualawarddate),\r\n            First(colPackageDetails).actualawarddate,\r\n            If(\r\n                !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),\r\n                DateAdd(First(colPackageDetails).actualevaluationcompletiondate, First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days),\r\n                DateAdd(DateAdd(First(colPackageDetails).revisedplannedrfqclosingdate, Value(Self.Text), TimeUnit.Days), First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days)\r\n            )\r\n        )\r\n    }\r\n)"
                                           Placeholder: =
-                                          Width: =header_description_1.Width - DayLabel1_2.Width
-                                          X: =140
-                                          Y: =7
+                                          FillPortions: =8
+                                          LayoutMinWidth: =0
                                     - Icon5_2:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -2880,11 +2884,12 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.ArrowDown
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =15
+                                          FillPortions: =0
+                                          Width: =16
                                     - DayLabel1_2:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2896,12 +2901,11 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =8
                                           Text: ="Days"
-                                          Width: |
-                                            =50
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =0
+                                          LayoutMinWidth: =0
+                                          Width: =36
                                     - RFQClosingPlannedDate:
-                                        Control: ModernDatePicker@1.0.0
+                                        Control: ModernDatePicker@1.0.2
                                         Properties:
                                           DefaultDate: |-
                                             =If(
@@ -2924,9 +2928,8 @@ Screens:
                                             =// PaddingLeft
                                             (Self.Width - 120) / 2
                                           Placeholder: =
-                                          Width: =header_lead_1.Width
-                                          X: =290
-                                          Y: =7
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - RFQClosingRevisedDate:
                                         Control: Label@2.5.1
                                         Properties:
@@ -2944,9 +2947,8 @@ Screens:
                                                 If(!IsBlank(First(colPackageDetails).revisedplannedsowdate), Text(First(colPackageDetails).revisedplannedsowdate, "mmm dd, yyyy"), "—"),
                                                 If(!IsBlank(First(colPackageDetails).revisedplannedrfqclosingdate), Text(First(colPackageDetails).revisedplannedrfqclosingdate, "mmm dd, yyyy"), "—")
                                             )
-                                          Width: =header_stage_2.Width
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - RFQClosingActualDate:
                                         Control: Classic/DatePicker@2.6.0
                                         Properties:
@@ -2982,9 +2984,7 @@ Screens:
                                           OnChange: "=If(\r\n    First(colPackageDetails).sole_source = \"No\",\r\n    Patch(\r\n        colPackageDetails,\r\n        First(colPackageDetails),\r\n        {\r\n            actualrfqclosingdate: Self.SelectedDate,\r\n            revisedplannedrfqclosingdate: Self.SelectedDate,\r\n            \r\n            revisedplannedevaluationcompletio: If(\r\n                !IsBlank(First(colPackageDetails).actualevaluationcompletiondate),\r\n                First(colPackageDetails).actualevaluationcompletiondate,\r\n                Max(\r\n                    First(colPackageDetails).revisedplannedevaluationcompletio,\r\n                    DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days)\r\n                )\r\n            ),\r\n            \r\n            revisedplannedawarddate: If(\r\n                !IsBlank(First(colPackageDetails).actualawarddate),\r\n                First(colPackageDetails).actualawarddate,\r\n                Max(\r\n                    First(colPackageDetails).revisedplannedawarddate,\r\n                    DateAdd(DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimeclosingtoevaluationdays, TimeUnit.Days), First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days)\r\n                )\r\n            )\r\n        }\r\n    )\r\n)"
                                           PaddingTop: =5
                                           Size: =10
-                                          Width: =header_stage_3.Width
-                                          X: =40
-                                          Y: =40
+                                          FillPortions: =18
                                     - ClearRFQClosingActual:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -3000,7 +3000,7 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.Cancel
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           OnSelect: |-
                                             =Patch(
                                                 colPackageDetails,
@@ -3022,6 +3022,7 @@ Screens:
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Visible: =!IsBlank(RFQClosingActualDate.SelectedDate) && First(colPackageDetails).sole_source = "No"
+                                          FillPortions: =0
                                           Width: =20
                                     - Icon8_2:
                                         Control: Classic/Icon@2.5.0
@@ -3040,9 +3041,8 @@ Screens:
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =header_award_1.Width
-                                          X: =788
-                                          Y: =7
+                                          FillPortions: =15
+                                          LayoutMinWidth: =0
                               - Container20_3:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -3050,12 +3050,13 @@ Screens:
                                     FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =38
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
                                     PaddingTop: =3
+                                    LayoutGap: =4
                                   Children:
                                     - header_package_5:
                                         Control: Label@2.5.1
@@ -3067,10 +3068,10 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =10
                                           Text: ="4 Eval and Sign Off"
-                                          Width: =header_package_1.Width
-                                          Y: =3
+                                          FillPortions: =17
+                                          LayoutMinWidth: =0
                                     - EvaltoAward_days_input:
-                                        Control: ModernTextInput@1.1.0
+                                        Control: ModernTextInput@1.1.2
                                         Properties:
                                           Align: =Align.Center
                                           AlignInContainer: =AlignInContainer.End
@@ -3081,9 +3082,8 @@ Screens:
                                           Height: =16
                                           OnChange: "=Patch(\r\n    colPackageDetails,\r\n    First(colPackageDetails),\r\n    {\r\n        leadtimeevaluationtoawarddays: Value(Self.Text),\r\n        \r\n        revisedplannedawarddate: If(\r\n            !IsBlank(First(colPackageDetails).actualawarddate),\r\n            First(colPackageDetails).actualawarddate,\r\n            DateAdd(First(colPackageDetails).revisedplannedevaluationcompletio, Value(Self.Text), TimeUnit.Days)\r\n        )\r\n    }\r\n)"
                                           Placeholder: =
-                                          Width: =header_description_1.Width - DayLabel1_3.Width
-                                          X: =140
-                                          Y: =7
+                                          FillPortions: =8
+                                          LayoutMinWidth: =0
                                     - Icon5_3:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -3100,11 +3100,12 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.ArrowDown
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =15
+                                          FillPortions: =0
+                                          Width: =16
                                     - DayLabel1_3:
                                         Control: Label@2.5.1
                                         Properties:
@@ -3116,12 +3117,11 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =8
                                           Text: ="Days"
-                                          Width: |
-                                            =50
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =0
+                                          LayoutMinWidth: =0
+                                          Width: =36
                                     - EvaluationPlannedDate:
-                                        Control: ModernDatePicker@1.0.0
+                                        Control: ModernDatePicker@1.0.2
                                         Properties:
                                           DefaultDate: |-
                                             =If(
@@ -3140,9 +3140,8 @@ Screens:
                                             =// PaddingLeft
                                             (Self.Width - 120) / 2
                                           Placeholder: =
-                                          Width: =header_lead_1.Width
-                                          X: =290
-                                          Y: =7
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - EvaluationRevisedDate:
                                         Control: Label@2.5.1
                                         Properties:
@@ -3159,9 +3158,8 @@ Screens:
                                                 Text(First(colPackageDetails).revisedplannedevaluationcompletio, "mmm dd, yyyy"),
                                                 "—"
                                             )
-                                          Width: =header_stage_2.Width
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - EvaluationActualDate:
                                         Control: Classic/DatePicker@2.6.0
                                         Properties:
@@ -3193,9 +3191,7 @@ Screens:
                                           OnChange: "=Patch(\r\n    colPackageDetails,\r\n    First(colPackageDetails),\r\n    {\r\n        actualevaluationcompletiondate: Self.SelectedDate,\r\n        revisedplannedevaluationcompletio: Self.SelectedDate,\r\n        \r\n        revisedplannedawarddate: If(\r\n            !IsBlank(First(colPackageDetails).actualawarddate),\r\n            First(colPackageDetails).actualawarddate,\r\n            Max(\r\n                First(colPackageDetails).revisedplannedawarddate,\r\n                DateAdd(Self.SelectedDate, First(colPackageDetails).leadtimeevaluationtoawarddays, TimeUnit.Days)\r\n            )\r\n        )\r\n    }\r\n)"
                                           PaddingTop: =5
                                           Size: =10
-                                          Width: =header_stage_3.Width
-                                          X: =40
-                                          Y: =40
+                                          FillPortions: =18
                                     - ClearEvaluationActual:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -3211,7 +3207,7 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.Cancel
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           OnSelect: |-
                                             =Patch(
                                                 colPackageDetails,
@@ -3231,6 +3227,7 @@ Screens:
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Visible: =!IsBlank(EvaluationActualDate.SelectedDate)
+                                          FillPortions: =0
                                           Width: =20
                                     - Icon8_3:
                                         Control: Classic/Icon@2.5.0
@@ -3249,9 +3246,8 @@ Screens:
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =header_award_1.Width
-                                          X: =788
-                                          Y: =7
+                                          FillPortions: =15
+                                          LayoutMinWidth: =0
                               - Container20_4:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -3259,12 +3255,13 @@ Screens:
                                     FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =38
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
                                     PaddingTop: =3
+                                    LayoutGap: =4
                                   Children:
                                     - header_package_6:
                                         Control: Label@2.5.1
@@ -3276,10 +3273,10 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =10
                                           Text: ="5 Contract Award"
-                                          Width: =header_package_1.Width
-                                          Y: =3
+                                          FillPortions: =17
+                                          LayoutMinWidth: =0
                                     - AwardtoOnsite_days_input:
-                                        Control: ModernTextInput@1.1.0
+                                        Control: ModernTextInput@1.1.2
                                         Properties:
                                           Align: =Align.Center
                                           AlignInContainer: =AlignInContainer.End
@@ -3297,9 +3294,8 @@ Screens:
                                                 }
                                             )
                                           Placeholder: =
-                                          Width: =header_description_1.Width - DayLabel1_4.Width
-                                          X: =140
-                                          Y: =7
+                                          FillPortions: =8
+                                          LayoutMinWidth: =0
                                     - Icon5_4:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -3316,11 +3312,12 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.ArrowDown
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =15
+                                          FillPortions: =0
+                                          Width: =16
                                     - DayLabel1_4:
                                         Control: Label@2.5.1
                                         Properties:
@@ -3332,12 +3329,11 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =8
                                           Text: ="Days"
-                                          Width: |
-                                            =50
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =0
+                                          LayoutMinWidth: =0
+                                          Width: =36
                                     - AwardPlannedDate:
-                                        Control: ModernDatePicker@1.0.0
+                                        Control: ModernDatePicker@1.0.2
                                         Properties:
                                           DefaultDate: |-
                                             =If(
@@ -3356,9 +3352,8 @@ Screens:
                                             =// PaddingLeft
                                             (Self.Width - 120) / 2
                                           Placeholder: =
-                                          Width: =header_lead_1.Width
-                                          X: =290
-                                          Y: =7
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - AwardRevisedDate:
                                         Control: Label@2.5.1
                                         Properties:
@@ -3375,9 +3370,8 @@ Screens:
                                                 Text(First(colPackageDetails).revisedplannedawarddate, "mmm dd, yyyy"),
                                                 "—"
                                             )
-                                          Width: =header_stage_2.Width
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - AwardActualDate:
                                         Control: Classic/DatePicker@2.6.0
                                         Properties:
@@ -3413,9 +3407,7 @@ Screens:
                                             )
                                           PaddingTop: =5
                                           Size: =10
-                                          Width: =header_stage_3.Width
-                                          X: =40
-                                          Y: =40
+                                          FillPortions: =18
                                     - ClearAwardActual:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -3431,7 +3423,7 @@ Screens:
                                           HoverFill: =RGBA(0, 0, 0, 0)
                                           Icon: =Icon.Cancel
                                           LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
+                                          LayoutMinWidth: =0
                                           OnSelect: |-
                                             =Patch(
                                                 colPackageDetails,
@@ -3449,6 +3441,7 @@ Screens:
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Visible: =!IsBlank(AwardActualDate.SelectedDate)
+                                          FillPortions: =0
                                           Width: =20
                                     - Icon8_4:
                                         Control: Classic/Icon@2.5.0
@@ -3467,9 +3460,8 @@ Screens:
                                           PressedBorderColor: =RGBA(0, 0, 0, 0)
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
-                                          Width: =header_award_1.Width
-                                          X: =788
-                                          Y: =7
+                                          FillPortions: =15
+                                          LayoutMinWidth: =0
                               - Container20_5:
                                   Control: GroupContainer@1.5.0
                                   Variant: AutoLayout
@@ -3477,12 +3469,13 @@ Screens:
                                     FillPortions: =1
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
-                                    LayoutMinHeight: =38
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     PaddingBottom: =3
                                     PaddingLeft: =8
                                     PaddingRight: =8
                                     PaddingTop: =3
+                                    LayoutGap: =4
                                   Children:
                                     - header_package_7:
                                         Control: Label@2.5.1
@@ -3494,10 +3487,10 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =10
                                           Text: ="6 On Site"
-                                          Width: =header_package_1.Width
-                                          Y: =3
+                                          FillPortions: =17
+                                          LayoutMinWidth: =0
                                     - AwardtoOnsite_days_input_1:
-                                        Control: ModernTextInput@1.1.0
+                                        Control: ModernTextInput@1.1.2
                                         Properties:
                                           Align: =Align.Center
                                           AlignInContainer: =AlignInContainer.End
@@ -3508,9 +3501,7 @@ Screens:
                                           Height: =16
                                           LayoutMinWidth: =0
                                           Placeholder: =
-                                          Width: =header_description_1.Width - DayLabel1_5.Width
-                                          X: =140
-                                          Y: =7
+                                          FillPortions: =8
                                     - OnSite_duration_spacer:
                                         Control: Rectangle@2.3.0
                                         Properties:
@@ -3519,7 +3510,8 @@ Screens:
                                           Fill: =RGBA(0, 0, 0, 0)
                                           FillPortions: =0
                                           Height: =16
-                                          Width: =15
+                                          LayoutMinWidth: =0
+                                          Width: =16
                                     - DayLabel1_5:
                                         Control: Label@2.5.1
                                         Properties:
@@ -3531,12 +3523,11 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Size: =10
                                           Text: ="NA"
-                                          Width: |
-                                            =50
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =0
+                                          LayoutMinWidth: =0
+                                          Width: =36
                                     - OnSitePlannedDate:
-                                        Control: ModernDatePicker@1.0.0
+                                        Control: ModernDatePicker@1.0.2
                                         Properties:
                                           DefaultDate: |-
                                             =If(
@@ -3557,9 +3548,8 @@ Screens:
                                             =// PaddingLeft
                                             (Self.Width - 120) / 2
                                           Placeholder: =
-                                          Width: =header_lead_1.Width
-                                          X: =290
-                                          Y: =7
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
                                     - OnSiteRevisedDate:
                                         Control: Label@2.5.1
                                         Properties:
@@ -3586,11 +3576,32 @@ Screens:
                                                     "—"
                                                 )
                                             )
-                                          Width: =header_stage_2.Width
-                                          X: =440
-                                          Y: =3
+                                          FillPortions: =18
+                                          LayoutMinWidth: =0
+                                    - OnSite_actual_spacer:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          FillPortions: =18
+                                          Height: =16
+                                          LayoutMinWidth: =0
+                                          Text: =""
+                                    - OnSite_clear_spacer:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          FillPortions: =0
+                                          Height: =16
+                                          LayoutMinWidth: =0
+                                          Text: =""
+                                          Width: =20
+                                    - OnSite_status_spacer:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          FillPortions: =15
+                                          Height: =16
+                                          LayoutMinWidth: =0
+                                          Text: =""
                                     - OnSiteActualDate:
-                                        Control: ModernDatePicker@1.0.0
+                                        Control: ModernDatePicker@1.0.2
                                         Properties:
                                           DefaultDate: =If(!IsBlank(First(colPackageDetails).actual_onsite), First(colPackageDetails).actual_onsite, Blank())
                                           Format: =DatePickerFormat.Short
@@ -3604,9 +3615,9 @@ Screens:
                                             )
                                           Placeholder: =
                                           Visible: =false
-                                          Width: =header_stage_3.Width
-                                          X: =590
-                                          Y: =7
+                                          FillPortions: =0
+                                          Width: =0
+                                          LayoutMinWidth: =0
                                     - Icon8_5:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -3625,9 +3636,9 @@ Screens:
                                           PressedColor: =RGBA(16, 110, 190, 1)
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Visible: =false
-                                          Width: =header_award_1.Width
-                                          X: =788
-                                          Y: =7
+                                          FillPortions: =0
+                                          Width: =0
+                                          LayoutMinWidth: =0
                         - Container24_1:
                             Control: GroupContainer@1.5.0
                             Variant: AutoLayout
@@ -3681,7 +3692,6 @@ Screens:
                                           Size: =13
                                           Text: ="Comments"
                                           VerticalAlign: =VerticalAlign.Middle
-                                          Width: =Parent.Width
                                           Wrap: =false
                               - Container19_4:
                                   Control: GroupContainer@1.5.0
@@ -3698,7 +3708,7 @@ Screens:
                                     PaddingRight: =0
                                   Children:
                                     - comments_input:
-                                        Control: ModernTextInput@1.1.0
+                                        Control: ModernTextInput@1.1.2
                                         Properties:
                                           AlignInContainer: =AlignInContainer.Stretch
                                           BorderColor: =RGBA(214, 221, 224, 1)
@@ -3726,7 +3736,7 @@ Screens:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
-                              Height: =236
+                              Height: =200
                               LayoutAlignItems: =LayoutAlignItems.Stretch
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =6
@@ -3769,7 +3779,6 @@ Screens:
                                           Size: =13
                                           Text: ="Post-Award Details"
                                           VerticalAlign: =VerticalAlign.Middle
-                                          Width: =Parent.Width
                                           Wrap: =false
                               - Container19_3:
                                   Control: GroupContainer@1.5.0
@@ -3817,7 +3826,7 @@ Screens:
                                                 Text: ="Subcontractor"
                                                 Wrap: =false
                                           - subcontractor_input:
-                                              Control: ModernTextInput@1.1.0
+                                              Control: ModernTextInput@1.1.2
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
                                                 BorderColor: =RGBA(214, 221, 224, 1)
@@ -3867,7 +3876,7 @@ Screens:
                                                 Text: ="PO Number"
                                                 Wrap: =false
                                           - POnumber_input:
-                                              Control: ModernTextInput@1.1.0
+                                              Control: ModernTextInput@1.1.2
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
                                                 BorderColor: =RGBA(214, 221, 224, 1)
@@ -3917,7 +3926,7 @@ Screens:
                                                 Text: ="Award Value"
                                                 Wrap: =false
                                           - award_value_input:
-                                              Control: ModernTextInput@1.1.0
+                                              Control: ModernTextInput@1.1.2
                                               Properties:
                                                 AlignInContainer: =AlignInContainer.Stretch
                                                 BorderColor: =RGBA(214, 221, 224, 1)
@@ -4001,7 +4010,7 @@ Screens:
                                                       Text: ="Indigenous Award"
                                                       Wrap: =false
                                                 - indigenous_award_input:
-                                                    Control: ModernTextInput@1.1.0
+                                                    Control: ModernTextInput@1.1.2
                                                     Properties:
                                                       AlignInContainer: =AlignInContainer.Stretch
                                                       BorderColor: =RGBA(214, 221, 224, 1)
@@ -4056,7 +4065,7 @@ Screens:
                                                       Text: ="Ontario Award"
                                                       Wrap: =false
                                                 - ontario_award_input:
-                                                    Control: ModernTextInput@1.1.0
+                                                    Control: ModernTextInput@1.1.2
                                                     Properties:
                                                       AlignInContainer: =AlignInContainer.Stretch
                                                       BorderColor: =RGBA(214, 221, 224, 1)
@@ -4111,7 +4120,7 @@ Screens:
                                                       Text: ="Buyback/Resale Value"
                                                       Wrap: =false
                                                 - buyback_resale_value:
-                                                    Control: ModernTextInput@1.1.0
+                                                    Control: ModernTextInput@1.1.2
                                                     Properties:
                                                       AlignInContainer: =AlignInContainer.Stretch
                                                       BorderColor: =RGBA(214, 221, 224, 1)
@@ -4188,7 +4197,7 @@ Screens:
                                                       Text: ="Budgeted"
                                                       Wrap: =false
                                                 - budgeted_input:
-                                                    Control: ModernTextInput@1.1.0
+                                                    Control: ModernTextInput@1.1.2
                                                     Properties:
                                                       AlignInContainer: =AlignInContainer.Stretch
                                                       BorderColor: =RGBA(214, 221, 224, 1)
@@ -4243,7 +4252,7 @@ Screens:
                                                       Text: ="Awarded"
                                                       Wrap: =false
                                                 - awarded_input:
-                                                    Control: ModernTextInput@1.1.0
+                                                    Control: ModernTextInput@1.1.2
                                                     Properties:
                                                       AlignInContainer: =AlignInContainer.Stretch
                                                       BorderColor: =RGBA(214, 221, 224, 1)
@@ -4298,7 +4307,7 @@ Screens:
                                                       Text: ="Variance"
                                                       Wrap: =false
                                                 - budget_difference:
-                                                    Control: ModernTextInput@1.1.0
+                                                    Control: ModernTextInput@1.1.2
                                                     Properties:
                                                       AlignInContainer: =AlignInContainer.Stretch
                                                       BorderColor: =RGBA(214, 221, 224, 1)

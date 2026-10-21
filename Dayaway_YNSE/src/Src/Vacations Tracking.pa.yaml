@@ -129,6 +129,25 @@ Screens:
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
                               Width: =8
+                        - btn_Settings_VT:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              OnSelect: =Navigate(Screen_Settings, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Settings"
+                              Visible: =varIsAdmin
+                              Width: =88
                         - btn_ApproverTab_VT:
                             Control: Classic/Button@2.2.0
                             Properties:
@@ -1167,7 +1186,7 @@ Screens:
                   Value(lbl_DaysCalc.Text) <= 0,
                   Notify("No working days in this range", NotificationType.Warning),
                   IsBlank(varApproverEmail),
-                  Notify("No approver assigned in Employees list", NotificationType.Error),
+                  Notify("Your account is not active in Dayaway, or no approver is assigned.", NotificationType.Error),
                   IsBlank(dd_LeaveType.Selected.Value),
                   Notify("Select a leave type", NotificationType.Warning),
                   CountRows(

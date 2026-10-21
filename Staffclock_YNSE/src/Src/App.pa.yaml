@@ -10,6 +10,7 @@ App:
   Properties:
     OnStart: |-
       =Set(varIsSaving, false);
+      Set(varAppReady, false);
 
       Set(
           varCurrentWeekStart,
@@ -87,61 +88,72 @@ App:
       );
       Clear(colApprovalWeekHours);
 
-      ClearCollect(colCostCodes, CostCodes);
-      ClearCollect(colEmployeesAll, Approvers);
-      ClearCollect(colPermissions, 'Hours Tracking (Permissions)');
+      ClearCollect(colCostCodes, 'Cost Codes');
+      ClearCollect(
+          colEmployeesAll,
+          Filter(Employees, IsActive = true)
+      );
 
       Set(varDrillFromWeekly, false);
 
       ClearCollect(
           colEmployees,
-          Filter(colEmployeesAll, Lower(Email_Address) = Lower(User().Email))
+          Filter(
+              colEmployeesAll,
+              Lower(Email) = Lower(User().Email) && UseStaffclock = true
+          )
       );
 
       Set(
           varApprovers,
           LookUp(
-              colEmployeesAll,
-              Lower(Email_Address) = Lower(User().Email)
+              colEmployees,
+              Lower(Email) = Lower(User().Email)
           )
       );
 
-      Set(varApprover1Email, varApprovers.'Approver 1 Email');
+      Set(varApprover1Email, Trim(Coalesce(varApprovers.ApproverEmail, "")));
+      Set(
+          varApprover1Name,
+          Coalesce(
+              Trim(varApprovers.ApproverName),
+              Trim(
+                  LookUp(
+                      colEmployeesAll,
+                      Lower(Email) = Lower(varApprover1Email)
+                  ).Title
+              ),
+              If(
+                  !IsBlank(varApprover1Email),
+                  IfError(
+                      Office365Users.UserProfileV2(varApprover1Email).displayName,
+                      Blank()
+                  )
+              ),
+              "Not assigned"
+          )
+      );
       Set(varMyEmail, User().Email);
       Set(varSubmitAsEmail, User().Email);
       Set(varSubmitAsName, User().FullName);
 
-      Set(SelectedProject, Trim(Coalesce(varApprovers.'Project Title', "")));
-      Refresh(Public_Holidays);
+      Set(SelectedProject, Trim(Coalesce(varApprovers.ProjectName, "")));
+      Refresh('Public Holidays');
       ClearCollect(
           colPublic_Holidays,
           AddColumns(
-              Public_Holidays,
+              'Public Holidays',
               CleanDate,
-              DateValue(Trim(Text(Date))) + 1,
+              DateAdd(HolidayDate, TimeZoneOffset(), "Minutes"),
               CleanDateKey,
-              Text(DateValue(Trim(Text(Date))) + 1, "yyyy-mm-dd")
+              Text(DateAdd(HolidayDate, TimeZoneOffset(), "Minutes"), "yyyy-mm-dd")
           )
       );
 
+      Set(varIsAdmin, Coalesce(varApprovers.IsAdmin, false));
       Set(
           varIsSuperAdmin,
-          !IsBlank(
-              LookUp(
-                  colPermissions,
-                  Lower(User_Email) = Lower(User().Email)
-              )
-          )
-      );
-      Set(
-          varIsAdmin,
-          !IsBlank(
-              LookUp(
-                  colPermissions,
-                  Lower(User_Email) = Lower(User().Email) &&
-                  IsAdmin = true
-              )
-          )
+          varIsAdmin || Coalesce(varApprovers.ApproverOfAll, false)
       );
       Set(
           varIsApprover,
@@ -149,18 +161,19 @@ App:
           !IsBlank(
               LookUp(
                   colEmployeesAll,
-                  Lower('Approver 1 Email') = Lower(User().Email)
+                  Lower(ApproverEmail) = Lower(User().Email)
               )
           )
       );
+      Set(varCanUseStaffclock, !IsBlank(varApprovers.Email));
 
       Set(
           varSelectedCostCode,
-          First(colCostCodes).Network_Activity_Name
+          First(colCostCodes).Title
       );
       Set(
           varSelectedCostCodeID,
-          First(colCostCodes).Network_Activity
+          First(colCostCodes).NetworkActivity
       );
 
       ClearCollect(
@@ -277,10 +290,15 @@ App:
 
       Set(GUID_Var, GUID());
 
-      Set(
-          varFirstTimeUser,
-          IsEmpty(Filter('Hours Tracking (Active Users)', Title = User().Email))
-      );
+      Set(varSettingsTab, "Employees");
+      Set(varSettingsModal, "");
+      Set(varSettingsId, 0);
+      Set(varSettingsHolidayId, 0);
+      Set(varSettingsCodeId, 0);
+      Set(varSettingsHasStart, false);
+      Set(varSettingsHasEnd, false);
+      Set(varSettingsStart, Today());
+      Set(varSettingsEnd, Today());
 
       Set(varResetGallery, false);
       Set(varHoursFormStamp, 0);
@@ -342,5 +360,6 @@ App:
               )
           )
       );
+      Set(varAppReady, true);
     StartScreen: =Screen_Home
     Theme: =PowerAppsTheme

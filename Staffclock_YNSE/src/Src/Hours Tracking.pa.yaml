@@ -12,33 +12,57 @@ Screens:
       Fill: =RGBA(245, 246, 251, 1)
       LoadingSpinnerColor: =RGBA(0, 18, 107, 1)
       OnVisible: |-
-        =Refresh(CostCodes);
-        ClearCollect(colCostCodes, CostCodes);
+        =Refresh('Cost Codes');
+        ClearCollect(colCostCodes, 'Cost Codes');
         Set(varSubmitAsEmail, User().Email);
         Set(varSubmitAsName, User().FullName);
         Set(
             varApprovers,
-            LookUp(colEmployeesAll, Lower(Email_Address) = Lower(User().Email))
+            LookUp(
+                colEmployeesAll,
+                Lower(Email) = Lower(User().Email) && UseStaffclock = true
+            )
         );
-        Set(varApprover1Email, varApprovers.'Approver 1 Email');
-        Set(SelectedProject, Trim(Coalesce(varApprovers.'Project Title', "")));
-        Refresh(Public_Holidays);
+        Set(varApprover1Email, Trim(Coalesce(varApprovers.ApproverEmail, "")));
+        Set(
+            varApprover1Name,
+            Coalesce(
+                Trim(varApprovers.ApproverName),
+                Trim(
+                    LookUp(
+                        colEmployeesAll,
+                        Lower(Email) = Lower(varApprover1Email)
+                    ).Title
+                ),
+                If(
+                    !IsBlank(varApprover1Email),
+                    IfError(
+                        Office365Users.UserProfileV2(varApprover1Email).displayName,
+                        Blank()
+                    )
+                ),
+                "Not assigned"
+            )
+        );
+        Set(SelectedProject, Trim(Coalesce(varApprovers.ProjectName, "")));
+        Set(varCanUseStaffclock, !IsBlank(varApprovers.Email));
+        Refresh('Public Holidays');
         ClearCollect(
             colPublic_Holidays,
             AddColumns(
-                Public_Holidays,
+                'Public Holidays',
                 CleanDate,
-                DateValue(Trim(Text(Date))) + 1,
+                DateAdd(HolidayDate, TimeZoneOffset(), "Minutes"),
                 CleanDateKey,
-                Text(DateValue(Trim(Text(Date))) + 1, "yyyy-mm-dd")
+                Text(DateAdd(HolidayDate, TimeZoneOffset(), "Minutes"), "yyyy-mm-dd")
             )
         );
         If(
             IsBlank(varSelectedCostCode),
-            Set(varSelectedCostCode, First(Sort(Distinct(colCostCodes, Network_Activity_Name), Value)).Value);
+            Set(varSelectedCostCode, First(Sort(Distinct(colCostCodes, Title), Value)).Value);
             Set(
                 varSelectedCostCodeID,
-                LookUp(colCostCodes, Network_Activity_Name = varSelectedCostCode).Network_Activity
+                LookUp(colCostCodes, Title = varSelectedCostCode).NetworkActivity
             )
         );
         If(
@@ -362,11 +386,11 @@ Screens:
                               FillPortions: =0
                               Font: =Font.'Segoe UI'
                               Height: =40
-                              Items: =Sort(Distinct(colCostCodes, Network_Activity_Name), Value)
+                              Items: =Sort(Distinct(colCostCodes, Title), Value)
                               Items.Value: =Value
                               OnChange: |-
                                 =Set(varSelectedCostCode, Self.Selected.Value);
-                                Set(varSelectedCostCodeID, LookUp(colCostCodes, Network_Activity_Name = Self.Selected.Value).Network_Activity);
+                                Set(varSelectedCostCodeID, LookUp(colCostCodes, Title = Self.Selected.Value).NetworkActivity);
                                 Select(Button_LoadWeek);
                               Width: =280
                   - hours_toolbar_actions:
@@ -508,6 +532,8 @@ Screens:
                                 =If(
                                     varIsSaving,
                                     Notify("Please wait, saving in progress...", NotificationType.Warning),
+                                    !varCanUseStaffclock,
+                                    Notify("Your account is not active for Staffclock. Ask an admin.", NotificationType.Error),
                                     CountIf(
                                         colHoursGallery,
                                         Or(
@@ -615,18 +641,6 @@ Screens:
                                                 }
                                             )
                                         )
-                                    );
-                                    If(
-                                        varFirstTimeUser,
-                                        Patch(
-                                            'Hours Tracking (Active Users)',
-                                            Defaults('Hours Tracking (Active Users)'),
-                                            {
-                                                Title: User().Email,
-                                                Name: User().FullName
-                                            }
-                                        );
-                                        Set(varFirstTimeUser, false)
                                     );
                                     Notify("Saved as Draft", NotificationType.Success);
                                     Refresh('Hours Tracking (Hours)');
@@ -824,7 +838,7 @@ Screens:
                         DisplayMode: =If(ThisItem.ApprovalStatus = "Approved", DisplayMode.View, Or(ThisItem.TaskCode = "Work Day", ThisItem.TaskCode = "Weekend", IsBlank(ThisItem.TaskCode)), DisplayMode.Edit, DisplayMode.View)
                         Font: =Font.'Open Sans'
                         Height: =36
-                        Items: =Sort(Distinct(colCostCodes, Network_Activity_Name), Value)
+                        Items: =Sort(Distinct(colCostCodes, Title), Value)
                         Items.Value: =Value
                         OnChange: |-
                           =UpdateIf(
@@ -832,7 +846,7 @@ Screens:
                               RowKey = ThisItem.RowKey,
                               {
                                   CostCode: Self.Selected.Value,
-                                  CostCodeID: LookUp(colCostCodes, Network_Activity_Name = Self.Selected.Value).Network_Activity,
+                                  CostCodeID: LookUp(colCostCodes, Title = Self.Selected.Value).NetworkActivity,
                                   IsDirty: true
                               }
                           )
@@ -1007,7 +1021,7 @@ Screens:
                                 WorkDate: DateAdd(ExistingRow.SrcDate, 0, "Days"),
                                 DayLabel: Text(DateAdd(ExistingRow.SrcDate, 0, "Days"), "ddd"),
                                 CostCode: ExistingRow.SrcCostCode,
-                                CostCodeID: LookUp(colCostCodes, Network_Activity_Name = ExistingRow.SrcCostCode).Network_Activity,
+                                CostCodeID: LookUp(colCostCodes, Title = ExistingRow.SrcCostCode).NetworkActivity,
                                 TaskCode: If(
                                     !IsBlank(ExistingRow.SrcTask),
                                     ExistingRow.SrcTask,
@@ -1101,6 +1115,8 @@ Screens:
                     =If(
                         varIsSaving,
                         Notify("Please wait, saving in progress...", NotificationType.Warning),
+                        !varCanUseStaffclock,
+                        Notify("Your account is not active for Staffclock. Ask an admin.", NotificationType.Error),
                         CountIf(
                             colHoursGallery,
                             Or(
@@ -1198,18 +1214,6 @@ Screens:
                                     }
                                 )
                             )
-                        );
-                        If(
-                            varFirstTimeUser,
-                            Patch(
-                                'Hours Tracking (Active Users)',
-                                Defaults('Hours Tracking (Active Users)'),
-                                {
-                                    Title: User().Email,
-                                    Name: User().FullName
-                                }
-                            );
-                            Set(varFirstTimeUser, false)
                         );
                         Notify("Hours Submitted", NotificationType.Success);
                         Refresh('Hours Tracking (Hours)');
@@ -1337,7 +1341,7 @@ Screens:
                                     FontWeight: =FontWeight.Semibold
                                     Height: =36
                                     Size: =12
-                                    Text: =Coalesce(ThisItem.CleanDateKey, Text(ThisItem.Date))
+                                    Text: =Coalesce(ThisItem.CleanDateKey, "")
                                     Width: =110
                                     X: =8
                                     Y: =4
@@ -1348,7 +1352,7 @@ Screens:
                                     Font: =Font.'Segoe UI'
                                     Height: =36
                                     Size: =12
-                                    Text: =Coalesce(ThisItem.Motive, "")
+                                    Text: =Coalesce(ThisItem.Title, "")
                                     Width: =240
                                     X: =124
                                     Y: =4

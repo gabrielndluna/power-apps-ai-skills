@@ -1,0 +1,1020 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  HRPublicHolidaysScr:
+    Properties:
+      LoadingSpinnerColor: =RGBA(56, 96, 178, 1)
+      OnVisible: |-
+        =UpdateContext({ locSection: "MainConManager" });
+
+        Set(
+            varPendingCount,
+            CountRows(
+                Filter(
+                    'Vacations Tracking (Days)',
+                    Lower(ApproverID_1) = Lower(User().Email) || Lower(ProjectDirector_Email) = Lower(User().Email),
+                    ApprovalStatus_1 = "Pending" || ProjectDirector_ApprovalStatus.Value = "Pending",
+                    EndDate >= varYearStart,
+                    StartDate <= varYearEnd
+                )
+            )
+        );
+    Children:
+      - WebLayoutManager_4:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            Fill: =Color.White
+            Height: |+
+              =768
+            Visible: =App.Width >= 680
+            Width: =1366
+            X: =(App.Width - Self.Width) / 2
+            Y: =(App.Height - Self.Height) / 2
+          Children:
+            - SideBarConManager_4:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =ColorValue("#D60C30")
+                  Height: =Parent.Height
+                  RadiusBottomLeft: =0
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =0
+                  RadiusTopRight: =16
+                  Width: =Parent.Width * 0.085
+                Children:
+                  - IOCLogoWhite_5:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: =75
+                        Image: ='IOC Logo White-No text'
+                        Width: =75
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =14
+                  - DashboardButton_5:
+                      Control: CanvasComponent
+                      ComponentName: DashboardButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: =Launch("https://app.powerbi.com/Redirect?action=OpenApp&appId=8b5f2e86-7dff-4932-bc91-59b17008279b&ctid=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&experience=power-bi")
+                        Width: =115
+                        X: =1
+                        Y: =678
+                  - SubmitRequestsButton_5:
+                      Control: CanvasComponent
+                      ComponentName: SubmitRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varEmployeeRow),
+                              Notify("Access denied. Your account is not registered in Employees.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(EmployeeDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        X: =1
+                        Y: =377
+                  - ManageRequestsButton_5:
+                      Control: CanvasComponent
+                      ComponentName: ManageRequestsButton
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =75
+                        OnPressAction: |
+                          =If(
+                              IsBlank(varManagerRow),
+                              Notify("Access denied. Your account is not registered as a Manager.  Please contact Human Resources.", NotificationType.Error, 5000),
+                              Navigate(ManagerDashScr, ScreenTransition.Fade)
+                          );
+                        Width: =115
+                        X: =1
+                        Y: =294
+            - MainConManager_5:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  Fill: =Color.White
+                  Height: =Parent.Height
+                  Visible: =locSection = "MainConManager"
+                  Width: =Parent.Width * 0.915
+                  X: =SideBarConManager_4.Width
+                Children:
+                  - BackButton_3:
+                      Control: CanvasComponent
+                      ComponentName: BackButton
+                      Properties:
+                        Fill: =ColorValue("#FFFFFF00")
+                        Height: =75
+                        OnPressAction: =Navigate(HRManageHomeScr, ScreenTransition.Fade)
+                        Width: =115
+                        X: =7
+                  - NewPublicHolidays_1:
+                      Control: CanvasComponent
+                      ComponentName: NewPublicHolidays
+                      Properties:
+                        Height: =60
+                        OnPressAction: |-
+                          =UpdateContext({ locShowPublicHolidayNew: true });
+                          ClearCollect(
+                              colNewPublicHolidays,
+                              {
+                                  Title: GUID(),
+                                  Projects: "",
+                                  Country: "",
+                                  Date: DateValue("1900-01-01"),
+                                  Motive: ""
+                              }
+                          );
+
+                          // blank the date
+                          UpdateIf(colNewPublicHolidays, true, { Date: Blank() });
+                        Width: =350
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: =Gallery2_6.Y + Gallery2_6.Height + 20
+                  - DayAwayLogoOnly_7:
+                      Control: Image@2.2.3
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Image: ='AECON Logo - Red with Transparent Back Ground'
+                        ImagePosition: =ImagePosition.Fill
+                        Width: =263
+                        X: =944
+                  - GreetingText_7:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =60
+                        PaddingLeft: =25
+                        PaddingRight: =25
+                        Size: =34
+                        Text: ="Manage Public Holidays"
+                        Width: =Parent.Width - DayAwayLogoOnly_7.Width -20
+                        Wrap: =false
+                        Y: |+
+                          =85
+                  - Container1_4:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: =50
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Width: =Parent.Width - 60
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =159
+                      Children:
+                        - Label14:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#F5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Project Name"
+                              X: =110
+                        - Label14_1:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#F5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Country"
+                              X: =396
+                        - Label14_2:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#F5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Date"
+                              X: =640
+                        - Label14_3:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#F5f5f5")
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =50
+                              Text: ="Occassion"
+                              X: =884
+                  - TextInput3_3:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        Default: =
+                        Font: =Font.'Open Sans'
+                        Height: |
+                          =35
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        Width: |
+                          =200
+                        X: =1020
+                        Y: =114
+                  - Label7_3:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        PaddingLeft: =0
+                        Size: =11
+                        Text: ="Filter by Country or Occassion"
+                        Width: =200
+                        X: =1020
+                        Y: =84
+                  - Gallery2_6:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: |+
+                          =450
+                        Items: "=\r\n// Gallery.Items\r\nWith(\r\n    { q: Trim(TextInput3_3.Text) },\r\n    If(\r\n        IsBlank(q),\r\n        'Vacations Tracking (Public Holidays)',\r\n        Filter(\r\n            'Vacations Tracking (Public Holidays)',\r\n            // Replace these column names with your actual ones\r\n            StartsWith(Motive, q) || StartsWith(Country, q)\r\n        )\r\n        \r\n    )\r\n)\r\n"
+                        TemplateSize: |+
+                          =45
+                        Width: =Container1_4.Width
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Container1_4.Y + Container1_4.Height
+                      Children:
+                        - Rectangle_6:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("White")
+                              Height: =Parent.TemplateHeight - Separator_6.Height
+                              OnSelect: =Select(Parent)
+                              Visible: =ThisItem.IsSelected
+                              Width: =4
+                        - TableIcon_5:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              AccessibleLabel: =Self.Tooltip
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: |+
+                                =ColorValue("#494949")
+                              DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                              DisabledColor: =RGBA(119, 119, 119, 1)
+                              Height: =50
+                              Icon: =Icon.ChevronRight
+                              OnSelect: |-
+                                =// Select current gallery employee
+                                Set(varSelectedHoliday, ThisItem);
+
+
+                                UpdateContext({ locShowHolidayDetails: true });
+                              PaddingBottom: =16
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              PaddingTop: =16
+                              Tooltip: ="View item details"
+                              Width: =50
+                              X: =Parent.TemplateWidth - Self.Width
+                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                        - StartDateLabel_6:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.Country
+                              Width: =230
+                              X: =(DateCreatedLabel_6.X + DateCreatedLabel_6.Width + 15)
+                              Y: =(Rectangle_6.Height - Self.Height) / 2
+                        - EndDateLabel_6:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.Date
+                              Width: =230
+                              X: =(StartDateLabel_6.X + StartDateLabel_6.Width + 15)
+                              Y: =(Rectangle_6.Height - Self.Height) / 2
+                        - DateCreatedLabel_6:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =RGBA(50, 49, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =If(ThisItem.IsSelected, FontWeight.Normal, FontWeight.Normal)
+                              Height: =37
+                              OnSelect: =Select(Parent)
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              Size: =12
+                              Text: =ThisItem.Projects
+                              Width: =300
+                              Wrap: =false
+                              X: =45
+                              Y: =(Rectangle_6.Height - Self.Height) / 2
+                        - Separator_6:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =ColorValue("#D9ECFA")
+                              Height: =4
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =Parent.TemplateHeight - Self.Height
+                        - EndDateLabel_7:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: =ThisItem.Motive
+                              Width: =230
+                              X: =(EndDateLabel_6.X + EndDateLabel_6.Width + 15)
+            - BackDrop_8:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |-
+                    =UpdateContext({ locShowPublicHolidayNew: false })
+                  Visible: =locShowPublicHolidayNew
+                  Width: =Parent.Width
+            - SubmitRequestBox_7:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =locShowPublicHolidayNew
+                  Width: |
+                    =Parent.Width * 0.70
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_9:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Add Public Holidays"
+                        Width: =550
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y - 20
+                  - Button3_9:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =ForAll(
+                              Filter(
+                                  colNewPublicHolidays,
+                                  !IsBlank(Projects) &&
+                                  !IsBlank(Country) &&
+                                  !IsBlank(Date)
+                              ),
+                              Patch(
+                                  'Vacations Tracking (Public Holidays)',
+                                  Defaults('Vacations Tracking (Public Holidays)'),
+                                  {
+                                      Title: Title,
+                                      Projects: Projects,
+                                      Country: Country,
+                                      Date: Date,
+                                      Motive: Motive
+                                  }
+                              )
+                          );
+
+                          Notify("Public holidays saved.", NotificationType.Success);
+
+                          Clear(colNewPublicHolidays);
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Submit"
+                        Width: =200
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: =604
+                  - Icon8_6:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#d60C30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |
+                          =UpdateContext({ locShowPublicHolidayNew: false })
+                        Width: =28
+                        X: =898
+                        Y: =40
+                  - Gallery4:
+                      Control: Gallery@2.15.0
+                      Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Height: |+
+                          =350
+                        Items: =colNewPublicHolidays
+                        TemplateSize: |+
+                          =55
+                        Width: =Parent.Width-60
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: =(Parent.Height-Self.Height)/2
+                      Children:
+                        - NextArrow2:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              AccessibleLabel: =Self.Tooltip
+                              BorderColor: =RGBA(0, 0, 0, 1)
+                              Color: =ColorValue("#D60C30")
+                              DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                              DisabledColor: =RGBA(119, 119, 119, 1)
+                              Height: =50
+                              Icon: =Icon.Trash
+                              OnSelect: =Remove(colNewPublicHolidays, ThisItem)
+                              PaddingBottom: =16
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              PaddingTop: =16
+                              Tooltip: ="View item details"
+                              Width: =50
+                              X: =Parent.TemplateWidth - Self.Width - 12
+                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+                        - Separator3:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              Height: =8
+                              OnSelect: =Select(Parent)
+                              Width: =Parent.TemplateWidth
+                              Y: =Parent.TemplateHeight - Self.Height
+                        - Rectangle2:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              Height: =Parent.TemplateHeight - Separator3.Height
+                              OnSelect: =Select(Parent)
+                              Visible: =ThisItem.IsSelected
+                              Width: =4
+                        - ManagerNameField_35:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: |
+                                =1
+                              Color: =ColorValue("#494949")
+                              Default: =
+                              Fill: =ColorValue("#D9ECFA")
+                              Font: =Font.'Segoe UI'
+                              Height: |+
+                                =35
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              OnChange: |-
+                                =Patch(
+                                    colNewPublicHolidays,
+                                    ThisItem,
+                                    { Motive: Self.Text }
+                                );
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =12
+                              Width: |
+                                =Parent.Width * 0.20
+                              X: =641
+                              Y: =8
+                        - ManagerNameField_40:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: |
+                                =1
+                              Color: =ColorValue("#494949")
+                              Default: =
+                              Fill: =ColorValue("#D9ECFA")
+                              Font: =Font.'Segoe UI'
+                              Height: |
+                                =35
+                              HoverBorderColor: =RGBA(0, 18, 107, 1)
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              OnChange: |-
+                                =Patch(
+                                    colNewPublicHolidays,
+                                    ThisItem,
+                                    { Country: Self.Text }
+                                );
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =12
+                              Width: |
+                                =Parent.Width * 0.20
+                              X: =239
+                              Y: =8
+                        - ComboBox2:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: =1
+                              ChevronBackground: =ColorValue("#D60C30")
+                              ChevronFill: =RGBA(255, 255, 255, 1)
+                              ChevronHoverBackground: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                              ChevronHoverFill: =RGBA(255, 255, 255, 1)
+                              Color: =ColorValue("#494949")
+                              DefaultSelectedItems: |-
+                                =If(
+                                    IsBlank(ThisItem.Projects),
+                                    Blank(),
+                                    Filter(
+                                        'Vacations Tracking (Projects)',
+                                        'Project Name' = ThisItem.Projects
+                                    )
+                                )
+                              DisplayFields: =["ProjectName"]
+                              Fill: =ColorValue("#D9ECFA")
+                              Font: =Font.'Segoe UI'
+                              Height: =35
+                              HoverFill: =RGBA(186, 202, 226, 1)
+                              IsSearchable: =false
+                              Items: ='Vacations Tracking (Projects)'
+                              OnChange: |-
+                                =Patch(
+                                    colNewPublicHolidays,
+                                    ThisItem,
+                                    { Projects: Self.Selected.'Project Name' }
+                                );
+                              PressedColor: =RGBA(255, 255, 255, 1)
+                              PressedFill: =RGBA(0, 18, 107, 1)
+                              SearchFields: =["ComplianceAssetId"]
+                              SelectMultiple: =false
+                              SelectionColor: =RGBA(255, 255, 255, 1)
+                              SelectionFill: =RGBA(56, 96, 178, 1)
+                              Size: =11
+                              Width: =Parent.Width * 0.20
+                              X: =38
+                              Y: =8
+                        - DatePicker3:
+                            Control: Classic/DatePicker@2.6.0
+                            Properties:
+                              BorderColor: =ColorValue("#494949")
+                              BorderThickness: |+
+                                =1
+                              Color: =ColorValue("#494949")
+                              Fill: =ColorValue("#D9ECFA")
+                              Font: =Font.'Segoe UI'
+                              Height: =35
+                              IconBackground: =ColorValue("#D60c30")
+                              IconFill: =RGBA(255, 255, 255, 1)
+                              OnChange: |-
+                                =Patch(
+                                    colNewPublicHolidays,
+                                    ThisItem,
+                                    { Date: Self.SelectedDate }
+                                );
+                              OnSelect: =Select(Parent)
+                              Size: =11
+                              Width: =Parent.Width * 0.20
+                              X: =441
+                              Y: |+
+                                =8
+                  - Button3_10:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: =35
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =Collect(
+                              colNewPublicHolidays,
+                              {
+                                  Title: GUID(),
+                                  Projects: Blank(),
+                                  Country: Blank(),
+                                  Date: Blank(),
+                                  Motive: Blank()
+                              }
+                          );
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Add Item"
+                        Width: =150
+                        X: =776
+                        Y: =90
+                  - Container7:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        Fill: =ColorValue("#D60C30")
+                        Height: |+
+                          =40
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: |+
+                          =0
+                        RadiusTopLeft: =8
+                        RadiusTopRight: |+
+                          =8
+                        Width: =Parent.Width-60
+                        X: =(Parent.Width-Self.Width)/2
+                        Y: =130
+                      Children:
+                        - Label15:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#F5F5F5")
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: ="Project"
+                              X: =54
+                        - Label15_1:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#F5F5F5")
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: ="Country"
+                              X: =256
+                        - Label15_2:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#F5F5F5")
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: ="Dat"
+                              X: =453
+                        - Label15_3:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =ColorValue("#F5F5F5")
+                              Font: =Font.'Segoe UI'
+                              Size: =12
+                              Text: ="Occassion"
+                              X: =658
+            - BackDrop_9:
+                Control: Rectangle@2.3.0
+                Properties:
+                  BorderColor: =RGBA(0, 18, 107, 1)
+                  Fill: =RGBA(0,0,0,0.45)
+                  Height: =Parent.Height
+                  OnSelect: |-
+                    =UpdateContext({ locShowHolidayDetails: false })
+                  Visible: =locShowHolidayDetails
+                  Width: =Parent.Width
+            - SubmitRequestBox_8:
+                Control: GroupContainer@1.5.0
+                Variant: ManualLayout
+                Properties:
+                  BorderColor: =ColorValue("#494949")
+                  BorderThickness: =2
+                  Fill: =ColorValue("#F5F5F5")
+                  Height: =Parent.Height * 0.90
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  Visible: =locShowHolidayDetails
+                  Width: |
+                    =Parent.Width * 0.50
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - SummaryHeaderLabel_10:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =50
+                        Size: =28
+                        Text: ="Public Holiday Details"
+                        Width: =550
+                        Wrap: =false
+                        X: =(Parent.Width - Self.Width) / 2
+                        Y: =Parent.Y -20
+                  - Button3_11:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =Set(
+                              varHolidaySaved,
+                              Patch(
+                                  'Vacations Tracking (Public Holidays)',
+                                  LookUp('Vacations Tracking (Public Holidays)', ID = varSelectedHoliday.ID),
+                                  {
+                                      Country: ManagerNameField_37.Text,
+                                      Date: DatePicker4.SelectedDate,
+                                      Motive:ManagerNameField_38.Text
+                                  }
+                              )
+                          );
+
+                          If(
+                              IsEmpty(Errors('Vacations Tracking (Public Holidays)', varHolidaySaved)),
+                              Set(varSelectedHoliday, varHolidaySaved);
+                              Refresh('Vacations Tracking (Public Holidays)');
+                              Notify("Public holiday saved successfully.", NotificationType.Success),
+                              Notify(
+                                  "Save failed: " & First(Errors('Vacations Tracking (Public Holidays)', varHolidaySaved)).Message,
+                                  NotificationType.Error
+                              )
+                          );
+
+                          UpdateContext({ locShowHolidayDetails: false });
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Save Changes"
+                        Width: =200
+                        X: =135
+                        Y: =561
+                  - Icon8_7:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#d60C30")
+                        Height: =28
+                        Icon: =Icon.CancelBadge
+                        OnSelect: |-
+                          =UpdateContext({ locShowHolidayDetails: false });
+                          Reset(ManagerNameField_37);
+                          Reset(ManagerNameField_38);
+                          Reset(ManagerNameField_41);
+                          Reset(DatePicker4);
+                        Width: =28
+                        X: =630
+                        Y: =40
+                  - Label4_66:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Country"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =28
+                        Y: =380
+                  - ManagerNameField_37:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedHoliday.Country
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        OnChange: |-
+                          =Set(
+                              varSelectedHoliday,
+                              Patch(
+                                  varSelectedHoliday,
+                                  { Country: Self.Text }
+                              )
+                          );
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =28
+                        Y: =405
+                  - Label4_67:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Occassion"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =351
+                        Y: =380
+                  - ManagerNameField_38:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedHoliday.Motive
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        OnChange: |-
+                          =Set(
+                              varSelectedHoliday,
+                              Patch(
+                                  varSelectedHoliday,
+                                  { Motive: Self.Text }
+                              )
+                          );
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =351
+                        Y: =405
+                  - Label4_69:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Project Name"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =188
+                        Y: =131
+                  - DatePicker4:
+                      Control: Classic/DatePicker@2.6.0
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: =1
+                        Color: =ColorValue("#494949")
+                        DefaultDate: =varSelectedHoliday.Date
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        IconBackground: =ColorValue("#d60c30")
+                        IconFill: =RGBA(255, 255, 255, 1)
+                        OnChange: |-
+                          =Set(
+                              varSelectedHoliday,
+                              Patch(
+                                  varSelectedHoliday,
+                                  { Date: Self.SelectedDate}
+                              )
+                          );
+                        Size: =12
+                        Width: =Parent.Width * 0.45
+                        X: =187
+                        Y: =274
+                  - Label4_70:
+                      Control: Label@2.5.1
+                      Properties:
+                        BorderColor: =RGBA(0, 18, 107, 1)
+                        Color: =ColorValue("#494949")
+                        Font: =Font.'Segoe UI'
+                        Height: =25
+                        Size: =11
+                        Text: ="Date"
+                        VerticalAlign: =VerticalAlign.Bottom
+                        X: =189
+                        Y: =248
+                  - ManagerNameField_41:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        BorderColor: =ColorValue("#494949")
+                        BorderThickness: |
+                          =1
+                        Color: =ColorValue("#494949")
+                        Default: =varSelectedHoliday.Projects
+                        DisplayMode: =DisplayMode.View
+                        Fill: =ColorValue("#D9ECFA")
+                        Font: =Font.'Segoe UI'
+                        Height: =45
+                        HoverBorderColor: =RGBA(0, 18, 107, 1)
+                        HoverFill: =RGBA(186, 202, 226, 1)
+                        OnChange: |-
+                          =Set(
+                              varSelectedHoliday,
+                              Patch(
+                                  varSelectedHoliday,
+                                  { Country: Self.Text }
+                              )
+                          );
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Width: |
+                          =Parent.Width * 0.45
+                        X: =186
+                        Y: =156
+                  - Button3_26:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =ColorFade(Self.Fill, -15%)
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisabledBorderColor: =RGBA(166, 166, 166, 1)
+                        Fill: |
+                          =ColorValue("#D60C30")
+                        Font: =Font.'Segoe UI'
+                        Height: |
+                          =50
+                        HoverBorderColor: =ColorFade(Self.BorderColor, 20%)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =ColorFade(RGBA(56, 96, 178, 1), -20%)
+                        OnSelect: |-
+                          =Remove('Vacations Tracking (Public Holidays)', varSelectedHoliday);
+                          Refresh('Vacations Tracking (Public Holidays)');
+                          Notify("Record Deleted");
+
+                          UpdateContext({ locShowHolidayDetails: false });
+                        PressedBorderColor: =Self.Fill
+                        PressedColor: =Self.Fill
+                        PressedFill: =Self.Color
+                        Text: ="Delete"
+                        Width: =200
+                        X: =351
+                        Y: =561

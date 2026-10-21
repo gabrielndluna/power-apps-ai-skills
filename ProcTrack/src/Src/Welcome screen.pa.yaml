@@ -12,13 +12,13 @@ Screens:
       Fill: =RGBA(214, 221, 224, 1)
       LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
       OnVisible: |-
-        =Set(varPackageFilter, "all");
+        =If(IsBlank(varPackageFilter), Set(varPackageFilter, "all"));
         If(
             !IsBlank(varSelectedProject),
             ClearCollect(
                 colProjectPackages,
                 Filter(
-                    'ProcTrack - Packages',
+                    colPermittedPackages,
                     ProjectID = varSelectedProject.projectid || projectidentifier = varSelectedProject.projectidentifier
                 )
             );
@@ -51,16 +51,16 @@ Screens:
                   DropShadow: =DropShadow.Light
                   Fill: =RGBA(214, 12, 48, 1)
                   FillPortions: =0
-                  Height: =108
+                  Height: =140
                   LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =8
-                  LayoutMinHeight: =108
+                  LayoutGap: =6
+                  LayoutMinHeight: =140
                   LayoutMinWidth: =16
                   PaddingBottom: =12
                   PaddingLeft: =16
                   PaddingRight: =16
-                  PaddingTop: =12
+                  PaddingTop: =8
                   RadiusBottomLeft: =8
                   RadiusBottomRight: =8
                   RadiusTopLeft: =8
@@ -73,11 +73,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =44
+                        Height: =52
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =44
+                        LayoutMinHeight: =52
                         LayoutMinWidth: =16
                       Children:
                         - welcome_header_icon_wrap:
@@ -102,7 +102,7 @@ Screens:
                                     Color: =RGBA(255, 255, 255, 1)
                                     Height: =20
                                     Icon: =Icon.Home
-                                    OnSelect: =Navigate('Project Dashboard', ScreenTransition.Fade)
+                                    OnSelect: =Navigate('Project Home', ScreenTransition.Fade)
                                     Width: =20
                                     X: =8
                                     Y: =8
@@ -122,7 +122,7 @@ Screens:
                                   Properties:
                                     AutoHeight: =true
                                     FontColor: =RGBA(255, 255, 255, 1)
-                                    Size: =20
+                                    Size: =16
                                     Text: ="ProcTrack"
                                     Weight: ='TextCanvas.Weight'.Bold
                                     Width: =260
@@ -152,7 +152,8 @@ Screens:
                               LayoutDirection: =LayoutDirection.Vertical
                               LayoutGap: =0
                               LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinWidth: =0
+                              Width: =180
                             Children:
                               - welcome_user_label:
                                   Control: Text@0.0.51
@@ -174,6 +175,34 @@ Screens:
                                     Text: =User().FullName
                                     Weight: ='TextCanvas.Weight'.Semibold
                                     Width: =200
+                        - welcome_settings_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 0.18)
+                              FillPortions: =0
+                              Height: =32
+                              LayoutMinHeight: =32
+                              LayoutMinWidth: =32
+                              RadiusBottomLeft: =16
+                              RadiusBottomRight: =16
+                              RadiusTopLeft: =16
+                              RadiusTopRight: =16
+                              Width: =32
+                            Children:
+                              - settings_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Height: =18
+                                    HoverColor: =RGBA(255, 255, 255, 0.85)
+                                    Icon: =Icon.Settings
+                                    OnSelect: =Navigate(Settings, ScreenTransition.Fade)
+                                    Width: =18
+                                    X: =7
+                                    Y: =7
                         - welcome_export_wrap:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
@@ -253,45 +282,17 @@ Screens:
                                     Width: =22
                                     X: =5
                                     Y: =5
-                        - welcome_settings_wrap:
-                            Control: GroupContainer@1.5.0
-                            Variant: ManualLayout
-                            Properties:
-                              AlignInContainer: =AlignInContainer.Center
-                              DropShadow: =DropShadow.None
-                              Fill: =RGBA(255, 255, 255, 0.18)
-                              FillPortions: =0
-                              Height: =32
-                              LayoutMinHeight: =32
-                              LayoutMinWidth: =32
-                              RadiusBottomLeft: =16
-                              RadiusBottomRight: =16
-                              RadiusTopLeft: =16
-                              RadiusTopRight: =16
-                              Width: =32
-                            Children:
-                              - settings_icon:
-                                  Control: Classic/Icon@2.5.0
-                                  Properties:
-                                    Color: =RGBA(255, 255, 255, 1)
-                                    Height: =18
-                                    HoverColor: =RGBA(255, 255, 255, 0.85)
-                                    Icon: =Icon.Settings
-                                    OnSelect: =Navigate(Settings, ScreenTransition.Fade)
-                                    Width: =18
-                                    X: =7
-                                    Y: =7
                   - welcome_header_bottom:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =32
+                        Height: =56
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =32
+                        LayoutMinHeight: =56
                         LayoutMinWidth: =16
                       Children:
                         - welcome_project_picker_wrap:
@@ -300,12 +301,13 @@ Screens:
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              FillPortions: =1
+                              FillPortions: =0
+                              Width: =520
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Horizontal
                               LayoutGap: =8
-                              Height: =32
-                              LayoutMinHeight: =32
+                              Height: =48
+                              LayoutMinHeight: =48
                               LayoutMinWidth: =16
                               PaddingBottom: =0
                               PaddingLeft: =12
@@ -325,7 +327,8 @@ Screens:
                                     Color: =RGBA(106, 122, 127, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =32
+                                    Height: =40
+                                    VerticalAlign: =VerticalAlign.Middle
                                     Size: =11
                                     Text: ="Project"
                                     Width: =68
@@ -355,7 +358,7 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =32
+                                    Height: =40
                                     HoverBorderColor: =RGBA(0, 0, 0, 0)
                                     HoverColor: =RGBA(33, 33, 33, 1)
                                     HoverFill: =RGBA(255, 255, 255, 1)
@@ -369,8 +372,8 @@ Screens:
                                           ClearCollect(
                                               colProjectPackages,
                                               Filter(
-                                                  'ProcTrack - Packages',
-                                                  ProjectID = Self.Selected.projectid || projectidentifier = Self.Selected.projectidentifier
+                                                  colPermittedPackages,
+                                                  ProjectID = varSelectedProject.projectid || projectidentifier = varSelectedProject.projectidentifier
                                               )
                                           );
                                           Set(
@@ -651,21 +654,23 @@ Screens:
                 Children:
                   - headers_container:
                       Control: GroupContainer@1.5.0
-                      Variant: ManualLayout
+                      Variant: AutoLayout
                       Properties:
                         Fill: =RGBA(237, 237, 237, 1)
-                        FillPortions: =11
-                        Height: =50
+                        FillPortions: =0
+                        Height: =40
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =6
                         LayoutMinHeight: =0
                         LayoutMinWidth: =0
-                        RadiusBottomLeft: =0
-                        RadiusBottomRight: =0
+                        PaddingLeft: =8
+                        PaddingRight: =8
                         RadiusTopLeft: =8
                         RadiusTopRight: =8
-                        Width: =Parent.Width - 60
-                        X: =(Parent.Width - Self.Width) / 2
+                        Width: =Parent.Width
                       Children:
-                        - variable_header_4:
+                        - header_package:
                             Control: Label@2.5.1
                             Properties:
                               Align: =Align.Center
@@ -674,22 +679,23 @@ Screens:
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
                               OnSelect: |-
-                                =With(
-                                    { _sf: LookUp(colColumns, key = varCol4).sortField },
-                                    If(
-                                        varSortColumn = _sf,
-                                        Set(varSortAscending, !varSortAscending),
-                                        Set(varSortColumn, _sf); Set(varSortAscending, true)
-                                    )
+                                =If(
+                                    varSortColumn = "itemnumber",
+                                    Set(varSortAscending, !varSortAscending),
+                                    Set(varSortColumn, "itemnumber"); Set(varSortAscending, true)
                                 )
                               Size: =12
                               Text: |-
-                                =LookUp(colColumns, key = varCol4).label &
-                                If(varSortColumn = LookUp(colColumns, key = varCol4).sortField, If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.085
-                              X: =headers_container.Width * 0.875
-                              Y: =10
-                        - variable_header_3:
+                                ="PACKAGE #" & If(varSortColumn = "itemnumber", If(varSortAscending, "  ▲", "  ▼"), "")
+                              FillPortions: =12
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
+                        - header_description:
                             Control: Label@2.5.1
                             Properties:
                               Align: =Align.Center
@@ -698,22 +704,22 @@ Screens:
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
                               OnSelect: |-
-                                =With(
-                                    { _sf: LookUp(colColumns, key = varCol3).sortField },
-                                    If(
-                                        varSortColumn = _sf,
-                                        Set(varSortAscending, !varSortAscending),
-                                        Set(varSortColumn, _sf); Set(varSortAscending, true)
-                                    )
+                                =If(
+                                    varSortColumn = "packagedescription",
+                                    Set(varSortAscending, !varSortAscending),
+                                    Set(varSortColumn, "packagedescription"); Set(varSortAscending, true)
                                 )
                               Size: =12
-                              Text: |-
-                                =LookUp(colColumns, key = varCol3).label &
-                                If(varSortColumn = LookUp(colColumns, key = varCol3).sortField, If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.085
-                              X: =headers_container.Width * 0.79
-                              Y: =10
-                        - variable_header_2:
+                              Text: ="DESCRIPTION" & If(varSortColumn = "packagedescription", If(varSortAscending, "  ▲", "  ▼"), "")
+                              FillPortions: =16
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
+                        - header_stage:
                             Control: Label@2.5.1
                             Properties:
                               Align: =Align.Center
@@ -722,21 +728,63 @@ Screens:
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
                               OnSelect: |-
-                                =With(
-                                    { _sf: LookUp(colColumns, key = varCol2).sortField },
-                                    If(
-                                        varSortColumn = _sf,
-                                        Set(varSortAscending, !varSortAscending),
-                                        Set(varSortColumn, _sf); Set(varSortAscending, true)
-                                    )
+                                =If(
+                                    varSortColumn = "_stageOrder",
+                                    Set(varSortAscending, !varSortAscending),
+                                    Set(varSortColumn, "_stageOrder"); Set(varSortAscending, true)
                                 )
                               Size: =12
-                              Text: |-
-                                =LookUp(colColumns, key = varCol2).label &
-                                If(varSortColumn = LookUp(colColumns, key = varCol2).sortField, If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.085
-                              X: =headers_container.Width * 0.705
-                              Y: =10
+                              Text: ="CURRENT STAGE" & If(varSortColumn = "_stageOrder", If(varSortAscending, "  ▲", "  ▼"), "")
+                              FillPortions: =12
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
+                        - header_stage_due:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              OnSelect: |-
+                                =If(
+                                    varSortColumn = "_sortDue",
+                                    Set(varSortAscending, !varSortAscending),
+                                    Set(varSortColumn, "_sortDue"); Set(varSortAscending, true)
+                                )
+                              Size: =12
+                              Text: ="STAGE DUE" & If(varSortColumn = "_sortDue", If(varSortAscending, "  ▲", "  ▼"), "")
+                              FillPortions: =10
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
+                        - header_lead:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Size: =12
+                              Text: ="LEADS"
+                              FillPortions: =16
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
                         - variable_header_1:
                             Control: Label@2.5.1
                             Properties:
@@ -758,10 +806,15 @@ Screens:
                               Text: |-
                                 =LookUp(colColumns, key = varCol1).label &
                                 If(varSortColumn = LookUp(colColumns, key = varCol1).sortField, If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.085
-                              X: =headers_container.Width * 0.62
-                              Y: =10
-                        - header_stage:
+                              FillPortions: =12
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
+                        - variable_header_2:
                             Control: Label@2.5.1
                             Properties:
                               Align: =Align.Center
@@ -770,68 +823,27 @@ Screens:
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
                               OnSelect: |-
-                                =If(
-                                    varSortColumn = "_stageOrder",
-                                    Set(varSortAscending, !varSortAscending),
-                                    Set(varSortColumn, "_stageOrder"); Set(varSortAscending, true)
-                                )
-                              Size: =12
-                              Text: ="CURRENT STAGE" & If(varSortColumn = "_stageOrder", If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.13
-                              X: =headers_container.Width * 0.29
-                              Y: =10
-                        - header_lead:
-                            Control: Label@2.5.1
-                            Properties:
-                              Align: =Align.Center
-                              BorderColor: =RGBA(0, 18, 107, 1)
-                              Color: =RGBA(106, 122, 127, 1)
-                              Font: =Font.'Segoe UI'
-                              FontWeight: =FontWeight.Semibold
-                              Size: =12
-                              Text: ="LEADS"
-                              Width: =headers_container.Width * 0.10
-                              X: =headers_container.Width * 0.52
-                              Y: =10
-                        - header_description:
-                            Control: Label@2.5.1
-                            Properties:
-                              Align: =Align.Center
-                              BorderColor: =RGBA(0, 18, 107, 1)
-                              Color: =RGBA(106, 122, 127, 1)
-                              Font: =Font.'Segoe UI'
-                              FontWeight: =FontWeight.Semibold
-                              OnSelect: |-
-                                =If(
-                                    varSortColumn = "packagedescription",
-                                    Set(varSortAscending, !varSortAscending),
-                                    Set(varSortColumn, "packagedescription"); Set(varSortAscending, true)
-                                )
-                              Size: =12
-                              Text: ="DESCRIPTION" & If(varSortColumn = "packagedescription", If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.14
-                              X: =headers_container.Width * 0.12
-                              Y: =10
-                        - header_package:
-                            Control: Label@2.5.1
-                            Properties:
-                              Align: =Align.Center
-                              BorderColor: =RGBA(0, 18, 107, 1)
-                              Color: =RGBA(106, 122, 127, 1)
-                              Font: =Font.'Segoe UI'
-                              FontWeight: =FontWeight.Semibold
-                              OnSelect: |-
-                                =If(
-                                    varSortColumn = "itemnumber",
-                                    Set(varSortAscending, !varSortAscending),
-                                    Set(varSortColumn, "itemnumber"); Set(varSortAscending, true)
+                                =With(
+                                    { _sf: LookUp(colColumns, key = varCol2).sortField },
+                                    If(
+                                        varSortColumn = _sf,
+                                        Set(varSortAscending, !varSortAscending),
+                                        Set(varSortColumn, _sf); Set(varSortAscending, true)
+                                    )
                                 )
                               Size: =12
                               Text: |-
-                                ="PACKAGE #" & If(varSortColumn = "itemnumber", If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.12
-                              Y: =10
-                        - header_stage_due:
+                                =LookUp(colColumns, key = varCol2).label &
+                                If(varSortColumn = LookUp(colColumns, key = varCol2).sortField, If(varSortAscending, "  ▲", "  ▼"), "")
+                              FillPortions: =12
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
+                        - variable_header_3:
                             Control: Label@2.5.1
                             Properties:
                               Align: =Align.Center
@@ -840,16 +852,63 @@ Screens:
                               Font: =Font.'Segoe UI'
                               FontWeight: =FontWeight.Semibold
                               OnSelect: |-
-                                =If(
-                                    varSortColumn = "_sortDue",
-                                    Set(varSortAscending, !varSortAscending),
-                                    Set(varSortColumn, "_sortDue"); Set(varSortAscending, true)
+                                =With(
+                                    { _sf: LookUp(colColumns, key = varCol3).sortField },
+                                    If(
+                                        varSortColumn = _sf,
+                                        Set(varSortAscending, !varSortAscending),
+                                        Set(varSortColumn, _sf); Set(varSortAscending, true)
+                                    )
                                 )
                               Size: =12
-                              Text: ="STAGE DUE" & If(varSortColumn = "_sortDue", If(varSortAscending, "  ▲", "  ▼"), "")
-                              Width: =headers_container.Width * 0.10
-                              X: =headers_container.Width * 0.42
-                              Y: =10
+                              Text: |-
+                                =LookUp(colColumns, key = varCol3).label &
+                                If(varSortColumn = LookUp(colColumns, key = varCol3).sortField, If(varSortAscending, "  ▲", "  ▼"), "")
+                              FillPortions: =12
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
+                        - variable_header_4:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              BorderColor: =RGBA(0, 18, 107, 1)
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              OnSelect: |-
+                                =With(
+                                    { _sf: LookUp(colColumns, key = varCol4).sortField },
+                                    If(
+                                        varSortColumn = _sf,
+                                        Set(varSortAscending, !varSortAscending),
+                                        Set(varSortColumn, _sf); Set(varSortAscending, true)
+                                    )
+                                )
+                              Size: =12
+                              Text: |-
+                                =LookUp(colColumns, key = varCol4).label &
+                                If(varSortColumn = LookUp(colColumns, key = varCol4).sortField, If(varSortAscending, "  ▲", "  ▼"), "")
+                              FillPortions: =12
+                              Height: =32
+                              LayoutMinWidth: =0
+                              PaddingBottom: =0
+                              PaddingLeft: =0
+                              PaddingRight: =4
+                              PaddingTop: =0
+                              Wrap: =true
+                        - header_arrow_gap:
+                            Control: Label@2.5.1
+                            Properties:
+                              FillPortions: =0
+                              Height: =32
+                              LayoutMinWidth: =0
+                              Text: =""
+                              Width: =32
                   - Gallery2:
                       Control: Gallery@2.15.0
                       Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
@@ -1068,755 +1127,588 @@ Screens:
                         LayoutMinHeight: =16
                         LayoutMinWidth: =16
                         TemplatePadding: =8
-                        TemplateSize: =75
+                        TemplateSize: =112
                       Children:
-                        - Separator24:
-                            Control: Rectangle@2.3.0
+                        - gallery_card:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
                             Properties:
-                              BorderColor: =RGBA(0, 0, 0, 0)
-                              Fill: =RGBA(0, 131, 143, 0.1)
-                              Height: =4
-                              OnSelect: =Select(Parent)
+                              DropShadow: =DropShadow.None
+                              Height: =Parent.TemplateHeight
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =2
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
                               Width: =Parent.TemplateWidth
-                              Y: =Parent.TemplateHeight - Self.Height
-                        - gallery_row_bg:
-                            Control: Rectangle@2.3.0
-                            Properties:
-                              BorderColor: =RGBA(0, 0, 0, 0)
-                              BorderStyle: =BorderStyle.None
-                              BorderThickness: =2
-                              DisabledFill: =
-                              Fill: |-
-                                =Switch(
-                                    true,
+                            Children:
+                              - gallery_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutGap: =6
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =6
+                                  Children:
+                                    - gallery_package:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =If(!IsBlank(ThisItem.packagefolderurl), RGBA(192, 0, 0, 1), RGBA(192, 0, 0, 0.45))
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =22
+                                          OnSelect: |-
+                                            =If(
+                                                !IsBlank(ThisItem.packagefolderurl),
+                                                Launch(ThisItem.packagefolderurl)
+                                            )
+                                          Overflow: =Overflow.Hidden
+                                          PaddingBottom: =0
+                                          PaddingLeft: =8
+                                          PaddingRight: =4
+                                          PaddingTop: =0
+                                          Size: =12
+                                          Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
+                                          Tooltip: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
+                                          Underline: =!IsBlank(ThisItem.packagefolderurl)
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Wrap: =false
+                                          FillPortions: =12
+                                          LayoutMinWidth: =0
+                                    - gallery_description:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AutoHeight: =false
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(30, 30, 30, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =40
+                                          OnSelect: =Select(gallery_arrow_details)
+                                          Overflow: =Overflow.Hidden
+                                          PaddingBottom: =0
+                                          PaddingLeft: =4
+                                          PaddingRight: =4
+                                          PaddingTop: =0
+                                          Size: =12
+                                          Text: =ThisItem.packagedescription
+                                          Tooltip: =ThisItem.packagedescription
+                                          VerticalAlign: =VerticalAlign.Top
+                                          Wrap: =true
+                                          FillPortions: =16
+                                          LayoutMinWidth: =0
+                                    - gallery_current_stage:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Align: ='TextCanvas.Align'.Center
+                                          BorderRadius: =14
+                                          Fill: |+
+                                            =Switch(
+                                                true,
+                                                !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
+                                                RGBA(133, 133, 133, 0.1),
+                                                !IsBlank(ThisItem.actualawarddate),
+                                                RGBA(133, 133, 133, 0.1),
+                                                !IsBlank(ThisItem.actualevaluationcompletiondate),
+                                                RGBA(133, 133, 133, 0.1),
+                                                !IsBlank(ThisItem.actualrfqclosingdate),
+                                                RGBA(133, 133, 133, 0.1),
+                                                !IsBlank(ThisItem.actualrfqissuedate),
+                                                RGBA(133, 133, 133, 0.1),
+                                                !IsBlank(ThisItem.actualsowdate),
+                                                RGBA(133, 133, 133, 0.1),
+                                                RGBA(133, 133, 133, 0.1)
+                                            )
+                                          FontColor: |+
+                                            =Switch(
+                                                true,
+                                                !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
+                                                RGBA(133, 133, 133, 1),
+                                                !IsBlank(ThisItem.actualawarddate),
+                                                RGBA(133, 133, 133, 1),
+                                                !IsBlank(ThisItem.actualevaluationcompletiondate),
+                                                RGBA(133, 133, 133, 1),
+                                                !IsBlank(ThisItem.actualrfqclosingdate),
+                                                RGBA(133, 133, 133, 1),
+                                                !IsBlank(ThisItem.actualrfqissuedate),
+                                                RGBA(133, 133, 133, 1),
+                                                !IsBlank(ThisItem.actualsowdate),
+                                                RGBA(133, 133, 133, 1),
+                                                RGBA(133, 133, 133, 1)
+                                            )
+                                          Height: =28
+                                          Text: |+
+                                            =Switch(
+                                                true,
+                                                !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate) And !IsBlank(ThisItem.purchaseordernumber),
+                                                "Award Completion",
+                                                !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate) And IsBlank(ThisItem.purchaseordernumber),
+                                                "Issuing PO",
+                                                !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
+                                                "On Site",
+                                                !IsBlank(ThisItem.actualawarddate),
+                                                "Awarded",
+                                                !IsBlank(ThisItem.actualevaluationcompletiondate),
+                                                "Awarding",
+                                                !IsBlank(ThisItem.actualrfqclosingdate),
+                                                "Evaluating",
+                                                !IsBlank(ThisItem.actualrfqissuedate),
+                                                "RFQ Closing",
+                                                !IsBlank(ThisItem.actualsowdate),
+                                                "RFQ Issuing",
+                                                "SOW Completion"
+                                            )
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          FillPortions: =12
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Wrap: =true
+                                    - gallery_due:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Align: ='TextCanvas.Align'.Center
+                                          Text: |-
+                                            =Switch(
+                                                gallery_current_stage.Text,
+                                                "Award Completion", "Complete",
+                                                "Issuing PO",       "PO Pending",
+                                                "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
+                                                "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
+                                                "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
+                                                "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
+                                                "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
+                                                "TBD"
+                                            )
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          FillPortions: =10
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Height: =36
+                                          Wrap: =true
+                                    - gallery_leads:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          FillPortions: =16
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutGap: =0
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                        Children:
+                                          - gallery_lead:
+                                              Control: Text@0.0.51
+                                              Properties:
+                                                Align: ='TextCanvas.Align'.Center
+                                                FontColor: =RGBA(60, 60, 60, 1)
+                                                Height: =18
+                                                Size: =11
+                                                Text: =ThisItem.procpackageleadname
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                LayoutMinWidth: =0
+                                                Wrap: =false
+                                          - opslead:
+                                              Control: Text@0.0.51
+                                              Properties:
+                                                Align: ='TextCanvas.Align'.Center
+                                                FontColor: =RGBA(90, 96, 102, 1)
+                                                Height: =18
+                                                Size: =11
+                                                Text: =ThisItem.opspackageleadname
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                LayoutMinWidth: =0
+                                                Wrap: =false
+                                    - variable_row_1:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Align: ='TextCanvas.Align'.Center
+                                          Height: =36
+                                          Text: |-
+                                            =Switch(
+                                                varCol1,
+                                                "contracttype",            ThisItem.contracttype,
+                                                "stagedue",
+                                                    Switch(
+                                                        gallery_current_stage.Text,
+                                                        "Award Completion", "Complete",
+                                                        "Issuing PO",       "PO Pending",
+                                                        "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                        "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                        "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
+                                                        "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
+                                                        "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
+                                                        "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
+                                                        "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
+                                                        "TBD"
+                                                    ),
+                                                "requiredatsitedate",      If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                "ras_original_input",      If(!IsBlank(ThisItem.ras_original_input), Text(ThisItem.ras_original_input, "mmm dd, yyyy"), "—"),
+                                                "revisedplannedawarddate", If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), "—"),
+                                                "budgetamount",            If(!IsBlank(ThisItem.budgetamount) && ThisItem.budgetamount <> 0, Text(ThisItem.budgetamount, "[$-en-US]$#,##0"), "—"),
+                                                "awardvalue",              If(!IsBlank(ThisItem.awardvalue) && ThisItem.awardvalue <> 0, Text(ThisItem.awardvalue, "[$-en-US]$#,##0"), "—"),
+                                                "indigenous_award",        If(!IsBlank(ThisItem.indigenous_award) && ThisItem.indigenous_award <> 0, Text(ThisItem.indigenous_award, "[$-en-US]$#,##0"), "—"),
+                                                "ontario_award",           If(!IsBlank(ThisItem.ontario_award) && ThisItem.ontario_award <> 0, Text(ThisItem.ontario_award, "[$-en-US]$#,##0"), "—"),
+                                                "mplcode",                 ThisItem.mplcode,
+                                                "qualityprogram",          ThisItem.qualityprogram,
+                                                "bopsite",                 ThisItem.bopsite,
+                                                "subcontractorname",       ThisItem.subcontractorname,
+                                                ""
+                                            )
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          FillPortions: =12
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Wrap: =true
+                                    - variable_row_2:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Align: =Align.Center
+                                          Color: =RGBA(0, 0, 0, 1)
+                                          Fill: =RGBA(192, 0, 0, 0.01)
+                                          OnSelect: =Select(gallery_arrow_details)
+                                          PaddingBottom: =0
+                                          PaddingLeft: =2
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          RadiusBottomLeft: =0
+                                          RadiusBottomRight: =0
+                                          RadiusTopLeft: =0
+                                          RadiusTopRight: =0
+                                          Size: =14
+                                          Text: |-
+                                            =Switch(
+                                                varCol2,
+                                                "contracttype",            ThisItem.contracttype,
+                                                "stagedue",
+                                                    Switch(
+                                                        gallery_current_stage.Text,
+                                                        "Award Completion", "Complete",
+                                                        "Issuing PO",       "PO Pending",
+                                                        "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                        "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                        "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
+                                                        "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
+                                                        "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
+                                                        "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
+                                                        "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
+                                                        "TBD"
+                                                    ),
+                                                "requiredatsitedate",      If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                "ras_original_input",      If(!IsBlank(ThisItem.ras_original_input), Text(ThisItem.ras_original_input, "mmm dd, yyyy"), "—"),
+                                                "revisedplannedawarddate", If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), "—"),
+                                                "budgetamount",            If(!IsBlank(ThisItem.budgetamount) && ThisItem.budgetamount <> 0, Text(ThisItem.budgetamount, "[$-en-US]$#,##0"), "—"),
+                                                "awardvalue",              If(!IsBlank(ThisItem.awardvalue) && ThisItem.awardvalue <> 0, Text(ThisItem.awardvalue, "[$-en-US]$#,##0"), "—"),
+                                                "indigenous_award",        If(!IsBlank(ThisItem.indigenous_award) && ThisItem.indigenous_award <> 0, Text(ThisItem.indigenous_award, "[$-en-US]$#,##0"), "—"),
+                                                "ontario_award",           If(!IsBlank(ThisItem.ontario_award) && ThisItem.ontario_award <> 0, Text(ThisItem.ontario_award, "[$-en-US]$#,##0"), "—"),
+                                                "mplcode",                 ThisItem.mplcode,
+                                                "qualityprogram",          ThisItem.qualityprogram,
+                                                "bopsite",                 ThisItem.bopsite,
+                                                "subcontractorname",       ThisItem.subcontractorname,
+                                                ""
+                                            )
+                                          FillPortions: =12
+                                          LayoutMinWidth: =0
+                                          Height: =36
+                                          Wrap: =true
+                                    - variable_row_3:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Align: ='TextCanvas.Align'.Center
+                                          Text: |-
+                                            =Switch(
+                                                varCol3,
+                                                "contracttype",            ThisItem.contracttype,
+                                                "stagedue",
+                                                    Switch(
+                                                        gallery_current_stage.Text,
+                                                        "Award Completion", "Complete",
+                                                        "Issuing PO",       "PO Pending",
+                                                        "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                        "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                        "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
+                                                        "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
+                                                        "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
+                                                        "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
+                                                        "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
+                                                        "TBD"
+                                                    ),
+                                                "requiredatsitedate",      If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                "ras_original_input",      If(!IsBlank(ThisItem.ras_original_input), Text(ThisItem.ras_original_input, "mmm dd, yyyy"), "—"),
+                                                "revisedplannedawarddate", If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), "—"),
+                                                "budgetamount",            If(!IsBlank(ThisItem.budgetamount) && ThisItem.budgetamount <> 0, Text(ThisItem.budgetamount, "[$-en-US]$#,##0"), "—"),
+                                                "awardvalue",              If(!IsBlank(ThisItem.awardvalue) && ThisItem.awardvalue <> 0, Text(ThisItem.awardvalue, "[$-en-US]$#,##0"), "—"),
+                                                "indigenous_award",        If(!IsBlank(ThisItem.indigenous_award) && ThisItem.indigenous_award <> 0, Text(ThisItem.indigenous_award, "[$-en-US]$#,##0"), "—"),
+                                                "ontario_award",           If(!IsBlank(ThisItem.ontario_award) && ThisItem.ontario_award <> 0, Text(ThisItem.ontario_award, "[$-en-US]$#,##0"), "—"),
+                                                "mplcode",                 ThisItem.mplcode,
+                                                "qualityprogram",          ThisItem.qualityprogram,
+                                                "bopsite",                 ThisItem.bopsite,
+                                                "subcontractorname",       ThisItem.subcontractorname,
+                                                ""
+                                            )
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          FillPortions: =12
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Height: =36
+                                          Wrap: =true
+                                    - variable_row_4:
+                                        Control: Text@0.0.51
+                                        Properties:
+                                          Align: ='TextCanvas.Align'.Center
+                                          Text: |-
+                                            =Switch(
+                                                varCol4,
+                                                "contracttype",            ThisItem.contracttype,
+                                                "stagedue",
+                                                    Switch(
+                                                        gallery_current_stage.Text,
+                                                        "Award Completion", "Complete",
+                                                        "Issuing PO",       "PO Pending",
+                                                        "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                        "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                        "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
+                                                        "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
+                                                        "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
+                                                        "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
+                                                        "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
+                                                        "TBD"
+                                                    ),
+                                                "requiredatsitedate",      If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
+                                                "ras_original_input",      If(!IsBlank(ThisItem.ras_original_input), Text(ThisItem.ras_original_input, "mmm dd, yyyy"), "—"),
+                                                "revisedplannedawarddate", If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), "—"),
+                                                "budgetamount",            If(!IsBlank(ThisItem.budgetamount) && ThisItem.budgetamount <> 0, Text(ThisItem.budgetamount, "[$-en-US]$#,##0"), "—"),
+                                                "awardvalue",              If(!IsBlank(ThisItem.awardvalue) && ThisItem.awardvalue <> 0, Text(ThisItem.awardvalue, "[$-en-US]$#,##0"), "—"),
+                                                "indigenous_award",        If(!IsBlank(ThisItem.indigenous_award) && ThisItem.indigenous_award <> 0, Text(ThisItem.indigenous_award, "[$-en-US]$#,##0"), "—"),
+                                                "ontario_award",           If(!IsBlank(ThisItem.ontario_award) && ThisItem.ontario_award <> 0, Text(ThisItem.ontario_award, "[$-en-US]$#,##0"), "—"),
+                                                "mplcode",                 ThisItem.mplcode,
+                                                "qualityprogram",          ThisItem.qualityprogram,
+                                                "bopsite",                 ThisItem.bopsite,
+                                                "subcontractorname",       ThisItem.subcontractorname,
+                                                ""
+                                            )
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Weight: ='TextCanvas.Weight'.Regular
+                                          FillPortions: =12
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Height: =36
+                                          Wrap: =true
+                                    - gallery_arrow_details:
+                                        Control: Classic/Icon@2.5.0
+                                        Properties:
+                                          AccessibleLabel: =Self.Tooltip
+                                          BorderColor: =RGBA(0, 0, 0, 1)
+                                          Color: =RGBA(180, 180, 180, 1)
+                                          DisabledBorderColor: =RGBA(56, 56, 56, 1)
+                                          DisabledColor: =RGBA(119, 119, 119, 1)
+                                          Height: =28
+                                          Icon: =Icon.ChevronRight
+                                          OnSelect: |-
+                                            =Set(varPackageScreenLoaded, false);
+                                            Set(varSelectedPackageId, ThisItem.packageidentifier);
 
-                                    // Ignored contract types - always neutral, no status coloring
-                                    ThisItem.contracttype in varIgnoredContractTypes,
-                                    RGBA(255, 255, 255, 1),
+                                            ClearCollect(
+                                                colPackageDetails,
+                                                {
+                                                    title:                              ThisItem.Title,
+                                                    packageidentifier:                  ThisItem.packageidentifier,
+                                                    projectidentifier:                  ThisItem.projectidentifier,
+                                                    itemnumber:                         ThisItem.itemnumber,
+                                                    packagedescription:                 ThisItem.packagedescription,
+                                                    packagetype:                        ThisItem.packagetype,
+                                                    qualityprogram:                     ThisItem.qualityprogram,
+                                                    prerequisitedesigndeliverable:      ThisItem.prerequisitedesigndeliverable,
+                                                    bopsite:                            ThisItem.bopsite,
+                                                    contracttype:                       ThisItem.contracttype,
+                                                    Created:                            ThisItem.Created,
+                                                    comments:                           ThisItem.comments,
+                                                    sole_source:                        ThisItem.sole_source,
+                                                    packagefolderurl:                   ThisItem.packagefolderurl,
+                                                    archived:                           ThisItem.archived,
 
-                                    // Delayed - Red background
-                                    (
-                                        IsBlank(ThisItem.actualsowdate) &&
-                                        !IsBlank(ThisItem.revisedplannedsowdate) &&
-                                        ThisItem.revisedplannedsowdate < Today()
-                                    ) ||
-                                    (
-                                        !IsBlank(ThisItem.actualsowdate) &&
-                                        IsBlank(ThisItem.actualrfqissuedate) &&
-                                        !IsBlank(ThisItem.revisedplannedrfqissuedate) &&
-                                        ThisItem.revisedplannedrfqissuedate < Today()
-                                    ) ||
-                                    (
-                                        !IsBlank(ThisItem.actualrfqissuedate) &&
-                                        IsBlank(ThisItem.actualrfqclosingdate) &&
-                                        !IsBlank(ThisItem.revisedplannedrfqclosingdate) &&
-                                        ThisItem.revisedplannedrfqclosingdate < Today()
-                                    ) ||
-                                    (
-                                        !IsBlank(ThisItem.actualrfqclosingdate) &&
-                                        IsBlank(ThisItem.actualevaluationcompletiondate) &&
-                                        !IsBlank(ThisItem.revisedplannedevaluationcompletio) &&
-                                        ThisItem.revisedplannedevaluationcompletio < Today()
-                                    ) ||
-                                    (
-                                        !IsBlank(ThisItem.actualevaluationcompletiondate) &&
-                                        IsBlank(ThisItem.actualawarddate) &&
-                                        !IsBlank(ThisItem.revisedplannedawarddate) &&
-                                        ThisItem.revisedplannedawarddate < Today()
-                                    ),
-                                    RGBA(255, 230, 230, 1),  // Light red for delayed
+                                                    procpackageleadname:                ThisItem.procpackageleadname,
+                                                    procurementpackageleadid:           ThisItem.procurementpackageleadid,
+                                                    opspackageleadname:                 ThisItem.opspackageleadname,
+                                                    operationspackageleadid:            ThisItem.operationspackageleadid,
+                                                    engineeringcontactid:               ThisItem.engineeringcontactid,
+                                                    engineeringcontactname:             ThisItem.engineeringcontactname,
+                                                    operationspackagebundle:            ThisItem.operationspackagebundle,
 
-                                    // At Risk - Yellow/Orange background
-                                    (
-                                        IsBlank(ThisItem.actualsowdate) &&
-                                        !IsBlank(ThisItem.revisedplannedsowdate) &&
-                                        ThisItem.revisedplannedsowdate >= Today() &&
-                                        ThisItem.revisedplannedsowdate <= DateAdd(Today(), 7, TimeUnit.Days)
-                                    ) ||
-                                    (
-                                        !IsBlank(ThisItem.actualsowdate) &&
-                                        IsBlank(ThisItem.actualrfqissuedate) &&
-                                        !IsBlank(ThisItem.revisedplannedrfqissuedate) &&
-                                        ThisItem.revisedplannedrfqissuedate >= Today() &&
-                                        ThisItem.revisedplannedrfqissuedate <= DateAdd(Today(), 7, TimeUnit.Days)
-                                    ) ||
-                                    (
-                                        !IsBlank(ThisItem.actualrfqissuedate) &&
-                                        IsBlank(ThisItem.actualrfqclosingdate) &&
-                                        !IsBlank(ThisItem.revisedplannedrfqclosingdate) &&
-                                        ThisItem.revisedplannedrfqclosingdate >= Today() &&
-                                        ThisItem.revisedplannedrfqclosingdate <= DateAdd(Today(), 7, TimeUnit.Days)
-                                    ) ||
-                                    (
-                                        !IsBlank(ThisItem.actualrfqclosingdate) &&
-                                        IsBlank(ThisItem.actualevaluationcompletiondate) &&
-                                        !IsBlank(ThisItem.revisedplannedevaluationcompletio) &&
-                                        ThisItem.revisedplannedevaluationcompletio >= Today() &&
-                                        ThisItem.revisedplannedevaluationcompletio <= DateAdd(Today(), 7, TimeUnit.Days)
-                                    ) ||
-                                    (
-                                        !IsBlank(ThisItem.actualevaluationcompletiondate) &&
-                                        IsBlank(ThisItem.actualawarddate) &&
-                                        !IsBlank(ThisItem.revisedplannedawarddate) &&
-                                        ThisItem.revisedplannedawarddate >= Today() &&
-                                        ThisItem.revisedplannedawarddate <= DateAdd(Today(), 7, TimeUnit.Days)
-                                    ),
-                                    RGBA(255, 248, 220, 1),  // Light yellow for at risk
+                                                    leadtimesowtorfqissuedays:          ThisItem.leadtimesowtorfqissuedays,
+                                                    leadtimerfqissuetoclosingdays:      ThisItem.leadtimerfqissuetoclosingdays,
+                                                    leadtimeclosingtoevaluationdays:    ThisItem.leadtimeclosingtoevaluationdays,
+                                                    leadtimeevaluationtoawarddays:      ThisItem.leadtimeevaluationtoawarddays,
+                                                    standardleadtimemonths:             ThisItem.standardleadtimemonths,
 
-                                    // On Track - White
-                                    RGBA(255, 255, 255, 1)
-                                )
-                              FocusedBorderThickness: =4
-                              Height: =75
-                              HoverFill: =
-                              PressedFill: =
-                              Width: =Parent.Width
-                        - gallery_arrow_details:
-                            Control: Classic/Icon@2.5.0
-                            Properties:
-                              AccessibleLabel: =Self.Tooltip
-                              BorderColor: =RGBA(0, 0, 0, 1)
-                              Color: =RGBA(180, 180, 180, 1)
-                              DisabledBorderColor: =RGBA(56, 56, 56, 1)
-                              DisabledColor: =RGBA(119, 119, 119, 1)
-                              Height: =50
-                              Icon: =Icon.ChevronRight
-                              OnSelect: |-
-                                =Set(varPackageScreenLoaded, false);
-                                Set(varSelectedPackageId, ThisItem.packageidentifier);
+                                                    originalplannedsowdate:             ThisItem.originalplannedsowdate,
+                                                    originalplannedrfqissuedate:        ThisItem.originalplannedrfqissuedate,
+                                                    originalplannedrfqclosingdate:      ThisItem.originalplannedrfqclosingdate,
+                                                    originalplannedevaluationcompleti:  ThisItem.originalplannedevaluationcompleti,
+                                                    originalplannedawarddate:           ThisItem.originalplannedawarddate,
+                                                    plannedawarddate:                   ThisItem.plannedawarddate,
+                                                    requiredatsitedate:                 ThisItem.requiredatsitedate,
+                                                    ras_original_input:                 ThisItem.ras_original_input,
 
-                                ClearCollect(
-                                    colPackageDetails,
-                                    {
-                                        title:                              ThisItem.Title,
-                                        packageidentifier:                  ThisItem.packageidentifier,
-                                        projectidentifier:                  ThisItem.projectidentifier,
-                                        itemnumber:                         ThisItem.itemnumber,
-                                        packagedescription:                 ThisItem.packagedescription,
-                                        packagetype:                        ThisItem.packagetype,
-                                        qualityprogram:                     ThisItem.qualityprogram,
-                                        prerequisitedesigndeliverable:      ThisItem.prerequisitedesigndeliverable,
-                                        bopsite:                            ThisItem.bopsite,
-                                        contracttype:                       ThisItem.contracttype,
-                                        Created:                            ThisItem.Created,
-                                        comments:                           ThisItem.comments,
-                                        sole_source:                        ThisItem.sole_source,
-                                        packagefolderurl:                   ThisItem.packagefolderurl,
-                                        archived:                           ThisItem.archived,
+                                                    actualsowdate:                      ThisItem.actualsowdate,
+                                                    actualrfqissuedate:                 ThisItem.actualrfqissuedate,
+                                                    actualrfqclosingdate:               ThisItem.actualrfqclosingdate,
+                                                    actualevaluationcompletiondate:     ThisItem.actualevaluationcompletiondate,
+                                                    actualawarddate:                    ThisItem.actualawarddate,
+                                                    actual_onsite:                      ThisItem.actual_onsite,
 
-                                        procpackageleadname:                ThisItem.procpackageleadname,
-                                        procurementpackageleadid:           ThisItem.procurementpackageleadid,
-                                        opspackageleadname:                 ThisItem.opspackageleadname,
-                                        operationspackageleadid:            ThisItem.operationspackageleadid,
-                                        engineeringcontactid:               ThisItem.engineeringcontactid,
-                                        engineeringcontactname:             ThisItem.engineeringcontactname,
-                                        operationspackagebundle:            ThisItem.operationspackagebundle,
+                                                    revisedplannedsowdate:              ThisItem.revisedplannedsowdate,
+                                                    revisedplannedrfqissuedate:         ThisItem.revisedplannedrfqissuedate,
+                                                    revisedplannedrfqclosingdate:       ThisItem.revisedplannedrfqclosingdate,
+                                                    revisedplannedevaluationcompletio:  ThisItem.revisedplannedevaluationcompletio,
+                                                    revisedplannedawarddate:            ThisItem.revisedplannedawarddate,
 
-                                        leadtimesowtorfqissuedays:          ThisItem.leadtimesowtorfqissuedays,
-                                        leadtimerfqissuetoclosingdays:      ThisItem.leadtimerfqissuetoclosingdays,
-                                        leadtimeclosingtoevaluationdays:    ThisItem.leadtimeclosingtoevaluationdays,
-                                        leadtimeevaluationtoawarddays:      ThisItem.leadtimeevaluationtoawarddays,
-                                        standardleadtimemonths:             ThisItem.standardleadtimemonths,
+                                                    subcontractorname:                  ThisItem.subcontractorname,
+                                                    purchaseordernumber:                ThisItem.purchaseordernumber,
+                                                    awardvalue:                         ThisItem.awardvalue,
+                                                    indigenous_award:                   ThisItem.indigenous_award,
+                                                    ontario_award:                      ThisItem.ontario_award,
+                                                    budgetamount:                       ThisItem.budgetamount,
+                                                    buybackresaletarget:                ThisItem.buybackresaletarget
+                                                }
+                                            );
 
-                                        originalplannedsowdate:             ThisItem.originalplannedsowdate,
-                                        originalplannedrfqissuedate:        ThisItem.originalplannedrfqissuedate,
-                                        originalplannedrfqclosingdate:      ThisItem.originalplannedrfqclosingdate,
-                                        originalplannedevaluationcompleti:  ThisItem.originalplannedevaluationcompleti,
-                                        originalplannedawarddate:           ThisItem.originalplannedawarddate,
-                                        plannedawarddate:                   ThisItem.plannedawarddate,
-                                        requiredatsitedate:                 ThisItem.requiredatsitedate,
-                                        ras_original_input:                 ThisItem.ras_original_input,
+                                            // Explicitly set actual date variables from the loaded package
+                                            Set(varActualSOW,        ThisItem.actualsowdate);
+                                            Set(varActualRFQIssue,   ThisItem.actualrfqissuedate);
+                                            Set(varActualRFQClosing, ThisItem.actualrfqclosingdate);
+                                            Set(varActualEval,       ThisItem.actualevaluationcompletiondate);
+                                            Set(varActualAward,      ThisItem.actualawarddate);
 
-                                        actualsowdate:                      ThisItem.actualsowdate,
-                                        actualrfqissuedate:                 ThisItem.actualrfqissuedate,
-                                        actualrfqclosingdate:               ThisItem.actualrfqclosingdate,
-                                        actualevaluationcompletiondate:     ThisItem.actualevaluationcompletiondate,
-                                        actualawarddate:                    ThisItem.actualawarddate,
-                                        actual_onsite:                      ThisItem.actual_onsite,
+                                            Navigate('Package Details', ScreenTransition.Fade)
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Tooltip: ="View item details"
+                                          FillPortions: =0
+                                          LayoutMinWidth: =0
+                                          Width: =28
+                              - gallery_status_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderStyle: =BorderStyle.None
+                                    BorderThickness: =2
+                                    Color: =RGBA(50, 49, 48, 1)
+                                    DisabledBorderColor: =RGBA(0, 0, 0, 0)
+                                    DisabledColor: =RGBA(161, 159, 157, 1)
+                                    FocusedBorderThickness: =4
+                                    Font: =Font.'Segoe UI'
+                                    Height: =18
+                                    Size: =10
+                                    Text: |-
+                                      =Switch(
+                                          true,
 
-                                        revisedplannedsowdate:              ThisItem.revisedplannedsowdate,
-                                        revisedplannedrfqissuedate:         ThisItem.revisedplannedrfqissuedate,
-                                        revisedplannedrfqclosingdate:       ThisItem.revisedplannedrfqclosingdate,
-                                        revisedplannedevaluationcompletio:  ThisItem.revisedplannedevaluationcompletio,
-                                        revisedplannedawarddate:            ThisItem.revisedplannedawarddate,
+                                          // Ignored contract types - no status banner
+                                          ThisItem.contracttype in varIgnoredContractTypes,
+                                          "",
 
-                                        subcontractorname:                  ThisItem.subcontractorname,
-                                        purchaseordernumber:                ThisItem.purchaseordernumber,
-                                        awardvalue:                         ThisItem.awardvalue,
-                                        indigenous_award:                   ThisItem.indigenous_award,
-                                        ontario_award:                      ThisItem.ontario_award,
-                                        budgetamount:                       ThisItem.budgetamount,
-                                        buybackresaletarget:                ThisItem.buybackresaletarget
-                                    }
-                                );
+                                          // Delayed cases
+                                          IsBlank(ThisItem.actualsowdate) &&
+                                          !IsBlank(ThisItem.revisedplannedsowdate) &&
+                                          ThisItem.revisedplannedsowdate < Today(),
+                                          "⚠️ Delayed: SOW overdue by " & DateDiff(ThisItem.revisedplannedsowdate, Today(), TimeUnit.Days) & " days",
 
-                                // Explicitly set actual date variables from the loaded package
-                                Set(varActualSOW,        ThisItem.actualsowdate);
-                                Set(varActualRFQIssue,   ThisItem.actualrfqissuedate);
-                                Set(varActualRFQClosing, ThisItem.actualrfqclosingdate);
-                                Set(varActualEval,       ThisItem.actualevaluationcompletiondate);
-                                Set(varActualAward,      ThisItem.actualawarddate);
+                                          !IsBlank(ThisItem.actualsowdate) &&
+                                          IsBlank(ThisItem.actualrfqissuedate) &&
+                                          !IsBlank(ThisItem.revisedplannedrfqissuedate) &&
+                                          ThisItem.revisedplannedrfqissuedate < Today(),
+                                          "⚠️ Delayed: RFQ Issue overdue by " & DateDiff(ThisItem.revisedplannedrfqissuedate, Today(), TimeUnit.Days) & " days",
 
-                                Navigate('Package Details', ScreenTransition.Fade)
-                              PaddingBottom: =16
-                              PaddingLeft: =16
-                              PaddingRight: =16
-                              PaddingTop: =16
-                              Tooltip: ="View item details"
-                              Width: =Parent.Width * 0.04
-                              X: =Parent.Width * 0.96
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - variable_row_4:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.Center
-                              Text: |-
-                                =Switch(
-                                    varCol4,
-                                    "contracttype",            ThisItem.contracttype,
-                                    "stagedue",
-                                        Switch(
-                                            gallery_current_stage.Text,
-                                            "Award Completion", "Complete",
-                                            "Issuing PO",       "PO Pending",
-                                            "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                            "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                            "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
-                                            "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
-                                            "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
-                                            "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
-                                            "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
-                                            "TBD"
-                                        ),
-                                    "requiredatsitedate",      If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                    "ras_original_input",      If(!IsBlank(ThisItem.ras_original_input), Text(ThisItem.ras_original_input, "mmm dd, yyyy"), "—"),
-                                    "revisedplannedawarddate", If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), "—"),
-                                    "budgetamount",            If(!IsBlank(ThisItem.budgetamount) && ThisItem.budgetamount <> 0, Text(ThisItem.budgetamount, "[$-en-US]$#,##0"), "—"),
-                                    "awardvalue",              If(!IsBlank(ThisItem.awardvalue) && ThisItem.awardvalue <> 0, Text(ThisItem.awardvalue, "[$-en-US]$#,##0"), "—"),
-                                    "indigenous_award",        If(!IsBlank(ThisItem.indigenous_award) && ThisItem.indigenous_award <> 0, Text(ThisItem.indigenous_award, "[$-en-US]$#,##0"), "—"),
-                                    "ontario_award",           If(!IsBlank(ThisItem.ontario_award) && ThisItem.ontario_award <> 0, Text(ThisItem.ontario_award, "[$-en-US]$#,##0"), "—"),
-                                    "mplcode",                 ThisItem.mplcode,
-                                    "qualityprogram",          ThisItem.qualityprogram,
-                                    "bopsite",                 ThisItem.bopsite,
-                                    "subcontractorname",       ThisItem.subcontractorname,
-                                    ""
-                                )
-                              VerticalAlign: =VerticalAlign.Middle
-                              Weight: ='TextCanvas.Weight'.Regular
-                              Width: =Parent.Width * 0.085
-                              X: =Parent.Width * 0.875
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - variable_row_3:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.Center
-                              Text: |-
-                                =Switch(
-                                    varCol3,
-                                    "contracttype",            ThisItem.contracttype,
-                                    "stagedue",
-                                        Switch(
-                                            gallery_current_stage.Text,
-                                            "Award Completion", "Complete",
-                                            "Issuing PO",       "PO Pending",
-                                            "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                            "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                            "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
-                                            "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
-                                            "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
-                                            "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
-                                            "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
-                                            "TBD"
-                                        ),
-                                    "requiredatsitedate",      If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                    "ras_original_input",      If(!IsBlank(ThisItem.ras_original_input), Text(ThisItem.ras_original_input, "mmm dd, yyyy"), "—"),
-                                    "revisedplannedawarddate", If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), "—"),
-                                    "budgetamount",            If(!IsBlank(ThisItem.budgetamount) && ThisItem.budgetamount <> 0, Text(ThisItem.budgetamount, "[$-en-US]$#,##0"), "—"),
-                                    "awardvalue",              If(!IsBlank(ThisItem.awardvalue) && ThisItem.awardvalue <> 0, Text(ThisItem.awardvalue, "[$-en-US]$#,##0"), "—"),
-                                    "indigenous_award",        If(!IsBlank(ThisItem.indigenous_award) && ThisItem.indigenous_award <> 0, Text(ThisItem.indigenous_award, "[$-en-US]$#,##0"), "—"),
-                                    "ontario_award",           If(!IsBlank(ThisItem.ontario_award) && ThisItem.ontario_award <> 0, Text(ThisItem.ontario_award, "[$-en-US]$#,##0"), "—"),
-                                    "mplcode",                 ThisItem.mplcode,
-                                    "qualityprogram",          ThisItem.qualityprogram,
-                                    "bopsite",                 ThisItem.bopsite,
-                                    "subcontractorname",       ThisItem.subcontractorname,
-                                    ""
-                                )
-                              VerticalAlign: =VerticalAlign.Middle
-                              Width: =Parent.Width * 0.085
-                              X: =Parent.Width * 0.79
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - variable_row_2:
-                            Control: ModernText@1.0.0
-                            Properties:
-                              Align: =Align.Center
-                              Color: =RGBA(0, 0, 0, 1)
-                              Fill: =RGBA(192, 0, 0, 0.01)
-                              OnSelect: =Select(Parent)
-                              PaddingBottom: =0
-                              PaddingLeft: =20
-                              PaddingRight: =0
-                              PaddingTop: =0
-                              RadiusBottomLeft: =0
-                              RadiusBottomRight: =0
-                              RadiusTopLeft: =0
-                              RadiusTopRight: =0
-                              Size: =14
-                              Text: |-
-                                =Switch(
-                                    varCol2,
-                                    "contracttype",            ThisItem.contracttype,
-                                    "stagedue",
-                                        Switch(
-                                            gallery_current_stage.Text,
-                                            "Award Completion", "Complete",
-                                            "Issuing PO",       "PO Pending",
-                                            "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                            "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                            "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
-                                            "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
-                                            "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
-                                            "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
-                                            "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
-                                            "TBD"
-                                        ),
-                                    "requiredatsitedate",      If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                    "ras_original_input",      If(!IsBlank(ThisItem.ras_original_input), Text(ThisItem.ras_original_input, "mmm dd, yyyy"), "—"),
-                                    "revisedplannedawarddate", If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), "—"),
-                                    "budgetamount",            If(!IsBlank(ThisItem.budgetamount) && ThisItem.budgetamount <> 0, Text(ThisItem.budgetamount, "[$-en-US]$#,##0"), "—"),
-                                    "awardvalue",              If(!IsBlank(ThisItem.awardvalue) && ThisItem.awardvalue <> 0, Text(ThisItem.awardvalue, "[$-en-US]$#,##0"), "—"),
-                                    "indigenous_award",        If(!IsBlank(ThisItem.indigenous_award) && ThisItem.indigenous_award <> 0, Text(ThisItem.indigenous_award, "[$-en-US]$#,##0"), "—"),
-                                    "ontario_award",           If(!IsBlank(ThisItem.ontario_award) && ThisItem.ontario_award <> 0, Text(ThisItem.ontario_award, "[$-en-US]$#,##0"), "—"),
-                                    "mplcode",                 ThisItem.mplcode,
-                                    "qualityprogram",          ThisItem.qualityprogram,
-                                    "bopsite",                 ThisItem.bopsite,
-                                    "subcontractorname",       ThisItem.subcontractorname,
-                                    ""
-                                )
-                              Width: =Parent.Width * 0.085
-                              X: =Parent.Width * 0.705
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - variable_row_1:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.Center
-                              Height: |+
-                                =45
-                              Text: |-
-                                =Switch(
-                                    varCol1,
-                                    "contracttype",            ThisItem.contracttype,
-                                    "stagedue",
-                                        Switch(
-                                            gallery_current_stage.Text,
-                                            "Award Completion", "Complete",
-                                            "Issuing PO",       "PO Pending",
-                                            "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                            "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                            "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
-                                            "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
-                                            "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
-                                            "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
-                                            "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
-                                            "TBD"
-                                        ),
-                                    "requiredatsitedate",      If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                    "ras_original_input",      If(!IsBlank(ThisItem.ras_original_input), Text(ThisItem.ras_original_input, "mmm dd, yyyy"), "—"),
-                                    "revisedplannedawarddate", If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), "—"),
-                                    "budgetamount",            If(!IsBlank(ThisItem.budgetamount) && ThisItem.budgetamount <> 0, Text(ThisItem.budgetamount, "[$-en-US]$#,##0"), "—"),
-                                    "awardvalue",              If(!IsBlank(ThisItem.awardvalue) && ThisItem.awardvalue <> 0, Text(ThisItem.awardvalue, "[$-en-US]$#,##0"), "—"),
-                                    "indigenous_award",        If(!IsBlank(ThisItem.indigenous_award) && ThisItem.indigenous_award <> 0, Text(ThisItem.indigenous_award, "[$-en-US]$#,##0"), "—"),
-                                    "ontario_award",           If(!IsBlank(ThisItem.ontario_award) && ThisItem.ontario_award <> 0, Text(ThisItem.ontario_award, "[$-en-US]$#,##0"), "—"),
-                                    "mplcode",                 ThisItem.mplcode,
-                                    "qualityprogram",          ThisItem.qualityprogram,
-                                    "bopsite",                 ThisItem.bopsite,
-                                    "subcontractorname",       ThisItem.subcontractorname,
-                                    ""
-                                )
-                              VerticalAlign: =VerticalAlign.Middle
-                              Width: =Parent.Width * 0.085
-                              X: =Parent.Width * 0.62
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - opslead_image:
-                            Control: Image@2.2.3
-                            Properties:
-                              BorderColor: =RGBA(0, 18, 107, 1)
-                              Height: =24
-                              Image: |
-                                =With(
-                                    {
-                                        upn: ThisItem.operationspackageleadid,
-                                        img: Office365Users.UserPhotoV2(ThisItem.operationspackageleadid)
-                                    },
-                                    If(
-                                        IsBlankOrError(img),
-                                        SampleImage,
-                                        img
-                                    )
-                                )
-                              ImagePosition: =ImagePosition.Fill
-                              OnSelect: =
-                              RadiusBottomLeft: =16
-                              RadiusBottomRight: =16
-                              RadiusTopLeft: =16
-                              RadiusTopRight: =16
-                              Width: =24
-                              X: =Parent.Width * 0.52 + 6
-                              Y: =40
-                        - lead_image:
-                            Control: Image@2.2.3
-                            Properties:
-                              BorderColor: =RGBA(0, 18, 107, 1)
-                              Height: =24
-                              Image: |
-                                =With(
-                                    {
-                                        upn: ThisItem.procurementpackageleadid,
-                                        img: Office365Users.UserPhotoV2(ThisItem.procurementpackageleadid)
-                                    },
-                                    If(
-                                        IsBlankOrError(img),
-                                        SampleImage,
-                                        img
-                                    )
-                                )
-                              ImagePosition: =ImagePosition.Fill
-                              OnSelect: =
-                              RadiusBottomLeft: =16
-                              RadiusBottomRight: =16
-                              RadiusTopLeft: =16
-                              RadiusTopRight: =16
-                              Width: =24
-                              X: =Parent.Width * 0.52 + 6
-                              Y: =8
-                        - opslead:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.Center
-                              FontColor: =RGBA(60, 60, 60, 1)
-                              Height: =26
-                              Size: =13
-                              Text: =ThisItem.opspackageleadname
-                              VerticalAlign: =VerticalAlign.Middle
-                              Width: =Parent.Width * 0.10 - 32
-                              X: =Parent.Width * 0.52 + 32
-                              Y: =40
-                        - gallery_lead:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.Center
-                              FontColor: =RGBA(60, 60, 60, 1)
-                              Height: =26
-                              Size: =13
-                              Text: =ThisItem.procpackageleadname
-                              VerticalAlign: =VerticalAlign.Middle
-                              Width: =Parent.Width * 0.10 - 32
-                              X: =Parent.Width * 0.52 + 32
-                              Y: =8
-                        - gallery_due:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.Center
-                              Text: |-
-                                =Switch(
-                                    gallery_current_stage.Text,
-                                    "Award Completion", "Complete",
-                                    "Issuing PO",       "PO Pending",
-                                    "On Site",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                    "Awarded",     If(!IsBlank(ThisItem.requiredatsitedate), Text(ThisItem.requiredatsitedate, "mmm dd, yyyy"), "—"),
-                                    "Awarding",    If(!IsBlank(ThisItem.revisedplannedawarddate), Text(ThisItem.revisedplannedawarddate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedawarddate), Text(ThisItem.originalplannedawarddate, "mmm dd, yyyy"), "TBD")),
-                                    "Evaluating",  If(!IsBlank(ThisItem.revisedplannedevaluationcompletio), Text(ThisItem.revisedplannedevaluationcompletio, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedevaluationcompleti), Text(ThisItem.originalplannedevaluationcompleti, "mmm dd, yyyy"), "TBD")),
-                                    "RFQ Closing", If(!IsBlank(ThisItem.revisedplannedrfqclosingdate), Text(ThisItem.revisedplannedrfqclosingdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqclosingdate), Text(ThisItem.originalplannedrfqclosingdate, "mmm dd, yyyy"), "TBD")),
-                                    "RFQ Issuing", If(!IsBlank(ThisItem.revisedplannedrfqissuedate), Text(ThisItem.revisedplannedrfqissuedate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedrfqissuedate), Text(ThisItem.originalplannedrfqissuedate, "mmm dd, yyyy"), "TBD")),
-                                    "SOW Completion", If(!IsBlank(ThisItem.revisedplannedsowdate), Text(ThisItem.revisedplannedsowdate, "mmm dd, yyyy"), If(!IsBlank(ThisItem.originalplannedsowdate), Text(ThisItem.originalplannedsowdate, "mmm dd, yyyy"), "TBD")),
-                                    "TBD"
-                                )
-                              VerticalAlign: =VerticalAlign.Middle
-                              Width: =Parent.Width * 0.08
-                              X: =Parent.Width * 0.42
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - gallery_current_stage:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.Center
-                              BorderRadius: =14
-                              Fill: |+
-                                =Switch(
-                                    true,
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(133, 133, 133, 0.1),
-                                    !IsBlank(ThisItem.actualawarddate),
-                                    RGBA(133, 133, 133, 0.1),
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate),
-                                    RGBA(133, 133, 133, 0.1),
-                                    !IsBlank(ThisItem.actualrfqclosingdate),
-                                    RGBA(133, 133, 133, 0.1),
-                                    !IsBlank(ThisItem.actualrfqissuedate),
-                                    RGBA(133, 133, 133, 0.1),
-                                    !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(133, 133, 133, 0.1),
-                                    RGBA(133, 133, 133, 0.1)
-                                )
-                              FontColor: |+
-                                =Switch(
-                                    true,
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(133, 133, 133, 1),
-                                    !IsBlank(ThisItem.actualawarddate),
-                                    RGBA(133, 133, 133, 1),
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate),
-                                    RGBA(133, 133, 133, 1),
-                                    !IsBlank(ThisItem.actualrfqclosingdate),
-                                    RGBA(133, 133, 133, 1),
-                                    !IsBlank(ThisItem.actualrfqissuedate),
-                                    RGBA(133, 133, 133, 1),
-                                    !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(133, 133, 133, 1),
-                                    RGBA(133, 133, 133, 1)
-                                )
-                              Height: =28
-                              Text: |+
-                                =Switch(
-                                    true,
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate) And !IsBlank(ThisItem.purchaseordernumber),
-                                    "Award Completion",
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate) And IsBlank(ThisItem.purchaseordernumber),
-                                    "Issuing PO",
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
-                                    "On Site",
-                                    !IsBlank(ThisItem.actualawarddate),
-                                    "Awarded",
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate),
-                                    "Awarding",
-                                    !IsBlank(ThisItem.actualrfqclosingdate),
-                                    "Evaluating",
-                                    !IsBlank(ThisItem.actualrfqissuedate),
-                                    "RFQ Closing",
-                                    !IsBlank(ThisItem.actualsowdate),
-                                    "RFQ Issuing",
-                                    "SOW Completion"
-                                )
-                              VerticalAlign: =VerticalAlign.Middle
-                              Weight: ='TextCanvas.Weight'.Semibold
-                              Width: =Parent.Width * 0.13
-                              X: =Parent.Width * 0.29
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - Circle2:
-                            Control: Circle@2.3.0
-                            Properties:
-                              BorderColor: =RGBA(245, 245, 245, 1)
-                              BorderStyle: =BorderStyle.None
-                              BorderThickness: =2
-                              DisabledFill: |+
-                                =Switch(
-                                    true,
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(41, 182, 246, 1),      // On Site — light blue
-                                    !IsBlank(ThisItem.actualawarddate),
-                                    RGBA(56, 142, 60, 1),        // Awarded — green
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate),
-                                    RGBA(251, 140, 0, 1),        // Awarding — amber
-                                    !IsBlank(ThisItem.actualrfqclosingdate),
-                                    RGBA(142, 36, 170, 1),       // Evaluating — purple
-                                    !IsBlank(ThisItem.actualrfqissuedate),
-                                    RGBA(21, 101, 192, 1),       // RFQ Closing — dark blue
-                                    !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(0, 131, 143, 1),        // RFQ Issuing — teal
-                                    RGBA(211, 47, 47, 1)         // SOW Completion — red
-                                )
-                              Fill: |+
-                                =Switch(
-                                    true,
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(133, 133, 133, 1),      // On Site — light blue
-                                    !IsBlank(ThisItem.actualawarddate),
-                                    RGBA(133, 133, 133, 1),        // Awarded — green
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate),
-                                    RGBA(133, 133, 133, 1),        // Awarding — amber
-                                    !IsBlank(ThisItem.actualrfqclosingdate),
-                                    RGBA(133, 133, 133, 1),       // Evaluating — purple
-                                    !IsBlank(ThisItem.actualrfqissuedate),
-                                    RGBA(133, 133, 133, 1),       // RFQ Closing — dark blue
-                                    !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(133, 133, 133, 1),        // RFQ Issuing — teal
-                                    RGBA(133, 133, 133, 1)         // SOW Completion — red
-                                )
-                              Height: =10
-                              HoverFill: |+
-                                =Switch(
-                                    true,
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(41, 182, 246, 1),      // On Site — light blue
-                                    !IsBlank(ThisItem.actualawarddate),
-                                    RGBA(56, 142, 60, 1),        // Awarded — green
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate),
-                                    RGBA(251, 140, 0, 1),        // Awarding — amber
-                                    !IsBlank(ThisItem.actualrfqclosingdate),
-                                    RGBA(142, 36, 170, 1),       // Evaluating — purple
-                                    !IsBlank(ThisItem.actualrfqissuedate),
-                                    RGBA(21, 101, 192, 1),       // RFQ Closing — dark blue
-                                    !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(0, 131, 143, 1),        // RFQ Issuing — teal
-                                    RGBA(211, 47, 47, 1)         // SOW Completion — red
-                                )
-                              PressedFill: |+
-                                =Switch(
-                                    true,
-                                    !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(41, 182, 246, 1),      // On Site — light blue
-                                    !IsBlank(ThisItem.actualawarddate),
-                                    RGBA(56, 142, 60, 1),        // Awarded — green
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate),
-                                    RGBA(251, 140, 0, 1),        // Awarding — amber
-                                    !IsBlank(ThisItem.actualrfqclosingdate),
-                                    RGBA(142, 36, 170, 1),       // Evaluating — purple
-                                    !IsBlank(ThisItem.actualrfqissuedate),
-                                    RGBA(21, 101, 192, 1),       // RFQ Closing — dark blue
-                                    !IsBlank(ThisItem.actualsowdate),
-                                    RGBA(0, 131, 143, 1),        // RFQ Issuing — teal
-                                    RGBA(211, 47, 47, 1)         // SOW Completion — red
-                                )
-                              Width: =10
-                              X: =Parent.Width * 0.29 + 10
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - gallery_description:
-                            Control: Label@2.5.1
-                            Properties:
-                              Align: =Align.Center
-                              AutoHeight: =false
-                              BorderColor: =RGBA(0, 0, 0, 0)
-                              Color: =RGBA(30, 30, 30, 1)
-                              Font: =Font.'Segoe UI'
-                              FontWeight: =FontWeight.Semibold
-                              Height: =22
-                              OnSelect: =Select(Parent)
-                              Overflow: =Overflow.Hidden
-                              PaddingBottom: =0
-                              PaddingLeft: =4
-                              PaddingRight: =16
-                              PaddingTop: =0
-                              Size: =12
-                              Text: =ThisItem.packagedescription
-                              Tooltip: =ThisItem.packagedescription
-                              VerticalAlign: =VerticalAlign.Middle
-                              Width: =Parent.Width * 0.14
-                              Wrap: =false
-                              X: =Parent.Width * 0.12
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - gallery_package:
-                            Control: Label@2.5.1
-                            Properties:
-                              AutoHeight: =false
-                              BorderColor: =RGBA(0, 0, 0, 0)
-                              Color: =If(!IsBlank(ThisItem.packagefolderurl), RGBA(192, 0, 0, 1), RGBA(192, 0, 0, 0.45))
-                              Font: =Font.'Segoe UI'
-                              FontWeight: =FontWeight.Bold
-                              Height: =22
-                              OnSelect: |-
-                                =If(
-                                    !IsBlank(ThisItem.packagefolderurl),
-                                    Launch(ThisItem.packagefolderurl)
-                                )
-                              Overflow: =Overflow.Hidden
-                              PaddingBottom: =0
-                              PaddingLeft: =8
-                              PaddingRight: =4
-                              PaddingTop: =0
-                              Size: =12
-                              Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
-                              Tooltip: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
-                              Underline: =!IsBlank(ThisItem.packagefolderurl)
-                              VerticalAlign: =VerticalAlign.Middle
-                              Width: =Parent.Width * 0.12
-                              Wrap: =false
-                              X: =0
-                              Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2) - Separator24.Height
-                        - gallery_status_label:
-                            Control: Label@2.5.1
-                            Properties:
-                              BorderColor: =RGBA(0, 0, 0, 0)
-                              BorderStyle: =BorderStyle.None
-                              BorderThickness: =2
-                              Color: =RGBA(50, 49, 48, 1)
-                              DisabledBorderColor: =RGBA(0, 0, 0, 0)
-                              DisabledColor: =RGBA(161, 159, 157, 1)
-                              FocusedBorderThickness: =4
-                              Font: =Font.'Segoe UI'
-                              Height: =15
-                              Size: =8
-                              Text: |-
-                                =Switch(
-                                    true,
+                                          !IsBlank(ThisItem.actualrfqissuedate) &&
+                                          IsBlank(ThisItem.actualrfqclosingdate) &&
+                                          !IsBlank(ThisItem.revisedplannedrfqclosingdate) &&
+                                          ThisItem.revisedplannedrfqclosingdate < Today(),
+                                          "⚠️ Delayed: RFQ Closing overdue by " & DateDiff(ThisItem.revisedplannedrfqclosingdate, Today(), TimeUnit.Days) & " days",
 
-                                    // Ignored contract types - no status banner
-                                    ThisItem.contracttype in varIgnoredContractTypes,
-                                    "",
+                                          !IsBlank(ThisItem.actualrfqclosingdate) &&
+                                          IsBlank(ThisItem.actualevaluationcompletiondate) &&
+                                          !IsBlank(ThisItem.revisedplannedevaluationcompletio) &&
+                                          ThisItem.revisedplannedevaluationcompletio < Today(),
+                                          "⚠️ Delayed: Evaluation overdue by " & DateDiff(ThisItem.revisedplannedevaluationcompletio, Today(), TimeUnit.Days) & " days",
 
-                                    // Delayed cases
-                                    IsBlank(ThisItem.actualsowdate) &&
-                                    !IsBlank(ThisItem.revisedplannedsowdate) &&
-                                    ThisItem.revisedplannedsowdate < Today(),
-                                    "⚠️ Delayed: SOW overdue by " & DateDiff(ThisItem.revisedplannedsowdate, Today(), TimeUnit.Days) & " days",
+                                          !IsBlank(ThisItem.actualevaluationcompletiondate) &&
+                                          IsBlank(ThisItem.actualawarddate) &&
+                                          !IsBlank(ThisItem.revisedplannedawarddate) &&
+                                          ThisItem.revisedplannedawarddate < Today(),
+                                          "⚠️ Delayed: Award overdue by " & DateDiff(ThisItem.revisedplannedawarddate, Today(), TimeUnit.Days) & " days",
 
-                                    !IsBlank(ThisItem.actualsowdate) &&
-                                    IsBlank(ThisItem.actualrfqissuedate) &&
-                                    !IsBlank(ThisItem.revisedplannedrfqissuedate) &&
-                                    ThisItem.revisedplannedrfqissuedate < Today(),
-                                    "⚠️ Delayed: RFQ Issue overdue by " & DateDiff(ThisItem.revisedplannedrfqissuedate, Today(), TimeUnit.Days) & " days",
+                                          // At Risk cases
+                                          IsBlank(ThisItem.actualsowdate) &&
+                                          !IsBlank(ThisItem.revisedplannedsowdate) &&
+                                          ThisItem.revisedplannedsowdate >= Today() &&
+                                          ThisItem.revisedplannedsowdate <= DateAdd(Today(), 7, TimeUnit.Days),
+                                          "🔶 At Risk: SOW due in " & DateDiff(Today(), ThisItem.revisedplannedsowdate, TimeUnit.Days) & " days",
 
-                                    !IsBlank(ThisItem.actualrfqissuedate) &&
-                                    IsBlank(ThisItem.actualrfqclosingdate) &&
-                                    !IsBlank(ThisItem.revisedplannedrfqclosingdate) &&
-                                    ThisItem.revisedplannedrfqclosingdate < Today(),
-                                    "⚠️ Delayed: RFQ Closing overdue by " & DateDiff(ThisItem.revisedplannedrfqclosingdate, Today(), TimeUnit.Days) & " days",
+                                          !IsBlank(ThisItem.actualsowdate) &&
+                                          IsBlank(ThisItem.actualrfqissuedate) &&
+                                          !IsBlank(ThisItem.revisedplannedrfqissuedate) &&
+                                          ThisItem.revisedplannedrfqissuedate >= Today() &&
+                                          ThisItem.revisedplannedrfqissuedate <= DateAdd(Today(), 7, TimeUnit.Days),
+                                          "🔶 At Risk: RFQ Issue due in " & DateDiff(Today(), ThisItem.revisedplannedrfqissuedate, TimeUnit.Days) & " days",
 
-                                    !IsBlank(ThisItem.actualrfqclosingdate) &&
-                                    IsBlank(ThisItem.actualevaluationcompletiondate) &&
-                                    !IsBlank(ThisItem.revisedplannedevaluationcompletio) &&
-                                    ThisItem.revisedplannedevaluationcompletio < Today(),
-                                    "⚠️ Delayed: Evaluation overdue by " & DateDiff(ThisItem.revisedplannedevaluationcompletio, Today(), TimeUnit.Days) & " days",
+                                          !IsBlank(ThisItem.actualrfqissuedate) &&
+                                          IsBlank(ThisItem.actualrfqclosingdate) &&
+                                          !IsBlank(ThisItem.revisedplannedrfqclosingdate) &&
+                                          ThisItem.revisedplannedrfqclosingdate >= Today() &&
+                                          ThisItem.revisedplannedrfqclosingdate <= DateAdd(Today(), 7, TimeUnit.Days),
+                                          "🔶 At Risk: RFQ Closing due in " & DateDiff(Today(), ThisItem.revisedplannedrfqclosingdate, TimeUnit.Days) & " days",
 
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate) &&
-                                    IsBlank(ThisItem.actualawarddate) &&
-                                    !IsBlank(ThisItem.revisedplannedawarddate) &&
-                                    ThisItem.revisedplannedawarddate < Today(),
-                                    "⚠️ Delayed: Award overdue by " & DateDiff(ThisItem.revisedplannedawarddate, Today(), TimeUnit.Days) & " days",
+                                          !IsBlank(ThisItem.actualrfqclosingdate) &&
+                                          IsBlank(ThisItem.actualevaluationcompletiondate) &&
+                                          !IsBlank(ThisItem.revisedplannedevaluationcompletio) &&
+                                          ThisItem.revisedplannedevaluationcompletio >= Today() &&
+                                          ThisItem.revisedplannedevaluationcompletio <= DateAdd(Today(), 7, TimeUnit.Days),
+                                          "🔶 At Risk: Evaluation due in " & DateDiff(Today(), ThisItem.revisedplannedevaluationcompletio, TimeUnit.Days) & " days",
 
-                                    // At Risk cases
-                                    IsBlank(ThisItem.actualsowdate) &&
-                                    !IsBlank(ThisItem.revisedplannedsowdate) &&
-                                    ThisItem.revisedplannedsowdate >= Today() &&
-                                    ThisItem.revisedplannedsowdate <= DateAdd(Today(), 7, TimeUnit.Days),
-                                    "🔶 At Risk: SOW due in " & DateDiff(Today(), ThisItem.revisedplannedsowdate, TimeUnit.Days) & " days",
+                                          !IsBlank(ThisItem.actualevaluationcompletiondate) &&
+                                          IsBlank(ThisItem.actualawarddate) &&
+                                          !IsBlank(ThisItem.revisedplannedawarddate) &&
+                                          ThisItem.revisedplannedawarddate >= Today() &&
+                                          ThisItem.revisedplannedawarddate <= DateAdd(Today(), 7, TimeUnit.Days),
+                                          "🔶 At Risk: Award due in " & DateDiff(Today(), ThisItem.revisedplannedawarddate, TimeUnit.Days) & " days",
 
-                                    !IsBlank(ThisItem.actualsowdate) &&
-                                    IsBlank(ThisItem.actualrfqissuedate) &&
-                                    !IsBlank(ThisItem.revisedplannedrfqissuedate) &&
-                                    ThisItem.revisedplannedrfqissuedate >= Today() &&
-                                    ThisItem.revisedplannedrfqissuedate <= DateAdd(Today(), 7, TimeUnit.Days),
-                                    "🔶 At Risk: RFQ Issue due in " & DateDiff(Today(), ThisItem.revisedplannedrfqissuedate, TimeUnit.Days) & " days",
-
-                                    !IsBlank(ThisItem.actualrfqissuedate) &&
-                                    IsBlank(ThisItem.actualrfqclosingdate) &&
-                                    !IsBlank(ThisItem.revisedplannedrfqclosingdate) &&
-                                    ThisItem.revisedplannedrfqclosingdate >= Today() &&
-                                    ThisItem.revisedplannedrfqclosingdate <= DateAdd(Today(), 7, TimeUnit.Days),
-                                    "🔶 At Risk: RFQ Closing due in " & DateDiff(Today(), ThisItem.revisedplannedrfqclosingdate, TimeUnit.Days) & " days",
-
-                                    !IsBlank(ThisItem.actualrfqclosingdate) &&
-                                    IsBlank(ThisItem.actualevaluationcompletiondate) &&
-                                    !IsBlank(ThisItem.revisedplannedevaluationcompletio) &&
-                                    ThisItem.revisedplannedevaluationcompletio >= Today() &&
-                                    ThisItem.revisedplannedevaluationcompletio <= DateAdd(Today(), 7, TimeUnit.Days),
-                                    "🔶 At Risk: Evaluation due in " & DateDiff(Today(), ThisItem.revisedplannedevaluationcompletio, TimeUnit.Days) & " days",
-
-                                    !IsBlank(ThisItem.actualevaluationcompletiondate) &&
-                                    IsBlank(ThisItem.actualawarddate) &&
-                                    !IsBlank(ThisItem.revisedplannedawarddate) &&
-                                    ThisItem.revisedplannedawarddate >= Today() &&
-                                    ThisItem.revisedplannedawarddate <= DateAdd(Today(), 7, TimeUnit.Days),
-                                    "🔶 At Risk: Award due in " & DateDiff(Today(), ThisItem.revisedplannedawarddate, TimeUnit.Days) & " days",
-
-                                    // On Track
-                                    ""
-                                )
-                              Width: =358
+                                          // On Track
+                                          ""
+                                      )
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =0
+                                    PaddingLeft: =8
+                                    PaddingRight: =8
+                                    PaddingTop: =0
+                                    Wrap: =true
+                                    Width: =Parent.Width

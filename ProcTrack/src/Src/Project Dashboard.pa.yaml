@@ -13,45 +13,70 @@ Screens:
       LoadingSpinnerColor: =RGBA(0, 120, 212, 1)
       OnVisible: |-
         =Set(varPackageFilter, "all");
-                Set(varSelectedProject, Blank());
-                Set(varUserPerm, LookUp('ProcTrack - Permissions', Title = varCurrentUserEmail));
-                Set(varIsAdmin, Coalesce(varUserPerm.IsAdmin, false));
-                ClearCollect(
-                    colMyProjectIds,
-                    Distinct(
-                        Filter(
-                            Split(
-                                Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
-                                ";"
-                            ),
-                            !IsBlank(Trim(ThisRecord.Value))
-                        ),
-                        Value
-                    )
-                );
-                Clear(colPermittedProjects);
+        Set(varSelectedProject, Blank());
+        Set(varCurrentUserEmail, Lower(User().Email));
+        ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+        ClearCollect(colAllProjects, 'ProcTrack - Projects');
+        Set(varUserPerm, LookUp(colAllPermissions, Lower(Title) = varCurrentUserEmail));
+        Set(
+            varIsAdmin,
+            !IsBlank(varUserPerm) &&
+            (
+                varUserPerm.IsAdmin = true ||
+                Lower(Text(varUserPerm.IsAdmin)) = "true" ||
+                Lower(Text(varUserPerm.IsAdmin)) = "yes"
+            )
+        );
+        ClearCollect(
+            colMyProjectIds,
+            Filter(
+                Split(
+                    Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                    ";"
+                ),
+                !IsBlank(Trim(Value))
+            )
+        );
+        ClearCollect(
+            colPermittedProjects,
+            If(
+                varIsAdmin,
+                colAllProjects,
+                Filter(
+                    colAllProjects,
+                    !IsBlank(LookUp(colMyProjectIds, Trim(Value) = projectid))
+                )
+            )
+        );
+        // One delegable query per project. Do not filter colPermittedProjects inside this loop.
+        If(
+            CountRows(colPermittedProjects) > 0,
+            ClearCollect(
+                colPermittedPackages,
+                Filter(
+                    'ProcTrack - Packages',
+                    projectidentifier = First(colPermittedProjects).projectidentifier ||
+                    ProjectID = First(colPermittedProjects).projectid
+                )
+            );
+            If(
+                CountRows(colPermittedProjects) > 1,
                 ForAll(
-                    colMyProjectIds As idRow,
-                    Collect(
-                        colPermittedProjects,
-                        LookUp('ProcTrack - Projects', projectid = Trim(idRow.Value))
-                    )
-                );
-                ClearCollect(
-                    colPermittedProjects,
-                    Filter(colPermittedProjects, !IsBlank(projectid))
-                );
-                Clear(colPermittedPackages);
-                ForAll(
-                    colPermittedProjects As p,
-                    Collect(
-                        colPermittedPackages,
-                        Filter(
-                            'ProcTrack - Packages',
-                            ProjectID = p.projectid || projectidentifier = p.projectidentifier
+                    colPermittedProjects As proj,
+                    If(
+                        proj.projectidentifier <> First(colPermittedProjects).projectidentifier ||
+                        proj.projectid <> First(colPermittedProjects).projectid,
+                        Collect(
+                            colPermittedPackages,
+                            Filter(
+                                'ProcTrack - Packages',
+                                projectidentifier = proj.projectidentifier || ProjectID = proj.projectid
+                            )
                         )
                     )
                 )
+            )
+        )
     Children:
       - dash_main_container:
           Control: GroupContainer@1.5.0
@@ -75,7 +100,7 @@ Screens:
                   DropShadow: =DropShadow.Light
                   Fill: =RGBA(214, 12, 48, 1)
                   FillPortions: =0
-                  Height: =64
+                  Height: =80
                   LayoutAlignItems: =LayoutAlignItems.Center
                   LayoutDirection: =LayoutDirection.Horizontal
                   LayoutGap: =10
@@ -129,7 +154,7 @@ Screens:
                             Properties:
                               AutoHeight: =true
                               FontColor: =RGBA(255, 255, 255, 1)
-                              Size: =20
+                              Size: =16
                               Text: ="ProcTrack"
                               Weight: ='TextCanvas.Weight'.Bold
                               Width: =260
@@ -149,6 +174,39 @@ Screens:
                         FillPortions: =1
                         LayoutMinHeight: =16
                         LayoutMinWidth: =16
+                  - dash_header_user_col:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        LayoutAlignItems: =LayoutAlignItems.End
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =0
+                        Width: =180
+                      Children:
+                        - dash_header_user_label:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.End
+                              AutoHeight: =true
+                              FontColor: =RGBA(255, 255, 255, 0.7)
+                              Size: =10
+                              Text: ="SIGNED IN AS"
+                              Weight: ='TextCanvas.Weight'.Bold
+                              Width: =200
+                        - dash_header_user_name:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.End
+                              AutoHeight: =true
+                              FontColor: =RGBA(255, 255, 255, 1)
+                              Size: =13
+                              Text: =User().FullName
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =200
                   - dash_settings_wrap:
                       Control: GroupContainer@1.5.0
                       Variant: ManualLayout
@@ -177,38 +235,6 @@ Screens:
                               Width: =18
                               X: =7
                               Y: =7
-                  - dash_header_user_col:
-                      Control: GroupContainer@1.5.0
-                      Variant: AutoLayout
-                      Properties:
-                        DropShadow: =DropShadow.None
-                        FillPortions: =0
-                        LayoutAlignItems: =LayoutAlignItems.End
-                        LayoutDirection: =LayoutDirection.Vertical
-                        LayoutGap: =0
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
-                      Children:
-                        - dash_header_user_label:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.End
-                              AutoHeight: =true
-                              FontColor: =RGBA(255, 255, 255, 0.7)
-                              Size: =10
-                              Text: ="SIGNED IN AS"
-                              Weight: ='TextCanvas.Weight'.Bold
-                              Width: =200
-                        - dash_header_user_name:
-                            Control: Text@0.0.51
-                            Properties:
-                              Align: ='TextCanvas.Align'.End
-                              AutoHeight: =true
-                              FontColor: =RGBA(255, 255, 255, 1)
-                              Size: =13
-                              Text: =User().FullName
-                              Weight: ='TextCanvas.Weight'.Semibold
-                              Width: =200
             - dash_kpi_row:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -777,7 +803,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    projectidentifier = ThisItem.projectidentifier && archived <> true
+                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true
                                                 )
                                             )
                                           Width: =dash_metric_packages.Width - 12
@@ -830,7 +856,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    projectidentifier = ThisItem.projectidentifier && !IsBlank(actualawarddate) && archived <> true
+                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && !IsBlank(actualawarddate) && archived <> true
                                                 )
                                             )
                                           Width: =dash_metric_awarded.Width - 12
@@ -897,7 +923,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    projectidentifier = ThisItem.projectidentifier && archived <> true && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate < Today()
+                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate < Today()
                                                 )
                                             )
                                           Width: =dash_metric_delayed.Width - 12
@@ -950,7 +976,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    projectidentifier = ThisItem.projectidentifier && archived <> true && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate >= Today() && revisedplannedawarddate <= Today() + 30
+                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate >= Today() && revisedplannedawarddate <= Today() + 30
                                                 )
                                             )
                                           Width: =dash_metric_risk.Width - 12
@@ -990,7 +1016,7 @@ Screens:
                                     varCanEditCurrentProject,
                                     varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = ThisItem.projectid))
                                 );
-                                Navigate('Welcome screen', ScreenTransition.Fade)
+                                Navigate('Project Home', ScreenTransition.Fade)
                               RadiusBottomLeft: =6
                               RadiusBottomRight: =6
                               RadiusTopLeft: =6

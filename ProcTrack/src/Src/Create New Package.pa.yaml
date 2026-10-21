@@ -40,16 +40,16 @@ Screens:
                   DropShadow: =DropShadow.Light
                   Fill: =RGBA(214, 12, 48, 1)
                   FillPortions: =0
-                  Height: =108
+                  Height: =140
                   LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =8
-                  LayoutMinHeight: =108
+                  LayoutGap: =6
+                  LayoutMinHeight: =140
                   LayoutMinWidth: =16
                   PaddingBottom: =12
                   PaddingLeft: =16
                   PaddingRight: =16
-                  PaddingTop: =12
+                  PaddingTop: =8
                   RadiusBottomLeft: =8
                   RadiusBottomRight: =8
                   RadiusTopLeft: =8
@@ -62,11 +62,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =44
+                        Height: =52
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =44
+                        LayoutMinHeight: =52
                         LayoutMinWidth: =16
                       Children:
                         - create_header_icon_wrap:
@@ -111,7 +111,7 @@ Screens:
                                   Properties:
                                     AutoHeight: =true
                                     FontColor: =RGBA(255, 255, 255, 1)
-                                    Size: =20
+                                    Size: =16
                                     Text: ="ProcTrack"
                                     Weight: ='TextCanvas.Weight'.Bold
                                     Width: =260
@@ -169,11 +169,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =32
+                        Height: =56
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =32
+                        LayoutMinHeight: =56
                         LayoutMinWidth: =16
                       Children:
                         - create_header_project_picker_wrap:
@@ -182,12 +182,13 @@ Screens:
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              FillPortions: =1
+                              FillPortions: =0
+                              Width: =520
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Horizontal
                               LayoutGap: =8
-                              Height: =32
-                              LayoutMinHeight: =32
+                              Height: =48
+                              LayoutMinHeight: =48
                               LayoutMinWidth: =16
                               PaddingBottom: =0
                               PaddingLeft: =12
@@ -207,7 +208,8 @@ Screens:
                                     Color: =RGBA(106, 122, 127, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =32
+                                    Height: =40
+                                    VerticalAlign: =VerticalAlign.Middle
                                     Size: =11
                                     Text: ="Project"
                                     Width: =68
@@ -237,7 +239,7 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =32
+                                    Height: =40
                                     HoverBorderColor: =RGBA(0, 0, 0, 0)
                                     HoverColor: =RGBA(33, 33, 33, 1)
                                     HoverFill: =RGBA(255, 255, 255, 1)
@@ -251,8 +253,8 @@ Screens:
                                           ClearCollect(
                                               colProjectPackages,
                                               Filter(
-                                                  'ProcTrack - Packages',
-                                                  ProjectID = Self.Selected.projectid || projectidentifier = Self.Selected.projectidentifier
+                                                  colPermittedPackages,
+                                                  ProjectID = varSelectedProject.projectid || projectidentifier = varSelectedProject.projectidentifier
                                               )
                                           );
                                           Set(
@@ -334,115 +336,123 @@ Screens:
                         AlignInContainer: =AlignInContainer.SetByContainer
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        FillPortions: =25
-                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutAlignItems: =LayoutAlignItems.Start
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutGap: =16
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
-                        LayoutOverflowY: =LayoutOverflow.Scroll
-                        LayoutWrap: =true
-                        PaddingBottom: =2
-                        PaddingLeft: =2
-                        PaddingRight: =2
-                        PaddingTop: =2
+                        LayoutGap: =12
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =4
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
-                        X: =40
-                        Y: =40
+                        Height: =76
                       Children:
                         - Container7_14:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - Text3_14:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: ="Description"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - package_description_input_1:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: |-
                                       =If(
                                           varShowValidationErrors && IsBlank(Self.Text),
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)  // Default border color
                                       )
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
                                     RadiusTopRight: =5
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container7_15:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - Text3_15:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: ="MPL"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - mpl_input:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: =RGBA(214, 221, 224, 1)
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
                                     RadiusTopRight: =5
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container7_16:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - contract_type_title:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: ="Contract Type"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - contract_type_input:
                                   Control: DropDown@0.0.45
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     BorderRadius: =5
                                     Fill: |-
                                       =If(
@@ -450,7 +460,7 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)  // Default border color
                                       )
-                                    Height: =40
+                                    Height: =36
                                     Items: |-
                                       =// Items
                                       [
@@ -467,8 +477,11 @@ Screens:
                                           "Self Perform",
                                           "Affiliate Construction Subcontract"
                                       ]
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                   - MainContainer6_1:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
@@ -476,81 +489,84 @@ Screens:
                         AlignInContainer: =AlignInContainer.SetByContainer
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        FillPortions: =25
-                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutAlignItems: =LayoutAlignItems.Start
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutGap: =16
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
-                        LayoutOverflowY: =LayoutOverflow.Scroll
-                        LayoutWrap: =true
-                        PaddingBottom: =2
-                        PaddingLeft: =2
-                        PaddingRight: =2
-                        PaddingTop: =2
+                        LayoutGap: =12
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =4
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
-                        X: =40
-                        Y: =40
+                        Height: =76
                       Children:
                         - Container7:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - Text3:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: |-
                                       ="Item #"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - item_no_input:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Default: =current_project_selected.Selected.projectcode
                                     Fill: =RGBA(214, 221, 224, 1)
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
                                     RadiusTopRight: =5
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container8:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - Text5:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: ="Prerequisite Design?"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - prerequisite_design_input:
                                   Control: DropDown@0.0.45
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     BorderRadius: =5
                                     Fill: |-
                                       =If(
@@ -558,20 +574,23 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)  // Default border color
                                       )
-                                    Height: =40
+                                    Height: =36
                                     Items: =["Yes", "No"]
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container8_1:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - Container25_3:
                                   Control: GroupContainer@1.5.0
@@ -579,12 +598,15 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =32
+                                    Height: =20
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    X: =4
+                                    Y: =4
+                                    Width: =Parent.Width - 8
                                   Children:
                                     - Text5_10:
                                         Control: ModernText@1.0.0
@@ -629,7 +651,6 @@ Screens:
                               - quality_program_input:
                                   Control: DropDown@0.0.45
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     BorderRadius: =5
                                     Fill: |-
                                       =If(
@@ -637,7 +658,7 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =40
+                                    Height: =18
                                     Items: |-
                                       =// Items
                                       [
@@ -650,26 +671,28 @@ Screens:
                                           "NCA-4000",
                                           "N291"
                                       ]
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Visible: |+
                                       =If(varQualityText = "No",
                                           true,
                                           false
                                       )
+                                    X: =4
+                                    Y: =4
+                                    Width: =Parent.Width - 8
                               - quality_program_text:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: |-
                                       =If(
                                           varShowValidationErrors && IsBlank(quality_program_input.Selected.Value) && IsBlank(Self.Text),
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
@@ -679,8 +702,9 @@ Screens:
                                           false,
                                           true
                                       )
-                                    X: =40
-                                    Y: =40
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
             - people_responsibilities:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -711,47 +735,45 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        FillPortions: =25
-                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutAlignItems: =LayoutAlignItems.Start
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutGap: =16
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
-                        LayoutOverflowY: =LayoutOverflow.Scroll
-                        LayoutWrap: =true
-                        PaddingBottom: =2
-                        PaddingLeft: =2
-                        PaddingRight: =2
-                        PaddingTop: =2
+                        LayoutGap: =12
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =4
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
-                        X: =40
-                        Y: =40
+                        Height: =76
                       Children:
                         - Container7_1:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =Parent.Width - 16
                             Children:
                               - Text3_1:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: ="Site / Location"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - bop_site_location_input:
                                   Control: DropDown@0.0.45
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     BorderRadius: =5
                                     Fill: |-
                                       =If(
@@ -759,46 +781,45 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)  // Default border color
                                       )
-                                    Height: =40
+                                    Height: =36
                                     Items: |-
                                       =// Items
                                       ["PB-MPEI", "PB-Civil", "BOP"]
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                   - MainContainer6_3:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        FillPortions: =25
-                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutAlignItems: =LayoutAlignItems.Start
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutGap: =16
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
-                        LayoutOverflowY: =LayoutOverflow.Scroll
-                        LayoutWrap: =true
-                        PaddingBottom: =2
-                        PaddingLeft: =2
-                        PaddingRight: =2
-                        PaddingTop: =2
+                        LayoutGap: =12
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =4
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
-                        X: =40
-                        Y: =40
+                        Height: =76
                       Children:
                         - Container7_2:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 52) / 4
                             Children:
                               - Container25_1:
                                   Control: GroupContainer@1.5.0
@@ -806,12 +827,15 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =32
+                                    Height: =20
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    X: =4
+                                    Y: =4
+                                    Width: =Parent.Width - 8
                                   Children:
                                     - Text5_7:
                                         Control: ModernText@1.0.0
@@ -854,16 +878,15 @@ Screens:
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Width: =33
                               - procurement_lead_input:
-                                  Control: ModernCombobox@1.1.0
+                                  Control: ModernCombobox@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: |-
                                       =If(
                                           varShowValidationErrors && IsBlank(Self.Selected.UserPrincipalName) && IsBlank(procurement_lead_input_txt.Text),
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =40
+                                    Height: =18
                                     InputTextPlaceholder: ="Search by name"
                                     ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                     Items: |-
@@ -880,8 +903,8 @@ Screens:
                                               Department
                                           )
                                       )
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     OnChange: |+
                                       =If(
                                           IsBlank(Self.Selected.DisplayName),
@@ -897,19 +920,21 @@ Screens:
                                           true,
                                           false
                                       )
+                                    X: =4
+                                    Y: =4
+                                    Width: =Parent.Width - 8
                               - procurement_lead_input_txt:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: |-
                                       =If(
                                           varShowValidationErrors && IsBlank(procurement_lead_input.Selected.UserPrincipalName) && IsBlank(Self.Text),
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
@@ -919,15 +944,18 @@ Screens:
                                           false,
                                           true
                                       )
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container8_3:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 52) / 4
                             Children:
                               - Container25:
                                   Control: GroupContainer@1.5.0
@@ -935,12 +963,15 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =32
+                                    Height: =20
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    X: =4
+                                    Y: =4
+                                    Width: =Parent.Width - 8
                                   Children:
                                     - Text5_3:
                                         Control: ModernText@1.0.0
@@ -983,9 +1014,8 @@ Screens:
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Width: =33
                               - operations_lead_input:
-                                  Control: ModernCombobox@1.1.0
+                                  Control: ModernCombobox@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     DefaultSelectedItems: |+
                                       =// DefaultSelectedItems
                                       If(
@@ -1015,7 +1045,7 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =40
+                                    Height: =18
                                     InputTextPlaceholder: ="Search by name"
                                     ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                     Items: |+
@@ -1032,8 +1062,8 @@ Screens:
                                               Department
                                           )
                                       )
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     OnChange: |+
                                       =If(
                                           IsBlank(Self.Selected.DisplayName),
@@ -1049,19 +1079,21 @@ Screens:
                                           true,
                                           false
                                       )
+                                    X: =4
+                                    Y: =4
+                                    Width: =Parent.Width - 8
                               - operations_lead_input_txt:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: |-
                                       =If(
                                           varShowValidationErrors && IsBlank(operations_lead_input.Selected.UserPrincipalName) && IsBlank(Self.Text),
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
@@ -1071,15 +1103,18 @@ Screens:
                                           false,
                                           true
                                       )
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container8_4:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 52) / 4
                             Children:
                               - Container25_2:
                                   Control: GroupContainer@1.5.0
@@ -1087,12 +1122,15 @@ Screens:
                                   Properties:
                                     DropShadow: =DropShadow.None
                                     FillPortions: =0
-                                    Height: =32
+                                    Height: =20
                                     LayoutAlignItems: =LayoutAlignItems.Center
                                     LayoutDirection: =LayoutDirection.Horizontal
                                     LayoutJustifyContent: =LayoutJustifyContent.SpaceBetween
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    X: =4
+                                    Y: =4
+                                    Width: =Parent.Width - 8
                                   Children:
                                     - Text5_9:
                                         Control: ModernText@1.0.0
@@ -1135,11 +1173,10 @@ Screens:
                                           PressedFill: =RGBA(0, 0, 0, 0)
                                           Width: =33
                               - technical_lead_input:
-                                  Control: ModernCombobox@1.1.0
+                                  Control: ModernCombobox@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: =RGBA(214, 221, 224, 1)
-                                    Height: =40
+                                    Height: =18
                                     InputTextPlaceholder: ="Search by name"
                                     ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                     Items: |+
@@ -1156,8 +1193,8 @@ Screens:
                                               Department
                                           )
                                       )
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     OnChange: |+
                                       =If(
                                           IsBlank(Self.Selected.DisplayName),
@@ -1173,14 +1210,16 @@ Screens:
                                           true,
                                           false
                                       )
+                                    X: =4
+                                    Y: =4
+                                    Width: =Parent.Width - 8
                               - technical_lead_input_txt:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: =RGBA(214, 221, 224, 1)
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
@@ -1190,27 +1229,32 @@ Screens:
                                           false,
                                           true
                                       )
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container8_5:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 52) / 4
                             Children:
                               - Text5_5:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Text: ="Package Bundle"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - package_bundle_input:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Default: |-
                                       =// package_bundle_input - Default
                                       If(
@@ -1228,13 +1272,16 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)  // Default border color
                                       )
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
                                     RadiusTopRight: =5
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
             - timeline_budget:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -1265,115 +1312,122 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        FillPortions: =25
-                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutAlignItems: =LayoutAlignItems.Start
                         LayoutDirection: =LayoutDirection.Horizontal
-                        LayoutGap: =16
-                        LayoutMinHeight: =16
-                        LayoutMinWidth: =16
-                        LayoutOverflowY: =LayoutOverflow.Scroll
-                        LayoutWrap: =true
-                        PaddingBottom: =2
-                        PaddingLeft: =2
-                        PaddingRight: =2
-                        PaddingTop: =2
+                        LayoutGap: =12
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =4
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
-                        X: =40
-                        Y: =40
+                        Height: =76
                       Children:
                         - Container7_3:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - Text3_3:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: ="Required at Site (RAS)"
-                                    Width: =200
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - ras_input:
-                                  Control: ModernDatePicker@1.0.0
+                                  Control: ModernDatePicker@1.0.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: |-
                                       =If(
                                           varShowValidationErrors && IsBlank(Self.SelectedDate),
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)  // Default border color
                                       )
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
                                     RadiusTopRight: =5
                                     Size: =16
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container8_6:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - Text5_6:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: ="P6 Planned Award"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - p6_planned_award_input:
-                                  Control: ModernDatePicker@1.0.0
+                                  Control: ModernDatePicker@1.0.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Fill: =RGBA(214, 221, 224, 1)
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     RadiusBottomLeft: =5
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
                                     RadiusTopRight: =5
                                     Size: =16
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
                         - Container8_8:
                             Control: GroupContainer@1.5.0
-                            Variant: AutoLayout
+                            Variant: ManualLayout
                             Properties:
                               DropShadow: =DropShadow.None
-                              LayoutAlignItems: =LayoutAlignItems.Center
-                              LayoutDirection: =LayoutDirection.Vertical
-                              LayoutMinHeight: =16
-                              LayoutMinWidth: =16
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              Height: =76
+                              Width: =(Parent.Width - 40) / 3
                             Children:
                               - Text5_8:
                                   Control: ModernText@1.0.0
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     Size: =16
                                     Text: ="Est. Budget"
+                                    X: =4
+                                    Y: =4
+                                    Height: =18
+                                    Width: =Parent.Width - 8
                               - est_budget_input:
-                                  Control: ModernTextInput@1.1.0
+                                  Control: ModernTextInput@1.1.2
                                   Properties:
-                                    AlignInContainer: =AlignInContainer.Stretch
                                     Default: =varFormattedNumber
                                     Fill: |-
                                       =If(
@@ -1381,9 +1435,9 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)  // Default border color
                                       )
-                                    Height: =40
-                                    LayoutMinHeight: =16
-                                    LayoutMinWidth: =16
+                                    Height: =36
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
                                     OnChange: |-
                                       =UpdateContext({ 
                                           varFormattedNumber: Text(
@@ -1396,6 +1450,9 @@ Screens:
                                     RadiusBottomRight: =5
                                     RadiusTopLeft: =5
                                     RadiusTopRight: =5
+                                    X: =4
+                                    Y: =26
+                                    Width: =Parent.Width - 8
             - buttons:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -1441,7 +1498,7 @@ Screens:
                         Icon: =Icon.Add
                         IconVisible: =false
                         LayoutMinHeight: =0
-                        OnPressAction: "=// ── Validation ────────────────────────────────────────────────────────────────\r\nIf(\r\n    IsBlank(current_project_selected.Selected.projectidentifier) Or\r\n    IsBlank(prerequisite_design_input.Selected.Value) Or\r\n    IsBlank(quality_program_input.Selected.Value) Or\r\n    IsBlank(bop_site_location_input.Selected.Value) Or\r\n    (IsBlank(procurement_lead_input.Selected.UserPrincipalName) && IsBlank(procurement_lead_input_txt.Text)) Or\r\n    (IsBlank(operations_lead_input.Selected.UserPrincipalName) && IsBlank(operations_lead_input_txt.Text)) Or\r\n    IsBlank(package_bundle_input.Text) Or\r\n    IsBlank(ras_input.SelectedDate),\r\n\r\n    // ── Show validation errors ───────────────────────────────────────────────\r\n    UpdateContext({varShowValidationErrors: true});\r\n    Notify(\"Please fill out all required fields before submitting.\", NotificationType.Error),\r\n\r\n    // ── Validation passed - proceed with save ────────────────────────────────\r\n    UpdateContext({varShowValidationErrors: false});\r\n    \r\n    // ── Patch to Sharepoint ──────────────────────────────────────────────────\r\n    IfError(\r\n        With(\r\n            {\r\n                newRecord: Patch(\r\n                    'ProcTrack - Packages',\r\n                    Defaults('ProcTrack - Packages'),\r\n                    {\r\n                        Title:                              GUID(),\r\n                        packageidentifier:                  GUID(),\r\n                        ProjectID: current_project_selected.Selected.projectid,\r\n                                    projectidentifier:                  current_project_selected.Selected.projectidentifier,\r\n                        packagedescription:                 package_description_input_1.Text,\r\n                        itemnumber:                         item_no_input.Text,\r\n                        prerequisitedesigndeliverable:      prerequisite_design_input.Selected.Value,\r\n                        qualityprogram:                     If(!IsBlank(quality_program_input.Selected.Value), quality_program_input.Selected.Value, quality_program_text.Text),\r\n                        bopsite:                            bop_site_location_input.Selected.Value,\r\n                        contracttype:                       If(!IsBlank(contract_type_input.Selected.Value), contract_type_input.Selected.Value, \"\"),\r\n                        procpackageleadname:                If(!IsBlank(procurement_lead_input.Selected.DisplayName), procurement_lead_input.Selected.DisplayName, procurement_lead_input_txt.Text),\r\n                        procurementpackageleadid:           If(!IsBlank(procurement_lead_input.Selected.UserPrincipalName), procurement_lead_input.Selected.UserPrincipalName, \"\"),\r\n                        opspackageleadname:                 If(!IsBlank(operations_lead_input.Selected.DisplayName), operations_lead_input.Selected.DisplayName, operations_lead_input_txt.Text),\r\n                        operationspackageleadid:            If(!IsBlank(operations_lead_input.Selected.UserPrincipalName), operations_lead_input.Selected.UserPrincipalName, \"\"),\r\n                        engineeringcontactname:             If(!IsBlank(technical_lead_input.Selected.DisplayName), technical_lead_input.Selected.DisplayName, technical_lead_input_txt.Text),\r\n                        engineeringcontactid:               If(!IsBlank(technical_lead_input.Selected.UserPrincipalName), technical_lead_input.Selected.UserPrincipalName, \"\"),\r\n                        operationspackagebundle:            package_bundle_input.Text,\r\n                        requiredatsitedate:                 ras_input.SelectedDate,\r\n                        ras_original_input:                 ras_input.SelectedDate,\r\n                        plannedawarddate:                   p6_planned_award_input.SelectedDate,\r\n                        budgetamount:                       If(!IsBlank(est_budget_input.Text), Value(est_budget_input.Text), Blank()),\r\n                        mplcode:                            mpl_input.Text,\r\n                        sole_source:                        \"No\",\r\n                        archived:                           false,\r\n\r\n                        // Durations\r\n                        leadtimesowtorfqissuedays:          15,\r\n                        leadtimerfqissuetoclosingdays:      30,\r\n                        leadtimeclosingtoevaluationdays:    30,\r\n                        leadtimeevaluationtoawarddays:      30,\r\n                        standardleadtimemonths:             30,\r\n\r\n                        // Original planned dates (backward from RAS)\r\n                        originalplannedsowdate:             DateAdd(ras_input.SelectedDate, -135, TimeUnit.Days),\r\n                        originalplannedrfqissuedate:        DateAdd(ras_input.SelectedDate, -120, TimeUnit.Days),\r\n                        originalplannedrfqclosingdate:      DateAdd(ras_input.SelectedDate, -90, TimeUnit.Days),\r\n                        originalplannedevaluationcompleti:  DateAdd(ras_input.SelectedDate, -60, TimeUnit.Days),\r\n                        originalplannedawarddate:           DateAdd(ras_input.SelectedDate, -30, TimeUnit.Days),\r\n\r\n                        // Revised planned dates (initialized equal to original planned)\r\n                        revisedplannedsowdate:              DateAdd(ras_input.SelectedDate, -135, TimeUnit.Days),\r\n                        revisedplannedrfqissuedate:         DateAdd(ras_input.SelectedDate, -120, TimeUnit.Days),\r\n                        revisedplannedrfqclosingdate:       DateAdd(ras_input.SelectedDate, -90, TimeUnit.Days),\r\n                        revisedplannedevaluationcompletio:  DateAdd(ras_input.SelectedDate, -60, TimeUnit.Days),\r\n                        revisedplannedawarddate:            DateAdd(ras_input.SelectedDate, -30, TimeUnit.Days)\r\n                    }\r\n                )\r\n            },\r\n\r\n            // ── Patch succeeded — build collection and navigate ─────────────\r\n            ClearCollect(\r\n                colPackageDetails,\r\n                {\r\n                    title:                              newRecord.Title,\r\n                    packageidentifier:                  newRecord.packageidentifier,\r\n                    projectidentifier:                  newRecord.projectidentifier,\r\n                    itemnumber:                         newRecord.itemnumber,\r\n                    archived:                           false,\r\n                    packagedescription:                 newRecord.packagedescription,\r\n                    packagetype:                        newRecord.packagetype,\r\n                    contracttype:                       newRecord.contracttype,\r\n                    qualityprogram:                     newRecord.qualityprogram,\r\n                    prerequisitedesigndeliverable:      newRecord.prerequisitedesigndeliverable,\r\n                    bopsite:                            newRecord.bopsite,\r\n                    mplcode:                            newRecord.mplcode,\r\n                    Created:                            newRecord.Created,\r\n                    comments:                           newRecord.comments,\r\n                    sole_source:                        newRecord.sole_source,\r\n\r\n                    procpackageleadname:                newRecord.procpackageleadname,\r\n                    procurementpackageleadid:           newRecord.procurementpackageleadid,\r\n                    opspackageleadname:                 newRecord.opspackageleadname,\r\n                    operationspackageleadid:            newRecord.operationspackageleadid,\r\n                    engineeringcontactid:               newRecord.engineeringcontactid,\r\n                    engineeringcontactname:             newRecord.engineeringcontactname,\r\n                    operationspackagebundle:            newRecord.operationspackagebundle,\r\n\r\n                    leadtimesowtorfqissuedays:          newRecord.leadtimesowtorfqissuedays,\r\n                    leadtimerfqissuetoclosingdays:      newRecord.leadtimerfqissuetoclosingdays,\r\n                    leadtimeclosingtoevaluationdays:    newRecord.leadtimeclosingtoevaluationdays,\r\n                    leadtimeevaluationtoawarddays:      newRecord.leadtimeevaluationtoawarddays,\r\n                    standardleadtimemonths:             newRecord.standardleadtimemonths,\r\n\r\n                    originalplannedsowdate:             newRecord.originalplannedsowdate,\r\n                    originalplannedrfqissuedate:        newRecord.originalplannedrfqissuedate,\r\n                    originalplannedrfqclosingdate:      newRecord.originalplannedrfqclosingdate,\r\n                    originalplannedevaluationcompleti:  newRecord.originalplannedevaluationcompleti,\r\n                    originalplannedawarddate:           newRecord.originalplannedawarddate,\r\n                    plannedawarddate:                   newRecord.plannedawarddate,\r\n                    requiredatsitedate:                 newRecord.requiredatsitedate,\r\n                    ras_original_input:                 newRecord.ras_original_input,\r\n\r\n                    actualsowdate:                      newRecord.actualsowdate,\r\n                    actualrfqissuedate:                 newRecord.actualrfqissuedate,\r\n                    actualrfqclosingdate:               newRecord.actualrfqclosingdate,\r\n                    actualevaluationcompletiondate:     newRecord.actualevaluationcompletiondate,\r\n                    actualawarddate:                    newRecord.actualawarddate,\r\n\r\n                    revisedplannedsowdate:              newRecord.revisedplannedsowdate,\r\n                    revisedplannedrfqissuedate:         newRecord.revisedplannedrfqissuedate,\r\n                    revisedplannedrfqclosingdate:       newRecord.revisedplannedrfqclosingdate,\r\n                    revisedplannedevaluationcompletio:  newRecord.revisedplannedevaluationcompletio,\r\n                    revisedplannedawarddate:            newRecord.revisedplannedawarddate,\r\n\r\n                    subcontractorname:                  newRecord.subcontractorname,\r\n                    purchaseordernumber:                newRecord.purchaseordernumber,\r\n                    awardvalue:                         newRecord.awardvalue,\r\n                    indigenous_award:                   newRecord.indigenous_award,\r\n                    ontario_award:                      newRecord.ontario_award,\r\n                    budgetamount:                       newRecord.budgetamount,\r\n                    buybackresaletarget:                newRecord.buybackresaletarget\r\n                }\r\n            );\r\n            \r\n            // ── Clear variables and navigate ─────────────────────────────────\r\n            UpdateContext({varFormattedNumber: \"\"});\r\n            Navigate('Package Details', ScreenTransition.Fade)\r\n        ),\r\n\r\n        // ── Patch failed ─────────────────────────────────────────────────────\r\n        Notify(\"Something went wrong saving the record. Please try again.\", NotificationType.Error)\r\n    )\r\n)"
+                        OnPressAction: "=// ── Validation ────────────────────────────────────────────────────────────────\r\nIf(\r\n    IsBlank(current_project_selected.Selected.projectidentifier) Or\r\n    IsBlank(prerequisite_design_input.Selected.Value) Or\r\n    IsBlank(quality_program_input.Selected.Value) Or\r\n    IsBlank(bop_site_location_input.Selected.Value) Or\r\n    (IsBlank(procurement_lead_input.Selected.UserPrincipalName) && IsBlank(procurement_lead_input_txt.Text)) Or\r\n    (IsBlank(operations_lead_input.Selected.UserPrincipalName) && IsBlank(operations_lead_input_txt.Text)) Or\r\n    IsBlank(package_bundle_input.Text) Or\r\n    IsBlank(ras_input.SelectedDate),\r\n\r\n    // ── Show validation errors ───────────────────────────────────────────────\r\n    UpdateContext({varShowValidationErrors: true});\r\n    Notify(\"Please fill out all required fields before submitting.\", NotificationType.Error),\r\n\r\n    // ── Validation passed - proceed with save ────────────────────────────────\r\n    UpdateContext({varShowValidationErrors: false});\r\n    \r\n    // ── Patch to Sharepoint ──────────────────────────────────────────────────\r\n    IfError(\r\n        With(\r\n            {\r\n                newRecord: Patch(\r\n                    'ProcTrack - Packages',\r\n                    Defaults('ProcTrack - Packages'),\r\n                    {\r\n                        Title:                              GUID(),\r\n                        packageidentifier:                  GUID(),\r\n                        ProjectID: current_project_selected.Selected.projectid,\r\n                                    projectidentifier:                  current_project_selected.Selected.projectidentifier,\r\n                        packagedescription:                 package_description_input_1.Text,\r\n                        itemnumber:                         item_no_input.Text,\r\n                        prerequisitedesigndeliverable:      prerequisite_design_input.Selected.Value,\r\n                        qualityprogram:                     If(!IsBlank(quality_program_input.Selected.Value), quality_program_input.Selected.Value, quality_program_text.Text),\r\n                        bopsite:                            bop_site_location_input.Selected.Value,\r\n                        contracttype:                       If(!IsBlank(contract_type_input.Selected.Value), contract_type_input.Selected.Value, \"\"),\r\n                        procpackageleadname:                If(!IsBlank(procurement_lead_input.Selected.DisplayName), procurement_lead_input.Selected.DisplayName, procurement_lead_input_txt.Text),\r\n                        procurementpackageleadid:           If(!IsBlank(procurement_lead_input.Selected.UserPrincipalName), procurement_lead_input.Selected.UserPrincipalName, \"\"),\r\n                        opspackageleadname:                 If(!IsBlank(operations_lead_input.Selected.DisplayName), operations_lead_input.Selected.DisplayName, operations_lead_input_txt.Text),\r\n                        operationspackageleadid:            If(!IsBlank(operations_lead_input.Selected.UserPrincipalName), operations_lead_input.Selected.UserPrincipalName, \"\"),\r\n                        engineeringcontactname:             If(!IsBlank(technical_lead_input.Selected.DisplayName), technical_lead_input.Selected.DisplayName, technical_lead_input_txt.Text),\r\n                        engineeringcontactid:               If(!IsBlank(technical_lead_input.Selected.UserPrincipalName), technical_lead_input.Selected.UserPrincipalName, \"\"),\r\n                        operationspackagebundle:            package_bundle_input.Text,\r\n                        requiredatsitedate:                 ras_input.SelectedDate,\r\n                        ras_original_input:                 ras_input.SelectedDate,\r\n                        plannedawarddate:                   p6_planned_award_input.SelectedDate,\r\n                        budgetamount:                       If(!IsBlank(est_budget_input.Text), Value(est_budget_input.Text), Blank()),\r\n                        mplcode:                            mpl_input.Text,\r\n                        sole_source:                        \"No\",\r\n                        archived:                           false,\r\n\r\n                        // Durations\r\n                        leadtimesowtorfqissuedays:          15,\r\n                        leadtimerfqissuetoclosingdays:      30,\r\n                        leadtimeclosingtoevaluationdays:    30,\r\n                        leadtimeevaluationtoawarddays:      30,\r\n                        standardleadtimemonths:             30,\r\n\r\n                        // Original planned dates (backward from RAS)\r\n                        originalplannedsowdate:             DateAdd(ras_input.SelectedDate, -135, TimeUnit.Days),\r\n                        originalplannedrfqissuedate:        DateAdd(ras_input.SelectedDate, -120, TimeUnit.Days),\r\n                        originalplannedrfqclosingdate:      DateAdd(ras_input.SelectedDate, -90, TimeUnit.Days),\r\n                        originalplannedevaluationcompleti:  DateAdd(ras_input.SelectedDate, -60, TimeUnit.Days),\r\n                        originalplannedawarddate:           DateAdd(ras_input.SelectedDate, -30, TimeUnit.Days),\r\n\r\n                        // Revised planned dates (initialized equal to original planned)\r\n                        revisedplannedsowdate:              DateAdd(ras_input.SelectedDate, -135, TimeUnit.Days),\r\n                        revisedplannedrfqissuedate:         DateAdd(ras_input.SelectedDate, -120, TimeUnit.Days),\r\n                        revisedplannedrfqclosingdate:       DateAdd(ras_input.SelectedDate, -90, TimeUnit.Days),\r\n                        revisedplannedevaluationcompletio:  DateAdd(ras_input.SelectedDate, -60, TimeUnit.Days),\r\n                        revisedplannedawarddate:            DateAdd(ras_input.SelectedDate, -30, TimeUnit.Days)\r\n                    }\r\n                )\r\n            },\r\n\r\n            // ── Patch succeeded — build collection and navigate ─────────────\r\n            ClearCollect(\r\n                colPackageDetails,\r\n                {\r\n                    title:                              newRecord.Title,\r\n                    packageidentifier:                  newRecord.packageidentifier,\r\n                    projectidentifier:                  newRecord.projectidentifier,\r\n                    itemnumber:                         newRecord.itemnumber,\r\n                    archived:                           false,\r\n                    packagedescription:                 newRecord.packagedescription,\r\n                    packagetype:                        newRecord.packagetype,\r\n                    contracttype:                       newRecord.contracttype,\r\n                    qualityprogram:                     newRecord.qualityprogram,\r\n                    prerequisitedesigndeliverable:      newRecord.prerequisitedesigndeliverable,\r\n                    bopsite:                            newRecord.bopsite,\r\n                    mplcode:                            newRecord.mplcode,\r\n                    Created:                            newRecord.Created,\r\n                    comments:                           newRecord.comments,\r\n                    sole_source:                        newRecord.sole_source,\r\n\r\n                    procpackageleadname:                newRecord.procpackageleadname,\r\n                    procurementpackageleadid:           newRecord.procurementpackageleadid,\r\n                    opspackageleadname:                 newRecord.opspackageleadname,\r\n                    operationspackageleadid:            newRecord.operationspackageleadid,\r\n                    engineeringcontactid:               newRecord.engineeringcontactid,\r\n                    engineeringcontactname:             newRecord.engineeringcontactname,\r\n                    operationspackagebundle:            newRecord.operationspackagebundle,\r\n\r\n                    leadtimesowtorfqissuedays:          newRecord.leadtimesowtorfqissuedays,\r\n                    leadtimerfqissuetoclosingdays:      newRecord.leadtimerfqissuetoclosingdays,\r\n                    leadtimeclosingtoevaluationdays:    newRecord.leadtimeclosingtoevaluationdays,\r\n                    leadtimeevaluationtoawarddays:      newRecord.leadtimeevaluationtoawarddays,\r\n                    standardleadtimemonths:             newRecord.standardleadtimemonths,\r\n\r\n                    originalplannedsowdate:             newRecord.originalplannedsowdate,\r\n                    originalplannedrfqissuedate:        newRecord.originalplannedrfqissuedate,\r\n                    originalplannedrfqclosingdate:      newRecord.originalplannedrfqclosingdate,\r\n                    originalplannedevaluationcompleti:  newRecord.originalplannedevaluationcompleti,\r\n                    originalplannedawarddate:           newRecord.originalplannedawarddate,\r\n                    plannedawarddate:                   newRecord.plannedawarddate,\r\n                    requiredatsitedate:                 newRecord.requiredatsitedate,\r\n                    ras_original_input:                 newRecord.ras_original_input,\r\n\r\n                    actualsowdate:                      newRecord.actualsowdate,\r\n                    actualrfqissuedate:                 newRecord.actualrfqissuedate,\r\n                    actualrfqclosingdate:               newRecord.actualrfqclosingdate,\r\n                    actualevaluationcompletiondate:     newRecord.actualevaluationcompletiondate,\r\n                    actualawarddate:                    newRecord.actualawarddate,\r\n\r\n                    revisedplannedsowdate:              newRecord.revisedplannedsowdate,\r\n                    revisedplannedrfqissuedate:         newRecord.revisedplannedrfqissuedate,\r\n                    revisedplannedrfqclosingdate:       newRecord.revisedplannedrfqclosingdate,\r\n                    revisedplannedevaluationcompletio:  newRecord.revisedplannedevaluationcompletio,\r\n                    revisedplannedawarddate:            newRecord.revisedplannedawarddate,\r\n\r\n                    subcontractorname:                  newRecord.subcontractorname,\r\n                    purchaseordernumber:                newRecord.purchaseordernumber,\r\n                    awardvalue:                         newRecord.awardvalue,\r\n                    indigenous_award:                   newRecord.indigenous_award,\r\n                    ontario_award:                      newRecord.ontario_award,\r\n                    budgetamount:                       newRecord.budgetamount,\r\n                    buybackresaletarget:                newRecord.buybackresaletarget\r\n                }\r\n            );\r\n            \r\n            // ── Clear variables and navigate ─────────────────────────────────\r\n            UpdateContext({varFormattedNumber: \"\"});\r\n            Collect(colPermittedPackages, newRecord); Collect(colProjectPackages, newRecord); Navigate('Package Details', ScreenTransition.Fade)\r\n        ),\r\n\r\n        // ── Patch failed ─────────────────────────────────────────────────────\r\n        Notify(\"Something went wrong saving the record. Please try again.\", NotificationType.Error)\r\n    )\r\n)"
                         Text: ="Add Package"
                         TextSize: =12
                         Width: =220

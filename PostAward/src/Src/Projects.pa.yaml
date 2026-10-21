@@ -1,0 +1,1107 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Projects:
+    Properties:
+      Fill: =RGBA(245, 245, 245, 1)
+      LoadingSpinnerColor: =RGBA(214, 12, 48, 1)
+      OnVisible: |-
+        =Set(varSelectedProject, Blank());
+        ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+        ClearCollect(colAllProjects, 'ProcTrack - Projects');
+        Set(varUserPerm, LookUp(colAllPermissions, Lower(Title) = varCurrentUserEmail));
+        Set(
+            varIsAdmin,
+            !IsBlank(varUserPerm) &&
+            (
+                varUserPerm.IsAdmin = true ||
+                Lower(Text(varUserPerm.IsAdmin)) = "true" ||
+                Lower(Text(varUserPerm.IsAdmin)) = "yes"
+            )
+        );
+        ClearCollect(
+            colMyProjectIds,
+            Filter(
+                Split(
+                    Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                    ";"
+                ),
+                !IsBlank(Trim(Value))
+            )
+        );
+        ClearCollect(
+            colPermittedProjects,
+            If(
+                varIsAdmin,
+                Filter(colAllProjects, !IsBlank(projectid)),
+                Filter(
+                    colAllProjects,
+                    !IsBlank(LookUp(colMyProjectIds, Trim(Value) = projectid))
+                )
+            )
+        );
+        ClearCollect(
+            colOwnerSubs,
+            Filter(
+                'PostAward - Subcontracts',
+                operationalowneremail = varCurrentUserEmail
+            )
+        );
+        ForAll(
+            colOwnerSubs As os,
+            If(
+                !IsBlank(os.projectidentifier) &&
+                IsBlank(
+                    LookUp(
+                        colPermittedProjects,
+                        projectidentifier = os.projectidentifier
+                    )
+                ),
+                Collect(
+                    colPermittedProjects,
+                    LookUp(
+                        colAllProjects,
+                        projectidentifier = os.projectidentifier
+                    )
+                )
+            )
+        );
+        ClearCollect(
+            colPermittedProjects,
+            Filter(colPermittedProjects, !IsBlank(projectid) || !IsBlank(projectidentifier))
+        );
+        Clear(colDashSubs);
+        Clear(colDashChanges);
+        Clear(colDashView);
+        IfError(
+            ForAll(
+                colPermittedProjects As p,
+                Collect(
+                    colDashSubs,
+                    Filter(
+                        'PostAward - Subcontracts',
+                        projectidentifier = p.projectidentifier
+                    )
+                )
+            );
+            ForAll(
+                colPermittedProjects As p,
+                Collect(
+                    colDashChanges,
+                    Filter(
+                        'PostAward - Changes',
+                        projectidentifier = p.projectidentifier
+                    )
+                )
+            );
+            ClearCollect(
+                colDashView,
+                ForAll(
+                    colDashSubs As s,
+                    With(
+                        {
+                            approvedSum: Coalesce(
+                                Sum(
+                                    AddColumns(
+                                        Filter(
+                                            colDashChanges,
+                                            subcontractid = s.packageidentifier && status.Value = "Approved"
+                                        ),
+                                        _amt,
+                                        value
+                                    ),
+                                    _amt
+                                ),
+                                0
+                            ),
+                            closed: !IsBlank(s.closeoutstatus) && s.closeoutstatus.Value = "Closed"
+                        },
+                        {
+                            projectidentifier: s.projectidentifier,
+                            isClosed: closed,
+                            isOver: !closed && Coalesce(s.invoicedtodate, 0) > (Coalesce(s.originalvalue, 0) + approvedSum)
+                        }
+                    )
+                )
+            ),
+            Notify("Project list is available. Metrics could not be loaded.", NotificationType.Warning)
+        )
+    Children:
+      - proj_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =RGBA(245, 245, 245, 1)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =10
+            PaddingBottom: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =12
+            Width: =Parent.Width
+          Children:
+            - proj_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.Light
+                  Fill: =RGBA(214, 12, 48, 1)
+                  FillPortions: =0
+                  Height: =64
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =10
+                  PaddingBottom: =10
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =10
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                Children:
+                  - proj_header_icon_wrap:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 0.18)
+                        FillPortions: =0
+                        Height: =36
+                        LayoutMinHeight: =36
+                        LayoutMinWidth: =36
+                        RadiusBottomLeft: =18
+                        RadiusBottomRight: =18
+                        RadiusTopLeft: =18
+                        RadiusTopRight: =18
+                        Width: =36
+                      Children:
+                        - proj_header_icon:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Height: =20
+                              Icon: =Icon.Home
+                              Width: =20
+                              X: =8
+                              Y: =8
+                  - proj_header_text_col:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                      Children:
+                        - proj_header_title:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =24
+                              Size: =18
+                              Text: ="PostAward"
+                              Width: =280
+                        - proj_header_subtitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 0.82)
+                              Font: =Font.'Segoe UI'
+                              Height: =16
+                              Size: =11
+                              Text: ="Select a project"
+                              Width: =280
+                  - proj_header_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                  - proj_user_col:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        LayoutAlignItems: =LayoutAlignItems.End
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =0
+                        Width: =180
+                      Children:
+                        - proj_user_label:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Right
+                              Color: =RGBA(255, 255, 255, 0.7)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =14
+                              Size: =10
+                              Text: ="SIGNED IN AS"
+                              Width: =180
+                        - proj_user_name:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Right
+                              Color: =RGBA(255, 255, 255, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =18
+                              Size: =13
+                              Text: =User().FullName
+                              Width: =180
+                  - proj_settings_wrap:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Center
+                        DropShadow: =DropShadow.None
+                        Fill: =RGBA(255, 255, 255, 0.18)
+                        FillPortions: =0
+                        Height: =32
+                        LayoutMinHeight: =32
+                        LayoutMinWidth: =32
+                        RadiusBottomLeft: =16
+                        RadiusBottomRight: =16
+                        RadiusTopLeft: =16
+                        RadiusTopRight: =16
+                        Width: =32
+                      Children:
+                        - proj_settings_icon:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Height: =18
+                              HoverColor: =RGBA(255, 255, 255, 0.85)
+                              Icon: =Icon.Settings
+                              OnSelect: =Navigate(Settings, ScreenTransition.Fade)
+                              Width: =18
+                              X: =7
+                              Y: =7
+            - proj_kpi_row:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =68
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =8
+                  LayoutMinHeight: =68
+                  LayoutMinWidth: =16
+                Children:
+                  - proj_kpi_projects:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =52
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - proj_kpi_projects_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(214, 12, 48, 0.12)
+                              FillPortions: =0
+                              Height: =28
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =28
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                              Width: =28
+                            Children:
+                              - proj_kpi_projects_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(214, 12, 48, 1)
+                                    Height: =16
+                                    Icon: =Icon.Folder
+                                    Width: =16
+                                    X: =6
+                                    Y: =6
+                        - proj_kpi_projects_text:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =44
+                              LayoutMinWidth: =48
+                            Children:
+                              - proj_kpi_projects_value:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: =CountRows(colPermittedProjects)
+                                    Width: =Parent.Width
+                              - proj_kpi_projects_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Projects"
+                                    Width: =Parent.Width
+                  - proj_kpi_subs:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =52
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - proj_kpi_subs_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(16, 124, 65, 0.14)
+                              FillPortions: =0
+                              Height: =28
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =28
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                              Width: =28
+                            Children:
+                              - proj_kpi_subs_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(16, 124, 65, 1)
+                                    Height: =16
+                                    Icon: =Icon.CheckBadge
+                                    Width: =16
+                                    X: =6
+                                    Y: =6
+                        - proj_kpi_subs_text:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =44
+                              LayoutMinWidth: =48
+                            Children:
+                              - proj_kpi_subs_value:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: =CountRows(colDashView)
+                                    Width: =Parent.Width
+                              - proj_kpi_subs_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Subcontracts"
+                                    Width: =Parent.Width
+                  - proj_kpi_over:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =52
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - proj_kpi_over_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(214, 12, 48, 0.12)
+                              FillPortions: =0
+                              Height: =28
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =28
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                              Width: =28
+                            Children:
+                              - proj_kpi_over_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(214, 12, 48, 1)
+                                    Height: =16
+                                    Icon: =Icon.Warning
+                                    Width: =16
+                                    X: =6
+                                    Y: =6
+                        - proj_kpi_over_text:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =44
+                              LayoutMinWidth: =48
+                            Children:
+                              - proj_kpi_over_value:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: =CountRows(Filter(colDashView, isOver && !isClosed))
+                                    Width: =Parent.Width
+                              - proj_kpi_over_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Over budget"
+                                    Width: =Parent.Width
+                  - proj_kpi_open:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =52
+                        LayoutMinWidth: =16
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - proj_kpi_open_icon_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 140, 0, 0.16)
+                              FillPortions: =0
+                              Height: =28
+                              LayoutMinHeight: =28
+                              LayoutMinWidth: =28
+                              RadiusBottomLeft: =14
+                              RadiusBottomRight: =14
+                              RadiusTopLeft: =14
+                              RadiusTopRight: =14
+                              Width: =28
+                            Children:
+                              - proj_kpi_open_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(255, 140, 0, 1)
+                                    Height: =16
+                                    Icon: =Icon.Edit
+                                    Width: =16
+                                    X: =6
+                                    Y: =6
+                        - proj_kpi_open_text:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =44
+                              LayoutMinWidth: =48
+                            Children:
+                              - proj_kpi_open_value:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =28
+                                    Size: =16
+                                    Text: |-
+                                      =CountRows(
+                                          Filter(
+                                              colDashChanges,
+                                              status.Value = "Pending" || status.Value = "Potential"
+                                          )
+                                      )
+                                    Width: =Parent.Width
+                              - proj_kpi_open_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =20
+                                    Size: =10
+                                    Text: ="Open changes"
+                                    Width: =Parent.Width
+            - proj_toolbar:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =40
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =12
+                  LayoutMinHeight: =40
+                  LayoutMinWidth: =16
+                Children:
+                  - proj_section_title:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(48, 48, 48, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =36
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        Size: =14
+                        Text: ="Your projects"
+                        VerticalAlign: =VerticalAlign.Middle
+                        Width: =200
+                  - proj_toolbar_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: ManualLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        LayoutMinHeight: =16
+                        LayoutMinWidth: =16
+                  - proj_refresh:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(214, 12, 48, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =36
+                        OnSelect: =Navigate(Projects, ScreenTransition.None)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Text: ="Refresh"
+                        Width: =90
+            - proj_gallery:
+                Control: Gallery@2.15.0
+                Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                Properties:
+                  FillPortions: =1
+                  Items: =Sort(colPermittedProjects, projectname, SortOrder.Ascending)
+                  LayoutMinHeight: =200
+                  OnSelect: |-
+                    =Set(varSelectedProject, ThisItem);
+                    Set(
+                        varCanEditCurrentProject,
+                        varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = ThisItem.projectid))
+                    );
+                    Navigate(Home, ScreenTransition.Fade)
+                  TemplatePadding: =8
+                  TemplateSize: =210
+                  Width: =Parent.Width
+                  WrapCount: =Max(1, RoundDown((Parent.Width - 16) / 360, 0))
+                Children:
+                  - proj_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        Height: =Parent.TemplateHeight - 4
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =6
+                        LayoutJustifyContent: =LayoutJustifyContent.Start
+                        PaddingBottom: =8
+                        PaddingLeft: =10
+                        PaddingRight: =10
+                        PaddingTop: =8
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        Width: =Parent.TemplateWidth - 4
+                      Children:
+                        - proj_card_accent:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              Fill: =RGBA(214, 12, 48, 1)
+                              Height: =3
+                              Width: =Parent.Width - 20
+                        - proj_card_header:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =48
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =6
+                              LayoutMinHeight: =48
+                              LayoutMinWidth: =16
+                            Children:
+                              - proj_card_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Center
+                                    Color: =RGBA(214, 12, 48, 1)
+                                    FillPortions: =0
+                                    Height: =22
+                                    Icon: =Icon.Folder
+                                    Width: =22
+                              - proj_card_title_col:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    FillPortions: =1
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =44
+                                    LayoutMinWidth: =16
+                                  Children:
+                                    - proj_card_name:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(33, 33, 33, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =30
+                                          Size: =12
+                                          Text: =ThisItem.projectname
+                                          Width: =Parent.Width
+                                          Wrap: =true
+                                    - proj_card_id:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(106, 122, 127, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: =ThisItem.projectidentifier
+                                          Width: =Parent.Width
+                              - proj_card_logo:
+                                  Control: Image@2.2.3
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Center
+                                    FillPortions: =0
+                                    Height: =28
+                                    Image: =ThisItem.project_logo
+                                    RadiusBottomLeft: =4
+                                    RadiusBottomRight: =4
+                                    RadiusTopLeft: =4
+                                    RadiusTopRight: =4
+                                    Visible: =!IsBlank(ThisItem.project_logo)
+                                    Width: =48
+                        - proj_metrics_row1:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =34
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =34
+                              LayoutMinWidth: =0
+                              Width: =Parent.Width - 20
+                            Children:
+                              - proj_metric_subs:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(245, 247, 250, 1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =34
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =3
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =3
+                                    RadiusBottomLeft: =6
+                                    RadiusBottomRight: =6
+                                    RadiusTopLeft: =6
+                                    RadiusTopRight: =6
+                                  Children:
+                                    - proj_metric_subs_value:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(33, 33, 33, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =11
+                                          Text: |-
+                                            =CountRows(
+                                                Filter(
+                                                    colDashView,
+                                                    projectidentifier = ThisItem.projectidentifier
+                                                )
+                                            )
+                                          Width: =proj_metric_subs.Width - 12
+                                    - proj_metric_subs_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(106, 122, 127, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: ="Subcontracts"
+                                          Width: =proj_metric_subs.Width - 12
+                              - proj_metric_active:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(232, 246, 238, 1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =34
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =3
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =3
+                                    RadiusBottomLeft: =6
+                                    RadiusBottomRight: =6
+                                    RadiusTopLeft: =6
+                                    RadiusTopRight: =6
+                                  Children:
+                                    - proj_metric_active_value:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(16, 124, 65, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =11
+                                          Text: |-
+                                            =CountRows(
+                                                Filter(
+                                                    colDashView,
+                                                    projectidentifier = ThisItem.projectidentifier && !isClosed && !isOver
+                                                )
+                                            )
+                                          Width: =proj_metric_active.Width - 12
+                                    - proj_metric_active_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(16, 124, 65, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: ="Active"
+                                          Width: =proj_metric_active.Width - 12
+                        - proj_metrics_row2:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =34
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =34
+                              LayoutMinWidth: =0
+                              Width: =Parent.Width - 20
+                            Children:
+                              - proj_metric_over:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(253, 236, 236, 1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =34
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =3
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =3
+                                    RadiusBottomLeft: =6
+                                    RadiusBottomRight: =6
+                                    RadiusTopLeft: =6
+                                    RadiusTopRight: =6
+                                  Children:
+                                    - proj_metric_over_value:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(214, 12, 48, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =11
+                                          Text: |-
+                                            =CountRows(
+                                                Filter(
+                                                    colDashView,
+                                                    projectidentifier = ThisItem.projectidentifier && isOver && !isClosed
+                                                )
+                                            )
+                                          Width: =proj_metric_over.Width - 12
+                                    - proj_metric_over_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(214, 12, 48, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: ="Over budget"
+                                          Width: =proj_metric_over.Width - 12
+                              - proj_metric_open:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 244, 229, 1)
+                                    FillPortions: =1
+                                    Height: =34
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =0
+                                    LayoutMinHeight: =34
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =3
+                                    PaddingLeft: =6
+                                    PaddingRight: =6
+                                    PaddingTop: =3
+                                    RadiusBottomLeft: =6
+                                    RadiusBottomRight: =6
+                                    RadiusTopLeft: =6
+                                    RadiusTopRight: =6
+                                  Children:
+                                    - proj_metric_open_value:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(255, 140, 0, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Bold
+                                          Height: =16
+                                          Size: =11
+                                          Text: |-
+                                            =CountRows(
+                                                Filter(
+                                                    colDashChanges,
+                                                    projectidentifier = ThisItem.projectidentifier &&
+                                                    (status.Value = "Pending" || status.Value = "Potential")
+                                                )
+                                            )
+                                          Width: =proj_metric_open.Width - 12
+                                    - proj_metric_open_label:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Color: =RGBA(255, 140, 0, 1)
+                                          Font: =Font.'Segoe UI'
+                                          Height: =12
+                                          Size: =9
+                                          Text: ="Open changes"
+                                          Width: =proj_metric_open.Width - 12
+                        - proj_open_button:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              BorderColor: =RGBA(214, 12, 48, 1)
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(214, 12, 48, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              Height: =30
+                              HoverFill: =RGBA(192, 0, 0, 1)
+                              OnSelect: |-
+                                =Set(varSelectedProject, ThisItem);
+                                Set(
+                                    varCanEditCurrentProject,
+                                    varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = ThisItem.projectid))
+                                );
+                                Navigate(Home, ScreenTransition.Fade)
+                              RadiusBottomLeft: =6
+                              RadiusBottomRight: =6
+                              RadiusTopLeft: =6
+                              RadiusTopRight: =6
+                              Text: ="Open project"
+                              Width: =Parent.Width - 20
+            - proj_empty:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =8
+                  LayoutMinHeight: =16
+                  LayoutMinWidth: =16
+                  PaddingBottom: =24
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =24
+                  RadiusBottomLeft: =10
+                  RadiusBottomRight: =10
+                  RadiusTopLeft: =10
+                  RadiusTopRight: =10
+                  Visible: =CountRows(proj_gallery.AllItems) = 0
+                Children:
+                  - proj_empty_title:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(48, 48, 48, 1)
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =15
+                        Text: ="No projects found"
+                        Width: =300
+                  - proj_empty_subtitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(106, 122, 127, 1)
+                        Font: =Font.'Segoe UI'
+                        Height: =20
+                        Size: =12
+                        Text: ="Try a different search, or check ProcTrack permissions."
+                        Width: =420

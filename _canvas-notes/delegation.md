@@ -66,18 +66,20 @@ Refresh `colPermittedPackages` on **Project Dashboard `OnVisible`** so counts st
 
 Search (`_q in projectname`) on a **local** collection is fine — delegation only applies to connector sources.
 
-### Single-project fetch (delegable)
+The app data-row limit is **2000**. A single delegable `Filter` still returns at most that many rows.
 
-When the user picks one project:
+ProcTrack package load is one query per permitted project:
 
 ```powerfx
-ClearCollect(
-    colProjectPackages,
-    Filter('ProcTrack - Packages', projectidentifier = Self.Selected.projectidentifier)
-);
+Filter(
+    'ProcTrack - Packages',
+    projectidentifier = proj.projectidentifier || ProjectID = proj.projectid
+)
 ```
 
-Equality on `projectidentifier` is delegable. Prefer reusing `Filter(colPermittedPackages, projectidentifier = …)` when the collection is already warm.
+That `||` of two equalities is delegable. Do not page by `ID`: this list only delegates `=` on `ID`, so a range reads the first page and Studio warns on every window.
+
+Do not `Filter` `colPermittedProjects` or `colPermittedPackages` inside the `ForAll` that walks projects. Both tables have `projectidentifier`, and that nested filter collapsed the dashboard to one project. Project screens read `colPermittedPackages`.
 
 ## Anti-patterns we removed
 

@@ -152,6 +152,31 @@ Nav rail on every screen: **RoleFit** brand (no subtitle), left-aligned nav butt
 
 `pac canvas pack` with SourceCode layout does not catch invalid icons or layout issues. Always validate with a **small import** in Studio.
 
+## Nested containers: borders and inputs overflow (critical)
+
+Two separate bugs. Both clip the child and hide the parent border.
+
+**1. Flexible width is not the drawn width.** A column with `FillPortions: 1` and no explicit `Width` is drawn at its share of the row, but `column.Width` (and `Parent.Width` inside it) still returns the row, or wider. An input set to `column.Width` is wider than the column, so the column clips it and the input disappears.
+
+**2. A child the same height as its parent hides the border.** AutoLayout clips children. If `card.Height` is equal to `row.Height`, the card border sits on the row edge and is clipped, and the checkbox inside is clipped with it.
+
+Form columns that sit side by side. Validated in Dayaway YNSE Settings on 2026-10-13 after Studio import. This is the pattern in `.cursor/skills/canvas-yaml-pack/SKILL.md`.
+
+```
+row  AutoLayout horizontal, LayoutGap 12, Height 76, LayoutMinWidth 0, LayoutMinHeight 0
+  column  ManualLayout, no FillPortions
+          Width: =(Parent.Width - 12) / 2
+          Height: =68
+    label   X: =4  Y: =4   Height: =18  Width: =Parent.Width - 8
+    input   X: =4  Y: =26  Height: =36  Width: =Parent.Width - 8
+```
+
+`Parent.Width` on the input is safe only because the ManualLayout column has an **explicit** Width, so the property matches the box on screen. The input is 8px narrower than that box, so its border stays inside.
+
+Cards in that same screen: row `Height 64` with `PaddingTop` and `PaddingBottom` 8, card `Height 40` and `FillPortions 1`, checkbox `Height 28` with `FillPortions 1` and no Width.
+
+Do not size a child from a flexible parent's `.Width`. Do not set a card `Height` equal to its row. Leave at least 8px of air so the border is not clipped.
+
 ## LayoutMinWidth / LayoutMinHeight defaults (critical)
 
 Power Apps **defaults** AutoLayout `GroupContainer` to:

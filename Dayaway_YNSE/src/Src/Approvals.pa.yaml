@@ -16,7 +16,8 @@ Screens:
         Set(varFilterEmployee, "");
         Set(varFilterFrom, Blank());
         Set(varFilterTo, Blank());
-        Set(varApprovalStatusFilter, "Pending");
+        Set(varApprovalStatusFilter, If(varIsAdmin, "All", "Pending"));
+        Set(varShowApprDelete, false);
         Reset(txt_FilterEmployee);
         Reset(DatePicker_FilterFrom);
         Reset(DatePicker_FilterTo);
@@ -126,6 +127,25 @@ Screens:
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
                               Width: =8
+                        - btn_Settings_Appr:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(0, 18, 107, 1)
+                              FillPortions: =0
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              OnSelect: =Navigate(Screen_Settings, ScreenTransition.Fade)
+                              RadiusBottomLeft: =9
+                              RadiusBottomRight: =9
+                              RadiusTopLeft: =9
+                              RadiusTopRight: =9
+                              Size: =11
+                              Text: ="Settings"
+                              Visible: =varIsAdmin
+                              Width: =88
                         - btn_ApproverTab_Appr:
                             Control: Classic/Button@2.2.0
                             Properties:
@@ -828,6 +848,23 @@ Screens:
                                             )
                                           Size: =11
                                           Width: =140
+                                    - ico_ApprDelete:
+                                        Control: Classic/Icon@2.5.0
+                                        Properties:
+                                          AlignInContainer: =AlignInContainer.Center
+                                          Color: =RGBA(179, 38, 30, 1)
+                                          FillPortions: =0
+                                          Height: =28
+                                          Icon: =Icon.Trash
+                                          OnSelect: |-
+                                            =Set(varDeleteRequestID, ThisItem.ID);
+                                            Set(varDeleteRequestLog, Coalesce(ThisItem.LOG_ID, ""));
+                                            Set(varDeleteStart, ThisItem.StartDate);
+                                            Set(varDeleteEnd, ThisItem.EndDate);
+                                            Set(varDeleteEmployee, Coalesce(ThisItem.Employee, ""));
+                                            Set(varShowApprDelete, true);
+                                          Visible: =varIsAdmin && ThisItem.ApprovalStatus_1 = "Approved"
+                                          Width: =28
                               - Label_EmployeeCommentsCap:
                                   Control: Label@2.5.1
                                   Properties:
@@ -973,3 +1010,133 @@ Screens:
               )
             Visible: =false
             Width: =1
+      - Overlay_ApprDelete:
+          Control: GroupContainer@1.5.0
+          Variant: ManualLayout
+          Properties:
+            DropShadow: =DropShadow.None
+            Fill: =RGBA(10, 12, 30, 0.42)
+            Height: =Parent.Height
+            LayoutMinHeight: =0
+            LayoutMinWidth: =0
+            Visible: =varShowApprDelete
+            Width: =Parent.Width
+            X: =0
+            Y: =0
+          Children:
+            - ApprDelete_Card:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =112
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =14
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  PaddingBottom: =16
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =18
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  Width: =Min(Parent.Width * 0.9, 320)
+                  X: =(Parent.Width - Self.Width) / 2
+                  Y: =(Parent.Height - Self.Height) / 2
+                Children:
+                  - lbl_ApprDeleteTitle:
+                      Control: Label@2.5.1
+                      Properties:
+                        Align: =Align.Center
+                        Color: =RGBA(23, 26, 51, 1)
+                        FillPortions: =0
+                        Font: =Font.'Open Sans'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =24
+                        Size: =14
+                        Text: ="Delete this approved request?"
+                        Width: =Parent.Width
+                  - appr_delete_btn_row:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =42
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =8
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        Width: =Parent.Width
+                      Children:
+                        - btn_ApprDeleteCancel:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderColor: =RGBA(226, 228, 240, 1)
+                              BorderThickness: =1
+                              Color: =RGBA(23, 26, 51, 1)
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =1
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              LayoutMinWidth: =0
+                              OnSelect: =Set(varShowApprDelete, false)
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =12
+                              Text: ="Cancel"
+                        - btn_ApprDeleteConfirm:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              BorderThickness: =0
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(179, 38, 30, 1)
+                              FillPortions: =1
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              LayoutMinWidth: =0
+                              OnSelect: |-
+                                =Remove(
+                                    'Vacations Tracking (Days)',
+                                    LookUp('Vacations Tracking (Days)', ID = varDeleteRequestID)
+                                );
+                                ClearCollect(
+                                    colHoursSync,
+                                    Filter(
+                                        'Hours Tracking (Hours)',
+                                        Employee = varDeleteEmployee &&
+                                        Date >= varDeleteStart &&
+                                        Date <= varDeleteEnd
+                                    )
+                                );
+                                ClearCollect(
+                                    colHoursSync,
+                                    Filter(
+                                        colHoursSync,
+                                        StartsWith(LOG_ID, varDeleteRequestLog & "_")
+                                    )
+                                );
+                                ForAll(
+                                    colHoursSync As apprHour,
+                                    Remove(
+                                        'Hours Tracking (Hours)',
+                                        LookUp('Hours Tracking (Hours)', ID = apprHour.ID)
+                                    )
+                                );
+                                Set(varShowApprDelete, false);
+                                Notify("Request deleted", NotificationType.Success);
+                                Select(btn_ReloadApprovals);
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Size: =12
+                              Text: ="Delete"

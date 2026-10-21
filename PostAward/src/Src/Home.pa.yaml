@@ -13,6 +13,39 @@ Screens:
       LoadingSpinnerColor: =RGBA(214, 12, 48, 1)
       OnVisible: |-
         =Set(varShowSettings, false);
+        ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+        ClearCollect(colAllProjects, 'ProcTrack - Projects');
+        Set(varUserPerm, LookUp(colAllPermissions, Lower(Title) = varCurrentUserEmail));
+        Set(
+            varIsAdmin,
+            !IsBlank(varUserPerm) &&
+            (
+                varUserPerm.IsAdmin = true ||
+                Lower(Text(varUserPerm.IsAdmin)) = "true" ||
+                Lower(Text(varUserPerm.IsAdmin)) = "yes"
+            )
+        );
+        ClearCollect(
+            colMyProjectIds,
+            Filter(
+                Split(
+                    Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                    ";"
+                ),
+                !IsBlank(Trim(Value))
+            )
+        );
+        ClearCollect(
+            colPermittedProjects,
+            If(
+                varIsAdmin,
+                Filter(colAllProjects, !IsBlank(projectid)),
+                Filter(
+                    colAllProjects,
+                    !IsBlank(LookUp(colMyProjectIds, Trim(Value) = projectid))
+                )
+            )
+        );
         If(
             IsBlank(varSelectedProject) && CountRows(colPermittedProjects) > 0,
             Set(varSelectedProject, First(colPermittedProjects))
@@ -214,6 +247,35 @@ Screens:
                         LayoutGap: =10
                         LayoutMinHeight: =44
                       Children:
+                        - home_back_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 0.18)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMaxWidth: =36
+                              LayoutMinHeight: =36
+                              LayoutMinWidth: =36
+                              RadiusBottomLeft: =18
+                              RadiusBottomRight: =18
+                              RadiusTopLeft: =18
+                              RadiusTopRight: =18
+                              Width: =36
+                            Children:
+                              - home_back_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Height: =20
+                                    Icon: =Icon.BackArrow
+                                    OnSelect: =Navigate(Projects, ScreenTransition.Fade)
+                                    Tooltip: ="All projects"
+                                    Width: =20
+                                    X: =8
+                                    Y: =8
                         - home_icon_wrap:
                             Control: GroupContainer@1.5.0
                             Variant: ManualLayout
@@ -337,7 +399,7 @@ Screens:
                                     Color: =RGBA(255, 255, 255, 1)
                                     Height: =18
                                     Icon: =Icon.Settings
-                                    OnSelect: =Set(varShowSettings, true)
+                                    OnSelect: =Navigate(Settings, ScreenTransition.None)
                                     Width: =18
                                     X: =7
                                     Y: =7
@@ -410,7 +472,6 @@ Screens:
                                           Select(home_refresh_btn)
                                       )
                                     Size: =12
-                                    Width: =Parent.Width - 76
                         - home_refresh_btn:
                             Control: Classic/Button@2.2.0
                             Properties:
@@ -582,19 +643,6 @@ Screens:
                         FillPortions: =1
                         LayoutMinHeight: =16
                         LayoutMinWidth: =16
-                  - home_pct_chip:
-                      Control: Label@2.5.1
-                      Properties:
-                        Align: =Align.Right
-                        Color: =RGBA(60, 65, 71, 1)
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Semibold
-                        Height: =36
-                        Size: =13
-                        Text: |-
-                          ="Invoiced vs current: " & Coalesce(varHomePctComplete, 0) & "%"
-                        VerticalAlign: =VerticalAlign.Middle
-                        Width: =220
             - home_kpi_counts:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -1028,7 +1076,7 @@ Screens:
                                           FontWeight: =FontWeight.Semibold
                                           Height: =36
                                           Size: =12
-                                          Text: =ThisItem.vendor & " - invoiced " & Text(ThisItem.invoicedtodate, "$#,##0") & " vs current " & Text(ThisItem.currentValue, "$#,##0")
+                                          Text: =ThisItem.vendor & " - incurred " & Text(ThisItem.invoicedtodate, "$#,##0") & " vs current " & Text(ThisItem.currentValue, "$#,##0")
                                           Wrap: =true
                               - home_attn_hit:
                                   Control: Rectangle@2.3.0
@@ -1179,88 +1227,3 @@ Screens:
                                     Width: =Parent.TemplateWidth
                                     X: =0
                                     Y: =0
-      - home_overlay_settings:
-          Control: GroupContainer@1.5.0
-          Variant: ManualLayout
-          Properties:
-            DropShadow: =DropShadow.None
-            Fill: =RGBA(0, 0, 0, 0.45)
-            Height: =Parent.Height
-            Visible: =varShowSettings
-            Width: =Parent.Width
-          Children:
-            - home_settings_panel:
-                Control: GroupContainer@1.5.0
-                Variant: AutoLayout
-                Properties:
-                  DropShadow: =DropShadow.Regular
-                  Fill: =RGBA(255, 255, 255, 1)
-                  Height: =300
-                  LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =10
-                  PaddingBottom: =16
-                  PaddingLeft: =18
-                  PaddingRight: =18
-                  PaddingTop: =16
-                  RadiusBottomLeft: =12
-                  RadiusBottomRight: =12
-                  RadiusTopLeft: =12
-                  RadiusTopRight: =12
-                  Width: =420
-                  X: =(Parent.Width - Self.Width) / 2
-                  Y: =(Parent.Height - Self.Height) / 2
-                Children:
-                  - home_set_title:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(27, 27, 27, 1)
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Bold
-                        Height: =28
-                        Size: =16
-                        Text: ="Settings"
-                  - home_set_user:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(60, 65, 71, 1)
-                        Font: =Font.'Segoe UI'
-                        Height: =40
-                        Size: =12
-                        Text: ="Signed in as " & User().FullName & " (" & User().Email & ")"
-                        Wrap: =true
-                  - home_set_edit:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(60, 65, 71, 1)
-                        Font: =Font.'Segoe UI'
-                        Height: =36
-                        Size: =12
-                        Text: |-
-                          ="Edit access for this project: " & If(varCanEditCurrentProject, "Yes", "No (view only)")
-                        Wrap: =true
-                  - home_set_help:
-                      Control: Label@2.5.1
-                      Properties:
-                        Color: =RGBA(108, 113, 118, 1)
-                        Font: =Font.'Segoe UI'
-                        Height: =90
-                        Size: =12
-                        Text: ="Permissions use ProcTrack - Permissions. Operational Owners listed on a subcontract get automatic view access to that project. Use Excel on Register (project subcontracts) or Subcontract Detail (this subcontract)."
-                        Wrap: =true
-                  - home_set_close:
-                      Control: Classic/Button@2.2.0
-                      Properties:
-                        BorderThickness: =0
-                        Color: =RGBA(255, 255, 255, 1)
-                        Fill: =RGBA(214, 12, 48, 1)
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Bold
-                        Height: =40
-                        OnSelect: =Set(varShowSettings, false)
-                        RadiusBottomLeft: =9
-                        RadiusBottomRight: =9
-                        RadiusTopLeft: =9
-                        RadiusTopRight: =9
-                        Size: =12
-                        Text: ="Close"
-                        Width: =110

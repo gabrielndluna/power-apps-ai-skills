@@ -1,0 +1,1357 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+Screens:
+  Project Home:
+    Properties:
+      Fill: =RGBA(245, 245, 245, 1)
+      LoadingSpinnerColor: =RGBA(214, 12, 48, 1)
+      OnVisible: |-
+        =If(
+            IsBlank(varSelectedProject) && CountRows(colPermittedProjects) > 0,
+            Set(varSelectedProject, First(colPermittedProjects))
+        );
+        If(
+            !IsBlank(varSelectedProject),
+            ClearCollect(
+                colProjectPackages,
+                Filter(
+                    colPermittedPackages,
+                    ProjectID = varSelectedProject.projectid || projectidentifier = varSelectedProject.projectidentifier
+                )
+            );
+            Set(
+                varCanEditCurrentProject,
+                varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = varSelectedProject.projectid))
+            )
+        )
+    Children:
+      - ph_root:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =RGBA(245, 245, 245, 1)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =12
+            LayoutMinHeight: =0
+            LayoutMinWidth: =0
+            PaddingBottom: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =12
+            Width: =Parent.Width
+          Children:
+            - ph_header:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.Light
+                  Fill: =RGBA(214, 12, 48, 1)
+                  FillPortions: =0
+                  Height: =132
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =6
+                  LayoutMinHeight: =132
+                  LayoutMinWidth: =0
+                  PaddingBottom: =12
+                  PaddingLeft: =16
+                  PaddingRight: =16
+                  PaddingTop: =8
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  Width: =Parent.Width
+                Children:
+                  - ph_header_top:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =44
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =44
+                        LayoutMinWidth: =0
+                      Children:
+                        - ph_back_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 0.18)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =18
+                              RadiusBottomRight: =18
+                              RadiusTopLeft: =18
+                              RadiusTopRight: =18
+                              Width: =36
+                            Children:
+                              - ph_back_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Height: =20
+                                    Icon: =Icon.BackArrow
+                                    OnSelect: =Navigate('Project Dashboard', ScreenTransition.Fade)
+                                    Tooltip: ="All projects"
+                                    Width: =20
+                                    X: =8
+                                    Y: =8
+                        - ph_brand_col:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - ph_brand_title:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =24
+                                    Size: =18
+                                    Text: ="ProcTrack"
+                                    Width: =220
+                              - ph_brand_sub:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 0.82)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =16
+                                    Size: =11
+                                    Text: ="Project home"
+                                    Width: =220
+                        - ph_spacer:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =1
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                        - ph_user_col:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              LayoutAlignItems: =LayoutAlignItems.End
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                            Children:
+                              - ph_user_l:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Right
+                                    Color: =RGBA(255, 255, 255, 0.7)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =14
+                                    Size: =10
+                                    Text: ="SIGNED IN AS"
+                                    Width: =180
+                              - ph_user_n:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Right
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    Size: =13
+                                    Text: =User().FullName
+                                    Width: =180
+                        - ph_settings_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 0.18)
+                              FillPortions: =0
+                              Height: =32
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =16
+                              RadiusBottomRight: =16
+                              RadiusTopLeft: =16
+                              RadiusTopRight: =16
+                              Width: =32
+                            Children:
+                              - ph_settings_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(255, 255, 255, 1)
+                                    Height: =18
+                                    Icon: =Icon.Settings
+                                    OnSelect: =Navigate(Settings, ScreenTransition.Fade)
+                                    Width: =18
+                                    X: =7
+                                    Y: =7
+                  - ph_header_bottom:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0
+                        Height: =56
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =10
+                        LayoutMinHeight: =56
+                        LayoutMinWidth: =0
+                      Children:
+                        - ph_project_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Width: =520
+                              Height: =48
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingLeft: =12
+                              PaddingRight: =8
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                            Children:
+                              - ph_project_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    Color: =RGBA(106, 122, 127, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =40
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Size: =11
+                                    Text: ="Project"
+                                    Width: =68
+                              - ph_project_combo:
+                                  Control: Classic/DropDown@2.3.1
+                                  Properties:
+                                    AllowEmptySelection: =false
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    BorderThickness: =0
+                                    ChevronBackground: =RGBA(255, 255, 255, 1)
+                                    ChevronFill: =RGBA(214, 12, 48, 1)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Default: =varSelectedProject.projectname
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    FillPortions: =1
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =40
+                                    Items: =Sort(Distinct(colPermittedProjects, projectname), Value)
+                                    LayoutMinWidth: =0
+                                    OnChange: |-
+                                      =If(
+                                          !IsBlank(Self.Selected.Value),
+                                          Set(
+                                              varSelectedProject,
+                                              LookUp(colPermittedProjects, projectname = Self.Selected.Value)
+                                          );
+                                          ClearCollect(
+                                              colProjectPackages,
+                                              Filter(
+                                                  colPermittedPackages,
+                                                  ProjectID = varSelectedProject.projectid || projectidentifier = varSelectedProject.projectidentifier
+                                              )
+                                          );
+                                          Set(
+                                              varCanEditCurrentProject,
+                                              varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = varSelectedProject.projectid))
+                                          )
+                                      )
+                                    Size: =12
+            - ph_actions:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =40
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutJustifyContent: =LayoutJustifyContent.Start
+                  LayoutGap: =8
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                Children:
+                  - ph_open_pkg:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Height: =1
+                        OnSelect: |-
+                          =With(
+                              {
+                                  pkg: LookUp(colProjectPackages, packageidentifier = varOpenPackageId)
+                              },
+                              Set(varPackageScreenLoaded, false);
+                              Set(varSelectedPackageId, pkg.packageidentifier);
+                              ClearCollect(
+                                  colPackageDetails,
+                                  {
+                                      title: pkg.Title,
+                                      packageidentifier: pkg.packageidentifier,
+                                      projectidentifier: pkg.projectidentifier,
+                                      itemnumber: pkg.itemnumber,
+                                      packagedescription: pkg.packagedescription,
+                                      packagetype: pkg.packagetype,
+                                      qualityprogram: pkg.qualityprogram,
+                                      prerequisitedesigndeliverable: pkg.prerequisitedesigndeliverable,
+                                      bopsite: pkg.bopsite,
+                                      contracttype: pkg.contracttype,
+                                      Created: pkg.Created,
+                                      comments: pkg.comments,
+                                      sole_source: pkg.sole_source,
+                                      packagefolderurl: pkg.packagefolderurl,
+                                      archived: pkg.archived,
+                                      procpackageleadname: pkg.procpackageleadname,
+                                      procurementpackageleadid: pkg.procurementpackageleadid,
+                                      opspackageleadname: pkg.opspackageleadname,
+                                      operationspackageleadid: pkg.operationspackageleadid,
+                                      engineeringcontactid: pkg.engineeringcontactid,
+                                      engineeringcontactname: pkg.engineeringcontactname,
+                                      operationspackagebundle: pkg.operationspackagebundle,
+                                      leadtimesowtorfqissuedays: pkg.leadtimesowtorfqissuedays,
+                                      leadtimerfqissuetoclosingdays: pkg.leadtimerfqissuetoclosingdays,
+                                      leadtimeclosingtoevaluationdays: pkg.leadtimeclosingtoevaluationdays,
+                                      leadtimeevaluationtoawarddays: pkg.leadtimeevaluationtoawarddays,
+                                      standardleadtimemonths: pkg.standardleadtimemonths,
+                                      originalplannedsowdate: pkg.originalplannedsowdate,
+                                      originalplannedrfqissuedate: pkg.originalplannedrfqissuedate,
+                                      originalplannedrfqclosingdate: pkg.originalplannedrfqclosingdate,
+                                      originalplannedevaluationcompleti: pkg.originalplannedevaluationcompleti,
+                                      originalplannedawarddate: pkg.originalplannedawarddate,
+                                      plannedawarddate: pkg.plannedawarddate,
+                                      requiredatsitedate: pkg.requiredatsitedate,
+                                      ras_original_input: pkg.ras_original_input,
+                                      actualsowdate: pkg.actualsowdate,
+                                      actualrfqissuedate: pkg.actualrfqissuedate,
+                                      actualrfqclosingdate: pkg.actualrfqclosingdate,
+                                      actualevaluationcompletiondate: pkg.actualevaluationcompletiondate,
+                                      actualawarddate: pkg.actualawarddate,
+                                      actual_onsite: pkg.actual_onsite,
+                                      revisedplannedsowdate: pkg.revisedplannedsowdate,
+                                      revisedplannedrfqissuedate: pkg.revisedplannedrfqissuedate,
+                                      revisedplannedrfqclosingdate: pkg.revisedplannedrfqclosingdate,
+                                      revisedplannedevaluationcompletio: pkg.revisedplannedevaluationcompletio,
+                                      revisedplannedawarddate: pkg.revisedplannedawarddate,
+                                      subcontractorname: pkg.subcontractorname,
+                                      purchaseordernumber: pkg.purchaseordernumber,
+                                      awardvalue: pkg.awardvalue,
+                                      indigenous_award: pkg.indigenous_award,
+                                      ontario_award: pkg.ontario_award,
+                                      budgetamount: pkg.budgetamount,
+                                      buybackresaletarget: pkg.buybackresaletarget
+                                  }
+                              );
+                              Set(varActualSOW, pkg.actualsowdate);
+                              Set(varActualRFQIssue, pkg.actualrfqissuedate);
+                              Set(varActualRFQClosing, pkg.actualrfqclosingdate);
+                              Set(varActualEval, pkg.actualevaluationcompletiondate);
+                              Set(varActualAward, pkg.actualawarddate);
+                              Navigate('Package Details', ScreenTransition.Fade)
+                          )
+                        Text: =""
+                        Visible: =false
+                        Width: =1
+                  - ph_btn_all:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(35, 38, 43, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(35, 38, 43, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Semibold
+                        Height: =40
+                        HoverBorderColor: =RGBA(35, 38, 43, 1)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =RGBA(35, 38, 43, 1)
+                        OnSelect: |-
+                          =Set(varPackageFilter, "all");
+                          Navigate('Welcome screen', ScreenTransition.Fade)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Text: ="View all packages"
+                        Width: =170
+                  - ph_actions_spacer:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =1
+                        Height: =40
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                  - ph_btn_dash:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderColor: =RGBA(214, 12, 48, 1)
+                        BorderThickness: =1
+                        Color: =RGBA(214, 12, 48, 1)
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =40
+                        HoverBorderColor: =RGBA(214, 12, 48, 1)
+                        HoverColor: =RGBA(255, 255, 255, 1)
+                        HoverFill: =RGBA(214, 12, 48, 1)
+                        OnSelect: =Launch(varSelectedProject.dashboard_url)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Text: ="Dashboard"
+                        Visible: =!IsBlank(varSelectedProject.dashboard_url)
+                        Width: =140
+                  - ph_btn_add:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        BorderThickness: =0
+                        Color: =RGBA(255, 255, 255, 1)
+                        DisplayMode: =If(varCanEditCurrentProject && !IsBlank(varSelectedProject), DisplayMode.Edit, DisplayMode.Disabled)
+                        Fill: =RGBA(35, 38, 43, 1)
+                        FillPortions: =0
+                        Font: =Font.'Segoe UI'
+                        FontWeight: =FontWeight.Bold
+                        Height: =40
+                        OnSelect: =Navigate('Create New Package', ScreenTransition.Fade)
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Size: =12
+                        Text: ="+ Add package"
+                        Width: =140
+            - ph_kpis:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =0
+                  Height: =72
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =8
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                Children:
+                  - ph_kpi_total:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - ph_kpi_total_n:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "all"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(35, 38, 43, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =20
+                              Text: =CountRows(Filter(colProjectPackages, archived <> true))
+                              Width: =Parent.Width
+                        - ph_kpi_total_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "all"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =16
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =11
+                              Text: ="Packages"
+                              Width: =Parent.Width
+                  - ph_kpi_awarded:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(232, 246, 238, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - ph_kpi_awarded_n:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "awarded"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(16, 124, 65, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =20
+                              Text: =CountRows(Filter(colProjectPackages, archived <> true && !IsBlank(actualawarddate)))
+                              Width: =Parent.Width
+                        - ph_kpi_awarded_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "awarded"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(16, 124, 65, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =16
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =11
+                              Text: ="Awarded"
+                              Width: =Parent.Width
+                  - ph_kpi_delayed:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(253, 236, 236, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - ph_kpi_delayed_n:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "delayed"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(214, 12, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =20
+                              Text: |-
+                                =CountRows(
+                                    Filter(
+                                        colProjectPackages,
+                                        archived <> true &&
+                                        (
+                                        (IsBlank(actualsowdate) &&
+                                        !IsBlank(revisedplannedsowdate) &&
+                                        revisedplannedsowdate < Today()) ||
+                                        (!IsBlank(actualsowdate) &&
+                                        IsBlank(actualrfqissuedate) &&
+                                        !IsBlank(revisedplannedrfqissuedate) &&
+                                        revisedplannedrfqissuedate < Today()) ||
+                                        (!IsBlank(actualrfqissuedate) &&
+                                        IsBlank(actualrfqclosingdate) &&
+                                        !IsBlank(revisedplannedrfqclosingdate) &&
+                                        revisedplannedrfqclosingdate < Today()) ||
+                                        (!IsBlank(actualrfqclosingdate) &&
+                                        IsBlank(actualevaluationcompletiondate) &&
+                                        !IsBlank(revisedplannedevaluationcompletio) &&
+                                        revisedplannedevaluationcompletio < Today()) ||
+                                        (!IsBlank(actualevaluationcompletiondate) &&
+                                        IsBlank(actualawarddate) &&
+                                        !IsBlank(revisedplannedawarddate) &&
+                                        revisedplannedawarddate < Today())
+                                        )
+                                    )
+                                )
+                              Width: =Parent.Width
+                        - ph_kpi_delayed_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "delayed"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(214, 12, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =16
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =11
+                              Text: ="Delayed"
+                              Width: =Parent.Width
+                  - ph_kpi_risk:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 244, 229, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - ph_kpi_risk_n:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "at_risk"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(255, 140, 0, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =20
+                              Text: |-
+                                =CountRows(
+                                    Filter(
+                                        colProjectPackages,
+                                        archived <> true &&
+                                        (
+                                        (IsBlank(actualsowdate) &&
+                                        !IsBlank(revisedplannedsowdate) &&
+                                        revisedplannedsowdate >= Today() &&
+                                        revisedplannedsowdate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
+                                        (!IsBlank(actualsowdate) &&
+                                        IsBlank(actualrfqissuedate) &&
+                                        !IsBlank(revisedplannedrfqissuedate) &&
+                                        revisedplannedrfqissuedate >= Today() &&
+                                        revisedplannedrfqissuedate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
+                                        (!IsBlank(actualrfqissuedate) &&
+                                        IsBlank(actualrfqclosingdate) &&
+                                        !IsBlank(revisedplannedrfqclosingdate) &&
+                                        revisedplannedrfqclosingdate >= Today() &&
+                                        revisedplannedrfqclosingdate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
+                                        (!IsBlank(actualrfqclosingdate) &&
+                                        IsBlank(actualevaluationcompletiondate) &&
+                                        !IsBlank(revisedplannedevaluationcompletio) &&
+                                        revisedplannedevaluationcompletio >= Today() &&
+                                        revisedplannedevaluationcompletio <= DateAdd(Today(), 7, TimeUnit.Days)) ||
+                                        (!IsBlank(actualevaluationcompletiondate) &&
+                                        IsBlank(actualawarddate) &&
+                                        !IsBlank(revisedplannedawarddate) &&
+                                        revisedplannedawarddate >= Today() &&
+                                        revisedplannedawarddate <= DateAdd(Today(), 7, TimeUnit.Days))
+                                        )
+                                    )
+                                )
+                              Width: =Parent.Width
+                        - ph_kpi_risk_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "at_risk"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(255, 140, 0, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =16
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =11
+                              Text: ="At risk"
+                              Width: =Parent.Width
+
+                  - ph_kpi_archived:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(237, 237, 237, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - ph_kpi_archived_n:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "archived"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(90, 96, 102, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =28
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =20
+                              Text: =CountRows(Filter(colProjectPackages, archived = true))
+                              Width: =Parent.Width
+                        - ph_kpi_archived_l:
+                            Control: Label@2.5.1
+                            Properties:
+                              OnSelect: =Set(varPackageFilter, "archived"); Navigate('Welcome screen', ScreenTransition.Fade)
+                              Align: =Align.Center
+                              Color: =RGBA(90, 96, 102, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =16
+                              PaddingBottom: =0
+                              PaddingTop: =0
+                              Size: =11
+                              Text: ="Archived"
+                              Width: =Parent.Width
+
+            - ph_lists:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  FillPortions: =1
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =8
+                  LayoutMinHeight: =160
+                  LayoutMinWidth: =0
+                Children:
+                  - ph_all_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - ph_all_head:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(35, 38, 43, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =36
+                              OnSelect: |-
+                                =Set(varPackageFilter, "all");
+                                Navigate('Welcome screen', ScreenTransition.Fade)
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              Size: =12
+                              Text: ="ALL PACKAGES (" & CountRows(ph_all_gal.AllItems) & ")"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =Parent.Width
+                        - ph_all_empty:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =64
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              Size: =12
+                              Text: ="No active packages."
+                              VerticalAlign: =VerticalAlign.Middle
+                              Visible: =CountRows(ph_all_gal.AllItems) = 0
+                              Width: =Parent.Width
+                        - ph_all_gal:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderThickness: =0
+                              FillPortions: =1
+                              Items: |-
+                                =Sort(
+                                    AddColumns(
+                                        Filter(colProjectPackages, archived <> true),
+                                        _stage,
+                                        If(
+                                            IsBlank(actualsowdate), "SOW",
+                                            IsBlank(actualrfqissuedate), "RFQ issue",
+                                            IsBlank(actualrfqclosingdate), "RFQ closing",
+                                            IsBlank(actualevaluationcompletiondate), "Evaluation",
+                                            IsBlank(actualawarddate), "Award",
+                                            "Awarded"
+                                        ),
+                                        _due,
+                                        If(
+                                            IsBlank(actualsowdate), Coalesce(revisedplannedsowdate, originalplannedsowdate),
+                                            IsBlank(actualrfqissuedate), Coalesce(revisedplannedrfqissuedate, originalplannedrfqissuedate),
+                                            IsBlank(actualrfqclosingdate), Coalesce(revisedplannedrfqclosingdate, originalplannedrfqclosingdate),
+                                            IsBlank(actualevaluationcompletiondate), Coalesce(revisedplannedevaluationcompletio, originalplannedevaluationcompleti),
+                                            IsBlank(actualawarddate), Coalesce(revisedplannedawarddate, originalplannedawarddate),
+                                            Blank()
+                                        ),
+                                        _sortDue,
+                                        Coalesce(
+                                            If(
+                                                IsBlank(actualsowdate), Coalesce(revisedplannedsowdate, originalplannedsowdate),
+                                                IsBlank(actualrfqissuedate), Coalesce(revisedplannedrfqissuedate, originalplannedrfqissuedate),
+                                                IsBlank(actualrfqclosingdate), Coalesce(revisedplannedrfqclosingdate, originalplannedrfqclosingdate),
+                                                IsBlank(actualevaluationcompletiondate), Coalesce(revisedplannedevaluationcompletio, originalplannedevaluationcompleti),
+                                                IsBlank(actualawarddate), Coalesce(revisedplannedawarddate, originalplannedawarddate),
+                                                Blank()
+                                            ),
+                                            Date(2099, 12, 31)
+                                        )
+                                    ),
+                                    _sortDue,
+                                    SortOrder.Ascending
+                                )
+                              LayoutMinHeight: =80
+                              OnSelect: |-
+                                =Set(varOpenPackageId, ThisItem.packageidentifier);
+                                Select(ph_open_pkg)
+                              TemplatePadding: =0
+                              TemplateSize: =60
+                              Width: =Parent.Width
+                            Children:
+                              - ph_all_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Height: =Parent.TemplateHeight
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =8
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =8
+                                    Width: =Parent.TemplateWidth
+                                  Children:
+                                    - ph_all_top:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Height: =22
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          Width: =Parent.Width - 24
+                                        Children:
+                                          - ph_all_id:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(214, 12, 48, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =22
+                                                OnSelect: |-
+                                                  =Select(ph_all_gal)
+                                                Size: =12
+                                                Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Width: =96
+                                          - ph_all_desc:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(35, 38, 43, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                Height: =22
+                                                LayoutMinWidth: =0
+                                                OnSelect: |-
+                                                  =Select(ph_all_gal)
+                                                Size: =12
+                                                Text: =ThisItem.packagedescription
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
+                                          - ph_all_go:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                Color: =RGBA(214, 12, 48, 1)
+                                                Height: =16
+                                                Icon: =Icon.ChevronRight
+                                                OnSelect: |-
+                                                  =Select(ph_all_gal)
+                                                Width: =16
+                                    - ph_all_why:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(90, 96, 102, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          OnSelect: |-
+                                            =Select(ph_all_gal)
+                                          Size: =11
+                                          Text: =If(ThisItem._stage = "Awarded", "Awarded", ThisItem._stage & "  " & If(IsBlank(ThisItem._due), "TBD", Text(ThisItem._due, "mmm dd, yyyy")))
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =Parent.Width - 24
+                                          Wrap: =false
+                  - ph_late_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - ph_late_head:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(214, 12, 48, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =36
+                              OnSelect: |-
+                                =Set(varPackageFilter, "delayed");
+                                Navigate('Welcome screen', ScreenTransition.Fade)
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              Size: =12
+                              Text: ="DELAYED (" & CountRows(ph_late_gal.AllItems) & ")"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =Parent.Width
+                        - ph_late_empty:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =64
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              Size: =12
+                              Text: ="No overdue milestones."
+                              VerticalAlign: =VerticalAlign.Middle
+                              Visible: =CountRows(ph_late_gal.AllItems) = 0
+                              Width: =Parent.Width
+                        - ph_late_gal:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderThickness: =0
+                              FillPortions: =1
+                              Items: |-
+                                =Sort(
+                                    AddColumns(
+                                        Filter(
+                                            colProjectPackages,
+                                            archived <> true &&
+                                            (
+                                            (IsBlank(actualsowdate) &&
+                                            !IsBlank(revisedplannedsowdate) &&
+                                            revisedplannedsowdate < Today()) ||
+                                            (!IsBlank(actualsowdate) &&
+                                            IsBlank(actualrfqissuedate) &&
+                                            !IsBlank(revisedplannedrfqissuedate) &&
+                                            revisedplannedrfqissuedate < Today()) ||
+                                            (!IsBlank(actualrfqissuedate) &&
+                                            IsBlank(actualrfqclosingdate) &&
+                                            !IsBlank(revisedplannedrfqclosingdate) &&
+                                            revisedplannedrfqclosingdate < Today()) ||
+                                            (!IsBlank(actualrfqclosingdate) &&
+                                            IsBlank(actualevaluationcompletiondate) &&
+                                            !IsBlank(revisedplannedevaluationcompletio) &&
+                                            revisedplannedevaluationcompletio < Today()) ||
+                                            (!IsBlank(actualevaluationcompletiondate) &&
+                                            IsBlank(actualawarddate) &&
+                                            !IsBlank(revisedplannedawarddate) &&
+                                            revisedplannedawarddate < Today())
+                                            )
+                                        ),
+                                        _stage,
+                                        If(
+                                            IsBlank(actualsowdate), "SOW",
+                                            IsBlank(actualrfqissuedate), "RFQ issue",
+                                            IsBlank(actualrfqclosingdate), "RFQ closing",
+                                            IsBlank(actualevaluationcompletiondate), "Evaluation",
+                                            IsBlank(actualawarddate), "Award",
+                                            "Awarded"
+                                        ),
+                                        _due,
+                                        If(
+                                            IsBlank(actualsowdate), revisedplannedsowdate,
+                                            IsBlank(actualrfqissuedate), revisedplannedrfqissuedate,
+                                            IsBlank(actualrfqclosingdate), revisedplannedrfqclosingdate,
+                                            IsBlank(actualevaluationcompletiondate), revisedplannedevaluationcompletio,
+                                            revisedplannedawarddate
+                                        )
+                                    ),
+                                    _due,
+                                    SortOrder.Ascending
+                                )
+                              LayoutMinHeight: =80
+                              OnSelect: |-
+                                =Set(varOpenPackageId, ThisItem.packageidentifier);
+                                Select(ph_open_pkg)
+                              TemplatePadding: =0
+                              TemplateSize: =60
+                              Width: =Parent.Width
+                            Children:
+                              - ph_late_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(253, 236, 236, 1)
+                                    Height: =Parent.TemplateHeight
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =8
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =8
+                                    Width: =Parent.TemplateWidth
+                                  Children:
+                                    - ph_late_top:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Height: =22
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          Width: =Parent.Width - 24
+                                        Children:
+                                          - ph_late_id:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(214, 12, 48, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =22
+                                                OnSelect: |-
+                                                  =Select(ph_late_gal)
+                                                Size: =12
+                                                Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Width: =96
+                                          - ph_late_desc:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(35, 38, 43, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                Height: =22
+                                                LayoutMinWidth: =0
+                                                OnSelect: |-
+                                                  =Select(ph_late_gal)
+                                                Size: =12
+                                                Text: =ThisItem.packagedescription
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
+                                          - ph_late_go:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                Color: =RGBA(214, 12, 48, 1)
+                                                Height: =16
+                                                Icon: =Icon.ChevronRight
+                                                OnSelect: |-
+                                                  =Select(ph_late_gal)
+                                                Width: =16
+                                    - ph_late_why:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(214, 12, 48, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          OnSelect: |-
+                                            =Select(ph_late_gal)
+                                          Size: =11
+                                          Text: '="Overdue: " & ThisItem._stage & "  " & Text(ThisItem._due, "mmm dd, yyyy")'
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =Parent.Width - 24
+                                          Wrap: =false
+                  - ph_soon_card:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =RGBA(255, 255, 255, 1)
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =0
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                      Children:
+                        - ph_soon_head:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(180, 95, 0, 1)
+                              Font: =Font.'Segoe UI'
+                              FontWeight: =FontWeight.Bold
+                              Height: =36
+                              OnSelect: |-
+                                =Set(varPackageFilter, "at_risk");
+                                Navigate('Welcome screen', ScreenTransition.Fade)
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              Size: =12
+                              Text: ="AT RISK (" & CountRows(ph_soon_gal.AllItems) & ")"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Width: =Parent.Width
+                        - ph_soon_empty:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Center
+                              Color: =RGBA(106, 122, 127, 1)
+                              Font: =Font.'Segoe UI'
+                              Height: =64
+                              PaddingLeft: =12
+                              PaddingRight: =12
+                              Size: =12
+                              Text: ="Nothing due in the next 7 days."
+                              VerticalAlign: =VerticalAlign.Middle
+                              Visible: =CountRows(ph_soon_gal.AllItems) = 0
+                              Width: =Parent.Width
+                        - ph_soon_gal:
+                            Control: Gallery@2.15.0
+                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
+                            Properties:
+                              BorderThickness: =0
+                              FillPortions: =1
+                              Items: |-
+                                =Sort(
+                                    AddColumns(
+                                        Filter(
+                                            colProjectPackages,
+                                            archived <> true &&
+                                            (
+                                            (IsBlank(actualsowdate) &&
+                                            !IsBlank(revisedplannedsowdate) &&
+                                            revisedplannedsowdate >= Today() &&
+                                            revisedplannedsowdate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
+                                            (!IsBlank(actualsowdate) &&
+                                            IsBlank(actualrfqissuedate) &&
+                                            !IsBlank(revisedplannedrfqissuedate) &&
+                                            revisedplannedrfqissuedate >= Today() &&
+                                            revisedplannedrfqissuedate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
+                                            (!IsBlank(actualrfqissuedate) &&
+                                            IsBlank(actualrfqclosingdate) &&
+                                            !IsBlank(revisedplannedrfqclosingdate) &&
+                                            revisedplannedrfqclosingdate >= Today() &&
+                                            revisedplannedrfqclosingdate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
+                                            (!IsBlank(actualrfqclosingdate) &&
+                                            IsBlank(actualevaluationcompletiondate) &&
+                                            !IsBlank(revisedplannedevaluationcompletio) &&
+                                            revisedplannedevaluationcompletio >= Today() &&
+                                            revisedplannedevaluationcompletio <= DateAdd(Today(), 7, TimeUnit.Days)) ||
+                                            (!IsBlank(actualevaluationcompletiondate) &&
+                                            IsBlank(actualawarddate) &&
+                                            !IsBlank(revisedplannedawarddate) &&
+                                            revisedplannedawarddate >= Today() &&
+                                            revisedplannedawarddate <= DateAdd(Today(), 7, TimeUnit.Days))
+                                            )
+                                        ),
+                                        _stage,
+                                        If(
+                                            IsBlank(actualsowdate), "SOW",
+                                            IsBlank(actualrfqissuedate), "RFQ issue",
+                                            IsBlank(actualrfqclosingdate), "RFQ closing",
+                                            IsBlank(actualevaluationcompletiondate), "Evaluation",
+                                            IsBlank(actualawarddate), "Award",
+                                            "Awarded"
+                                        ),
+                                        _due,
+                                        If(
+                                            IsBlank(actualsowdate), revisedplannedsowdate,
+                                            IsBlank(actualrfqissuedate), revisedplannedrfqissuedate,
+                                            IsBlank(actualrfqclosingdate), revisedplannedrfqclosingdate,
+                                            IsBlank(actualevaluationcompletiondate), revisedplannedevaluationcompletio,
+                                            revisedplannedawarddate
+                                        )
+                                    ),
+                                    _due,
+                                    SortOrder.Ascending
+                                )
+                              LayoutMinHeight: =80
+                              OnSelect: |-
+                                =Set(varOpenPackageId, ThisItem.packageidentifier);
+                                Select(ph_open_pkg)
+                              TemplatePadding: =0
+                              TemplateSize: =60
+                              Width: =Parent.Width
+                            Children:
+                              - ph_soon_row:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: AutoLayout
+                                  Properties:
+                                    DropShadow: =DropShadow.None
+                                    Fill: =RGBA(255, 244, 229, 1)
+                                    Height: =Parent.TemplateHeight
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutGap: =2
+                                    LayoutMinHeight: =0
+                                    LayoutMinWidth: =0
+                                    PaddingBottom: =8
+                                    PaddingLeft: =12
+                                    PaddingRight: =12
+                                    PaddingTop: =8
+                                    Width: =Parent.TemplateWidth
+                                  Children:
+                                    - ph_soon_top:
+                                        Control: GroupContainer@1.5.0
+                                        Variant: AutoLayout
+                                        Properties:
+                                          DropShadow: =DropShadow.None
+                                          Height: =22
+                                          LayoutAlignItems: =LayoutAlignItems.Center
+                                          LayoutDirection: =LayoutDirection.Horizontal
+                                          LayoutGap: =8
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          Width: =Parent.Width - 24
+                                        Children:
+                                          - ph_soon_id:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(214, 12, 48, 1)
+                                                Font: =Font.'Segoe UI'
+                                                FontWeight: =FontWeight.Bold
+                                                Height: =22
+                                                OnSelect: |-
+                                                  =Select(ph_soon_gal)
+                                                Size: =12
+                                                Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Width: =96
+                                          - ph_soon_desc:
+                                              Control: Label@2.5.1
+                                              Properties:
+                                                Color: =RGBA(35, 38, 43, 1)
+                                                FillPortions: =1
+                                                Font: =Font.'Segoe UI'
+                                                Height: =22
+                                                LayoutMinWidth: =0
+                                                OnSelect: |-
+                                                  =Select(ph_soon_gal)
+                                                Size: =12
+                                                Text: =ThisItem.packagedescription
+                                                VerticalAlign: =VerticalAlign.Middle
+                                                Wrap: =false
+                                          - ph_soon_go:
+                                              Control: Classic/Icon@2.5.0
+                                              Properties:
+                                                Color: =RGBA(214, 12, 48, 1)
+                                                Height: =16
+                                                Icon: =Icon.ChevronRight
+                                                OnSelect: |-
+                                                  =Select(ph_soon_gal)
+                                                Width: =16
+                                    - ph_soon_why:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =RGBA(180, 95, 0, 1)
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =16
+                                          OnSelect: |-
+                                            =Select(ph_soon_gal)
+                                          Size: =11
+                                          Text: '="Due soon: " & ThisItem._stage & "  " & Text(ThisItem._due, "mmm dd, yyyy")'
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Width: =Parent.Width - 24
+                                          Wrap: =false
