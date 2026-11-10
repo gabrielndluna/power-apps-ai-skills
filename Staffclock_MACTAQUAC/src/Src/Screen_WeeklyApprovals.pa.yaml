@@ -251,39 +251,75 @@ Screens:
                               Text: ="Employee"
                               Width: =90
                         - Dropdown_Employee_Weekly:
-                            Control: Classic/ComboBox@2.4.0
+                            Control: ModernCombobox@1.1.2
                             Properties:
                               BorderColor: =RGBA(200, 204, 210, 1)
-                              ChevronBackground: =RGBA(0, 18, 107, 1)
-                              ChevronFill: =RGBA(255, 255, 255, 1)
-                              DisplayFields: =["DisplayName"]
-                              Font: =Font.'Segoe UI'
-                              InputTextPlaceholder: ="Search employee"
+                              BorderThickness: =1
+                              Height: =36
+                              InputTextPlaceholder: ="All employees"
+                              ItemDisplayText: =ThisItem.'Employee Name'
                               Items: |-
-                                =If(
-                                    !IsBlank(Trim(Self.SearchText)),
-                                    ShowColumns(
-                                        Office365Users.SearchUser(
+                                =With(
+                                    {
+                                        people: Sort(
+                                            DropColumns(
+                                                GroupBy(
+                                                    Filter(
+                                                        colEmployeesAll,
+                                                        !IsBlank(Email_Address) &&
+                                                        (
+                                                            varIsSuperAdmin ||
+                                                            Lower('Approver 1 Email') = Lower(User().Email)
+                                                        ) &&
+                                                        (
+                                                            IsBlank(Trim(Self.SearchText)) ||
+                                                            Trim(Self.SearchText) in 'Employee Name' ||
+                                                            Trim(Self.SearchText) in Email_Address
+                                                        )
+                                                    ),
+                                                    'Employee Name',
+                                                    Email_Address,
+                                                    Extra
+                                                ),
+                                                Extra
+                                            ),
+                                            'Employee Name',
+                                            SortOrder.Ascending
+                                        )
+                                    },
+                                    Ungroup(
+                                        Table(
                                             {
-                                                searchTerm: Trim(Self.SearchText),
-                                                top: 15
+                                                g: Table({ 'Employee Name': "All employees", Email_Address: "" })
+                                            },
+                                            {
+                                                g: people
                                             }
                                         ),
-                                        Id,
-                                        DisplayName,
-                                        Mail,
-                                        UserPrincipalName,
-                                        Department
+                                        g
                                     )
                                 )
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
                               OnChange: |-
-                                =Set(
-                                    varWeeklyEmployeeEmail,
-                                    Lower(Coalesce(Self.Selected.Mail, Self.Selected.UserPrincipalName))
-                                );
-                                Set(varWeeklyEmployeeName, Self.Selected.DisplayName);
-                                Select(btn_ReloadWeekly);
-                              SearchFields: =["DisplayName","Mail"]
+                                =With(
+                                    {
+                                        nextEmail: If(
+                                            IsBlank(Self.Selected.Email_Address),
+                                            "",
+                                            Lower(Trim(Self.Selected.Email_Address))
+                                        )
+                                    },
+                                    If(
+                                        nextEmail <> Coalesce(varWeeklyEmployeeEmail, ""),
+                                        Set(varWeeklyEmployeeEmail, nextEmail);
+                                        Set(
+                                            varWeeklyEmployeeName,
+                                            If(IsBlank(nextEmail), "", Self.Selected.'Employee Name')
+                                        );
+                                        Select(btn_ReloadWeekly)
+                                    )
+                                )
                               SelectMultiple: =false
                               Width: =320
                   - weekly_toolbar_actions:

@@ -3220,7 +3220,7 @@ Screens:
                                           Default: =Coalesce(varEditingChange.reason.Value, "Design Change")
                                           Font: =Font.'Segoe UI'
                                           Height: =34
-                                          Items: =["Design Change", "Scope Gap", "Variation", "Acceleration", "New Scope"]
+                                          Items: =["Design Change", "Scope Gap", "Variation", "Acceleration", "New Scope", "Standby Claim"]
                                           Size: =12
                                           Width: =Parent.Width - 8
                                           X: =4
@@ -3274,7 +3274,7 @@ Screens:
                                         Properties:
                                           BorderColor: =RGBA(201, 207, 210, 1)
                                           BorderThickness: =1
-                                          Default: =Text(Coalesce(varEditingChange.value, 0), "#,##0.00")
+                                          Default: =Text(Coalesce(varEditingChange.initialvalue, varEditingChange.value, 0), "0.00")
                                           Font: =Font.'Segoe UI'
                                           Format: =TextFormat.Number
                                           Height: =34
@@ -3318,7 +3318,7 @@ Screens:
                                         Properties:
                                           BorderColor: =RGBA(201, 207, 210, 1)
                                           BorderThickness: =1
-                                          Default: =Text(Coalesce(varEditingChange.value, 0), "#,##0.00")
+                                          Default: =Text(Coalesce(varEditingChange.finalvalue, varEditingChange.value, 0), "0.00")
                                           Font: =Font.'Segoe UI'
                                           Format: =TextFormat.Number
                                           Height: =34
@@ -3495,7 +3495,7 @@ Screens:
                                   Properties:
                                     BorderColor: =RGBA(201, 207, 210, 1)
                                     BorderThickness: =1
-                                    Default: =Text(Coalesce(varEditingChange.budget, 0), "#,##0.00")
+                                    Default: =Text(Coalesce(varEditingChange.budget, 0), "0.00")
                                     Font: =Font.'Segoe UI'
                                     Format: =TextFormat.Number
                                     Height: =36
@@ -3603,87 +3603,111 @@ Screens:
                               FontWeight: =FontWeight.Bold
                               Height: =38
                               OnSelect: |-
-                                =If(
-                                    IsBlank(Trim(det_cp_ref.Text)),
-                                    Notify("Ref No. is required.", NotificationType.Error),
-                                    With(
-                                        {
-                                            aeconRef: "SCO" & Substitute(Substitute(Upper(Trim(det_cp_aecon.Text)), "SCO", ""), " ", "")
-                                        },
-                                        If(
-                                            IsBlank(varEditingChange),
-                                            Patch(
-                                                'PostAward - Changes',
-                                                Defaults('PostAward - Changes'),
+                                =IfError(
+                                    If(
+                                        IsBlank(Trim(det_cp_ref.Text)),
+                                        Notify("Ref No. is required.", NotificationType.Error),
+                                        With(
+                                            {
+                                                aeconRef: "SCO" & Substitute(Substitute(Upper(Trim(det_cp_aecon.Text)), "SCO", ""), " ", "")
+                                            },
+                                            With(
                                                 {
-                                                    Title: Trim(det_cp_ref.Text),
-                                                    subcontractid: varSelectedSubcontract.packageidentifier,
-                                                    projectidentifier: varSelectedSubcontract.projectidentifier,
-                                                    refnumber: Trim(det_cp_ref.Text),
-                                                    changedate: det_cp_date.SelectedDate,
-                                                    datereceived: det_cp_received.SelectedDate,
-                                                    datefullyexecuted: det_cp_executed.SelectedDate,
-                                                    description: det_cp_desc.Text,
-                                                    changetype: det_cp_type.SelectedText,
-                                                    reason: det_cp_reason.SelectedText,
-                                                    value: Value(det_cp_final.Text),
-                                                    budget: Value(det_cp_budget.Text),
-                                                    status: det_cp_st.SelectedText,
-                                                    aeconref: aeconRef
-                                                }
-                                            ),
-                                            Patch(
-                                                'PostAward - Changes',
-                                                LookUp('PostAward - Changes', ID = varEditingChange.ID),
-                                                {
-                                                    Title: Trim(det_cp_ref.Text),
-                                                    refnumber: Trim(det_cp_ref.Text),
-                                                    changedate: det_cp_date.SelectedDate,
-                                                    datereceived: det_cp_received.SelectedDate,
-                                                    datefullyexecuted: det_cp_executed.SelectedDate,
-                                                    description: det_cp_desc.Text,
-                                                    changetype: det_cp_type.SelectedText,
-                                                    reason: det_cp_reason.SelectedText,
-                                                    value: Value(det_cp_final.Text),
-                                                    budget: Value(det_cp_budget.Text),
-                                                    status: det_cp_st.SelectedText,
-                                                    aeconref: aeconRef
-                                                }
+                                                    saved: If(
+                                                    IsBlank(varEditingChange),
+                                                    Patch(
+                                                        'PostAward - Changes',
+                                                        Defaults('PostAward - Changes'),
+                                                        {
+                                                            Title: Trim(det_cp_ref.Text),
+                                                            subcontractid: varSelectedSubcontract.packageidentifier,
+                                                            projectidentifier: varSelectedSubcontract.projectidentifier,
+                                                            refnumber: Trim(det_cp_ref.Text),
+                                                            changedate: det_cp_date.SelectedDate,
+                                                            datereceived: det_cp_received.SelectedDate,
+                                                            datefullyexecuted: det_cp_executed.SelectedDate,
+                                                            description: det_cp_desc.Text,
+                                                            changetype: {Value: det_cp_type.Selected.Value},
+                                                            reason: {Value: det_cp_reason.Selected.Value},
+                                                            initialvalue: Value(det_cp_initial.Text),
+                                                            finalvalue: Value(det_cp_final.Text),
+                                                            value: Value(det_cp_final.Text),
+                                                            budget: Value(det_cp_budget.Text),
+                                                            status: {Value: det_cp_st.Selected.Value},
+                                                            aeconref: aeconRef
+                                                        }
+                                                    ),
+                                                    Patch(
+                                                        'PostAward - Changes',
+                                                        LookUp('PostAward - Changes', ID = varEditingChange.ID),
+                                                        {
+                                                            Title: Trim(det_cp_ref.Text),
+                                                            refnumber: Trim(det_cp_ref.Text),
+                                                            changedate: det_cp_date.SelectedDate,
+                                                            datereceived: det_cp_received.SelectedDate,
+                                                            datefullyexecuted: det_cp_executed.SelectedDate,
+                                                            description: det_cp_desc.Text,
+                                                            changetype: {Value: det_cp_type.Selected.Value},
+                                                            reason: {Value: det_cp_reason.Selected.Value},
+                                                            initialvalue: Value(det_cp_initial.Text),
+                                                            finalvalue: Value(det_cp_final.Text),
+                                                            value: Value(det_cp_final.Text),
+                                                            budget: Value(det_cp_budget.Text),
+                                                            status: {Value: det_cp_st.Selected.Value},
+                                                            aeconref: aeconRef
+                                                        }
+                                                    )
+                                                )
+                                            },
+                                            If(
+                                                IsBlank(saved),
+                                                Notify(
+                                                    Coalesce(
+                                                        First(Errors('PostAward - Changes')).Message,
+                                                        "Could not save this change."
+                                                    ),
+                                                    NotificationType.Error
+                                                ),
+                                                Set(varShowAddChange, false);
+                                                Set(varEditingChange, Blank());
+                                                ClearCollect(
+                                                    colSubChanges,
+                                                    Filter(
+                                                        'PostAward - Changes',
+                                                        subcontractid = varSelectedSubcontract.packageidentifier
+                                                    )
+                                                );
+                                                ClearCollect(
+                                                    colProjectChanges,
+                                                    Filter(
+                                                        'PostAward - Changes',
+                                                        projectidentifier = varSelectedSubcontract.projectidentifier
+                                                    )
+                                                );
+                                                Set(varApprovedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved"), _amt, value), _amt), 0));
+                                                Set(varPendingSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Pending"), _amt, value), _amt), 0));
+                                                Set(varPotentialSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Potential"), _amt, value), _amt), 0));
+                                                Set(varRejectedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Rejected"), _amt, value), _amt), 0));
+                                                Set(varCurrentValue, Coalesce(Value(varSelectedSubcontract.originalvalue), 0) + varApprovedSum);
+                                                Set(varFutureLiab, varPendingSum + varPotentialSum);
+                                                Set(varEAC, varCurrentValue + varFutureLiab);
+                                                Set(varIsOver, Coalesce(Value(varSelectedSubcontract.invoicedtodate), 0) > varCurrentValue);
+                                                Set(varReasonDesign, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), _amt, value), _amt), 0));
+                                                Set(varReasonScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), _amt, value), _amt), 0));
+                                                Set(varReasonVar, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), _amt, value), _amt), 0));
+                                                Set(varReasonAccel, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), _amt, value), _amt), 0));
+                                                Set(varReasonNewScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "New Scope"), _amt, value), _amt), 0));
+                                                Set(varPctComplete, Min(100, Round(Coalesce(Value(varSelectedSubcontract.invoicedtodate), 0) / Max(varCurrentValue, 1) * 100, 0)));
+                                                Set(varRollMaxStatus, Max(Abs(varApprovedSum), Abs(varPendingSum), Abs(varPotentialSum), Abs(varRejectedSum), 1));
+                                                Set(varRollMaxReason, Max(Abs(varReasonDesign), Abs(varReasonScope), Abs(varReasonVar), Abs(varReasonAccel), Abs(varReasonNewScope), 1));
+                                                Notify("Change saved.", NotificationType.Success)
                                             )
-                                        );
-                                        Set(varShowAddChange, false);
-                                        Set(varEditingChange, Blank());
-                                        ClearCollect(
-                                            colSubChanges,
-                                            Filter(
-                                                'PostAward - Changes',
-                                                subcontractid = varSelectedSubcontract.packageidentifier
-                                            )
-                                        );
-                                        ClearCollect(
-                                            colProjectChanges,
-                                            Filter(
-                                                'PostAward - Changes',
-                                                projectidentifier = varSelectedSubcontract.projectidentifier
-                                            )
-                                        );
-                                        Set(varApprovedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved"), _amt, value), _amt), 0));
-                                        Set(varPendingSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Pending"), _amt, value), _amt), 0));
-                                        Set(varPotentialSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Potential"), _amt, value), _amt), 0));
-                                        Set(varRejectedSum, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Rejected"), _amt, value), _amt), 0));
-                                        Set(varCurrentValue, Coalesce(Value(varSelectedSubcontract.originalvalue), 0) + varApprovedSum);
-                                        Set(varFutureLiab, varPendingSum + varPotentialSum);
-                                        Set(varEAC, varCurrentValue + varFutureLiab);
-                                        Set(varIsOver, Coalesce(Value(varSelectedSubcontract.invoicedtodate), 0) > varCurrentValue);
-                                        Set(varReasonDesign, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Design Change"), _amt, value), _amt), 0));
-                                        Set(varReasonScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Scope Gap"), _amt, value), _amt), 0));
-                                        Set(varReasonVar, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Variation"), _amt, value), _amt), 0));
-                                        Set(varReasonAccel, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "Acceleration"), _amt, value), _amt), 0));
-                                        Set(varReasonNewScope, Coalesce(Sum(AddColumns(Filter(colSubChanges, status.Value = "Approved" && reason.Value = "New Scope"), _amt, value), _amt), 0));
-                                        Set(varPctComplete, Min(100, Round(Coalesce(Value(varSelectedSubcontract.invoicedtodate), 0) / Max(varCurrentValue, 1) * 100, 0)));
-                                        Set(varRollMaxStatus, Max(Abs(varApprovedSum), Abs(varPendingSum), Abs(varPotentialSum), Abs(varRejectedSum), 1));
-                                        Set(varRollMaxReason, Max(Abs(varReasonDesign), Abs(varReasonScope), Abs(varReasonVar), Abs(varReasonAccel), Abs(varReasonNewScope), 1));
-                                        Notify("Change saved.", NotificationType.Success)
+                                        )
+                                    )
+                                ),
+                                    Notify(
+                                        Coalesce(FirstError.Message, "Could not save this change."),
+                                        NotificationType.Error
                                     )
                                 )
                               RadiusBottomLeft: =8

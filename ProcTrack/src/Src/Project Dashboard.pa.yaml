@@ -400,7 +400,7 @@ Screens:
                                       =CountRows(
                                           Filter(
                                               colPermittedPackages,
-                                              archived <> true
+                                              archived <> true && contracttype <> "Cancelled"
                                           )
                                       )
                                     Width: =Parent.Width
@@ -486,7 +486,7 @@ Screens:
                                       =CountRows(
                                           Filter(
                                               colPermittedPackages,
-                                              !IsBlank(actualawarddate) && archived <> true
+                                              !IsBlank(actualawarddate) && archived <> true && contracttype <> "Cancelled"
                                           )
                                       )
                                     Width: =Parent.Width
@@ -573,6 +573,7 @@ Screens:
                                           Filter(
                                               colPermittedPackages,
                                               archived <> true &&
+                                              contracttype <> "Cancelled" &&
                                               IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && (
                                                   revisedplannedawarddate < Today() ||
                                                   (
@@ -803,7 +804,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true
+                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true && contracttype <> "Cancelled"
                                                 )
                                             )
                                           Width: =dash_metric_packages.Width - 12
@@ -856,7 +857,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && !IsBlank(actualawarddate) && archived <> true
+                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && !IsBlank(actualawarddate) && archived <> true && contracttype <> "Cancelled"
                                                 )
                                             )
                                           Width: =dash_metric_awarded.Width - 12
@@ -923,7 +924,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate < Today()
+                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true && contracttype <> "Cancelled" && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate < Today()
                                                 )
                                             )
                                           Width: =dash_metric_delayed.Width - 12
@@ -976,7 +977,7 @@ Screens:
                                             =CountRows(
                                                 Filter(
                                                     colPermittedPackages,
-                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate >= Today() && revisedplannedawarddate <= Today() + 30
+                                                    (ProjectID = ThisItem.projectid || projectidentifier = ThisItem.projectidentifier) && archived <> true && contracttype <> "Cancelled" && IsBlank(actualawarddate) && !IsBlank(revisedplannedawarddate) && revisedplannedawarddate >= Today() && revisedplannedawarddate <= Today() + 30
                                                 )
                                             )
                                           Width: =dash_metric_risk.Width - 12

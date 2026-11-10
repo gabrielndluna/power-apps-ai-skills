@@ -1,14 +1,18 @@
 # Office 365 Users search patterns
 
-Validated in Staffclock YNSE (2026-07-16) on `Dropdown_Employee_Weekly`.
+Use `ModernCombobox@1.1.2` for every new or rebuilt people picker. Skill: `.cursor/skills/office365-users-combobox/SKILL.md`.
 
-## Classic ComboBox people search (validated)
+Validated on Dayaway Aecon, ProcTrack `technical_lead_input`, and Staffclock Mactaquac Settings `Dropdown_SettingsEmployee` (2026-11-03).
 
-This exact combo works in Studio. Do not invent variants unless re-validated.
+## Modern combobox (use this)
+
+`Classic/ComboBox` `DisplayFields` and `SearchFields` often import blank. Search stays dead until someone opens the property in Studio, deletes the formula, and types the same formula again. The next YAML pack drops it again.
+
+`ModernCombobox` keeps `ItemDisplayText` and `Items`, so search works on import.
 
 ```powerfx
-// DisplayFields
-["DisplayName"]
+// ItemDisplayText
+ThisItem.DisplayName & " - " & ThisItem.Mail
 
 // Items
 If(
@@ -24,26 +28,9 @@ If(
         Department
     )
 )
-
-// SearchFields — keep ONLY these two
-["DisplayName", "Mail"]
 ```
 
-Also set:
-
-```powerfx
-IsSearchable = true
-SelectMultiple = false
-```
-
-### Why these properties matter
-
-| Property | Rule |
-|----------|------|
-| `DisplayFields` | Must be `["DisplayName"]`. Custom label columns like `UserLabel` break dropdown display/search. |
-| `Items` | Call `Office365Users.SearchUser` only when `Self.SearchText` is non-blank. Use plain `ShowColumns` — no `AddColumns` wrapper. |
-| `SearchFields` | Must be exactly `["DisplayName", "Mail"]`. Adding `UserPrincipalName` (or other fields) broke search in Studio. |
-| `top` | `15` is the validated limit. |
+Also set `SelectMultiple = false`. Do not set `DisplayFields`, `SearchFields`, or `IsSearchable`.
 
 ## Capture the selected email
 
@@ -70,6 +57,14 @@ Do not run `Lower(Employee)` against a large SharePoint source. Load with delega
 
 Blank `varWeeklyEmployeeEmail` means "all employees" (no filter).
 
+## Default selected person
+
+`DefaultSelectedItems` must be a table with the same five columns as `Items`. Map `Office365Users.UserProfileV2` (`id`, `displayName`, `mail`, `userPrincipalName`, `department`) into `Id`, `DisplayName`, `Mail`, `UserPrincipalName`, `Department`. Return `[]` when the email is blank. Dayaway `ComboBox3_1` is the reference.
+
 ## Connector metadata
 
 When Office 365 Users is added to a Studio-exported `.msapp`, unpack that export and refresh the app's `src/*.msapr` before packing. Editing YAML alone does not add the connector metadata.
+
+## Old pattern
+
+`Classic/ComboBox@2.4.0` with `DisplayFields = ["DisplayName"]` and `SearchFields = ["DisplayName", "Mail"]` was the Staffclock YNSE pattern (2026-07-16). Leave an existing classic control alone only if it was saved in Studio and you are not repacking that screen. Any new picker, or any picker that needs the formula retyped after import, is the modern control above.

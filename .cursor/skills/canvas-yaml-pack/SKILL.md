@@ -33,32 +33,9 @@ pac canvas unpack --msapp RoleFit/RoleFit.msapp --sources RoleFit/src --layout S
 
 For a Studio export with newly added connectors, unpack to a temporary folder first and copy the refreshed `.msapr` into the working `src/` so current YAML edits are not overwritten. For Office 365 Users search formulas, follow `_canvas-notes/office365-users.md`. For SharePoint file upload/view UI, follow `_canvas-notes/attachments.md` (Form + ClassicAttachmentsEdit — do not fake attachments with Patch).
 
-### Office 365 Users ComboBox (validated Staffclock YNSE)
+### Office 365 Users people search
 
-People search ComboBoxes must use this exact pattern (do not "improve" it without Studio re-validation):
-
-```powerfx
-DisplayFields = ["DisplayName"]
-SearchFields = ["DisplayName", "Mail"]   // only these two
-Items =
-If(
-    !IsBlank(Trim(Self.SearchText)),
-    ShowColumns(
-        Office365Users.SearchUser(
-            { searchTerm: Trim(Self.SearchText), top: 15 }
-        ),
-        Id, DisplayName, Mail, UserPrincipalName, Department
-    )
-)
-```
-
-Known failures:
-
-- `DisplayFields = ["UserLabel"]` or any custom `AddColumns` label → search/display breaks
-- `SearchFields` including `UserPrincipalName` → search stops returning results
-- Calling `SearchUser` when `SearchText` is blank → noisy / empty behavior
-
-OnChange should store `Lower(Coalesce(Selected.Mail, Selected.UserPrincipalName))` and filter **local collections** with `Lower(Employee) = varEmail`, not SharePoint directly. Full notes: `_canvas-notes/office365-users.md`.
+Use `ModernCombobox@1.1.2` with the search inside `Items`. Do not use `Classic/ComboBox` `DisplayFields` / `SearchFields` for `Office365Users.SearchUser`. Those two properties often import blank, and search only starts working after someone deletes and retypes the same formula in Studio. Follow `.cursor/skills/office365-users-combobox/SKILL.md` and `_canvas-notes/office365-users.md`.
 
 ### No CanvasComponents in YAML-only packs
 

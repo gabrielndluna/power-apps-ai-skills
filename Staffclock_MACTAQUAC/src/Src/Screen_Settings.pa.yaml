@@ -277,24 +277,20 @@ Screens:
                               Width: =Parent.Width
                             Children:
                               - Dropdown_SettingsEmployee:
-                                  Control: Classic/ComboBox@2.4.0
+                                  Control: ModernCombobox@1.1.2
                                   Properties:
                                     BorderColor: =RGBA(200, 204, 210, 1)
-                                    ChevronBackground: =RGBA(0, 18, 107, 1)
-                                    ChevronFill: =RGBA(255, 255, 255, 1)
-                                    DisplayFields: =["DisplayName"]
+                                    BorderThickness: =1
                                     FillPortions: =1
-                                    Font: =Font.'Segoe UI'
+                                    Height: =40
                                     InputTextPlaceholder: ="Search by name or email"
-                                    Items: |-
+                                    ItemDisplayText: =ThisItem.DisplayName & " - " & ThisItem.Mail
+                                    Items: |+
                                       =If(
                                           !IsBlank(Trim(Self.SearchText)),
                                           ShowColumns(
                                               Office365Users.SearchUser(
-                                                  {
-                                                      searchTerm: Trim(Self.SearchText),
-                                                      top: 15
-                                                  }
+                                                  { searchTerm: Trim(Self.SearchText), top: 15 }
                                               ),
                                               Id,
                                               DisplayName,
@@ -303,6 +299,7 @@ Screens:
                                               Department
                                           )
                                       )
+                                    LayoutMinHeight: =0
                                     LayoutMinWidth: =120
                                     OnChange: |-
                                       =Set(
@@ -310,7 +307,6 @@ Screens:
                                           Lower(Coalesce(Self.Selected.Mail, Self.Selected.UserPrincipalName))
                                       );
                                       Set(varSettingsSelectedName, Self.Selected.DisplayName);
-                                    SearchFields: =["DisplayName","Mail"]
                                     SelectMultiple: =false
                         - Label_SelectedHint:
                             Control: Label@2.5.1

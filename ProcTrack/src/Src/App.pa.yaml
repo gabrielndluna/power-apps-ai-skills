@@ -156,6 +156,11 @@ App:
 
       Clear(colProjectPackages);
       Clear(colSettingsProjectAccess);
+      Clear(colHomeDelayed);
+      Clear(colHomeSoon);
+      Set(varHomePageSize, 6);
+      Set(varLatePage, 1);
+      Set(varSoonPage, 1);
 
       // ── Column registry: only the swappable pool lives here ──────────────
       ClearCollect(

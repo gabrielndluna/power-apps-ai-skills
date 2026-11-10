@@ -18,7 +18,7 @@ Screens:
             CountRows(
                 Filter(
                     'Vacations Tracking (Days)',
-                    Lower(ApproverID_1) = Lower(User().Email) || Lower(ProjectDirector_Email) = Lower(User().Email),
+                    ApproverID_1 = User().Email || ProjectDirector_Email = User().Email,
                     ApprovalStatus_1 = "Pending" || ProjectDirector_ApprovalStatus.Value = "Pending",
                     EndDate >= varYearStart,
                     StartDate <= varYearEnd
@@ -381,7 +381,31 @@ Screens:
                         BorderColor: =RGBA(0, 18, 107, 1)
                         Fill: =ColorValue("#F5f5f5")
                         Height: =226
-                        Items: "=Sort(\r\n    Filter(\r\n        'Vacations Tracking (Days)',\r\n        \r\n        // --- Who qualifies: A1 approver OR PD approver OR Permissions (A2) ---\r\n        (\r\n            (ApproverID_1 = User().Email && ApprovalStatus_1 = \"Pending\")\r\n            ||\r\n            (ProjectDirector_Email = User().Email && ProjectDirector_ApprovalStatus.Value = \"Pending\")\r\n            ||\r\n            (\r\n                ApprovalStatus_2 = \"Pending\" &&\r\n                !IsBlank(\r\n                    LookUp(\r\n                        'Vacations Tracking (Permissions)',\r\n                        Lower(User_Email) = Lower(User().Email)\r\n                    )\r\n                )\r\n            )\r\n        )\r\n        &&\r\n        // --- Date window applies to ALL branches ---\r\n        StartDate >= varYearStart && Archived <> \"Yes\"\r\n    ),\r\n    Created,\r\n    SortOrder.Descending\r\n)"
+                        Items: |-
+                          =With(
+                              {
+                                  isHrApprover: !IsBlank(
+                                      LookUp(
+                                          'Vacations Tracking (Permissions)',
+                                          User_Email = User().Email
+                                      )
+                                  )
+                              },
+                              Sort(
+                                  Filter(
+                                      'Vacations Tracking (Days)',
+                                      (
+                                          (ApproverID_1 = User().Email && ApprovalStatus_1 = "Pending")
+                                          || (ProjectDirector_Email = User().Email && ProjectDirector_ApprovalStatus.Value = "Pending")
+                                          || (isHrApprover && ApprovalStatus_2 = "Pending")
+                                      )
+                                      && StartDate >= varYearStart
+                                      && Archived <> "Yes"
+                                  ),
+                                  Created,
+                                  SortOrder.Descending
+                              )
+                          )
                         TemplateSize: =60
                         Width: =Container1.Width
                         X: =(Parent.Width - Self.Width) / 2
@@ -515,8 +539,8 @@ Screens:
                               Default: |-
                                 =With(
                                     {
-                                        isA1: ThisItem.ApproverID_1 = User().Email,
-                                        isPD: ThisItem.ProjectDirector_Email = User().Email,
+                                        isA1: Lower(ThisItem.ApproverID_1) = Lower(User().Email),
+                                        isPD: Lower(ThisItem.ProjectDirector_Email) = Lower(User().Email),
                                         isA2: !IsBlank(
                                             LookUp(
                                                 'Vacations Tracking (Permissions)',
@@ -590,11 +614,11 @@ Screens:
 
                                         canApprove1:
                                             ThisItem.ApprovalStatus_1 = "Pending"
-                                            && ThisItem.ApproverID_1 = User().Email,
+                                            && Lower(ThisItem.ApproverID_1) = Lower(User().Email),
 
                                         canApprovePD:
                                             ThisItem.ProjectDirector_ApprovalStatus.Value = "Pending"
-                                            && ThisItem.ProjectDirector_Email = User().Email,
+                                            && Lower(ThisItem.ProjectDirector_Email) = Lower(User().Email),
 
                                         // ✅ UPDATED: Level 2 approval now depends on PD being Approved
                                         canApprove2:
@@ -644,7 +668,7 @@ Screens:
                                             _isHR: !IsBlank(
                                                 LookUp(
                                                     'Vacations Tracking (Permissions)',
-                                                    Lower(User_Email) = Lower(User().Email)
+                                                    User_Email = User().Email
                                                 )
                                             ),
                                             _hasFlight: !IsBlank(ThisItem.Flight_DepartureDate)
@@ -1128,8 +1152,8 @@ Screens:
                                 =
                                 With(
                                     {
-                                        isA1: ThisItem.ApproverID_1 = User().Email,
-                                        isPD: ThisItem.ProjectDirector_Email = User().Email,
+                                        isA1: Lower(ThisItem.ApproverID_1) = Lower(User().Email),
+                                        isPD: Lower(ThisItem.ProjectDirector_Email) = Lower(User().Email),
                                         isA2: !IsBlank(
                                             LookUp(
                                                 'Vacations Tracking (Permissions)',
@@ -1203,11 +1227,11 @@ Screens:
 
                                         canApprove1:
                                             ThisItem.ApprovalStatus_1 = "Pending"
-                                            && ThisItem.ApproverID_1 = User().Email,
+                                            && Lower(ThisItem.ApproverID_1) = Lower(User().Email),
 
                                         canApprovePD:
                                             ThisItem.ProjectDirector_ApprovalStatus.Value = "Pending"
-                                            && ThisItem.ProjectDirector_Email = User().Email,
+                                            && Lower(ThisItem.ProjectDirector_Email) = Lower(User().Email),
 
                                         // ✅ UPDATED: Level 2 approval now depends on PD being Approved
                                         canApprove2:
@@ -1273,7 +1297,7 @@ Screens:
                                             _isHR: !IsBlank(
                                                 LookUp(
                                                     'Vacations Tracking (Permissions)',
-                                                    Lower(User_Email) = Lower(User().Email)
+                                                    User_Email = User().Email
                                                 )
                                             ),
                                             _hasFlight: !IsBlank(ThisItem.Flight_DepartureDate)
@@ -2499,7 +2523,7 @@ Screens:
                                         )
                                     )
                                 )
-                              Visible: =!IsBlank(LookUp('Vacations Tracking (Permissions)', Lower(User_Email) = Lower(User().Email))) || varSelectedRequest.ApprovalStatus_2 = "Withdrawn"
+                              Visible: =!IsBlank(LookUp('Vacations Tracking (Permissions)', User_Email = User().Email)) || varSelectedRequest.ApprovalStatus_2 = "Withdrawn"
                               Width: =28
                               X: =985
                               Y: |
@@ -2795,7 +2819,7 @@ Screens:
                                 varSelectedRequest.ApprovalStatus_2
                               DisplayMode: |-
                                 =If(
-                                    !IsBlank(LookUp('Vacations Tracking (Permissions)', Lower(User_Email) = Lower(User().Email))),
+                                    !IsBlank(LookUp('Vacations Tracking (Permissions)', User_Email = User().Email)),
                                     DisplayMode.Edit,
                                     DisplayMode.Disabled
                                 )
@@ -2805,13 +2829,13 @@ Screens:
                               HoverFill: =ColorValue("#D60C30")
                               Items: =["Pending","Approved","Rejected"]
                               Items.Value: =Value
-                              OnChange: "=// Optimistic UI with success/error notifications + HR routing for flight cases\nIf(\n    // 0) Do nothing if user picked \"Pending\"\n    Self.Selected.Value = \"Pending\",\n    Notify(\"No change saved. Select Approved or Rejected to update.\", NotificationType.Information),\n\n    // 1) Otherwise proceed\n    With(\n        {\n            _isA3: !IsBlank(LookUp('Vacations Tracking (Permissions)', Lower(User_Email) = Lower(User().Email))) && varSelectedRequest.ProjectDirector_ApprovalStatus.Value = \"Approved\"\n        },\n\n        If(\n            // 1a) Not the assignee -> block change & reset\n            !_isA3,\n                Notify(\"You are not the assignee for this request.\", NotificationType.Error);\n                Reset(Self),\n\n            // 1b) Else proceed to patch the selected approver's status\n            Set(varSaving, true);\n           \n            IfError(\n                Patch(\n                    'Vacations Tracking (Days)',\n                    varSelectedRequest,\n                    If(\n                        _isA3,\n                            { ApprovalStatus_2: Self.Selected.Value }                           // Approver1 (text)\n                    )\n                ),\n                // On error\n                Set(varSaving, false);\n                Notify(\"Couldn't update status. Please try again.\", NotificationType.Error);\n                Reset(Self),\n\n                // On success\n                Set(varSaving, false);\n                Notify(\"Status updated.\", NotificationType.Success)\n            ))));\n\nIf(\n    Self.Selected.Value = \"Approved\",\n\n    // =========================\n    // APPROVED (HR Final) → To Employee, CC Manager + HR\n    // =========================\n    Office365Outlook.SendEmailV2(\n        varSelectedRequest.Employee,\n        \"Vacation request (with flights) - \" & varSelectedRequest.Employee_Name,\n        \"<p>Hello \" & varSelectedRequest.Employee_Name & \",</p>\" &\n        \"<p>Your vacation request <b>with flights</b> has been fully approved by your manager, project director and HR.</p>\"\n        &\n        \"<p>Access the <a href=\"\"https://apps.powerapps.com/play/e/default-dd3edd7f-5cb4-4f13-8645-b0f69dacb19a/a/f278eca2-cf28-4d9c-a7ad-bbaed4865210?tenantId=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&hint=ee1713ad-43d1-4bc0-8d26-58f078455185&sourcetime=1772804639028\"\">Dayaway</a> app to review the request.</p>\",\n        {\n            IsHtml: true,\n            Cc: If(IsBlank(varSelectedRequest.ApproverID_1), \"geohr@aecon.com\", varSelectedRequest.ApproverID_1 & \"; geohr@aecon.com\") // HR email here (geohr@aecon.com)\n        }\n    )\n);\n\nIf(\n    Self.Selected.Value = \"Rejected\",\n\n    // =========================\n    // REJECTED (HR) → Email Employee\n    // =========================\n    Office365Outlook.SendEmailV2(\n        varSelectedRequest.Employee,\n        \"Vacation request - Rejected - \" & varSelectedRequest.Employee_Name,\n        \"<p>Hello \" & varSelectedRequest.Employee_Name & \",</p>\" &\n        \"<p>Your vacation request was <b>rejected</b> by HR.</p>\" &\n        \"<p>Please review the request details and resubmit if needed.</p>\"\n        &\n        \"<p>Access the <a href=\"\"https://apps.powerapps.com/play/e/default-dd3edd7f-5cb4-4f13-8645-b0f69dacb19a/a/f278eca2-cf28-4d9c-a7ad-bbaed4865210?tenantId=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&hint=ee1713ad-43d1-4bc0-8d26-58f078455185&sourcetime=1772804639028\"\">Dayaway</a> app to review the request.</p>\",\n        { IsHtml: true }\n    )\n);"
+                              OnChange: "=// Optimistic UI with success/error notifications + HR routing for flight cases\nIf(\n    // 0) Do nothing if user picked \"Pending\"\n    Self.Selected.Value = \"Pending\",\n    Notify(\"No change saved. Select Approved or Rejected to update.\", NotificationType.Information),\n\n    // 1) Otherwise proceed\n    With(\n        {\n            _isA3: !IsBlank(LookUp('Vacations Tracking (Permissions)', User_Email = User().Email)) && varSelectedRequest.ProjectDirector_ApprovalStatus.Value = \"Approved\"\n        },\n\n        If(\n            // 1a) Not the assignee -> block change & reset\n            !_isA3,\n                Notify(\"You are not the assignee for this request.\", NotificationType.Error);\n                Reset(Self),\n\n            // 1b) Else proceed to patch the selected approver's status\n            Set(varSaving, true);\n           \n            IfError(\n                Patch(\n                    'Vacations Tracking (Days)',\n                    varSelectedRequest,\n                    If(\n                        _isA3,\n                            { ApprovalStatus_2: Self.Selected.Value }                           // Approver1 (text)\n                    )\n                ),\n                // On error\n                Set(varSaving, false);\n                Notify(\"Couldn't update status. Please try again.\", NotificationType.Error);\n                Reset(Self),\n\n                // On success\n                Set(varSaving, false);\n                Notify(\"Status updated.\", NotificationType.Success)\n            ))));\n\nIf(\n    Self.Selected.Value = \"Approved\",\n\n    // =========================\n    // APPROVED (HR Final) → To Employee, CC Manager + HR\n    // =========================\n    Office365Outlook.SendEmailV2(\n        varSelectedRequest.Employee,\n        \"Vacation request (with flights) - \" & varSelectedRequest.Employee_Name,\n        \"<p>Hello \" & varSelectedRequest.Employee_Name & \",</p>\" &\n        \"<p>Your vacation request <b>with flights</b> has been fully approved by your manager, project director and HR.</p>\"\n        &\n        \"<p>Access the <a href=\"\"https://apps.powerapps.com/play/e/default-dd3edd7f-5cb4-4f13-8645-b0f69dacb19a/a/f278eca2-cf28-4d9c-a7ad-bbaed4865210?tenantId=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&hint=ee1713ad-43d1-4bc0-8d26-58f078455185&sourcetime=1772804639028\"\">Dayaway</a> app to review the request.</p>\",\n        {\n            IsHtml: true,\n            Cc: If(IsBlank(varSelectedRequest.ApproverID_1), \"geohr@aecon.com\", varSelectedRequest.ApproverID_1 & \"; geohr@aecon.com\") // HR email here (geohr@aecon.com)\n        }\n    )\n);\n\nIf(\n    Self.Selected.Value = \"Rejected\",\n\n    // =========================\n    // REJECTED (HR) → Email Employee\n    // =========================\n    Office365Outlook.SendEmailV2(\n        varSelectedRequest.Employee,\n        \"Vacation request - Rejected - \" & varSelectedRequest.Employee_Name,\n        \"<p>Hello \" & varSelectedRequest.Employee_Name & \",</p>\" &\n        \"<p>Your vacation request was <b>rejected</b> by HR.</p>\" &\n        \"<p>Please review the request details and resubmit if needed.</p>\"\n        &\n        \"<p>Access the <a href=\"\"https://apps.powerapps.com/play/e/default-dd3edd7f-5cb4-4f13-8645-b0f69dacb19a/a/f278eca2-cf28-4d9c-a7ad-bbaed4865210?tenantId=dd3edd7f-5cb4-4f13-8645-b0f69dacb19a&hint=ee1713ad-43d1-4bc0-8d26-58f078455185&sourcetime=1772804639028\"\">Dayaway</a> app to review the request.</p>\",\n        { IsHtml: true }\n    )\n);"
                               PaddingLeft: =5
                               PressedColor: =ColorValue("#D60C30")
                               PressedFill: =ColorValue("#D60C30")
                               SelectionColor: =ColorValue("#494949")
                               SelectionFill: =ColorValue("#ffffff")
-                              Visible: =If(!IsBlank(LookUp('Vacations Tracking (Permissions)', Lower(User_Email) = Lower(User().Email))) && varSelectedRequest.ProjectDirector_ApprovalStatus.Value = "Approved" && varSelectedRequest.ApprovalStatus_2 <> "Withdrawn", true, false)
+                              Visible: =If(!IsBlank(LookUp('Vacations Tracking (Permissions)', User_Email = User().Email)) && varSelectedRequest.ProjectDirector_ApprovalStatus.Value = "Approved" && varSelectedRequest.ApprovalStatus_2 <> "Withdrawn", true, false)
                               Width: =120
                               X: =939
                               Y: =131
@@ -3903,7 +3927,31 @@ Screens:
                         Fill: =ColorValue("#F5f5f5")
                         Height: |+
                           =Parent.Height * 0.77
-                        Items: "=Sort(\r\n    Filter(\r\n        'Vacations Tracking (Days)',\r\n        \r\n        // --- Who qualifies: A1 approver OR PD approver OR Permissions (A2) ---\r\n        (\r\n            (ApproverID_1 = User().Email && ApprovalStatus_1 = \"Pending\")\r\n            ||\r\n            (ProjectDirector_Email = User().Email && ProjectDirector_ApprovalStatus.Value = \"Pending\")\r\n            ||\r\n            (\r\n                ApprovalStatus_2 = \"Pending\" &&\r\n                !IsBlank(\r\n                    LookUp(\r\n                        'Vacations Tracking (Permissions)',\r\n                        User_Email = User().Email\r\n                    )\r\n                )\r\n            )\r\n        )\r\n        &&\r\n        // --- Date window applies to ALL branches ---\r\n        StartDate >= Today() &&\r\n        StartDate <= varYearEnd\r\n    ),\r\n    Created,\r\n    SortOrder.Descending\r\n)"
+                        Items: |-
+                          =With(
+                              {
+                                  isHrApprover: !IsBlank(
+                                      LookUp(
+                                          'Vacations Tracking (Permissions)',
+                                          User_Email = User().Email
+                                      )
+                                  )
+                              },
+                              Sort(
+                                  Filter(
+                                      'Vacations Tracking (Days)',
+                                      (
+                                          (ApproverID_1 = User().Email && ApprovalStatus_1 = "Pending")
+                                          || (ProjectDirector_Email = User().Email && ProjectDirector_ApprovalStatus.Value = "Pending")
+                                          || (isHrApprover && ApprovalStatus_2 = "Pending")
+                                      )
+                                      && StartDate >= Today()
+                                      && StartDate <= varYearEnd
+                                  ),
+                                  Created,
+                                  SortOrder.Descending
+                              )
+                          )
                         TemplateSize: =95
                         Width: =Container8_1.Width
                         X: =(Parent.Width - Self.Width) / 2
@@ -3991,8 +4039,8 @@ Screens:
                               Default: |-
                                 =With(
                                     {
-                                        isA1: ThisItem.ApproverID_1 = User().Email,
-                                        isPD: ThisItem.ProjectDirector_Email = User().Email,
+                                        isA1: Lower(ThisItem.ApproverID_1) = Lower(User().Email),
+                                        isPD: Lower(ThisItem.ProjectDirector_Email) = Lower(User().Email),
                                         isA2: !IsBlank(
                                             LookUp(
                                                 'Vacations Tracking (Permissions)',
@@ -4066,11 +4114,11 @@ Screens:
 
                                         canApprove1:
                                             ThisItem.ApprovalStatus_1 = "Pending"
-                                            && ThisItem.ApproverID_1 = User().Email,
+                                            && Lower(ThisItem.ApproverID_1) = Lower(User().Email),
 
                                         canApprovePD:
                                             ThisItem.ProjectDirector_ApprovalStatus.Value = "Pending"
-                                            && ThisItem.ProjectDirector_Email = User().Email,
+                                            && Lower(ThisItem.ProjectDirector_Email) = Lower(User().Email),
 
                                         // ✅ UPDATED: Level 2 approval now depends on PD being Approved
                                         canApprove2:
@@ -4121,7 +4169,7 @@ Screens:
                                             _isHR: !IsBlank(
                                                 LookUp(
                                                     'Vacations Tracking (Permissions)',
-                                                    Lower(User_Email) = Lower(User().Email)
+                                                    User_Email = User().Email
                                                 )
                                             ),
                                             _hasFlight: !IsBlank(ThisItem.Flight_DepartureDate)

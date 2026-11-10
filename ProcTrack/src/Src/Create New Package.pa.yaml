@@ -31,6 +31,9 @@ Screens:
             PaddingRight: =16
             PaddingTop: =16
             Width: =Parent.Width
+            LayoutMinHeight: =0
+            LayoutMinWidth: =0
+            LayoutOverflowY: =LayoutOverflow.Scroll
           Children:
             - header_container_1:
                 Control: GroupContainer@1.5.0
@@ -40,13 +43,13 @@ Screens:
                   DropShadow: =DropShadow.Light
                   Fill: =RGBA(214, 12, 48, 1)
                   FillPortions: =0
-                  Height: =140
+                  Height: =124
                   LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =6
-                  LayoutMinHeight: =140
+                  LayoutGap: =4
+                  LayoutMinHeight: =124
                   LayoutMinWidth: =16
-                  PaddingBottom: =12
+                  PaddingBottom: =8
                   PaddingLeft: =16
                   PaddingRight: =16
                   PaddingTop: =8
@@ -109,8 +112,9 @@ Screens:
                               - create_header_brand_title:
                                   Control: Text@0.0.51
                                   Properties:
-                                    AutoHeight: =true
+                                    AutoHeight: =false
                                     FontColor: =RGBA(255, 255, 255, 1)
+                                    Height: =22
                                     Size: =16
                                     Text: ="ProcTrack"
                                     Weight: ='TextCanvas.Weight'.Bold
@@ -118,8 +122,9 @@ Screens:
                               - create_header_brand_subtitle:
                                   Control: Text@0.0.51
                                   Properties:
-                                    AutoHeight: =true
+                                    AutoHeight: =false
                                     FontColor: =RGBA(255, 255, 255, 0.82)
+                                    Height: =22
                                     Size: =12
                                     Text: ="Package tracking"
                                     Width: =260
@@ -147,8 +152,9 @@ Screens:
                                   Control: Text@0.0.51
                                   Properties:
                                     Align: ='TextCanvas.Align'.End
-                                    AutoHeight: =true
+                                    AutoHeight: =false
                                     FontColor: =RGBA(255, 255, 255, 0.7)
+                                    Height: =14
                                     Size: =10
                                     Text: ="SIGNED IN AS"
                                     Weight: ='TextCanvas.Weight'.Bold
@@ -157,8 +163,9 @@ Screens:
                                   Control: Text@0.0.51
                                   Properties:
                                     Align: ='TextCanvas.Align'.End
-                                    AutoHeight: =true
+                                    AutoHeight: =false
                                     FontColor: =RGBA(255, 255, 255, 1)
+                                    Height: =18
                                     Size: =13
                                     Text: =User().FullName
                                     Weight: ='TextCanvas.Weight'.Semibold
@@ -169,11 +176,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =56
+                        Height: =48
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =56
+                        LayoutMinHeight: =48
                         LayoutMinWidth: =16
                       Children:
                         - create_header_project_picker_wrap:
@@ -187,8 +194,8 @@ Screens:
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Horizontal
                               LayoutGap: =8
-                              Height: =48
-                              LayoutMinHeight: =48
+                              Height: =40
+                              LayoutMinHeight: =40
                               LayoutMinWidth: =16
                               PaddingBottom: =0
                               PaddingLeft: =12
@@ -208,7 +215,7 @@ Screens:
                                     Color: =RGBA(106, 122, 127, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =40
+                                    Height: =32
                                     VerticalAlign: =VerticalAlign.Middle
                                     Size: =11
                                     Text: ="Project"
@@ -239,7 +246,7 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =40
+                                    Height: =32
                                     HoverBorderColor: =RGBA(0, 0, 0, 0)
                                     HoverColor: =RGBA(33, 33, 33, 1)
                                     HoverFill: =RGBA(255, 255, 255, 1)
@@ -295,31 +302,38 @@ Screens:
                               Visible: =!IsBlank(varSelectedProject)
                               Width: =72
             - page_title:
-                Control: ModernText@1.0.0
+                Control: Label@2.5.1
                 Properties:
-                  AlignInContainer: =AlignInContainer.Start
-                  FillPortions: =8
+                  Color: =RGBA(35, 38, 43, 1)
+                  Font: =Font.'Segoe UI'
                   FontWeight: =FontWeight.Bold
-                  Height: =45
-                  LayoutMinHeight: =16
-                  LayoutMinWidth: =16
-                  Size: =24
+                  FillPortions: =0
+                  Height: =40
+                  PaddingBottom: =0
+                  PaddingLeft: =4
+                  PaddingRight: =4
+                  PaddingTop: =0
+                  Size: =22
                   Text: ="Create New Package"
-                  Width: =350
+                  VerticalAlign: =VerticalAlign.Middle
+                  Width: =Parent.Width
             - package_basics:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
                 Properties:
                   Fill: =RGBA(255, 255, 255, 1)
-                  FillPortions: =30
                   LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutMinHeight: =16
-                  LayoutMinWidth: =16
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
                   PaddingBottom: =8
                   PaddingLeft: =8
                   PaddingRight: =8
                   PaddingTop: =8
+                  FillPortions: =0
+                  Height: =219
+                  LayoutGap: =8
+                  Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                 Children:
                   - Create_Subtitle_2:
                       Control: CanvasComponent
@@ -336,20 +350,22 @@ Screens:
                         AlignInContainer: =AlignInContainer.SetByContainer
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =12
                         LayoutMinHeight: =0
                         LayoutMinWidth: =0
-                        PaddingBottom: =4
-                        PaddingLeft: =8
-                        PaddingRight: =8
-                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
                         Height: =76
+                        FillPortions: =0
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                       Children:
                         - Container7_14:
                             Control: GroupContainer@1.5.0
@@ -359,20 +375,26 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 1)
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - Text3_14:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="Description"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - package_description_input_1:
                                   Control: ModernTextInput@1.1.2
                                   Properties:
@@ -400,20 +422,26 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 1)
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - Text3_15:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="MPL"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - mpl_input:
                                   Control: ModernTextInput@1.1.2
                                   Properties:
@@ -436,20 +464,26 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 1)
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - contract_type_title:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="Contract Type"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - contract_type_input:
                                   Control: DropDown@0.0.45
                                   Properties:
@@ -489,20 +523,22 @@ Screens:
                         AlignInContainer: =AlignInContainer.SetByContainer
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =12
                         LayoutMinHeight: =0
                         LayoutMinWidth: =0
-                        PaddingBottom: =4
-                        PaddingLeft: =8
-                        PaddingRight: =8
-                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
                         Height: =76
+                        FillPortions: =0
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                       Children:
                         - Container7:
                             Control: GroupContainer@1.5.0
@@ -512,21 +548,27 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 1)
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - Text3:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: |-
                                       ="Item #"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - item_no_input:
                                   Control: ModernTextInput@1.1.2
                                   Properties:
@@ -550,20 +592,26 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 1)
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - Text5:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="Prerequisite Design?"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - prerequisite_design_input:
                                   Control: DropDown@0.0.45
                                   Properties:
@@ -589,8 +637,8 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 1)
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - Container25_3:
                                   Control: GroupContainer@1.5.0
@@ -609,15 +657,23 @@ Screens:
                                     Width: =Parent.Width - 8
                                   Children:
                                     - Text5_10:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =16
+                                          AlignInContainer: =AlignInContainer.Center
+                                          Color: =RGBA(79, 90, 94, 1)
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =18
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =12
                                           Text: ="Quality Program"
-                                          X: =40
-                                          Y: =40
+                                          VerticalAlign: =VerticalAlign.Middle
                                     - Icon2_3:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -658,7 +714,7 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =18
+                                    Height: =36
                                     Items: |-
                                       =// Items
                                       [
@@ -679,7 +735,7 @@ Screens:
                                           false
                                       )
                                     X: =4
-                                    Y: =4
+                                    Y: =26
                                     Width: =Parent.Width - 8
                               - quality_program_text:
                                   Control: ModernTextInput@1.1.2
@@ -710,15 +766,18 @@ Screens:
                 Variant: AutoLayout
                 Properties:
                   Fill: =RGBA(255, 255, 255, 1)
-                  FillPortions: =37
-                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
                   PaddingBottom: =8
                   PaddingLeft: =8
                   PaddingRight: =8
                   PaddingTop: =8
-                  X: =40
-                  Y: =40
+                  FillPortions: =0
+                  Height: =219
+                  LayoutGap: =8
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
+                  Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                 Children:
                   - Create_Subtitle_3:
                       Control: CanvasComponent
@@ -735,20 +794,22 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =12
                         LayoutMinHeight: =0
                         LayoutMinWidth: =0
-                        PaddingBottom: =4
-                        PaddingLeft: =8
-                        PaddingRight: =8
-                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
                         Height: =76
+                        FillPortions: =0
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                       Children:
                         - Container7_1:
                             Control: GroupContainer@1.5.0
@@ -757,20 +818,26 @@ Screens:
                               DropShadow: =DropShadow.None
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =Parent.Width - 16
+                              Height: =68
+                              Width: =Parent.Width
                             Children:
                               - Text3_1:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="Site / Location"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - bop_site_location_input:
                                   Control: DropDown@0.0.45
                                   Properties:
@@ -796,20 +863,22 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =12
                         LayoutMinHeight: =0
                         LayoutMinWidth: =0
-                        PaddingBottom: =4
-                        PaddingLeft: =8
-                        PaddingRight: =8
-                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
                         Height: =76
+                        FillPortions: =0
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                       Children:
                         - Container7_2:
                             Control: GroupContainer@1.5.0
@@ -818,8 +887,8 @@ Screens:
                               DropShadow: =DropShadow.None
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 52) / 4
+                              Height: =68
+                              Width: =(Parent.Width - 36) / 4
                             Children:
                               - Container25_1:
                                   Control: GroupContainer@1.5.0
@@ -838,15 +907,23 @@ Screens:
                                     Width: =Parent.Width - 8
                                   Children:
                                     - Text5_7:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =16
+                                          AlignInContainer: =AlignInContainer.Center
+                                          Color: =RGBA(79, 90, 94, 1)
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =18
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =12
                                           Text: ="Procurement Lead"
-                                          X: =40
-                                          Y: =40
+                                          VerticalAlign: =VerticalAlign.Middle
                                     - Icon2_1:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -886,7 +963,7 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =18
+                                    Height: =36
                                     InputTextPlaceholder: ="Search by name"
                                     ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                     Items: |-
@@ -921,7 +998,7 @@ Screens:
                                           false
                                       )
                                     X: =4
-                                    Y: =4
+                                    Y: =26
                                     Width: =Parent.Width - 8
                               - procurement_lead_input_txt:
                                   Control: ModernTextInput@1.1.2
@@ -954,8 +1031,8 @@ Screens:
                               DropShadow: =DropShadow.None
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 52) / 4
+                              Height: =68
+                              Width: =(Parent.Width - 36) / 4
                             Children:
                               - Container25:
                                   Control: GroupContainer@1.5.0
@@ -974,15 +1051,23 @@ Screens:
                                     Width: =Parent.Width - 8
                                   Children:
                                     - Text5_3:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =16
+                                          AlignInContainer: =AlignInContainer.Center
+                                          Color: =RGBA(79, 90, 94, 1)
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =18
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =12
                                           Text: ="Operations Lead"
-                                          X: =40
-                                          Y: =40
+                                          VerticalAlign: =VerticalAlign.Middle
                                     - Icon2:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -1045,7 +1130,7 @@ Screens:
                                           Color.Pink,
                                           RGBA(214, 221, 224, 1)
                                       )
-                                    Height: =18
+                                    Height: =36
                                     InputTextPlaceholder: ="Search by name"
                                     ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                     Items: |+
@@ -1080,7 +1165,7 @@ Screens:
                                           false
                                       )
                                     X: =4
-                                    Y: =4
+                                    Y: =26
                                     Width: =Parent.Width - 8
                               - operations_lead_input_txt:
                                   Control: ModernTextInput@1.1.2
@@ -1113,8 +1198,8 @@ Screens:
                               DropShadow: =DropShadow.None
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 52) / 4
+                              Height: =68
+                              Width: =(Parent.Width - 36) / 4
                             Children:
                               - Container25_2:
                                   Control: GroupContainer@1.5.0
@@ -1133,15 +1218,23 @@ Screens:
                                     Width: =Parent.Width - 8
                                   Children:
                                     - Text5_9:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
-                                          AlignInContainer: =AlignInContainer.Stretch
-                                          LayoutMinHeight: =16
-                                          LayoutMinWidth: =16
-                                          Size: =16
+                                          AlignInContainer: =AlignInContainer.Center
+                                          Color: =RGBA(79, 90, 94, 1)
+                                          FillPortions: =1
+                                          Font: =Font.'Segoe UI'
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =18
+                                          LayoutMinHeight: =0
+                                          LayoutMinWidth: =0
+                                          PaddingBottom: =0
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          Size: =12
                                           Text: ="Technical Lead"
-                                          X: =40
-                                          Y: =40
+                                          VerticalAlign: =VerticalAlign.Middle
                                     - Icon2_2:
                                         Control: Classic/Icon@2.5.0
                                         Properties:
@@ -1176,7 +1269,7 @@ Screens:
                                   Control: ModernCombobox@1.1.2
                                   Properties:
                                     Fill: =RGBA(214, 221, 224, 1)
-                                    Height: =18
+                                    Height: =36
                                     InputTextPlaceholder: ="Search by name"
                                     ItemDisplayText: =ThisItem.DisplayName & " - " &ThisItem.Mail
                                     Items: |+
@@ -1211,7 +1304,7 @@ Screens:
                                           false
                                       )
                                     X: =4
-                                    Y: =4
+                                    Y: =26
                                     Width: =Parent.Width - 8
                               - technical_lead_input_txt:
                                   Control: ModernTextInput@1.1.2
@@ -1239,19 +1332,26 @@ Screens:
                               DropShadow: =DropShadow.None
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 52) / 4
+                              Height: =68
+                              Width: =(Parent.Width - 36) / 4
                             Children:
                               - Text5_5:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="Package Bundle"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - package_bundle_input:
                                   Control: ModernTextInput@1.1.2
                                   Properties:
@@ -1287,15 +1387,18 @@ Screens:
                 Variant: AutoLayout
                 Properties:
                   Fill: =RGBA(255, 255, 255, 1)
-                  FillPortions: =20
-                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutMinHeight: =16
-                  LayoutMinWidth: =16
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
                   PaddingBottom: =8
                   PaddingLeft: =8
                   PaddingRight: =8
                   PaddingTop: =8
+                  FillPortions: =0
+                  Height: =135
+                  LayoutGap: =8
+                  Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                 Children:
                   - Create_Subtitle_1:
                       Control: CanvasComponent
@@ -1312,20 +1415,22 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         Fill: =RGBA(255, 255, 255, 1)
-                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =12
                         LayoutMinHeight: =0
                         LayoutMinWidth: =0
-                        PaddingBottom: =4
-                        PaddingLeft: =8
-                        PaddingRight: =8
-                        PaddingTop: =4
                         RadiusBottomLeft: =0
                         RadiusBottomRight: =0
                         RadiusTopLeft: =0
                         RadiusTopRight: =0
                         Height: =76
+                        FillPortions: =0
+                        PaddingBottom: =0
+                        PaddingLeft: =0
+                        PaddingRight: =0
+                        PaddingTop: =0
+                        Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                       Children:
                         - Container7_3:
                             Control: GroupContainer@1.5.0
@@ -1334,20 +1439,26 @@ Screens:
                               DropShadow: =DropShadow.None
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - Text3_3:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="Required at Site (RAS)"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - ras_input:
                                   Control: ModernDatePicker@1.0.2
                                   Properties:
@@ -1375,20 +1486,26 @@ Screens:
                               DropShadow: =DropShadow.None
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - Text5_6:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="P6 Planned Award"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - p6_planned_award_input:
                                   Control: ModernDatePicker@1.0.2
                                   Properties:
@@ -1411,20 +1528,26 @@ Screens:
                               DropShadow: =DropShadow.None
                               LayoutMinHeight: =0
                               LayoutMinWidth: =0
-                              Height: =76
-                              Width: =(Parent.Width - 40) / 3
+                              Height: =68
+                              Width: =(Parent.Width - 24) / 3
                             Children:
                               - Text5_8:
-                                  Control: ModernText@1.0.0
+                                  Control: Label@2.5.1
                                   Properties:
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    Size: =16
+                                    Color: =RGBA(79, 90, 94, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =18
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="Est. Budget"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =Parent.Width - 8
                                     X: =4
                                     Y: =4
-                                    Height: =18
-                                    Width: =Parent.Width - 8
                               - est_budget_input:
                                   Control: ModernTextInput@1.1.2
                                   Properties:
@@ -1458,17 +1581,19 @@ Screens:
                 Variant: AutoLayout
                 Properties:
                   DropShadow: =DropShadow.None
-                  FillPortions: =5
+                  FillPortions: =0
                   LayoutAlignItems: =LayoutAlignItems.Center
                   LayoutDirection: =LayoutDirection.Horizontal
                   LayoutGap: =10
                   LayoutJustifyContent: =LayoutJustifyContent.End
-                  LayoutMinHeight: =16
-                  LayoutMinWidth: =16
+                  LayoutMinHeight: =0
+                  LayoutMinWidth: =0
                   PaddingBottom: =2
                   PaddingLeft: =8
                   PaddingRight: =8
                   PaddingTop: =2
+                  Height: =68
+                  Width: =Parent.Width - Parent.PaddingLeft - Parent.PaddingRight
                 Children:
                   - ButtonInverted_1:
                       Control: CanvasComponent

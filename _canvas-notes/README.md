@@ -12,7 +12,7 @@ Update these files whenever Studio import confirms or rejects something.
 | [design-tokens.md](./design-tokens.md) | ProcTrack colors, spacing, typography |
 | [dashboard-spec.md](./dashboard-spec.md) | Project Dashboard exact pixel measures |
 | [delegation.md](./delegation.md) | SharePoint delegable formulas & preload pattern |
-| [office365-users.md](./office365-users.md) | Office 365 Users ComboBox search and selected-email pattern |
+| [office365-users.md](./office365-users.md) | Office 365 Users modern combobox search and selected-email pattern |
 | [attachments.md](./attachments.md) | SharePoint item attachments via Form + ClassicAttachmentsEdit |
 | [sharepoint-hyperlinks.md](./sharepoint-hyperlinks.md) | Hyperlink columns — use field directly in `Launch()` |
 | [powerfx-formulas.md](./powerfx-formulas.md) | SortOrder enum, Confirm vs custom dialog overlays |

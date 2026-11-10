@@ -1,0 +1,163 @@
+# ************************************************************************************************
+# Warning: YAML source code for Canvas Apps should only be used to review changes made within Power Apps Studio and for minor edits (Preview).
+# Use the maker portal to create and edit your Power Apps.
+# 
+# The schema file for Canvas Apps is available at https://go.microsoft.com/fwlink/?linkid=2304907
+# 
+# For more information, visit https://go.microsoft.com/fwlink/?linkid=2292623
+# ************************************************************************************************
+App:
+  Properties:
+    OnStart: |-
+      =Set(varCurrentUserEmail, Lower(User().Email));
+      Set(varCanEditCurrentProject, false);
+      Set(varSelectedProject, Blank());
+      Set(varSelectedSubcontract, Blank());
+      Set(varRegisterFilter, "all");
+      Set(varSearchCA, "");
+      Set(varSearchVendor, "");
+      Set(varSearchSub, "");
+      Set(varSortColumn, "subcontractnumber");
+      Set(varSortAscending, true);
+      Set(varShowAddSub, false);
+      Set(varShowSettings, false);
+      Set(varShowAddChange, false);
+      Set(varEditingChange, Blank());
+      Set(varShowDeleteSub, false);
+      Set(varShowValidationErrors, false);
+      Set(varCaFreeText, false);
+      Set(varBackupCaFreeText, false);
+      Set(varOwnerFreeText, false);
+      Set(varDetLeftTab, "details");
+      Set(varSubCurrency, "CAD");
+      Set(varPendingOpenAddSub, false);
+      Set(varExporting, false);
+      Set(varExportResult, Blank());
+      Set(varSettingsTab, "users");
+      Set(varSettingsSelectedEmail, "");
+      Set(varSettingsSelectedName, "");
+      Set(varSettingsEntraId, "");
+      Set(varSettingsGrantAdmin, false);
+      Set(varSettingsEditProject, Blank());
+      Set(varSettingsFilter, "");
+      Set(varShowUserModal, false);
+      Set(varShowProjectModal, false);
+      Set(varSettingsUserIsNew, true);
+      Set(
+          varSubcontractsListUrl,
+          "https://neconnectors.sharepoint.com/Lists/PostAward%20%20Subcontracts/AllItems.aspx"
+      );
+
+      // One Permissions row per user (shared with ProcTrack)
+      ClearCollect(colAllPermissions, 'ProcTrack - Permissions');
+      ClearCollect(colAllProjects, 'ProcTrack - Projects');
+      Set(varUserPerm, LookUp(colAllPermissions, Lower(Title) = varCurrentUserEmail));
+      Set(
+          varIsAdmin,
+          !IsBlank(varUserPerm) &&
+          (
+              varUserPerm.IsAdmin = true ||
+              Lower(Text(varUserPerm.IsAdmin)) = "true" ||
+              Lower(Text(varUserPerm.IsAdmin)) = "yes"
+          )
+      );
+      If(
+          IsBlank(varUserPerm),
+          Notify(
+              "No ProcTrack - Permissions row for " & varCurrentUserEmail,
+              NotificationType.Warning
+          )
+      );
+
+      ClearCollect(
+          colMyProjectIds,
+          Filter(
+              Split(
+                  Coalesce(varUserPerm.Edit_Projects, "") & ";" & Coalesce(varUserPerm.View_Projects, ""),
+                  ";"
+              ),
+              !IsBlank(Trim(Value))
+          )
+      );
+
+      ClearCollect(
+          colPermittedProjects,
+          If(
+              varIsAdmin,
+              Filter(colAllProjects, !IsBlank(projectid)),
+              Filter(
+                  colAllProjects,
+                  !IsBlank(LookUp(colMyProjectIds, Trim(Value) = projectid))
+              )
+          )
+      );
+
+      // Operational owners get automatic view of projects they own on a subcontract
+      ClearCollect(
+          colOwnerSubs,
+          Filter(
+              'PostAward - Subcontracts',
+              operationalowneremail = varCurrentUserEmail
+          )
+      );
+      ForAll(
+          colOwnerSubs As os,
+          If(
+              !IsBlank(os.projectidentifier) &&
+              IsBlank(
+                  LookUp(
+                      colPermittedProjects,
+                      projectidentifier = os.projectidentifier
+                  )
+              ),
+              Collect(
+                  colPermittedProjects,
+                  LookUp(
+                      colAllProjects,
+                      projectidentifier = os.projectidentifier
+                  )
+              )
+          )
+      );
+      ClearCollect(
+          colPermittedProjects,
+          Filter(colPermittedProjects, !IsBlank(projectid) || !IsBlank(projectidentifier))
+      );
+
+      If(
+          CountRows(colPermittedProjects) = 0,
+          Notify(
+              "No projects found for this user. Check ProcTrack - Permissions.",
+              NotificationType.Warning
+          )
+      );
+
+      Set(
+          varUserCanEdit,
+          varIsAdmin || !IsBlank(varUserPerm.Edit_Projects)
+      );
+
+      Clear(colPermittedPackages);
+      ForAll(
+          colPermittedProjects As p,
+          Collect(
+              colPermittedPackages,
+              Filter(
+                  'ProcTrack - Packages',
+                  ProjectID = p.projectid || projectidentifier = p.projectidentifier
+              )
+          )
+      );
+
+      Clear(colProjectSubcontracts);
+      Clear(colProjectChanges);
+      Clear(colProjectPackages);
+      Clear(colRegisterView);
+      Clear(colAwardedAvailable);
+      Clear(colSubChanges);
+      Clear(colHomeAttention);
+      Clear(colHomePendingChanges);
+      Clear(colSettingsProjectAccess);
+      Clear(colSettingsUserMatrix);
+    StartScreen: =Projects
+    Theme: =PowerAppsTheme

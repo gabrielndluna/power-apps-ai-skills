@@ -643,7 +643,7 @@ Screens:
                               Text(Round(Coalesce(ThisItem.Standard_time, 0), 2), "0.##")
                           )
                         Width: =70
-                        X: |+
+                        X: |
                           =lbl_ADate.X + lbl_ADate.Width + 1
                         Y: =6
                   - lbl_ATask:
@@ -669,7 +669,7 @@ Screens:
                               )
                           )
                         Width: =120
-                        X: |+
+                        X: |
                           =lbl_AHours.X + lbl_AHours.Width + 1
                         Y: =6
                   - lbl_AComments:
@@ -691,7 +691,7 @@ Screens:
                               )
                           )
                         Width: =433
-                        X: |+
+                        X: |
                           =lbl_ATask.X + lbl_ATask.Width + 1
                         Y: =6
                   - dd_AStatus:

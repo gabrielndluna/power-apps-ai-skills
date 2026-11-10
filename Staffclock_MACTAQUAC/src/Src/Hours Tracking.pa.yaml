@@ -317,7 +317,7 @@ Screens:
                               FontWeight: =FontWeight.Semibold
                               Size: =14
                               Text: ="Week of " & Text(varCurrentWeekStart, "mmm d") & " - " & Text(DateAdd(varCurrentWeekStart, 6, "Days"), "mmm d, yyyy")
-                              Width: |+
+                              Width: |
                                 =400
                         - Button_NextWeek:
                             Control: Classic/Button@2.2.0
@@ -360,135 +360,47 @@ Screens:
                               Items: =Sort(Distinct(colCostCodes, Cost_Code_Description), Value)
                               Items.Value: =Value
                               OnChange: |-
-                                =
-                                Set(varSelectedCostCode, Self.Selected.Value);
-                                //Set(varSelectedTaskCode, Self.Selected.Value);
+                                =Set(varSelectedCostCode, Self.Selected.Value);
                                 Set(varSelectedCostCodeID, LookUp(colCostCodes, Cost_Code_Description = Self.Selected.Value).Cost_Code);
-                                //Set(
-                                //    varSelectedTaskCode,
-                                //    First(
-                                //        Sort(
-                                //            Distinct(
-                                //                Filter(
-                                //                    colCostCodes,
-                                //                    Network_Activity_Name = Self.Selected.Value &&
-                                //                    !IsBlank(Task_Code)
-                                //                ),
-                                //                Task_Code
-                                //            ),
-                                //            Value
-                                //        )
-                                //    ).Value
-                                //);
                                 ClearCollect(
                                     colHoursGallery,
                                     ForAll(
                                         colHoursGallery As Row,
-                                        {
-                                            RowKey: Text(GUID()),
-                                            WorkDate: Row.WorkDate,
-                                            DayLabel: Row.DayLabel,
-                                            CostCode: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
+                                        With(
+                                            {
+                                                applyCode:
+                                                    !Row.IsSubmitted &&
+                                                    IsBlank(Row.ApprovalStatus) &&
+                                                    (
+                                                        Row.EntryType = "Work Day" ||
+                                                        Row.EntryType = "Weekend" ||
+                                                        Row.EntryType = "Stat. Holiday" ||
+                                                        IsBlank(Row.EntryType)
+                                                    )
+                                            },
+                                            {
+                                                RowKey: Text(GUID()),
+                                                WorkDate: Row.WorkDate,
+                                                DayLabel: Row.DayLabel,
+                                                CostCode: If(applyCode, varSelectedCostCode, Row.CostCode),
+                                                CostCodeID: If(applyCode, varSelectedCostCodeID, Row.CostCodeID),
+                                                ActivityTaskCode: If(
+                                                    applyCode,
+                                                    Coalesce(varSelectedTaskCode, Row.ActivityTaskCode),
+                                                    Row.ActivityTaskCode
                                                 ),
-                                                varSelectedCostCode,
-                                                Row.CostCode
-                                            ),
-                                            CostCodeID: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                varSelectedCostCodeID,
-                                                Row.CostCodeID
-                                            ),
-                                            ActivityTaskCode: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                Coalesce(varSelectedTaskCode, Row.ActivityTaskCode),
-                                                Row.ActivityTaskCode
-                                            ),
-                                            EntryType: Row.EntryType,
-                                            Comments: Row.Comments,
-                                            StandardHours: Row.StandardHours,
-                                            IsSubmitted: Row.IsSubmitted,
-                                            RecordID: Row.RecordID,
-                                            ApprovalStatus: Row.ApprovalStatus,
-                                            IsDirty: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                true,
-                                                Row.IsDirty
-                                            )
-                                        }
-                                    )
-
-                                );
-                                /*
-
-                                Set(varSelectedCostCode, Self.Selected.Value);
-                                ClearCollect(
-                                    colHoursGallery,
-                                    ForAll(
-                                        colHoursGallery As Row,
-                                        {
-                                            RowKey: Text(GUID()),
-                                            WorkDate: Row.WorkDate,
-                                            DayLabel: Row.DayLabel,
-                                            CostCode: Row.CostCode,
-                                            CostCodeID: Row.CostCodeID,
-                                            TaskCode:Row.TaskCode,
-                                            ActivityTaskCode: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                Self.Selected.Value,
-                                                Row.ActivityTaskCode
-                                            ),
-                                            EntryType: Row.EntryType,
-                                            Comments: Row.Comments,
-                                            StandardHours: Row.StandardHours,
-                                            IsSubmitted: Row.IsSubmitted,
-                                            RecordID: Row.RecordID,
-                                            ApprovalStatus: Row.ApprovalStatus,
-                                            IsDirty: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                true,
-                                                Row.IsDirty
-                                            )
-                                        }
+                                                EntryType: Row.EntryType,
+                                                Comments: Row.Comments,
+                                                StandardHours: Row.StandardHours,
+                                                Approver_Comments: Row.Approver_Comments,
+                                                IsSubmitted: Row.IsSubmitted,
+                                                RecordID: Row.RecordID,
+                                                ApprovalStatus: Row.ApprovalStatus,
+                                                IsDirty: If(applyCode, true, Row.IsDirty)
+                                            }
+                                        )
                                     )
                                 );
-
-                                */
                               Size: =11
                               Width: =300
                         - Label_TaskCodeHint:
@@ -526,41 +438,35 @@ Screens:
                                     colHoursGallery,
                                     ForAll(
                                         colHoursGallery As Row,
-                                        {
-                                            RowKey: Text(GUID()),
-                                            WorkDate: Row.WorkDate,
-                                            DayLabel: Row.DayLabel,
-                                            CostCode: Row.CostCode,
-                                            CostCodeID: Row.CostCodeID,
-                                            ActivityTaskCode: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                Self.Selected.Value,
-                                                Row.ActivityTaskCode
-                                            ),
-                                            EntryType: Row.EntryType,
-                                            Comments: Row.Comments,
-                                            StandardHours: Row.StandardHours,
-                                            IsSubmitted: Row.IsSubmitted,
-                                            RecordID: Row.RecordID,
-                                            ApprovalStatus: Row.ApprovalStatus,
-                                            IsDirty: If(
-                                                Row.ApprovalStatus <> "Approved" &&
-                                                (
-                                                    Row.EntryType = "Work Day" ||
-                                                    Row.EntryType = "Weekend" ||
-                                                    Row.EntryType = "Stat. Holiday" ||
-                                                    IsBlank(Row.EntryType)
-                                                ),
-                                                true,
-                                                Row.IsDirty
-                                            )
-                                        }
+                                        With(
+                                            {
+                                                applyCode:
+                                                    !Row.IsSubmitted &&
+                                                    IsBlank(Row.ApprovalStatus) &&
+                                                    (
+                                                        Row.EntryType = "Work Day" ||
+                                                        Row.EntryType = "Weekend" ||
+                                                        Row.EntryType = "Stat. Holiday" ||
+                                                        IsBlank(Row.EntryType)
+                                                    )
+                                            },
+                                            {
+                                                RowKey: Text(GUID()),
+                                                WorkDate: Row.WorkDate,
+                                                DayLabel: Row.DayLabel,
+                                                CostCode: Row.CostCode,
+                                                CostCodeID: Row.CostCodeID,
+                                                ActivityTaskCode: If(applyCode, Self.Selected.Value, Row.ActivityTaskCode),
+                                                EntryType: Row.EntryType,
+                                                Comments: Row.Comments,
+                                                StandardHours: Row.StandardHours,
+                                                Approver_Comments: Row.Approver_Comments,
+                                                IsSubmitted: Row.IsSubmitted,
+                                                RecordID: Row.RecordID,
+                                                ApprovalStatus: Row.ApprovalStatus,
+                                                IsDirty: If(applyCode, true, Row.IsDirty)
+                                            }
+                                        )
                                     )
                                 );
                               Size: =11
@@ -956,7 +862,7 @@ Screens:
                   AlignInContainer: =AlignInContainer
                   DropShadow: =DropShadow.None
                   Fill: =RGBA(10, 12, 30, 0.42)
-                  Height: |+
+                  Height: |
                     =Parent.Height
                   LayoutAlignItems: =LayoutAlignItems.Center
                   LayoutDirection: =LayoutDirection.Vertical
@@ -964,7 +870,7 @@ Screens:
                   LayoutMinHeight: =520
                   LayoutMinWidth: =0
                   PaddingBottom: =20
-                  PaddingLeft: |+
+                  PaddingLeft: |
                     =20
                   PaddingRight: =20
                   PaddingTop: =20
@@ -1310,7 +1216,7 @@ Screens:
                               }
                           )
                         Size: =11
-                        Width: |+
+                        Width: |
                           =Parent.TemplateWidth - 1280
                         X: =800
                         Y: =8

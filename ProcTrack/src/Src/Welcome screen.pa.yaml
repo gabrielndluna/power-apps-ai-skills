@@ -51,13 +51,13 @@ Screens:
                   DropShadow: =DropShadow.Light
                   Fill: =RGBA(214, 12, 48, 1)
                   FillPortions: =0
-                  Height: =140
+                  Height: =124
                   LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =6
-                  LayoutMinHeight: =140
+                  LayoutGap: =4
+                  LayoutMinHeight: =124
                   LayoutMinWidth: =16
-                  PaddingBottom: =12
+                  PaddingBottom: =8
                   PaddingLeft: =16
                   PaddingRight: =16
                   PaddingTop: =8
@@ -120,8 +120,9 @@ Screens:
                               - welcome_brand_title:
                                   Control: Text@0.0.51
                                   Properties:
-                                    AutoHeight: =true
+                                    AutoHeight: =false
                                     FontColor: =RGBA(255, 255, 255, 1)
+                                    Height: =22
                                     Size: =16
                                     Text: ="ProcTrack"
                                     Weight: ='TextCanvas.Weight'.Bold
@@ -129,8 +130,9 @@ Screens:
                               - welcome_brand_subtitle:
                                   Control: Text@0.0.51
                                   Properties:
-                                    AutoHeight: =true
+                                    AutoHeight: =false
                                     FontColor: =RGBA(255, 255, 255, 0.82)
+                                    Height: =22
                                     Size: =12
                                     Text: ="Package tracking"
                                     Width: =260
@@ -159,8 +161,9 @@ Screens:
                                   Control: Text@0.0.51
                                   Properties:
                                     Align: ='TextCanvas.Align'.End
-                                    AutoHeight: =true
+                                    AutoHeight: =false
                                     FontColor: =RGBA(255, 255, 255, 0.7)
+                                    Height: =14
                                     Size: =10
                                     Text: ="SIGNED IN AS"
                                     Weight: ='TextCanvas.Weight'.Bold
@@ -169,8 +172,9 @@ Screens:
                                   Control: Text@0.0.51
                                   Properties:
                                     Align: ='TextCanvas.Align'.End
-                                    AutoHeight: =true
+                                    AutoHeight: =false
                                     FontColor: =RGBA(255, 255, 255, 1)
+                                    Height: =18
                                     Size: =13
                                     Text: =User().FullName
                                     Weight: ='TextCanvas.Weight'.Semibold
@@ -288,11 +292,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =56
+                        Height: =48
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =56
+                        LayoutMinHeight: =48
                         LayoutMinWidth: =16
                       Children:
                         - welcome_project_picker_wrap:
@@ -306,8 +310,8 @@ Screens:
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Horizontal
                               LayoutGap: =8
-                              Height: =48
-                              LayoutMinHeight: =48
+                              Height: =40
+                              LayoutMinHeight: =40
                               LayoutMinWidth: =16
                               PaddingBottom: =0
                               PaddingLeft: =12
@@ -327,7 +331,7 @@ Screens:
                                     Color: =RGBA(106, 122, 127, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =40
+                                    Height: =32
                                     VerticalAlign: =VerticalAlign.Middle
                                     Size: =11
                                     Text: ="Project"
@@ -358,7 +362,7 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =40
+                                    Height: =32
                                     HoverBorderColor: =RGBA(0, 0, 0, 0)
                                     HoverColor: =RGBA(33, 33, 33, 1)
                                     HoverFill: =RGBA(255, 255, 255, 1)
@@ -422,15 +426,15 @@ Screens:
                               DropShadow: =DropShadow.None
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
-                              Height: =32
-                              LayoutMinHeight: =32
-                              LayoutMinWidth: =112
+                              Height: =36
+                              LayoutMinHeight: =36
+                              LayoutMinWidth: =156
                               RadiusBottomLeft: =8
                               RadiusBottomRight: =8
                               RadiusTopLeft: =8
                               RadiusTopRight: =8
                               Visible: =!IsBlank(varSelectedProject.dashboard_url)
-                              Width: =112
+                              Width: =156
                             Children:
                               - welcome_pbi_dashboard_label:
                                   Control: Label@2.5.1
@@ -440,14 +444,19 @@ Screens:
                                     Color: =RGBA(33, 33, 33, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =16
+                                    Height: =22
                                     OnSelect: =Launch(varSelectedProject.dashboard_url)
-                                    Size: =11
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
                                     Text: ="Dashboard"
-                                    Width: =72
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =108
                                     Wrap: =false
-                                    X: =10
-                                    Y: =8
+                                    X: =12
+                                    Y: =7
                               - welcome_pbi_dashboard_icon:
                                   Control: Classic/Icon@2.5.0
                                   Properties:
@@ -456,8 +465,8 @@ Screens:
                                     Icon: =Icon.OpenInNewWindow
                                     OnSelect: =Launch(varSelectedProject.dashboard_url)
                                     Width: =16
-                                    X: =86
-                                    Y: =8
+                                    X: =124
+                                    Y: =10
             - Container4:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
@@ -1126,7 +1135,7 @@ Screens:
                           )
                         LayoutMinHeight: =16
                         LayoutMinWidth: =16
-                        TemplatePadding: =8
+                        TemplatePadding: =4
                         TemplateSize: =112
                       Children:
                         - gallery_card:
@@ -1152,9 +1161,10 @@ Screens:
                                     LayoutGap: =6
                                     LayoutMinHeight: =0
                                     LayoutMinWidth: =0
+                                    PaddingBottom: =8
                                     PaddingLeft: =8
                                     PaddingRight: =8
-                                    PaddingTop: =6
+                                    PaddingTop: =8
                                   Children:
                                     - gallery_package:
                                         Control: Label@2.5.1
@@ -1192,7 +1202,7 @@ Screens:
                                           Color: =RGBA(30, 30, 30, 1)
                                           Font: =Font.'Segoe UI'
                                           FontWeight: =FontWeight.Semibold
-                                          Height: =40
+                                          Height: =64
                                           OnSelect: =Select(gallery_arrow_details)
                                           Overflow: =Overflow.Hidden
                                           PaddingBottom: =0
@@ -1202,15 +1212,17 @@ Screens:
                                           Size: =12
                                           Text: =ThisItem.packagedescription
                                           Tooltip: =ThisItem.packagedescription
-                                          VerticalAlign: =VerticalAlign.Top
+                                          VerticalAlign: =VerticalAlign.Middle
                                           Wrap: =true
                                           FillPortions: =16
                                           LayoutMinWidth: =0
                                     - gallery_current_stage:
-                                        Control: Text@0.0.51
+                                        Control: Label@2.5.1
                                         Properties:
-                                          Align: ='TextCanvas.Align'.Center
-                                          BorderRadius: =14
+                                          AutoHeight: =false
+                                          Overflow: =Overflow.Hidden
+                                          Font: =Font.'Segoe UI'
+                                          Align: =Align.Center
                                           Fill: |+
                                             =Switch(
                                                 true,
@@ -1228,7 +1240,7 @@ Screens:
                                                 RGBA(133, 133, 133, 0.1),
                                                 RGBA(133, 133, 133, 0.1)
                                             )
-                                          FontColor: |+
+                                          Color: |+
                                             =Switch(
                                                 true,
                                                 !IsBlank(ThisItem.actualawarddate) And !IsBlank(ThisItem.actualevaluationcompletiondate) And !IsBlank(ThisItem.actualrfqclosingdate) And !IsBlank(ThisItem.actualrfqissuedate) And !IsBlank(ThisItem.actualsowdate),
@@ -1245,7 +1257,8 @@ Screens:
                                                 RGBA(133, 133, 133, 1),
                                                 RGBA(133, 133, 133, 1)
                                             )
-                                          Height: =28
+                                          Height: =44
+                                          Size: =10
                                           Text: |+
                                             =Switch(
                                                 true,
@@ -1268,18 +1281,21 @@ Screens:
                                                 "SOW Completion"
                                             )
                                           VerticalAlign: =VerticalAlign.Middle
-                                          Weight: ='TextCanvas.Weight'.Semibold
+                                          FontWeight: =FontWeight.Semibold
                                           FillPortions: =12
                                           LayoutMinWidth: =0
-                                          PaddingBottom: =0
-                                          PaddingLeft: =0
-                                          PaddingRight: =0
-                                          PaddingTop: =0
+                                          PaddingBottom: =2
+                                          PaddingLeft: =4
+                                          PaddingRight: =4
+                                          PaddingTop: =2
                                           Wrap: =true
                                     - gallery_due:
-                                        Control: Text@0.0.51
+                                        Control: Label@2.5.1
                                         Properties:
-                                          Align: ='TextCanvas.Align'.Center
+                                          AutoHeight: =false
+                                          Overflow: =Overflow.Hidden
+                                          Font: =Font.'Segoe UI'
+                                          Align: =Align.Center
                                           Text: |-
                                             =Switch(
                                                 gallery_current_stage.Text,
@@ -1301,7 +1317,7 @@ Screens:
                                           PaddingLeft: =0
                                           PaddingRight: =0
                                           PaddingTop: =0
-                                          Height: =36
+                                          Height: =40
                                           Wrap: =true
                                     - gallery_leads:
                                         Control: GroupContainer@1.5.0
@@ -1309,39 +1325,58 @@ Screens:
                                         Properties:
                                           DropShadow: =DropShadow.None
                                           FillPortions: =16
+                                          Height: =64
                                           LayoutAlignItems: =LayoutAlignItems.Center
                                           LayoutDirection: =LayoutDirection.Vertical
-                                          LayoutGap: =0
+                                          LayoutGap: =2
+                                          LayoutJustifyContent: =LayoutJustifyContent.Center
                                           LayoutMinHeight: =0
                                           LayoutMinWidth: =0
                                         Children:
                                           - gallery_lead:
-                                              Control: Text@0.0.51
+                                              Control: Label@2.5.1
                                               Properties:
-                                                Align: ='TextCanvas.Align'.Center
-                                                FontColor: =RGBA(60, 60, 60, 1)
-                                                Height: =18
+                                                AutoHeight: =false
+                                                Overflow: =Overflow.Hidden
+                                                Font: =Font.'Segoe UI'
+                                                Align: =Align.Center
+                                                Color: =RGBA(60, 60, 60, 1)
+                                                Height: =20
+                                                PaddingBottom: =0
+                                                PaddingLeft: =2
+                                                PaddingRight: =2
+                                                PaddingTop: =0
                                                 Size: =11
                                                 Text: =ThisItem.procpackageleadname
                                                 VerticalAlign: =VerticalAlign.Middle
                                                 LayoutMinWidth: =0
                                                 Wrap: =false
                                           - opslead:
-                                              Control: Text@0.0.51
+                                              Control: Label@2.5.1
                                               Properties:
-                                                Align: ='TextCanvas.Align'.Center
-                                                FontColor: =RGBA(90, 96, 102, 1)
-                                                Height: =18
+                                                AutoHeight: =false
+                                                Overflow: =Overflow.Hidden
+                                                Font: =Font.'Segoe UI'
+                                                Align: =Align.Center
+                                                Color: =RGBA(90, 96, 102, 1)
+                                                Height: =20
+                                                PaddingBottom: =0
+                                                PaddingLeft: =2
+                                                PaddingRight: =2
+                                                PaddingTop: =0
                                                 Size: =11
                                                 Text: =ThisItem.opspackageleadname
                                                 VerticalAlign: =VerticalAlign.Middle
                                                 LayoutMinWidth: =0
                                                 Wrap: =false
                                     - variable_row_1:
-                                        Control: Text@0.0.51
+                                        Control: Label@2.5.1
                                         Properties:
-                                          Align: ='TextCanvas.Align'.Center
-                                          Height: =36
+                                          AutoHeight: =false
+                                          Overflow: =Overflow.Hidden
+                                          Font: =Font.'Segoe UI'
+                                          Align: =Align.Center
+                                          Height: =64
                                           Text: |-
                                             =Switch(
                                                 varCol1,
@@ -1382,8 +1417,12 @@ Screens:
                                           PaddingTop: =0
                                           Wrap: =true
                                     - variable_row_2:
-                                        Control: ModernText@1.0.0
+                                        Control: Label@2.5.1
                                         Properties:
+                                          AutoHeight: =false
+                                          Overflow: =Overflow.Hidden
+                                          Font: =Font.'Segoe UI'
+                                          VerticalAlign: =VerticalAlign.Middle
                                           Align: =Align.Center
                                           Color: =RGBA(0, 0, 0, 1)
                                           Fill: =RGBA(192, 0, 0, 0.01)
@@ -1392,10 +1431,6 @@ Screens:
                                           PaddingLeft: =2
                                           PaddingRight: =0
                                           PaddingTop: =0
-                                          RadiusBottomLeft: =0
-                                          RadiusBottomRight: =0
-                                          RadiusTopLeft: =0
-                                          RadiusTopRight: =0
                                           Size: =14
                                           Text: |-
                                             =Switch(
@@ -1430,12 +1465,15 @@ Screens:
                                             )
                                           FillPortions: =12
                                           LayoutMinWidth: =0
-                                          Height: =36
+                                          Height: =64
                                           Wrap: =true
                                     - variable_row_3:
-                                        Control: Text@0.0.51
+                                        Control: Label@2.5.1
                                         Properties:
-                                          Align: ='TextCanvas.Align'.Center
+                                          AutoHeight: =false
+                                          Overflow: =Overflow.Hidden
+                                          Font: =Font.'Segoe UI'
+                                          Align: =Align.Center
                                           Text: |-
                                             =Switch(
                                                 varCol3,
@@ -1474,12 +1512,15 @@ Screens:
                                           PaddingLeft: =0
                                           PaddingRight: =0
                                           PaddingTop: =0
-                                          Height: =36
+                                          Height: =64
                                           Wrap: =true
                                     - variable_row_4:
-                                        Control: Text@0.0.51
+                                        Control: Label@2.5.1
                                         Properties:
-                                          Align: ='TextCanvas.Align'.Center
+                                          AutoHeight: =false
+                                          Overflow: =Overflow.Hidden
+                                          Font: =Font.'Segoe UI'
+                                          Align: =Align.Center
                                           Text: |-
                                             =Switch(
                                                 varCol4,
@@ -1512,14 +1553,14 @@ Screens:
                                                 ""
                                             )
                                           VerticalAlign: =VerticalAlign.Middle
-                                          Weight: ='TextCanvas.Weight'.Regular
+                                          FontWeight: =FontWeight.Normal
                                           FillPortions: =12
                                           LayoutMinWidth: =0
                                           PaddingBottom: =0
                                           PaddingLeft: =0
                                           PaddingRight: =0
                                           PaddingTop: =0
-                                          Height: =36
+                                          Height: =64
                                           Wrap: =true
                                     - gallery_arrow_details:
                                         Control: Classic/Icon@2.5.0

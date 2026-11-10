@@ -18,7 +18,7 @@ Screens:
             CountRows(
                 Filter(
                     'Vacations Tracking (Days)',
-                    Lower(ApproverID_1) = Lower(User().Email) || Lower(ProjectDirector_Email) = Lower(User().Email),
+                    ApproverID_1 = User().Email || ProjectDirector_Email = User().Email,
                     ApprovalStatus_1 = "Pending" || ProjectDirector_ApprovalStatus.Value = "Pending",
                     EndDate >= varYearStart,
                     StartDate <= varYearEnd

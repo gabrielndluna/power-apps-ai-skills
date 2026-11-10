@@ -28,7 +28,136 @@ Screens:
             Set(
                 varCanEditCurrentProject,
                 varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = varSelectedProject.projectid))
-            )
+            );
+            ClearCollect(
+                colHomeDelayed,
+                Sort(
+                    AddColumns(
+                        Filter(
+                            colProjectPackages,
+                            archived <> true &&
+                            (
+                                (
+                                    IsBlank(actualsowdate) &&
+                                    !IsBlank(revisedplannedsowdate) &&
+                                    revisedplannedsowdate < Today()
+                                ) ||
+                                (
+                                    !IsBlank(actualsowdate) &&
+                                    IsBlank(actualrfqissuedate) &&
+                                    !IsBlank(revisedplannedrfqissuedate) &&
+                                    revisedplannedrfqissuedate < Today()
+                                ) ||
+                                (
+                                    !IsBlank(actualrfqissuedate) &&
+                                    IsBlank(actualrfqclosingdate) &&
+                                    !IsBlank(revisedplannedrfqclosingdate) &&
+                                    revisedplannedrfqclosingdate < Today()
+                                ) ||
+                                (
+                                    !IsBlank(actualrfqclosingdate) &&
+                                    IsBlank(actualevaluationcompletiondate) &&
+                                    !IsBlank(revisedplannedevaluationcompletio) &&
+                                    revisedplannedevaluationcompletio < Today()
+                                ) ||
+                                (
+                                    !IsBlank(actualevaluationcompletiondate) &&
+                                    IsBlank(actualawarddate) &&
+                                    !IsBlank(revisedplannedawarddate) &&
+                                    revisedplannedawarddate < Today()
+                                )
+                            )
+                        ),
+                        _stage,
+                        If(
+                            IsBlank(actualsowdate), "SOW",
+                            IsBlank(actualrfqissuedate), "RFQ issue",
+                            IsBlank(actualrfqclosingdate), "RFQ closing",
+                            IsBlank(actualevaluationcompletiondate), "Evaluation",
+                            IsBlank(actualawarddate), "Award",
+                            "Awarded"
+                        ),
+                        _due,
+                        If(
+                            IsBlank(actualsowdate), revisedplannedsowdate,
+                            IsBlank(actualrfqissuedate), revisedplannedrfqissuedate,
+                            IsBlank(actualrfqclosingdate), revisedplannedrfqclosingdate,
+                            IsBlank(actualevaluationcompletiondate), revisedplannedevaluationcompletio,
+                            revisedplannedawarddate
+                        )
+                    ),
+                    _due,
+                    SortOrder.Ascending
+                )
+            );
+            ClearCollect(
+                colHomeSoon,
+                Sort(
+                    AddColumns(
+                        Filter(
+                            colProjectPackages,
+                            archived <> true &&
+                            (
+                                (
+                                    IsBlank(actualsowdate) &&
+                                    !IsBlank(revisedplannedsowdate) &&
+                                    revisedplannedsowdate >= Today() &&
+                                    revisedplannedsowdate <= DateAdd(Today(), 7, TimeUnit.Days)
+                                ) ||
+                                (
+                                    !IsBlank(actualsowdate) &&
+                                    IsBlank(actualrfqissuedate) &&
+                                    !IsBlank(revisedplannedrfqissuedate) &&
+                                    revisedplannedrfqissuedate >= Today() &&
+                                    revisedplannedrfqissuedate <= DateAdd(Today(), 7, TimeUnit.Days)
+                                ) ||
+                                (
+                                    !IsBlank(actualrfqissuedate) &&
+                                    IsBlank(actualrfqclosingdate) &&
+                                    !IsBlank(revisedplannedrfqclosingdate) &&
+                                    revisedplannedrfqclosingdate >= Today() &&
+                                    revisedplannedrfqclosingdate <= DateAdd(Today(), 7, TimeUnit.Days)
+                                ) ||
+                                (
+                                    !IsBlank(actualrfqclosingdate) &&
+                                    IsBlank(actualevaluationcompletiondate) &&
+                                    !IsBlank(revisedplannedevaluationcompletio) &&
+                                    revisedplannedevaluationcompletio >= Today() &&
+                                    revisedplannedevaluationcompletio <= DateAdd(Today(), 7, TimeUnit.Days)
+                                ) ||
+                                (
+                                    !IsBlank(actualevaluationcompletiondate) &&
+                                    IsBlank(actualawarddate) &&
+                                    !IsBlank(revisedplannedawarddate) &&
+                                    revisedplannedawarddate >= Today() &&
+                                    revisedplannedawarddate <= DateAdd(Today(), 7, TimeUnit.Days)
+                                )
+                            )
+                        ),
+                        _stage,
+                        If(
+                            IsBlank(actualsowdate), "SOW",
+                            IsBlank(actualrfqissuedate), "RFQ issue",
+                            IsBlank(actualrfqclosingdate), "RFQ closing",
+                            IsBlank(actualevaluationcompletiondate), "Evaluation",
+                            IsBlank(actualawarddate), "Award",
+                            "Awarded"
+                        ),
+                        _due,
+                        If(
+                            IsBlank(actualsowdate), revisedplannedsowdate,
+                            IsBlank(actualrfqissuedate), revisedplannedrfqissuedate,
+                            IsBlank(actualrfqclosingdate), revisedplannedrfqclosingdate,
+                            IsBlank(actualevaluationcompletiondate), revisedplannedevaluationcompletio,
+                            revisedplannedawarddate
+                        )
+                    ),
+                    _due,
+                    SortOrder.Ascending
+                )
+            );
+            Set(varLatePage, 1);
+            Set(varSoonPage, 1);
         )
     Children:
       - ph_root:
@@ -55,13 +184,13 @@ Screens:
                   DropShadow: =DropShadow.Light
                   Fill: =RGBA(214, 12, 48, 1)
                   FillPortions: =0
-                  Height: =132
+                  Height: =116
                   LayoutAlignItems: =LayoutAlignItems.Stretch
                   LayoutDirection: =LayoutDirection.Vertical
-                  LayoutGap: =6
-                  LayoutMinHeight: =132
+                  LayoutGap: =4
+                  LayoutMinHeight: =116
                   LayoutMinWidth: =0
-                  PaddingBottom: =12
+                  PaddingBottom: =8
                   PaddingLeft: =16
                   PaddingRight: =16
                   PaddingTop: =8
@@ -128,8 +257,8 @@ Screens:
                                     Color: =RGBA(255, 255, 255, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Bold
-                                    Height: =24
-                                    Size: =18
+                                    Height: =20
+                                    Size: =16
                                     Text: ="ProcTrack"
                                     Width: =220
                               - ph_brand_sub:
@@ -137,7 +266,7 @@ Screens:
                                   Properties:
                                     Color: =RGBA(255, 255, 255, 0.82)
                                     Font: =Font.'Segoe UI'
-                                    Height: =16
+                                    Height: =14
                                     Size: =11
                                     Text: ="Project home"
                                     Width: =220
@@ -215,11 +344,11 @@ Screens:
                       Properties:
                         DropShadow: =DropShadow.None
                         FillPortions: =0
-                        Height: =56
+                        Height: =48
                         LayoutAlignItems: =LayoutAlignItems.Center
                         LayoutDirection: =LayoutDirection.Horizontal
                         LayoutGap: =10
-                        LayoutMinHeight: =56
+                        LayoutMinHeight: =48
                         LayoutMinWidth: =0
                       Children:
                         - ph_project_wrap:
@@ -230,7 +359,7 @@ Screens:
                               Fill: =RGBA(255, 255, 255, 1)
                               FillPortions: =0
                               Width: =520
-                              Height: =48
+                              Height: =40
                               LayoutAlignItems: =LayoutAlignItems.Center
                               LayoutDirection: =LayoutDirection.Horizontal
                               LayoutGap: =8
@@ -250,7 +379,7 @@ Screens:
                                     Color: =RGBA(106, 122, 127, 1)
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =40
+                                    Height: =32
                                     VerticalAlign: =VerticalAlign.Middle
                                     Size: =11
                                     Text: ="Project"
@@ -269,7 +398,7 @@ Screens:
                                     FillPortions: =1
                                     Font: =Font.'Segoe UI'
                                     FontWeight: =FontWeight.Semibold
-                                    Height: =40
+                                    Height: =32
                                     Items: =Sort(Distinct(colPermittedProjects, projectname), Value)
                                     LayoutMinWidth: =0
                                     OnChange: |-
@@ -289,22 +418,205 @@ Screens:
                                           Set(
                                               varCanEditCurrentProject,
                                               varIsAdmin || !IsBlank(LookUp(Split(Coalesce(varUserPerm.Edit_Projects, ""), ";"), Trim(Value) = varSelectedProject.projectid))
-                                          )
+                                          );
+                                          ClearCollect(
+                                              colHomeDelayed,
+                                              Sort(
+                                                  AddColumns(
+                                                      Filter(
+                                                          colProjectPackages,
+                                                          archived <> true &&
+                                                          (
+                                                              (
+                                                                  IsBlank(actualsowdate) &&
+                                                                  !IsBlank(revisedplannedsowdate) &&
+                                                                  revisedplannedsowdate < Today()
+                                                              ) ||
+                                                              (
+                                                                  !IsBlank(actualsowdate) &&
+                                                                  IsBlank(actualrfqissuedate) &&
+                                                                  !IsBlank(revisedplannedrfqissuedate) &&
+                                                                  revisedplannedrfqissuedate < Today()
+                                                              ) ||
+                                                              (
+                                                                  !IsBlank(actualrfqissuedate) &&
+                                                                  IsBlank(actualrfqclosingdate) &&
+                                                                  !IsBlank(revisedplannedrfqclosingdate) &&
+                                                                  revisedplannedrfqclosingdate < Today()
+                                                              ) ||
+                                                              (
+                                                                  !IsBlank(actualrfqclosingdate) &&
+                                                                  IsBlank(actualevaluationcompletiondate) &&
+                                                                  !IsBlank(revisedplannedevaluationcompletio) &&
+                                                                  revisedplannedevaluationcompletio < Today()
+                                                              ) ||
+                                                              (
+                                                                  !IsBlank(actualevaluationcompletiondate) &&
+                                                                  IsBlank(actualawarddate) &&
+                                                                  !IsBlank(revisedplannedawarddate) &&
+                                                                  revisedplannedawarddate < Today()
+                                                              )
+                                                          )
+                                                      ),
+                                                      _stage,
+                                                      If(
+                                                          IsBlank(actualsowdate), "SOW",
+                                                          IsBlank(actualrfqissuedate), "RFQ issue",
+                                                          IsBlank(actualrfqclosingdate), "RFQ closing",
+                                                          IsBlank(actualevaluationcompletiondate), "Evaluation",
+                                                          IsBlank(actualawarddate), "Award",
+                                                          "Awarded"
+                                                      ),
+                                                      _due,
+                                                      If(
+                                                          IsBlank(actualsowdate), revisedplannedsowdate,
+                                                          IsBlank(actualrfqissuedate), revisedplannedrfqissuedate,
+                                                          IsBlank(actualrfqclosingdate), revisedplannedrfqclosingdate,
+                                                          IsBlank(actualevaluationcompletiondate), revisedplannedevaluationcompletio,
+                                                          revisedplannedawarddate
+                                                      )
+                                                  ),
+                                                  _due,
+                                                  SortOrder.Ascending
+                                              )
+                                          );
+                                          ClearCollect(
+                                              colHomeSoon,
+                                              Sort(
+                                                  AddColumns(
+                                                      Filter(
+                                                          colProjectPackages,
+                                                          archived <> true &&
+                                                          (
+                                                              (
+                                                                  IsBlank(actualsowdate) &&
+                                                                  !IsBlank(revisedplannedsowdate) &&
+                                                                  revisedplannedsowdate >= Today() &&
+                                                                  revisedplannedsowdate <= DateAdd(Today(), 7, TimeUnit.Days)
+                                                              ) ||
+                                                              (
+                                                                  !IsBlank(actualsowdate) &&
+                                                                  IsBlank(actualrfqissuedate) &&
+                                                                  !IsBlank(revisedplannedrfqissuedate) &&
+                                                                  revisedplannedrfqissuedate >= Today() &&
+                                                                  revisedplannedrfqissuedate <= DateAdd(Today(), 7, TimeUnit.Days)
+                                                              ) ||
+                                                              (
+                                                                  !IsBlank(actualrfqissuedate) &&
+                                                                  IsBlank(actualrfqclosingdate) &&
+                                                                  !IsBlank(revisedplannedrfqclosingdate) &&
+                                                                  revisedplannedrfqclosingdate >= Today() &&
+                                                                  revisedplannedrfqclosingdate <= DateAdd(Today(), 7, TimeUnit.Days)
+                                                              ) ||
+                                                              (
+                                                                  !IsBlank(actualrfqclosingdate) &&
+                                                                  IsBlank(actualevaluationcompletiondate) &&
+                                                                  !IsBlank(revisedplannedevaluationcompletio) &&
+                                                                  revisedplannedevaluationcompletio >= Today() &&
+                                                                  revisedplannedevaluationcompletio <= DateAdd(Today(), 7, TimeUnit.Days)
+                                                              ) ||
+                                                              (
+                                                                  !IsBlank(actualevaluationcompletiondate) &&
+                                                                  IsBlank(actualawarddate) &&
+                                                                  !IsBlank(revisedplannedawarddate) &&
+                                                                  revisedplannedawarddate >= Today() &&
+                                                                  revisedplannedawarddate <= DateAdd(Today(), 7, TimeUnit.Days)
+                                                              )
+                                                          )
+                                                      ),
+                                                      _stage,
+                                                      If(
+                                                          IsBlank(actualsowdate), "SOW",
+                                                          IsBlank(actualrfqissuedate), "RFQ issue",
+                                                          IsBlank(actualrfqclosingdate), "RFQ closing",
+                                                          IsBlank(actualevaluationcompletiondate), "Evaluation",
+                                                          IsBlank(actualawarddate), "Award",
+                                                          "Awarded"
+                                                      ),
+                                                      _due,
+                                                      If(
+                                                          IsBlank(actualsowdate), revisedplannedsowdate,
+                                                          IsBlank(actualrfqissuedate), revisedplannedrfqissuedate,
+                                                          IsBlank(actualrfqclosingdate), revisedplannedrfqclosingdate,
+                                                          IsBlank(actualevaluationcompletiondate), revisedplannedevaluationcompletio,
+                                                          revisedplannedawarddate
+                                                      )
+                                                  ),
+                                                  _due,
+                                                  SortOrder.Ascending
+                                              )
+                                          );
+                                          Set(varLatePage, 1);
+                                          Set(varSoonPage, 1);
                                       )
                                     Size: =12
+                        - ph_dash_wrap:
+                            Control: GroupContainer@1.5.0
+                            Variant: ManualLayout
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Center
+                              DropShadow: =DropShadow.None
+                              Fill: =RGBA(255, 255, 255, 1)
+                              FillPortions: =0
+                              Height: =36
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              Visible: =!IsBlank(varSelectedProject.dashboard_url)
+                              Width: =156
+                            Children:
+                              - ph_dash_label:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Left
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Color: =RGBA(33, 33, 33, 1)
+                                    Font: =Font.'Segoe UI'
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =22
+                                    OnSelect: =Launch(varSelectedProject.dashboard_url)
+                                    PaddingBottom: =0
+                                    PaddingLeft: =0
+                                    PaddingRight: =0
+                                    PaddingTop: =0
+                                    Size: =12
+                                    Text: ="Dashboard"
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =108
+                                    Wrap: =false
+                                    X: =12
+                                    Y: =7
+                              - ph_dash_icon:
+                                  Control: Classic/Icon@2.5.0
+                                  Properties:
+                                    Color: =RGBA(214, 12, 48, 1)
+                                    Height: =16
+                                    Icon: =Icon.OpenInNewWindow
+                                    OnSelect: =Launch(varSelectedProject.dashboard_url)
+                                    Width: =16
+                                    X: =124
+                                    Y: =10
             - ph_actions:
                 Control: GroupContainer@1.5.0
                 Variant: AutoLayout
                 Properties:
                   DropShadow: =DropShadow.None
                   FillPortions: =0
-                  Height: =40
+                  Height: =64
                   LayoutAlignItems: =LayoutAlignItems.Center
                   LayoutDirection: =LayoutDirection.Horizontal
                   LayoutJustifyContent: =LayoutJustifyContent.Start
                   LayoutGap: =8
                   LayoutMinHeight: =0
                   LayoutMinWidth: =0
+                  PaddingBottom: =8
+                  PaddingLeft: =4
+                  PaddingRight: =4
+                  PaddingTop: =8
+                  Width: =Parent.Width
                 Children:
                   - ph_open_pkg:
                       Control: Classic/Button@2.2.0
@@ -395,7 +707,9 @@ Screens:
                         FillPortions: =0
                         Font: =Font.'Segoe UI'
                         FontWeight: =FontWeight.Semibold
-                        Height: =40
+                        Height: =36
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
                         HoverBorderColor: =RGBA(35, 38, 43, 1)
                         HoverColor: =RGBA(255, 255, 255, 1)
                         HoverFill: =RGBA(35, 38, 43, 1)
@@ -418,29 +732,6 @@ Screens:
                         Height: =40
                         LayoutMinHeight: =0
                         LayoutMinWidth: =0
-                  - ph_btn_dash:
-                      Control: Classic/Button@2.2.0
-                      Properties:
-                        BorderColor: =RGBA(214, 12, 48, 1)
-                        BorderThickness: =1
-                        Color: =RGBA(214, 12, 48, 1)
-                        Fill: =RGBA(255, 255, 255, 1)
-                        FillPortions: =0
-                        Font: =Font.'Segoe UI'
-                        FontWeight: =FontWeight.Bold
-                        Height: =40
-                        HoverBorderColor: =RGBA(214, 12, 48, 1)
-                        HoverColor: =RGBA(255, 255, 255, 1)
-                        HoverFill: =RGBA(214, 12, 48, 1)
-                        OnSelect: =Launch(varSelectedProject.dashboard_url)
-                        RadiusBottomLeft: =8
-                        RadiusBottomRight: =8
-                        RadiusTopLeft: =8
-                        RadiusTopRight: =8
-                        Size: =12
-                        Text: ="Dashboard"
-                        Visible: =!IsBlank(varSelectedProject.dashboard_url)
-                        Width: =140
                   - ph_btn_add:
                       Control: Classic/Button@2.2.0
                       Properties:
@@ -451,7 +742,9 @@ Screens:
                         FillPortions: =0
                         Font: =Font.'Segoe UI'
                         FontWeight: =FontWeight.Bold
-                        Height: =40
+                        Height: =36
+                        LayoutMinHeight: =0
+                        LayoutMinWidth: =0
                         OnSelect: =Navigate('Create New Package', ScreenTransition.Fade)
                         RadiusBottomLeft: =8
                         RadiusBottomRight: =8
@@ -785,187 +1078,6 @@ Screens:
                   LayoutMinHeight: =160
                   LayoutMinWidth: =0
                 Children:
-                  - ph_all_card:
-                      Control: GroupContainer@1.5.0
-                      Variant: AutoLayout
-                      Properties:
-                        DropShadow: =DropShadow.Light
-                        Fill: =RGBA(255, 255, 255, 1)
-                        FillPortions: =1
-                        LayoutAlignItems: =LayoutAlignItems.Stretch
-                        LayoutDirection: =LayoutDirection.Vertical
-                        LayoutGap: =0
-                        LayoutMinHeight: =0
-                        LayoutMinWidth: =0
-                        RadiusBottomLeft: =8
-                        RadiusBottomRight: =8
-                        RadiusTopLeft: =8
-                        RadiusTopRight: =8
-                      Children:
-                        - ph_all_head:
-                            Control: Label@2.5.1
-                            Properties:
-                              Color: =RGBA(255, 255, 255, 1)
-                              Fill: =RGBA(35, 38, 43, 1)
-                              Font: =Font.'Segoe UI'
-                              FontWeight: =FontWeight.Bold
-                              Height: =36
-                              OnSelect: |-
-                                =Set(varPackageFilter, "all");
-                                Navigate('Welcome screen', ScreenTransition.Fade)
-                              PaddingLeft: =12
-                              PaddingRight: =12
-                              Size: =12
-                              Text: ="ALL PACKAGES (" & CountRows(ph_all_gal.AllItems) & ")"
-                              VerticalAlign: =VerticalAlign.Middle
-                              Width: =Parent.Width
-                        - ph_all_empty:
-                            Control: Label@2.5.1
-                            Properties:
-                              Align: =Align.Center
-                              Color: =RGBA(106, 122, 127, 1)
-                              Font: =Font.'Segoe UI'
-                              Height: =64
-                              PaddingLeft: =12
-                              PaddingRight: =12
-                              Size: =12
-                              Text: ="No active packages."
-                              VerticalAlign: =VerticalAlign.Middle
-                              Visible: =CountRows(ph_all_gal.AllItems) = 0
-                              Width: =Parent.Width
-                        - ph_all_gal:
-                            Control: Gallery@2.15.0
-                            Variant: BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0
-                            Properties:
-                              BorderThickness: =0
-                              FillPortions: =1
-                              Items: |-
-                                =Sort(
-                                    AddColumns(
-                                        Filter(colProjectPackages, archived <> true),
-                                        _stage,
-                                        If(
-                                            IsBlank(actualsowdate), "SOW",
-                                            IsBlank(actualrfqissuedate), "RFQ issue",
-                                            IsBlank(actualrfqclosingdate), "RFQ closing",
-                                            IsBlank(actualevaluationcompletiondate), "Evaluation",
-                                            IsBlank(actualawarddate), "Award",
-                                            "Awarded"
-                                        ),
-                                        _due,
-                                        If(
-                                            IsBlank(actualsowdate), Coalesce(revisedplannedsowdate, originalplannedsowdate),
-                                            IsBlank(actualrfqissuedate), Coalesce(revisedplannedrfqissuedate, originalplannedrfqissuedate),
-                                            IsBlank(actualrfqclosingdate), Coalesce(revisedplannedrfqclosingdate, originalplannedrfqclosingdate),
-                                            IsBlank(actualevaluationcompletiondate), Coalesce(revisedplannedevaluationcompletio, originalplannedevaluationcompleti),
-                                            IsBlank(actualawarddate), Coalesce(revisedplannedawarddate, originalplannedawarddate),
-                                            Blank()
-                                        ),
-                                        _sortDue,
-                                        Coalesce(
-                                            If(
-                                                IsBlank(actualsowdate), Coalesce(revisedplannedsowdate, originalplannedsowdate),
-                                                IsBlank(actualrfqissuedate), Coalesce(revisedplannedrfqissuedate, originalplannedrfqissuedate),
-                                                IsBlank(actualrfqclosingdate), Coalesce(revisedplannedrfqclosingdate, originalplannedrfqclosingdate),
-                                                IsBlank(actualevaluationcompletiondate), Coalesce(revisedplannedevaluationcompletio, originalplannedevaluationcompleti),
-                                                IsBlank(actualawarddate), Coalesce(revisedplannedawarddate, originalplannedawarddate),
-                                                Blank()
-                                            ),
-                                            Date(2099, 12, 31)
-                                        )
-                                    ),
-                                    _sortDue,
-                                    SortOrder.Ascending
-                                )
-                              LayoutMinHeight: =80
-                              OnSelect: |-
-                                =Set(varOpenPackageId, ThisItem.packageidentifier);
-                                Select(ph_open_pkg)
-                              TemplatePadding: =0
-                              TemplateSize: =60
-                              Width: =Parent.Width
-                            Children:
-                              - ph_all_row:
-                                  Control: GroupContainer@1.5.0
-                                  Variant: AutoLayout
-                                  Properties:
-                                    DropShadow: =DropShadow.None
-                                    Fill: =RGBA(255, 255, 255, 1)
-                                    Height: =Parent.TemplateHeight
-                                    LayoutAlignItems: =LayoutAlignItems.Stretch
-                                    LayoutDirection: =LayoutDirection.Vertical
-                                    LayoutGap: =2
-                                    LayoutMinHeight: =0
-                                    LayoutMinWidth: =0
-                                    PaddingBottom: =8
-                                    PaddingLeft: =12
-                                    PaddingRight: =12
-                                    PaddingTop: =8
-                                    Width: =Parent.TemplateWidth
-                                  Children:
-                                    - ph_all_top:
-                                        Control: GroupContainer@1.5.0
-                                        Variant: AutoLayout
-                                        Properties:
-                                          DropShadow: =DropShadow.None
-                                          Height: =22
-                                          LayoutAlignItems: =LayoutAlignItems.Center
-                                          LayoutDirection: =LayoutDirection.Horizontal
-                                          LayoutGap: =8
-                                          LayoutMinHeight: =0
-                                          LayoutMinWidth: =0
-                                          Width: =Parent.Width - 24
-                                        Children:
-                                          - ph_all_id:
-                                              Control: Label@2.5.1
-                                              Properties:
-                                                Color: =RGBA(214, 12, 48, 1)
-                                                Font: =Font.'Segoe UI'
-                                                FontWeight: =FontWeight.Bold
-                                                Height: =22
-                                                OnSelect: |-
-                                                  =Select(ph_all_gal)
-                                                Size: =12
-                                                Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
-                                                VerticalAlign: =VerticalAlign.Middle
-                                                Width: =96
-                                          - ph_all_desc:
-                                              Control: Label@2.5.1
-                                              Properties:
-                                                Color: =RGBA(35, 38, 43, 1)
-                                                FillPortions: =1
-                                                Font: =Font.'Segoe UI'
-                                                Height: =22
-                                                LayoutMinWidth: =0
-                                                OnSelect: |-
-                                                  =Select(ph_all_gal)
-                                                Size: =12
-                                                Text: =ThisItem.packagedescription
-                                                VerticalAlign: =VerticalAlign.Middle
-                                                Wrap: =false
-                                          - ph_all_go:
-                                              Control: Classic/Icon@2.5.0
-                                              Properties:
-                                                Color: =RGBA(214, 12, 48, 1)
-                                                Height: =16
-                                                Icon: =Icon.ChevronRight
-                                                OnSelect: |-
-                                                  =Select(ph_all_gal)
-                                                Width: =16
-                                    - ph_all_why:
-                                        Control: Label@2.5.1
-                                        Properties:
-                                          Color: =RGBA(90, 96, 102, 1)
-                                          Font: =Font.'Segoe UI'
-                                          FontWeight: =FontWeight.Semibold
-                                          Height: =16
-                                          OnSelect: |-
-                                            =Select(ph_all_gal)
-                                          Size: =11
-                                          Text: =If(ThisItem._stage = "Awarded", "Awarded", ThisItem._stage & "  " & If(IsBlank(ThisItem._due), "TBD", Text(ThisItem._due, "mmm dd, yyyy")))
-                                          VerticalAlign: =VerticalAlign.Middle
-                                          Width: =Parent.Width - 24
-                                          Wrap: =false
                   - ph_late_card:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
@@ -997,7 +1109,7 @@ Screens:
                               PaddingLeft: =12
                               PaddingRight: =12
                               Size: =12
-                              Text: ="DELAYED (" & CountRows(ph_late_gal.AllItems) & ")"
+                              Text: ="DELAYED (" & CountRows(colHomeDelayed) & ")"
                               VerticalAlign: =VerticalAlign.Middle
                               Width: =Parent.Width
                         - ph_late_empty:
@@ -1012,7 +1124,7 @@ Screens:
                               Size: =12
                               Text: ="No overdue milestones."
                               VerticalAlign: =VerticalAlign.Middle
-                              Visible: =CountRows(ph_late_gal.AllItems) = 0
+                              Visible: =CountRows(colHomeDelayed) = 0
                               Width: =Parent.Width
                         - ph_late_gal:
                             Control: Gallery@2.15.0
@@ -1021,53 +1133,12 @@ Screens:
                               BorderThickness: =0
                               FillPortions: =1
                               Items: |-
-                                =Sort(
-                                    AddColumns(
-                                        Filter(
-                                            colProjectPackages,
-                                            archived <> true &&
-                                            (
-                                            (IsBlank(actualsowdate) &&
-                                            !IsBlank(revisedplannedsowdate) &&
-                                            revisedplannedsowdate < Today()) ||
-                                            (!IsBlank(actualsowdate) &&
-                                            IsBlank(actualrfqissuedate) &&
-                                            !IsBlank(revisedplannedrfqissuedate) &&
-                                            revisedplannedrfqissuedate < Today()) ||
-                                            (!IsBlank(actualrfqissuedate) &&
-                                            IsBlank(actualrfqclosingdate) &&
-                                            !IsBlank(revisedplannedrfqclosingdate) &&
-                                            revisedplannedrfqclosingdate < Today()) ||
-                                            (!IsBlank(actualrfqclosingdate) &&
-                                            IsBlank(actualevaluationcompletiondate) &&
-                                            !IsBlank(revisedplannedevaluationcompletio) &&
-                                            revisedplannedevaluationcompletio < Today()) ||
-                                            (!IsBlank(actualevaluationcompletiondate) &&
-                                            IsBlank(actualawarddate) &&
-                                            !IsBlank(revisedplannedawarddate) &&
-                                            revisedplannedawarddate < Today())
-                                            )
-                                        ),
-                                        _stage,
-                                        If(
-                                            IsBlank(actualsowdate), "SOW",
-                                            IsBlank(actualrfqissuedate), "RFQ issue",
-                                            IsBlank(actualrfqclosingdate), "RFQ closing",
-                                            IsBlank(actualevaluationcompletiondate), "Evaluation",
-                                            IsBlank(actualawarddate), "Award",
-                                            "Awarded"
-                                        ),
-                                        _due,
-                                        If(
-                                            IsBlank(actualsowdate), revisedplannedsowdate,
-                                            IsBlank(actualrfqissuedate), revisedplannedrfqissuedate,
-                                            IsBlank(actualrfqclosingdate), revisedplannedrfqclosingdate,
-                                            IsBlank(actualevaluationcompletiondate), revisedplannedevaluationcompletio,
-                                            revisedplannedawarddate
-                                        )
+                                =FirstN(
+                                    LastN(
+                                        colHomeDelayed,
+                                        Max(0, CountRows(colHomeDelayed) - (varLatePage - 1) * varHomePageSize)
                                     ),
-                                    _due,
-                                    SortOrder.Ascending
+                                    varHomePageSize
                                 )
                               LayoutMinHeight: =80
                               OnSelect: |-
@@ -1117,10 +1188,15 @@ Screens:
                                                 Height: =22
                                                 OnSelect: |-
                                                   =Select(ph_late_gal)
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
                                                 Size: =12
                                                 Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =96
+                                                Width: =180
+                                                Wrap: =false
                                           - ph_late_desc:
                                               Control: Label@2.5.1
                                               Properties:
@@ -1158,6 +1234,63 @@ Screens:
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =Parent.Width - 24
                                           Wrap: =false
+                        - ph_late_pager:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =56
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                            Children:
+                              - ph_late_prev:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(180, 180, 180, 1)
+                                    BorderThickness: =1
+                                    Color: =RGBA(35, 38, 43, 1)
+                                    DisplayMode: =If(varLatePage <= 1, DisplayMode.Disabled, DisplayMode.Edit)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =32
+                                    OnSelect: =Set(varLatePage, varLatePage - 1)
+                                    Size: =12
+                                    Text: ="Prev"
+                                    Width: =72
+                              - ph_late_page:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    Color: =RGBA(90, 96, 102, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =32
+                                    Size: =12
+                                    Text: =If(CountRows(colHomeDelayed) = 0, "0", varLatePage & " / " & RoundUp(CountRows(colHomeDelayed) / varHomePageSize, 0))
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =72
+                              - ph_late_next:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(180, 180, 180, 1)
+                                    BorderThickness: =1
+                                    Color: =RGBA(35, 38, 43, 1)
+                                    DisplayMode: =If(varLatePage * varHomePageSize >= CountRows(colHomeDelayed), DisplayMode.Disabled, DisplayMode.Edit)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =32
+                                    OnSelect: =Set(varLatePage, varLatePage + 1)
+                                    Size: =12
+                                    Text: ="Next"
+                                    Width: =72
                   - ph_soon_card:
                       Control: GroupContainer@1.5.0
                       Variant: AutoLayout
@@ -1189,7 +1322,7 @@ Screens:
                               PaddingLeft: =12
                               PaddingRight: =12
                               Size: =12
-                              Text: ="AT RISK (" & CountRows(ph_soon_gal.AllItems) & ")"
+                              Text: ="AT RISK (" & CountRows(colHomeSoon) & ")"
                               VerticalAlign: =VerticalAlign.Middle
                               Width: =Parent.Width
                         - ph_soon_empty:
@@ -1204,7 +1337,7 @@ Screens:
                               Size: =12
                               Text: ="Nothing due in the next 7 days."
                               VerticalAlign: =VerticalAlign.Middle
-                              Visible: =CountRows(ph_soon_gal.AllItems) = 0
+                              Visible: =CountRows(colHomeSoon) = 0
                               Width: =Parent.Width
                         - ph_soon_gal:
                             Control: Gallery@2.15.0
@@ -1213,58 +1346,12 @@ Screens:
                               BorderThickness: =0
                               FillPortions: =1
                               Items: |-
-                                =Sort(
-                                    AddColumns(
-                                        Filter(
-                                            colProjectPackages,
-                                            archived <> true &&
-                                            (
-                                            (IsBlank(actualsowdate) &&
-                                            !IsBlank(revisedplannedsowdate) &&
-                                            revisedplannedsowdate >= Today() &&
-                                            revisedplannedsowdate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
-                                            (!IsBlank(actualsowdate) &&
-                                            IsBlank(actualrfqissuedate) &&
-                                            !IsBlank(revisedplannedrfqissuedate) &&
-                                            revisedplannedrfqissuedate >= Today() &&
-                                            revisedplannedrfqissuedate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
-                                            (!IsBlank(actualrfqissuedate) &&
-                                            IsBlank(actualrfqclosingdate) &&
-                                            !IsBlank(revisedplannedrfqclosingdate) &&
-                                            revisedplannedrfqclosingdate >= Today() &&
-                                            revisedplannedrfqclosingdate <= DateAdd(Today(), 7, TimeUnit.Days)) ||
-                                            (!IsBlank(actualrfqclosingdate) &&
-                                            IsBlank(actualevaluationcompletiondate) &&
-                                            !IsBlank(revisedplannedevaluationcompletio) &&
-                                            revisedplannedevaluationcompletio >= Today() &&
-                                            revisedplannedevaluationcompletio <= DateAdd(Today(), 7, TimeUnit.Days)) ||
-                                            (!IsBlank(actualevaluationcompletiondate) &&
-                                            IsBlank(actualawarddate) &&
-                                            !IsBlank(revisedplannedawarddate) &&
-                                            revisedplannedawarddate >= Today() &&
-                                            revisedplannedawarddate <= DateAdd(Today(), 7, TimeUnit.Days))
-                                            )
-                                        ),
-                                        _stage,
-                                        If(
-                                            IsBlank(actualsowdate), "SOW",
-                                            IsBlank(actualrfqissuedate), "RFQ issue",
-                                            IsBlank(actualrfqclosingdate), "RFQ closing",
-                                            IsBlank(actualevaluationcompletiondate), "Evaluation",
-                                            IsBlank(actualawarddate), "Award",
-                                            "Awarded"
-                                        ),
-                                        _due,
-                                        If(
-                                            IsBlank(actualsowdate), revisedplannedsowdate,
-                                            IsBlank(actualrfqissuedate), revisedplannedrfqissuedate,
-                                            IsBlank(actualrfqclosingdate), revisedplannedrfqclosingdate,
-                                            IsBlank(actualevaluationcompletiondate), revisedplannedevaluationcompletio,
-                                            revisedplannedawarddate
-                                        )
+                                =FirstN(
+                                    LastN(
+                                        colHomeSoon,
+                                        Max(0, CountRows(colHomeSoon) - (varSoonPage - 1) * varHomePageSize)
                                     ),
-                                    _due,
-                                    SortOrder.Ascending
+                                    varHomePageSize
                                 )
                               LayoutMinHeight: =80
                               OnSelect: |-
@@ -1314,10 +1401,15 @@ Screens:
                                                 Height: =22
                                                 OnSelect: |-
                                                   =Select(ph_soon_gal)
+                                                PaddingBottom: =0
+                                                PaddingLeft: =0
+                                                PaddingRight: =0
+                                                PaddingTop: =0
                                                 Size: =12
                                                 Text: =ThisItem.projectidentifier & "-" & ThisItem.itemnumber
                                                 VerticalAlign: =VerticalAlign.Middle
-                                                Width: =96
+                                                Width: =180
+                                                Wrap: =false
                                           - ph_soon_desc:
                                               Control: Label@2.5.1
                                               Properties:
@@ -1355,3 +1447,60 @@ Screens:
                                           VerticalAlign: =VerticalAlign.Middle
                                           Width: =Parent.Width - 24
                                           Wrap: =false
+                        - ph_soon_pager:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.None
+                              FillPortions: =0
+                              Height: =56
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =8
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              LayoutMinHeight: =0
+                              LayoutMinWidth: =0
+                              PaddingBottom: =8
+                              PaddingLeft: =8
+                              PaddingRight: =8
+                              PaddingTop: =8
+                            Children:
+                              - ph_soon_prev:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(180, 180, 180, 1)
+                                    BorderThickness: =1
+                                    Color: =RGBA(35, 38, 43, 1)
+                                    DisplayMode: =If(varSoonPage <= 1, DisplayMode.Disabled, DisplayMode.Edit)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =32
+                                    OnSelect: =Set(varSoonPage, varSoonPage - 1)
+                                    Size: =12
+                                    Text: ="Prev"
+                                    Width: =72
+                              - ph_soon_page:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    Color: =RGBA(90, 96, 102, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =32
+                                    Size: =12
+                                    Text: =If(CountRows(colHomeSoon) = 0, "0", varSoonPage & " / " & RoundUp(CountRows(colHomeSoon) / varHomePageSize, 0))
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Width: =72
+                              - ph_soon_next:
+                                  Control: Classic/Button@2.2.0
+                                  Properties:
+                                    BorderColor: =RGBA(180, 180, 180, 1)
+                                    BorderThickness: =1
+                                    Color: =RGBA(35, 38, 43, 1)
+                                    DisplayMode: =If(varSoonPage * varHomePageSize >= CountRows(colHomeSoon), DisplayMode.Disabled, DisplayMode.Edit)
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    Font: =Font.'Segoe UI'
+                                    Height: =32
+                                    OnSelect: =Set(varSoonPage, varSoonPage + 1)
+                                    Size: =12
+                                    Text: ="Next"
+                                    Width: =72

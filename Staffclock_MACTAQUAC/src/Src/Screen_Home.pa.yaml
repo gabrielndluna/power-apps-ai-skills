@@ -510,7 +510,7 @@ Screens:
                                       Set(varDrillFromWeekly, false);
                                       Navigate('Hours Tracking', ScreenTransition.Cover);
                                     Width: =28
-                                    X: |+
+                                    X: |
                                       =Parent.TemplateWidth - 60
                                     Y: =18
                   - Container_Approvals:

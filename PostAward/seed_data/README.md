@@ -32,7 +32,7 @@ Generated from ProcTrack Packages/Projects exports (awarded packages only).
 | `datefullyexecuted` | Date | |
 | `initialvalue` | Currency or Number | |
 | `finalvalue` | Currency or Number | Drives KPIs / rollups |
-| `reason` Choice | add **New Scope** | keep Design Change, Scope Gap, Variation, Acceleration |
+| `reason` Choice | add **New Scope** and **Standby Claim** | keep Design Change, Scope Gap, Variation, Acceleration |
 | `status` Choice | add **Canceled** | keep Approved, Pending, Potential, Rejected |
 
 Keep existing `value` for a transition period; the app prefers `finalvalue` and falls back with `Coalesce(finalvalue, value)`.
@@ -45,7 +45,7 @@ Keep existing `value` for a transition period; the app prefers `finalvalue` and 
   - holdback: Applicable | Not applicable
   - closeoutstatus: In progress | Close-out pending | Holdback to process | Closed
   - changetype: Change Order | Claim | Change Directive
-  - reason: Design Change | Scope Gap | Variation | Acceleration | New Scope
+  - reason: Design Change | Scope Gap | Variation | Acceleration | New Scope | Standby Claim
   - status: Approved | Pending | Potential | Rejected | Canceled
   - currencycode: CAD | USD
   - indigenouscontribution: 0 | 5 | 10 | 15 | 20 | 25 | 50 | 100
